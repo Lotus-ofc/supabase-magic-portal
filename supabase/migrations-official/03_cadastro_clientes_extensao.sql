@@ -13,6 +13,7 @@
 -- ---------- 1. Colunas aditivas em cadastro_clientes ----------
 ALTER TABLE public.cadastro_clientes
   ADD COLUMN IF NOT EXISTS ativo            boolean      NOT NULL DEFAULT true,
+  ADD COLUMN IF NOT EXISTS slug             text,
   ADD COLUMN IF NOT EXISTS email_principal  text,
   ADD COLUMN IF NOT EXISTS telefone         text,
   ADD COLUMN IF NOT EXISTS empresa          text,
@@ -22,6 +23,18 @@ ALTER TABLE public.cadastro_clientes
   ADD COLUMN IF NOT EXISTS data_inicio      date,
   ADD COLUMN IF NOT EXISTS valor_mensal     numeric(12,2),
   ADD COLUMN IF NOT EXISTS updated_at       timestamptz  NOT NULL DEFAULT now();
+
+-- Unicidade do slug (idempotente; só cria se não existir)
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'cadastro_clientes_slug_key'
+  ) THEN
+    ALTER TABLE public.cadastro_clientes
+      ADD CONSTRAINT cadastro_clientes_slug_key UNIQUE (slug);
+  END IF;
+END $$;
+CREATE INDEX IF NOT EXISTS idx_cadastro_clientes_slug
+  ON public.cadastro_clientes (slug);
 
 -- Trigger genérico para manter updated_at (aditivo; só ATUALIZA timestamp)
 CREATE OR REPLACE FUNCTION public.tg_set_updated_at()
