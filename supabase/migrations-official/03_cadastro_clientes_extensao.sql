@@ -218,6 +218,7 @@ WITH (security_invoker = on) AS
 SELECT
   cc.id,
   cc.nome_cliente,
+  cc.slug,
   cc.ativo,
   cc.empresa,
   cc.email_principal,
