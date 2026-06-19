@@ -1,7 +1,7 @@
 // Browser-safe Supabase client. Uses the publishable (anon) key.
 // Do NOT import this from server-only modules — use client.server.ts there.
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./types";
+
 
 const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ??
@@ -17,7 +17,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   );
 }
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: typeof window !== "undefined",
     autoRefreshToken: true,
