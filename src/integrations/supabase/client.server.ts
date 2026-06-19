@@ -1,16 +1,15 @@
-// SERVER-ONLY admin client. Uses the service role key.
-// NEVER import this from client code; the `.server.ts` extension blocks
-// it from client bundles. Inside `*.functions.ts`, load with
-// `const { supabaseAdmin } = await import("@/integrations/supabase/client.server")`.
+// SERVER-ONLY admin client para o projeto OFICIAL (ywvhoctcmibjitvwkkhb).
+// Usa OFFICIAL_SERVICE_ROLE_KEY (a service_role padrão do Supabase, renomeada
+// porque o prefixo SUPABASE_ é reservado pela plataforma Lovable).
+// NUNCA importe deste arquivo no client; o sufixo .server.ts bloqueia.
 import { createClient } from "@supabase/supabase-js";
 
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_URL = process.env.OFFICIAL_SUPABASE_URL;
+const SERVICE_ROLE = process.env.OFFICIAL_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SERVICE_ROLE) {
   throw new Error(
-    "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY env vars for admin client",
+    "Missing OFFICIAL_SUPABASE_URL / OFFICIAL_SERVICE_ROLE_KEY env vars for admin client",
   );
 }
 
