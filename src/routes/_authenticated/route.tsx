@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet, redirect, Link, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { checkIsAdmin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -14,6 +16,12 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const { user } = Route.useRouteContext();
   const router = useRouter();
+  const { data: adminCheck } = useQuery({
+    queryKey: ["me", "isAdmin"],
+    queryFn: () => checkIsAdmin(),
+    staleTime: 60_000,
+  });
+  const isAdmin = adminCheck?.isAdmin;
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -32,6 +40,11 @@ function AuthenticatedLayout() {
               <Link to="/dashboard" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>
                 Dashboard
               </Link>
+              {isAdmin && (
+                <Link to="/admin/clientes" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>
+                  Admin
+                </Link>
+              )}
             </nav>
           </div>
           <div className="flex items-center gap-3 text-sm">
@@ -51,3 +64,4 @@ function AuthenticatedLayout() {
     </div>
   );
 }
+
