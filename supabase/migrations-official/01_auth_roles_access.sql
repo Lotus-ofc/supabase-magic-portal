@@ -37,10 +37,25 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- Cria o trigger apenas se ainda não existir (não usa DROP em auth.users).
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgname = 'on_auth_user_created'
+      AND tgrelid = 'auth.users'::regclass
+  ) THEN
+    CREATE TRIGGER on_auth_user_created
+      AFTER INSERT ON auth.users
+      FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  END IF;
+END $$;
+
+-- ---------- Índices aditivos em base_metricas (não alteram estrutura/dados) ----------
+CREATE INDEX IF NOT EXISTS idx_base_metricas_cliente_data
+  ON public.base_metricas (cliente, data);
+
+CREATE INDEX IF NOT EXISTS idx_base_metricas_plataforma
+  ON public.base_metricas (plataforma);
 
 -- ---------- roles ----------
 DO $$ BEGIN
