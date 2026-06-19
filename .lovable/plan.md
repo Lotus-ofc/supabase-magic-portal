@@ -117,3 +117,28 @@ Após você validar o mapeamento da Etapa 2:
 - Migrar dados existentes dessas duas tabelas.
 - Publicar ou expor URLs externas.
 - Remover o fluxo mLabs/`client_reports` antes do dashboard novo estar validado.
+
+---
+
+## Débitos técnicos registrados (2026-06-19)
+
+### 1. Relacionamento por `cliente_nome` é TEMPORÁRIO
+Hoje o join entre `client_access`, `base_metricas` e as views é feito por **string** (`cliente_nome` / `base_metricas.cliente`).
+
+**Plano de migração futura para UUID:**
+1. Criar/popular catálogo `clientes_catalogo (id uuid pk, nome text unique, ...)` a partir de `cadastro_clientes`.
+2. Adicionar `base_metricas.cliente_id uuid` (aditivo) e backfill via `cliente`.
+3. Preencher `client_access.cliente_id` (coluna já existe, reservada).
+4. Recriar views usando `cliente_id` como chave de join; manter `cliente` (texto) apenas para exibição.
+5. Eventualmente: tornar `cliente_id` NOT NULL e indexar.
+
+Enquanto isso, `cliente_nome` segue sendo a chave canônica de RLS via `current_user_clientes()`.
+
+### 2. `current_user_clientes()` faz scan em `base_metricas` para admins
+Substituir por catálogo dedicado (`clientes_catalogo` ou `vw_clientes_ativos` materializada) quando a base crescer e o `SELECT DISTINCT` ficar custoso. Validar com `EXPLAIN` antes de migrar.
+
+### 3. Índices criados nesta etapa
+- `idx_base_metricas_cliente_data (cliente, data)`
+- `idx_base_metricas_plataforma (plataforma)`
+
+Reavaliar índices adicionais (`metrica`, parciais por plataforma) após observar planos de execução reais.
