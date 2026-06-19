@@ -2,6 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/lotus/PageHeader";
+import { StatCard } from "@/components/lotus/StatCard";
+import {
+  DollarSign,
+  MousePointerClick,
+  Eye,
+  Target,
+  Activity,
+  Sparkles,
+  ArrowUpRight,
+} from "lucide-react";
 
 type ClienteAtivo = {
   cliente: string;
@@ -51,14 +62,14 @@ const overviewQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard · Majrá" }] }),
+  head: () => ({ meta: [{ title: "Visão geral · Lotus" }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesQuery);
     void context.queryClient.ensureQueryData(overviewQuery);
   },
   component: DashboardPage,
   errorComponent: ({ error }) => (
-    <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+    <div className="lotus-surface p-4 text-sm text-danger">
       Erro ao carregar dashboard: {error.message}
     </div>
   ),
@@ -66,26 +77,37 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const fmtBRL = (n: number | null | undefined) =>
-  n == null ? "—" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  n == null ? "—" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 const fmtInt = (n: number | null | undefined) =>
   n == null ? "—" : Math.round(n).toLocaleString("pt-BR");
 
 function DashboardPage() {
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Visão geral · últimos 30 dias</p>
-      </div>
-      <Suspense fallback={<div className="text-sm text-muted-foreground">Carregando…</div>}>
-        <KPIs />
-        <ClientesList />
+      <PageHeader
+        eyebrow="Plataforma Lotus"
+        title="Visão geral"
+        description="Acompanhe a performance consolidada do seu portfólio nos últimos 30 dias."
+      />
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="lotus-surface h-28 animate-lotus-fade">
+                <div className="lotus-skeleton m-5 h-3 w-1/2" />
+                <div className="lotus-skeleton mx-5 mt-3 h-6 w-2/3" />
+              </div>
+            ))}
+          </div>
+        }
+      >
+        <DashboardBody />
       </Suspense>
     </div>
   );
 }
 
-function KPIs() {
+function DashboardBody() {
   const { data: overview } = useSuspenseQuery(overviewQuery);
   const { data: clientes } = useSuspenseQuery(clientesQuery);
 
@@ -93,71 +115,119 @@ function KPIs() {
     (acc, r) => {
       acc.meta += r.meta_spend ?? 0;
       acc.google += r.google_spend ?? 0;
+      acc.impr += r.total_impressions ?? 0;
+      acc.clicks += r.total_clicks ?? 0;
       acc.sessions += r.ga4_sessions ?? 0;
       acc.conv += r.ga4_conversions ?? 0;
+      acc.reach += r.instagram_reach ?? 0;
+      acc.engagement += r.instagram_interactions ?? 0;
       return acc;
     },
-    { meta: 0, google: 0, sessions: 0, conv: 0 },
+    { meta: 0, google: 0, impr: 0, clicks: 0, sessions: 0, conv: 0, reach: 0, engagement: 0 },
   );
 
-  const cards = [
-    { label: "Clientes ativos", value: String(clientes.length) },
-    { label: "Spend Meta Ads", value: fmtBRL(totals.meta) },
-    { label: "Spend Google Ads", value: fmtBRL(totals.google) },
-    { label: "Sessões GA4", value: fmtInt(totals.sessions) },
-    { label: "Conversões GA4", value: fmtInt(totals.conv) },
-  ];
+  const totalSpend = totals.meta + totals.google;
+  const ctr = totals.impr > 0 ? (totals.clicks / totals.impr) * 100 : 0;
+  const convRate = totals.sessions > 0 ? (totals.conv / totals.sessions) * 100 : 0;
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-      {cards.map((c) => (
-        <div key={c.label} className="rounded-lg border border-border bg-card p-4">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">{c.label}</div>
-          <div className="mt-2 text-2xl font-semibold tracking-tight">{c.value}</div>
-        </div>
-      ))}
+    <div className="space-y-7">
+      {/* Hero KPI band: 1 grande + métricas relacionadas */}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        <StatCard
+          label="Investimento total"
+          value={fmtBRL(totalSpend)}
+          hint={`${fmtBRL(totals.google)} Google · ${fmtBRL(totals.meta)} Meta`}
+          icon={DollarSign}
+          emphasis="hero"
+          className="lg:col-span-3"
+        />
+        <StatCard label="Conversões" value={fmtInt(totals.conv)} icon={Target} hint={`${convRate.toFixed(2)}% taxa`} />
+        <StatCard label="Sessões GA4" value={fmtInt(totals.sessions)} icon={Activity} />
+        <StatCard label="Cliques" value={fmtInt(totals.clicks)} icon={MousePointerClick} hint={`${ctr.toFixed(2)}% CTR`} />
+      </section>
+
+      {/* Linha secundária: alcance + engajamento + impressões */}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <StatCard label="Impressões" value={fmtInt(totals.impr)} icon={Eye} emphasis="compact" />
+        <StatCard label="Alcance Instagram" value={fmtInt(totals.reach)} icon={Sparkles} emphasis="compact" />
+        <StatCard label="Engajamento Instagram" value={fmtInt(totals.engagement)} icon={Activity} emphasis="compact" />
+      </section>
+
+      {/* Lista de clientes — surface sólida, sem glass */}
+      <section className="lotus-surface">
+        <header className="flex items-center justify-between border-b border-border/70 px-5 py-4">
+          <div>
+            <h2 className="font-display text-[15px] font-semibold tracking-tight">
+              Seus clientes
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Acesso liberado · {clientes.length} {clientes.length === 1 ? "cliente" : "clientes"}
+            </p>
+          </div>
+        </header>
+
+        {clientes.length === 0 ? (
+          <EmptyClientes />
+        ) : (
+          <ul className="divide-y divide-border/60">
+            {clientes.map((c) => (
+              <li key={c.cliente}>
+                <Link
+                  to="/cliente/$cliente"
+                  params={{ cliente: c.cliente }}
+                  className="lotus-row group flex items-center gap-4 px-5 py-3.5"
+                >
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 text-[12px] font-semibold text-primary-700 dark:from-primary-700/40 dark:to-secondary-700/30 dark:text-primary-100">
+                    {c.cliente.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14px] font-medium text-foreground">
+                      {c.cliente}
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-1">
+                      {(c.plataformas_ativas ?? []).length === 0 && (
+                        <span className="text-[11px] text-muted-foreground">Sem plataformas</span>
+                      )}
+                      {(c.plataformas_ativas ?? []).map((p) => (
+                        <span
+                          key={p}
+                          className="inline-flex items-center rounded-md border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                        >
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="hidden text-right text-[11px] text-muted-foreground sm:block">
+                    <div className="tabular-nums">{fmtInt(c.total_registros)} registros</div>
+                    <div>Última: {c.ultima_data_recebida ?? "—"}</div>
+                  </div>
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-300" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
 
-function ClientesList() {
-  const { data: clientes } = useSuspenseQuery(clientesQuery);
-
-  if (clientes.length === 0) {
-    return (
-      <div className="rounded-md border border-border bg-card p-6 text-sm text-muted-foreground">
-        Nenhum cliente acessível. Verifique <code>client_access</code> ou se há registros em{" "}
-        <code>base_metricas</code>.
-      </div>
-    );
-  }
-
+function EmptyClientes() {
   return (
-    <div className="rounded-lg border border-border bg-card">
-      <div className="border-b border-border px-4 py-3 text-sm font-medium">
-        Clientes ({clientes.length})
+    <div className="lotus-aurora flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
+      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-card/80 shadow-[var(--shadow-sm)]">
+        <Sparkles className="h-5 w-5 text-primary-600 dark:text-primary-300" />
       </div>
-      <div className="divide-y divide-border">
-        {clientes.map((c) => (
-          <Link
-            key={c.cliente}
-            to="/cliente/$cliente"
-            params={{ cliente: c.cliente }}
-            className="flex items-center justify-between px-4 py-3 text-sm hover:bg-accent"
-          >
-            <div>
-              <div className="font-medium">{c.cliente}</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                {(c.plataformas_ativas ?? []).join(" · ") || "sem plataformas"}
-              </div>
-            </div>
-            <div className="text-right text-xs text-muted-foreground">
-              <div>Última: {c.ultima_data_recebida ?? "—"}</div>
-              <div>{fmtInt(c.total_registros)} registros</div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <p className="font-display text-base font-semibold tracking-tight">
+        Nenhum cliente acessível
+      </p>
+      <p className="max-w-sm text-sm text-muted-foreground">
+        Verifique <code className="rounded bg-muted px-1 py-0.5 text-[11px]">client_access</code>{" "}
+        ou se há registros em{" "}
+        <code className="rounded bg-muted px-1 py-0.5 text-[11px]">base_metricas</code>.
+      </p>
     </div>
   );
 }

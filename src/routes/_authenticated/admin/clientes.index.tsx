@@ -1,11 +1,9 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  listClientes,
-  deactivateCliente,
-  toggleClienteAtivo,
-} from "@/lib/admin.functions";
+import { listClientes, toggleClienteAtivo } from "@/lib/admin.functions";
+import { PageHeader } from "@/components/lotus/PageHeader";
+import { Search, Plus, MoreHorizontal } from "lucide-react";
 
 const clientesQuery = {
   queryKey: ["admin", "clientes"],
@@ -13,10 +11,11 @@ const clientesQuery = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/")({
+  head: () => ({ meta: [{ title: "Clientes · Admin Lotus" }] }),
   loader: ({ context }) => (context as any).queryClient?.ensureQueryData(clientesQuery),
   component: ClientesList,
   errorComponent: ({ error }) => (
-    <p className="text-sm text-destructive">Erro: {error.message}</p>
+    <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>
   ),
 });
 
@@ -35,103 +34,171 @@ function ClientesList() {
   });
 
   const toggle = async (id: number, ativo: boolean) => {
-    if (!ativo && !confirm("Desativar este cliente? Histórico será preservado.")) return;
+    if (!ativo && !confirm("Desativar este cliente? O histórico será preservado.")) return;
     await toggleClienteAtivo({ data: { id, ativo } });
     await qc.invalidateQueries({ queryKey: ["admin", "clientes"] });
     await router.invalidate();
   };
 
+  const filters: Array<{ key: typeof filter; label: string; count: number }> = [
+    { key: "ativos", label: "Ativos", count: (data ?? []).filter((c: any) => c.ativo).length },
+    { key: "inativos", label: "Inativos", count: (data ?? []).filter((c: any) => !c.ativo).length },
+    { key: "todos", label: "Todos", count: (data ?? []).length },
+  ];
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <input
-            placeholder="Buscar por nome…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-1.5 text-sm"
-          />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as any)}
-            className="rounded-md border border-input bg-background px-3 py-1.5 text-sm"
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Operações"
+        title="Clientes"
+        description="Gerencie o portfólio. Soft delete preserva todo o histórico de métricas, acessos e serviços."
+        actions={
+          <Link
+            to="/admin/clientes/novo"
+            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px"
           >
-            <option value="ativos">Ativos</option>
-            <option value="inativos">Inativos</option>
-            <option value="todos">Todos</option>
-          </select>
+            <Plus className="h-3.5 w-3.5" /> Novo cliente
+          </Link>
+        }
+      />
+
+      <div className="lotus-surface overflow-hidden">
+        {/* Toolbar */}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 px-4 py-3 sm:flex sm:flex-wrap">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              placeholder="Buscar cliente por nome…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="lotus-focus h-9 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-[13px] placeholder:text-muted-foreground/70"
+            />
+          </div>
+          <div className="flex shrink-0 items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
+            {filters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={
+                  "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-colors " +
+                  (filter === f.key
+                    ? "bg-card text-foreground shadow-[var(--shadow-xs)]"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {f.label}
+                <span className="text-[10.5px] text-muted-foreground/80">{f.count}</span>
+              </button>
+            ))}
+          </div>
         </div>
-        <Link
-          to="/admin/clientes/novo"
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          Novo cliente
-        </Link>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
+                <th className="px-4 py-2.5 font-medium">Cliente</th>
+                <th className="px-4 py-2.5 font-medium">Empresa</th>
+                <th className="px-4 py-2.5 font-medium">Serviços</th>
+                <th className="px-4 py-2.5 font-medium">Acessos</th>
+                <th className="px-4 py-2.5 font-medium">Status</th>
+                <th className="px-4 py-2.5"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    Nenhum cliente encontrado para este filtro.
+                  </td>
+                </tr>
+              )}
+              {rows.map((c: any) => (
+                <tr key={c.id} className="lotus-row border-t border-border/60">
+                  <td className="px-4 py-3">
+                    <Link
+                      to="/admin/clientes/$id"
+                      params={{ id: String(c.id) }}
+                      className="flex items-center gap-3"
+                    >
+                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary-100 to-secondary-100 text-[12px] font-semibold text-primary-700 dark:from-primary-700/40 dark:to-secondary-700/30 dark:text-primary-100">
+                        {c.nome_cliente.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-[13px] font-medium text-foreground">
+                          {c.nome_cliente}
+                        </div>
+                        {c.slug && (
+                          <div className="truncate text-[11px] text-muted-foreground">
+                            /{c.slug}
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                    {c.empresa ?? "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {(c.servicos ?? []).length === 0 && (
+                        <span className="text-[11px] text-muted-foreground">—</span>
+                      )}
+                      {(c.servicos ?? []).slice(0, 3).map((s: string) => (
+                        <span
+                          key={s}
+                          className="inline-flex items-center rounded-md border border-border/70 bg-muted/50 px-1.5 py-0.5 text-[10.5px] font-medium text-muted-foreground"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                      {(c.servicos ?? []).length > 3 && (
+                        <span className="text-[10.5px] text-muted-foreground">
+                          +{c.servicos.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-[13px] tabular-nums text-muted-foreground">
+                    {c.qtd_acessos ?? 0}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={
+                        "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium " +
+                        (c.ativo
+                          ? "bg-success/12 text-[color:var(--success)]"
+                          : "bg-muted text-muted-foreground")
+                      }
+                    >
+                      <span
+                        className={
+                          "h-1.5 w-1.5 rounded-full " +
+                          (c.ativo ? "bg-success" : "bg-muted-foreground/50")
+                        }
+                      />
+                      {c.ativo ? "Ativo" : "Inativo"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => toggle(c.id, !c.ativo)}
+                      className="lotus-focus inline-flex h-7 items-center rounded-md border border-border bg-card px-2.5 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground"
+                    >
+                      {c.ativo ? "Desativar" : "Reativar"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2">Cliente</th>
-              <th className="px-3 py-2">Empresa</th>
-              <th className="px-3 py-2">Serviços</th>
-              <th className="px-3 py-2">Acessos</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-3 py-6 text-center text-muted-foreground">
-                  Nenhum cliente.
-                </td>
-              </tr>
-            )}
-            {rows.map((c: any) => (
-              <tr key={c.id} className="border-t border-border">
-                <td className="px-3 py-2 font-medium">
-                  <Link
-                    to="/admin/clientes/$id"
-                    params={{ id: String(c.id) }}
-                    className="hover:underline"
-                  >
-                    {c.nome_cliente}
-                  </Link>
-                  {c.slug && <span className="ml-2 text-xs text-muted-foreground">/{c.slug}</span>}
-                </td>
-                <td className="px-3 py-2 text-muted-foreground">{c.empresa ?? "—"}</td>
-                <td className="px-3 py-2 text-xs text-muted-foreground">
-                  {c.servicos?.length ? c.servicos.join(", ") : "—"}
-                </td>
-                <td className="px-3 py-2 text-muted-foreground">{c.qtd_acessos ?? 0}</td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      c.ativo
-                        ? "bg-emerald-500/15 text-emerald-600"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {c.ativo ? "Ativo" : "Inativo"}
-                  </span>
-                </td>
-                <td className="px-3 py-2 text-right">
-                  <button
-                    onClick={() => toggle(c.id, !c.ativo)}
-                    className="rounded-md border border-input px-2 py-1 text-xs hover:bg-accent"
-                  >
-                    {c.ativo ? "Desativar" : "Reativar"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Soft delete apenas. Histórico de métricas, acessos e serviços é sempre preservado.
+      <p className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
+        <MoreHorizontal className="h-3 w-3" />
+        Apenas soft delete. Histórico de métricas, acessos e serviços é sempre preservado.
       </p>
     </div>
   );
