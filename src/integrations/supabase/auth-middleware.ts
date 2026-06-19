@@ -1,10 +1,8 @@
-// Server-function middleware that validates the request bearer token
-// and exposes a Supabase client scoped to the signed-in user (RLS-respecting).
+// Middleware de server-function que valida o bearer token do request
+// contra o Supabase OFICIAL e expõe um client com RLS do usuário logado.
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
-
-
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
@@ -16,10 +14,10 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     }
     const token = authHeader.slice("Bearer ".length).trim();
 
-    const SUPABASE_URL = process.env.SUPABASE_URL!;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const SUPABASE_URL = process.env.OFFICIAL_SUPABASE_URL!;
+    const SUPABASE_ANON_KEY = process.env.OFFICIAL_SUPABASE_ANON_KEY!;
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
       global: { headers: { Authorization: `Bearer ${token}` } },
     });

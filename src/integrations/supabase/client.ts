@@ -1,21 +1,23 @@
-// Browser-safe Supabase client. Uses the publishable (anon) key.
-// Do NOT import this from server-only modules — use client.server.ts there.
+// Browser-safe Supabase client conectado ao projeto OFICIAL (ywvhoctcmibjitvwkkhb).
+// As chaves OFICIAIS usam prefixo OFFICIAL_ porque SUPABASE_ é reservado pelo Lovable.
 import { createClient } from "@supabase/supabase-js";
 
-
 const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ??
-  (typeof process !== "undefined" ? process.env.SUPABASE_URL : undefined);
+  import.meta.env.VITE_OFFICIAL_SUPABASE_URL ??
+  (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_URL : undefined);
 
 const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  (typeof process !== "undefined" ? process.env.SUPABASE_PUBLISHABLE_KEY : undefined);
+  import.meta.env.VITE_OFFICIAL_SUPABASE_ANON_KEY ??
+  (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_ANON_KEY : undefined);
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error(
-    "Missing VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY env vars",
+    "Missing VITE_OFFICIAL_SUPABASE_URL / VITE_OFFICIAL_SUPABASE_ANON_KEY env vars",
   );
 }
+
+const PROJECT_ID =
+  import.meta.env.VITE_OFFICIAL_SUPABASE_PROJECT_ID ?? "ywvhoctcmibjitvwkkhb";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
@@ -23,6 +25,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     autoRefreshToken: true,
     detectSessionInUrl: typeof window !== "undefined",
     storage: typeof window !== "undefined" ? window.localStorage : undefined,
-    storageKey: `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "qednvazhwsbixdtswqeg"}-auth-token`,
+    storageKey: `sb-${PROJECT_ID}-auth-token`,
   },
 });
