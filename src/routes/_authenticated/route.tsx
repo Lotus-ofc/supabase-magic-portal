@@ -79,6 +79,7 @@ function AuthenticatedLayout() {
       groups={groups}
       topRight={
         <div className="flex items-center gap-2">
+          {inAdmin && isAdmin && <ImpersonateClienteMenu />}
           <div className="hidden text-right sm:block">
             <p className="text-[12px] font-medium leading-tight text-foreground">
               {user.email?.split("@")[0]}
