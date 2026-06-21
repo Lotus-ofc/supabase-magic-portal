@@ -9,11 +9,8 @@ import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/Evolutio
 import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
 import {
   formatMetric,
-  pctDelta,
   periodRange,
-  sumOverview,
   type OverviewRow,
-  PLATFORM_LABEL,
 } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
