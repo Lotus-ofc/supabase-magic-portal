@@ -103,12 +103,21 @@ function buildInitialForm(c: any, currentServicos: any[], allServicos: any[]) {
     data_inicio: c.data_inicio ?? "",
     valor_mensal: c.valor_mensal != null ? String(c.valor_mensal) : "",
     mlabs_url: c.mlabs_url ?? "",
-    google_business_location_id: c.google_business_location_id ?? "",
+    // flags de plataforma
     google_ads_ativo: normFlag(c.google_ads_ativo),
     meta_ativo: normFlag(c.meta_ativo),
     ga4_ativo: normFlag(c.ga4_ativo),
     google_business_ativo: normFlag(c.google_business_ativo),
     instagram_ativo: !!c.instagram_ativo,
+    tiktok_ativo: !!c.tiktok_ativo,
+    // integrações (IDs técnicos consumidos pelo Make)
+    google_ads_customer_id: c.google_ads_customer_id ?? "",
+    meta_ad_account_id: c.meta_ad_account_id ?? "",
+    meta_pixel_id: c.meta_pixel_id ?? "",
+    instagram_business_account_id: c.instagram_business_account_id ?? "",
+    ga4_property_id: c.ga4_property_id ?? "",
+    google_business_location_id: c.google_business_location_id ?? "",
+    tiktok_ad_account_id: c.tiktok_ad_account_id ?? "",
     servicos,
   };
 }
