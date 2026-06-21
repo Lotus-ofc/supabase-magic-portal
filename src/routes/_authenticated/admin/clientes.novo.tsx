@@ -44,9 +44,12 @@ function NovoCliente() {
           instagram_ativo: false,
         },
       });
+      toast.success("Cliente criado", { description: nome });
       router.navigate({ to: "/admin/clientes/$id", params: { id: String((row as any).id) } });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro");
+      const msg = err instanceof Error ? err.message : "Erro ao criar cliente";
+      setError(msg);
+      toast.error("Não foi possível criar o cliente", { description: msg });
     } finally {
       setLoading(false);
     }
