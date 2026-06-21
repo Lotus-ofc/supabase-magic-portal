@@ -43,7 +43,7 @@ export function getSeriesColor(tone: AreaSeriesTone) {
 }
 
 interface Props {
-  data: Array<Record<string, unknown> & { date: string }>;
+  data: ReadonlyArray<{ date: string } & Record<string, unknown>>;
   series: AreaSeries[];
   height?: number;
   className?: string;
