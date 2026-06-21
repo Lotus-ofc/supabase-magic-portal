@@ -546,7 +546,7 @@ function ClienteEdit() {
 
       {/* SERVIÇOS */}
       <CollapsibleSection
-        eyebrow="04"
+        eyebrow="06"
         title="Serviços contratados"
         description="Marque os serviços ativos e defina o valor de cada um (opcional)."
         badge={
@@ -604,7 +604,7 @@ function ClienteEdit() {
 
       {/* ACESSOS */}
       <CollapsibleSection
-        eyebrow="05"
+        eyebrow="07"
         title="Acessos do cliente"
         description="Usuários que podem visualizar este cliente na área do cliente."
         badge={
