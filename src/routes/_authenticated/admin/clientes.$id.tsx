@@ -279,11 +279,7 @@ function ClienteEdit() {
         <PageHeader
           eyebrow={`ID #${c.id}`}
           title={c.nome_cliente}
-          description={
-            c.slug ? (
-              <span className="font-mono">/{c.slug}</span> as unknown as string
-            ) : undefined
-          }
+          description={c.slug ? `/${c.slug}` : undefined}
           actions={
             <div className="flex items-center gap-2">
               <StatusBadge active={c.ativo} />
