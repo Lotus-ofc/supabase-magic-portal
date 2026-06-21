@@ -4,7 +4,6 @@ import { Suspense, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { cn } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 import { ArrowLeft, Inbox } from "lucide-react";
 
 type Platform = "meta" | "google" | "ga4" | "instagram";
