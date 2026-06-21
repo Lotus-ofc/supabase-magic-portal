@@ -6,6 +6,15 @@ import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
+import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import {
+  formatMetric,
+  pctDelta,
+  periodRange,
+  sumOverview,
+  type OverviewRow,
+  PLATFORM_LABEL,
+} from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
@@ -31,18 +40,7 @@ type ClienteAtivo = {
   total_registros: number;
 };
 
-type Overview = {
-  data: string;
-  cliente: string;
-  meta_spend: number | null;
-  google_spend: number | null;
-  total_impressions: number | null;
-  total_clicks: number | null;
-  ga4_sessions: number | null;
-  ga4_conversions: number | null;
-  instagram_reach: number | null;
-  instagram_interactions: number | null;
-};
+type Overview = OverviewRow;
 
 const clientesQuery = queryOptions({
   queryKey: ["vw_clientes_ativos"],
@@ -88,16 +86,11 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   notFoundComponent: () => <div>Não encontrado</div>,
 });
 
-const fmtBRL = (n: number | null | undefined) =>
-  n == null ? "—" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const fmtBRL = (n: number | null | undefined) => formatMetric("spend", n);
 const fmtInt = (n: number | null | undefined) =>
   n == null ? "—" : Math.round(n).toLocaleString("pt-BR");
 
-const PERIODOS = [
-  { d: 7, label: "7 dias" },
-  { d: 30, label: "30 dias" },
-  { d: 90, label: "90 dias" },
-] as const;
+
 
 function ClientHome() {
   const [days, setDays] = useState<7 | 30 | 90>(30);
