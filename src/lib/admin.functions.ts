@@ -355,3 +355,90 @@ export const revokeClientAccess = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- CRIAR USUÁRIO (admin) ----------
+export const createUserAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        email: z.string().trim().email().max(255),
+        nome: z.string().trim().max(200).optional().nullable(),
+        tipo: z.enum(["admin", "cliente"]).default("cliente"),
+        mode: z.enum(["invite", "password"]).default("invite"),
+        password: z.string().min(8).max(72).optional().nullable(),
+        cadastro_cliente_id: z.number().int().optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let userId: string | null = null;
+    let inviteSent = false;
+    let tempPassword: string | null = null;
+
+    const genPwd = () => `Lotus#${Math.random().toString(36).slice(2, 10)}A1`;
+
+    if (data.mode === "invite") {
+      const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+        data.email,
+        { data: { full_name: data.nome ?? undefined } },
+      );
+      if (error) {
+        const temp = data.password && data.password.length >= 8 ? data.password : genPwd();
+        const { data: created, error: e2 } = await supabaseAdmin.auth.admin.createUser({
+          email: data.email,
+          password: temp,
+          email_confirm: true,
+          user_metadata: { full_name: data.nome ?? undefined },
+        });
+        if (e2) throw new Error(translatePgError(e2.message));
+        userId = created.user?.id ?? null;
+        tempPassword = temp;
+      } else {
+        userId = invited.user?.id ?? null;
+        inviteSent = true;
+      }
+    } else {
+      const temp = data.password && data.password.length >= 8 ? data.password : genPwd();
+      const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: temp,
+        email_confirm: true,
+        user_metadata: { full_name: data.nome ?? undefined },
+      });
+      if (error) throw new Error(translatePgError(error.message));
+      userId = created.user?.id ?? null;
+      tempPassword = temp;
+    }
+
+    if (!userId) throw new Error("Falha ao obter id do usuário criado.");
+
+    if (data.tipo === "admin") {
+      const { error: er } = await supabaseAdmin
+        .from("user_roles")
+        .insert({ user_id: userId, role: "admin" });
+      if (er && !/duplicate key/i.test(er.message)) throw new Error(er.message);
+    }
+
+    if (data.cadastro_cliente_id) {
+      const { data: cliente, error: ec } = await supabaseAdmin
+        .from("cadastro_clientes")
+        .select("id, nome_cliente")
+        .eq("id", data.cadastro_cliente_id)
+        .maybeSingle();
+      if (ec) throw new Error(ec.message);
+      if (cliente) {
+        const { error: ea } = await supabaseAdmin.from("client_access").insert({
+          user_id: userId,
+          cliente_nome: cliente.nome_cliente,
+          cadastro_cliente_id: cliente.id,
+        });
+        if (ea && !/duplicate key/i.test(ea.message)) throw new Error(ea.message);
+      }
+    }
+
+    return { user_id: userId, invite_sent: inviteSent, temp_password: tempPassword };
+  });

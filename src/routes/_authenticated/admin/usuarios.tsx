@@ -3,8 +3,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listUsersWithRoles } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
+import { StatCard } from "@/components/lotus/StatCard";
 import { TextInput } from "@/components/lotus/FormField";
-import { Search, ShieldCheck, User, Mail } from "lucide-react";
+import { Search, ShieldCheck, User, UserPlus, Users as UsersIcon, CheckCircle2, Clock3 } from "lucide-react";
 
 const usersQuery = {
   queryKey: ["admin", "users-with-roles"],
@@ -56,8 +57,22 @@ function UsuariosPage() {
       <PageHeader
         eyebrow="Operações"
         title="Usuários"
-        description="Todos os usuários cadastrados na plataforma. Aqui você acompanha quem tem acesso administrativo ou de cliente."
+        description="Administradores e clientes com acesso à plataforma."
+        actions={
+          <Link
+            to="/admin/usuarios/novo"
+            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-primary-foreground"
+          >
+            <UserPlus className="h-3.5 w-3.5" /> Novo usuário
+          </Link>
+        }
       />
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <StatCard label="Total" value={String(counts.todos)} icon={UsersIcon} />
+        <StatCard label="Administradores" value={String(counts.admin)} icon={ShieldCheck} />
+        <StatCard label="Clientes" value={String(counts.cliente)} icon={User} />
+      </div>
 
       <div className="lotus-surface overflow-hidden">
         <div className="flex flex-wrap items-center gap-3 border-b border-border/70 px-4 py-3">
@@ -103,7 +118,7 @@ function UsuariosPage() {
                 <th className="px-4 py-2.5 font-medium">Tipo</th>
                 <th className="px-4 py-2.5 font-medium">Clientes vinculados</th>
                 <th className="px-4 py-2.5 font-medium">Cadastrado em</th>
-                <th className="px-4 py-2.5 font-medium">Último acesso</th>
+                <th className="px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -166,32 +181,21 @@ function UsuariosPage() {
                   <td className="px-4 py-3 text-[12px] text-muted-foreground">
                     {fmtDate(u.created_at)}
                   </td>
-                  <td className="px-4 py-3 text-[12px] text-muted-foreground">
-                    {fmtDate(u.last_sign_in_at)}
+                  <td className="px-4 py-3">
+                    {u.last_sign_in_at ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-success/12 px-2 py-0.5 text-[11px] font-medium text-[color:var(--success)]">
+                        <CheckCircle2 className="h-3 w-3" /> Ativo
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        <Clock3 className="h-3 w-3" /> Convite pendente
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div className="lotus-surface flex items-start gap-3 p-4 text-[12.5px]">
-        <Mail className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-        <div className="text-muted-foreground">
-          <p className="font-medium text-foreground">Criação de usuário cliente</p>
-          <p className="mt-1">
-            Hoje o convite/cadastro de novos usuários ainda é feito fora do painel. Use o sign-up
-            normal em{" "}
-            <Link to="/auth" className="text-primary hover:underline">
-              /auth
-            </Link>{" "}
-            ou peça o cadastro ao próprio cliente, depois conceda o acesso ao registro dele em{" "}
-            <Link to="/admin/clientes" className="text-primary hover:underline">
-              Clientes → Acessos
-            </Link>
-            . Em breve esta tela permitirá enviar convites por email.
-          </p>
         </div>
       </div>
     </div>
