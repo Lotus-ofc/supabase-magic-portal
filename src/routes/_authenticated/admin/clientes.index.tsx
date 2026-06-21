@@ -24,27 +24,37 @@ function ClientesList() {
   const { data } = useSuspenseQuery(clientesQuery);
   const qc = useQueryClient();
   const router = useRouter();
-  const [filter, setFilter] = useState<"todos" | "ativos" | "inativos">("ativos");
+  const [filter, setFilter] = useState<"todos" | "ativos" | "inativos">("todos");
   const [search, setSearch] = useState("");
 
-  const rows = (data ?? []).filter((c: any) => {
+  const all = data ?? [];
+  const rows = all.filter((c: any) => {
     if (filter === "ativos" && !c.ativo) return false;
     if (filter === "inativos" && c.ativo) return false;
     if (search && !c.nome_cliente.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
-  const toggle = async (id: number, ativo: boolean) => {
-    if (!ativo && !confirm("Desativar este cliente? O histórico será preservado.")) return;
-    await toggleClienteAtivo({ data: { id, ativo } });
-    await qc.invalidateQueries({ queryKey: ["admin", "clientes"] });
-    await router.invalidate();
+  const hiddenCount = all.length - rows.length;
+  const filterActive = filter !== "todos" || search.length > 0;
+
+  const toggle = async (id: number, ativo: boolean, nome: string) => {
+    if (!ativo && !confirm(`Desativar "${nome}"? O histórico será preservado.`)) return;
+    const promise = toggleClienteAtivo({ data: { id, ativo } }).then(async () => {
+      await qc.invalidateQueries({ queryKey: ["admin", "clientes"] });
+      await router.invalidate();
+    });
+    toast.promise(promise, {
+      loading: ativo ? "Reativando…" : "Desativando…",
+      success: ativo ? `${nome} reativado` : `${nome} desativado`,
+      error: (e) => `Erro: ${e instanceof Error ? e.message : "falha"}`,
+    });
   };
 
   const filters: Array<{ key: typeof filter; label: string; count: number }> = [
-    { key: "ativos", label: "Ativos", count: (data ?? []).filter((c: any) => c.ativo).length },
-    { key: "inativos", label: "Inativos", count: (data ?? []).filter((c: any) => !c.ativo).length },
-    { key: "todos", label: "Todos", count: (data ?? []).length },
+    { key: "todos", label: "Todos", count: all.length },
+    { key: "ativos", label: "Ativos", count: all.filter((c: any) => c.ativo).length },
+    { key: "inativos", label: "Inativos", count: all.filter((c: any) => !c.ativo).length },
   ];
 
   return (
