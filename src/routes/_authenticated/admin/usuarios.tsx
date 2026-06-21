@@ -118,7 +118,7 @@ function UsuariosPage() {
                 <th className="px-4 py-2.5 font-medium">Tipo</th>
                 <th className="px-4 py-2.5 font-medium">Clientes vinculados</th>
                 <th className="px-4 py-2.5 font-medium">Cadastrado em</th>
-                <th className="px-4 py-2.5 font-medium">Último acesso</th>
+                <th className="px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
