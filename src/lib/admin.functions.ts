@@ -442,3 +442,98 @@ export const createUserAccount = createServerFn({ method: "POST" })
 
     return { user_id: userId, invite_sent: inviteSent, temp_password: tempPassword };
   });
+
+// ---------- DEBUG / DIAGNÓSTICO ----------
+export const getDebugSnapshot = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const safe = async <T,>(p: PromiseLike<{ data: T; error: any }>) => {
+      try {
+        const { data, error } = await p;
+        return { data: (data ?? null) as T | null, error: error?.message ?? null };
+      } catch (e: any) {
+        return { data: null as T | null, error: e?.message ?? String(e) };
+      }
+    };
+
+    const [
+      totalRes,
+      ultimosRes,
+      clientesRes,
+      plataformasRes,
+      ultimaDataRes,
+      overviewRes,
+      googleRes,
+      metaRes,
+      ga4Res,
+      instaRes,
+    ] = await Promise.all([
+      safe(supabaseAdmin.from("base_metricas").select("*", { count: "exact", head: true })),
+      safe(
+        supabaseAdmin
+          .from("base_metricas")
+          .select("id, data, cliente, plataforma, metrica, valor, campanha, created_at")
+          .order("created_at", { ascending: false })
+          .limit(20),
+      ),
+      safe(supabaseAdmin.from("base_metricas").select("cliente")),
+      safe(supabaseAdmin.from("base_metricas").select("plataforma")),
+      safe(
+        supabaseAdmin
+          .from("base_metricas")
+          .select("data")
+          .order("data", { ascending: false })
+          .limit(1),
+      ),
+      safe(supabaseAdmin.from("vw_overview_cliente").select("*").limit(20)),
+      safe(supabaseAdmin.from("vw_google_ads_diario").select("*").limit(20)),
+      safe(supabaseAdmin.from("vw_meta_ads_diario").select("*").limit(20)),
+      safe(supabaseAdmin.from("vw_ga4_diario").select("*").limit(20)),
+      safe(supabaseAdmin.from("vw_instagram_diario").select("*").limit(20)),
+    ]);
+
+    const totalRegistros =
+      (totalRes as any)?.error == null
+        ? ((totalRes as any).count ?? null)
+        : null;
+    // count comes via head:true — re-run to capture it properly
+    const totalCount = await supabaseAdmin
+      .from("base_metricas")
+      .select("*", { count: "exact", head: true });
+
+    const clientesSet = new Set<string>();
+    (clientesRes.data as any[] | null)?.forEach((r) => r?.cliente && clientesSet.add(r.cliente));
+
+    const porPlataforma: Record<string, number> = {};
+    (plataformasRes.data as any[] | null)?.forEach((r) => {
+      const k = r?.plataforma ?? "(null)";
+      porPlataforma[k] = (porPlataforma[k] ?? 0) + 1;
+    });
+
+    return {
+      total_registros: totalCount.count ?? null,
+      total_clientes: clientesSet.size,
+      ultima_data: (ultimaDataRes.data as any[] | null)?.[0]?.data ?? null,
+      por_plataforma: Object.entries(porPlataforma)
+        .map(([plataforma, total]) => ({ plataforma, total }))
+        .sort((a, b) => b.total - a.total),
+      ultimos: ultimosRes,
+      views: {
+        vw_overview_cliente: overviewRes,
+        vw_google_ads_diario: googleRes,
+        vw_meta_ads_diario: metaRes,
+        vw_ga4_diario: ga4Res,
+        vw_instagram_diario: instaRes,
+      },
+      errors: {
+        total: totalRes.error,
+        ultimos: ultimosRes.error,
+        clientes: clientesRes.error,
+        plataformas: plataformasRes.error,
+        ultima_data: ultimaDataRes.error,
+      },
+    };
+  });
