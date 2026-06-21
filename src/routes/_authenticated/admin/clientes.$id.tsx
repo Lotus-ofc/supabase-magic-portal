@@ -220,12 +220,21 @@ function ClienteEdit() {
           data_inicio: form.data_inicio || null,
           valor_mensal: form.valor_mensal === "" ? null : Number(form.valor_mensal),
           mlabs_url: form.mlabs_url || null,
-          google_business_location_id: form.google_business_location_id || null,
+          // flags
           google_ads_ativo: toFlag(form.google_ads_ativo),
           meta_ativo: toFlag(form.meta_ativo),
           ga4_ativo: toFlag(form.ga4_ativo),
           google_business_ativo: toFlag(form.google_business_ativo),
           instagram_ativo: form.instagram_ativo,
+          tiktok_ativo: form.tiktok_ativo,
+          // integrações
+          google_ads_customer_id: form.google_ads_customer_id || null,
+          meta_ad_account_id: form.meta_ad_account_id || null,
+          meta_pixel_id: form.meta_pixel_id || null,
+          instagram_business_account_id: form.instagram_business_account_id || null,
+          ga4_property_id: form.ga4_property_id || null,
+          google_business_location_id: form.google_business_location_id || null,
+          tiktok_ad_account_id: form.tiktok_ad_account_id || null,
         },
       });
       // Sync serviços
