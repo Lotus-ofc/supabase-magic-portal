@@ -119,12 +119,20 @@ export const checkSlugAvailable = createServerFn({ method: "POST" })
     return { available: !rows || rows.length === 0 };
   });
 
+function sanitizeClientePayload<T extends Record<string, any>>(input: T): T {
+  const out: any = { ...input };
+  for (const k of Object.keys(out)) {
+    if (typeof out[k] === "string" && out[k].trim() === "") out[k] = null;
+  }
+  return out;
+}
+
 export const createCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => clienteFields.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const payload = { ...data, email_principal: data.email_principal || null };
+    const payload = sanitizeClientePayload(data);
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .insert(payload)
@@ -141,8 +149,8 @@ export const updateCliente = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { id, ...patch } = data;
-    if ("email_principal" in patch && !patch.email_principal) patch.email_principal = null;
+    const { id, ...rest } = data;
+    const patch = sanitizeClientePayload(rest);
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .update(patch)
