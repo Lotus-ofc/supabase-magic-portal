@@ -32,6 +32,8 @@ import { ConfirmDialog } from "@/components/lotus/ConfirmDialog";
 import { Field, FormRow, Select, TextArea, TextInput } from "@/components/lotus/FormField";
 import { Switch } from "@/components/ui/switch";
 import { useDirtyBlocker } from "@/hooks/use-dirty-blocker";
+import { INTEGRATIONS, getIntegrationStatus } from "@/lib/integrations-catalog";
+import { IntegrationCard } from "@/components/lotus/IntegrationCard";
 
 const detailQuery = (id: number) => ({
   queryKey: ["admin", "cliente", id],
