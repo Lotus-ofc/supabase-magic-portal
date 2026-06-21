@@ -7,11 +7,7 @@ import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
 import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
-import {
-  formatMetric,
-  periodRange,
-  type OverviewRow,
-} from "@/lib/metrics";
+import { formatMetric, type OverviewRow } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
