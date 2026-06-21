@@ -283,7 +283,25 @@ function ClienteEdit() {
     Number(form.meta_ativo) +
     Number(form.ga4_ativo) +
     Number(form.google_business_ativo) +
-    Number(form.instagram_ativo);
+    Number(form.instagram_ativo) +
+    Number(form.tiktok_ativo);
+
+  const integrationActiveMap: Record<string, boolean> = {
+    google_ads_ativo: form.google_ads_ativo,
+    meta_ativo: form.meta_ativo,
+    ga4_ativo: form.ga4_ativo,
+    google_business_ativo: form.google_business_ativo,
+    instagram_ativo: form.instagram_ativo,
+    tiktok_ativo: form.tiktok_ativo,
+  };
+  const integrationsConfigured = INTEGRATIONS.filter(
+    (i) =>
+      getIntegrationStatus(
+        i,
+        form as unknown as Record<string, unknown>,
+        !!integrationActiveMap[i.activeField],
+      ) === "configured",
+  ).length;
 
   return (
     <div className="space-y-5 pb-24">
