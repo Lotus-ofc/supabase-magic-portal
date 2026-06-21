@@ -439,20 +439,29 @@ function AcessosTab({
 
   const grant = async () => {
     if (!userId) return;
+    const userEmail = users.find((u) => u.id === userId)?.email ?? userId;
     try {
       await grantClientAccess({ data: { user_id: userId, cadastro_cliente_id: clienteId } });
       setUserId("");
+      toast.success("Acesso concedido", { description: userEmail });
       await qc.invalidateQueries({ queryKey: ["admin"] });
       await router.invalidate();
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao conceder acesso", { description: m });
     }
   };
-  const revoke = async (id: string) => {
-    if (!confirm("Revogar acesso deste usuário?")) return;
-    await revokeClientAccess({ data: { id } });
-    await qc.invalidateQueries({ queryKey: ["admin"] });
-    await router.invalidate();
+  const revoke = async (id: string, userEmail: string) => {
+    if (!confirm(`Revogar acesso de ${userEmail}?`)) return;
+    try {
+      await revokeClientAccess({ data: { id } });
+      toast.success("Acesso revogado", { description: userEmail });
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+      await router.invalidate();
+    } catch (e) {
+      toast.error("Falha ao revogar", { description: e instanceof Error ? e.message : "Erro" });
+    }
   };
 
   return (
