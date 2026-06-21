@@ -498,7 +498,7 @@ function AcessosTab({
             <li key={a.id} className="flex items-center justify-between px-3 py-2 text-sm">
               <span>{u?.email ?? a.user_id}</span>
               <button
-                onClick={() => revoke(a.id)}
+                onClick={() => revoke(a.id, u?.email ?? a.user_id)}
                 className="rounded-md border border-input px-2 py-1 text-xs hover:bg-accent"
               >
                 Revogar
