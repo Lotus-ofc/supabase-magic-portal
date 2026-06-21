@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { listClientes, toggleClienteAtivo } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Plus, MoreHorizontal, Filter, X } from "lucide-react";
 
 const clientesQuery = {
   queryKey: ["admin", "clientes"],
