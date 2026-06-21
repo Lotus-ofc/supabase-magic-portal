@@ -11,6 +11,7 @@ import {
   LogOut,
   Sparkles,
   UserCircle2,
+  Bug,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
