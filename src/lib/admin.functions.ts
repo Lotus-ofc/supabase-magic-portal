@@ -279,6 +279,44 @@ export const listUsers = createServerFn({ method: "GET" })
     return data.users.map((u) => ({ id: u.id, email: u.email, created_at: u.created_at }));
   });
 
+export const listUsersWithRoles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [usersRes, rolesRes, accessRes] = await Promise.all([
+      supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+      supabaseAdmin.from("user_roles").select("user_id, role"),
+      supabaseAdmin.from("client_access").select("user_id, cliente_nome"),
+    ]);
+    if (usersRes.error) throw new Error(usersRes.error.message);
+    const rolesByUser = new Map<string, string[]>();
+    (rolesRes.data ?? []).forEach((r: any) => {
+      const arr = rolesByUser.get(r.user_id) ?? [];
+      arr.push(r.role);
+      rolesByUser.set(r.user_id, arr);
+    });
+    const accessByUser = new Map<string, string[]>();
+    (accessRes.data ?? []).forEach((a: any) => {
+      const arr = accessByUser.get(a.user_id) ?? [];
+      arr.push(a.cliente_nome);
+      accessByUser.set(a.user_id, arr);
+    });
+    return usersRes.data.users.map((u) => {
+      const roles = rolesByUser.get(u.id) ?? [];
+      const isAdmin = roles.includes("admin");
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at ?? null,
+        is_admin: isAdmin,
+        tipo: isAdmin ? ("admin" as const) : ("cliente" as const),
+        clientes: accessByUser.get(u.id) ?? [],
+      };
+    });
+  });
+
 export const grantClientAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
