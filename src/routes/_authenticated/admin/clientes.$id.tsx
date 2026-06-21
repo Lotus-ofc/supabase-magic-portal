@@ -1,7 +1,19 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Save,
+  Power,
+  Trash2,
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  CircleDashed,
+  ExternalLink,
+  Plus,
+} from "lucide-react";
 import {
   getCliente,
   listServicos,
@@ -11,7 +23,15 @@ import {
   grantClientAccess,
   revokeClientAccess,
   toggleClienteAtivo,
+  checkSlugAvailable,
 } from "@/lib/admin.functions";
+import { PageHeader } from "@/components/lotus/PageHeader";
+import { CollapsibleSection } from "@/components/lotus/CollapsibleSection";
+import { StatusBadge } from "@/components/lotus/StatusBadge";
+import { ConfirmDialog } from "@/components/lotus/ConfirmDialog";
+import { Field, FormRow, Select, TextArea, TextInput } from "@/components/lotus/FormField";
+import { Switch } from "@/components/ui/switch";
+import { useDirtyBlocker } from "@/hooks/use-dirty-blocker";
 
 const detailQuery = (id: number) => ({
   queryKey: ["admin", "cliente", id],
@@ -32,10 +52,10 @@ export const Route = createFileRoute("/_authenticated/admin/clientes/$id")({
     return { id };
   },
   component: ClienteEdit,
-  errorComponent: ({ error }) => <p className="text-sm text-destructive">Erro: {error.message}</p>,
+  errorComponent: ({ error }) => (
+    <div className="lotus-surface p-4 text-sm text-destructive">Erro: {error.message}</div>
+  ),
 });
-
-type Tab = "dados" | "plataformas" | "servicos" | "acessos";
 
 function normFlag(v: string | null | undefined): boolean {
   if (!v) return false;
@@ -44,6 +64,56 @@ function normFlag(v: string | null | undefined): boolean {
 function toFlag(b: boolean): string {
   return b ? "true" : "false";
 }
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+type ServicoState = {
+  servico_id: string;
+  nome: string;
+  selected: boolean;
+  valor: string;
+};
+
+function buildInitialForm(c: any, currentServicos: any[], allServicos: any[]) {
+  const servMap = new Map(currentServicos.map((cs) => [cs.servico_id, cs]));
+  const servicos: ServicoState[] = allServicos.map((s) => {
+    const cur = servMap.get(s.id);
+    return {
+      servico_id: s.id,
+      nome: s.nome,
+      selected: !!cur && cur.ativo,
+      valor: cur?.valor != null ? String(cur.valor) : "",
+    };
+  });
+  return {
+    nome_cliente: c.nome_cliente ?? "",
+    slug: c.slug ?? "",
+    empresa: c.empresa ?? "",
+    email_principal: c.email_principal ?? "",
+    telefone: c.telefone ?? "",
+    observacoes: c.observacoes ?? "",
+    data_inicio: c.data_inicio ?? "",
+    valor_mensal: c.valor_mensal != null ? String(c.valor_mensal) : "",
+    mlabs_url: c.mlabs_url ?? "",
+    google_business_location_id: c.google_business_location_id ?? "",
+    google_ads_ativo: normFlag(c.google_ads_ativo),
+    meta_ativo: normFlag(c.meta_ativo),
+    ga4_ativo: normFlag(c.ga4_ativo),
+    google_business_ativo: normFlag(c.google_business_ativo),
+    instagram_ativo: !!c.instagram_ativo,
+    servicos,
+  };
+}
+
+type FormState = ReturnType<typeof buildInitialForm>;
 
 function ClienteEdit() {
   const { id } = Route.useLoaderData();
@@ -52,41 +122,88 @@ function ClienteEdit() {
   const { data: users } = useSuspenseQuery(usersQuery);
   const qc = useQueryClient();
   const router = useRouter();
-
-  const [tab, setTab] = useState<Tab>("dados");
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const c: any = detail.cliente;
 
-  const [form, setForm] = useState({
-    nome_cliente: c.nome_cliente ?? "",
-    slug: c.slug ?? "",
-    empresa: c.empresa ?? "",
-    email_principal: c.email_principal ?? "",
-    telefone: c.telefone ?? "",
-    observacoes: c.observacoes ?? "",
-    data_inicio: c.data_inicio ?? "",
-    valor_mensal: c.valor_mensal ?? "",
-    mlabs_url: c.mlabs_url ?? "",
-    google_business_location_id: c.google_business_location_id ?? "",
-    google_ads_ativo: normFlag(c.google_ads_ativo),
-    meta_ativo: normFlag(c.meta_ativo),
-    ga4_ativo: normFlag(c.ga4_ativo),
-    google_business_ativo: normFlag(c.google_business_ativo),
-    instagram_ativo: !!c.instagram_ativo,
-  });
+  const initial = useMemo(
+    () => buildInitialForm(c, detail.servicos as any[], servicos as any[]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [c.id, c.updated_at, (servicos as any[]).length, (detail.servicos as any[]).length],
+  );
+  const [form, setForm] = useState<FormState>(initial);
+  useEffect(() => setForm(initial), [initial]);
 
-  const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
+  const [toggleDialog, setToggleDialog] = useState(false);
 
-  const saveDados = async () => {
+  const dirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(initial), [form, initial]);
+  useDirtyBlocker(dirty);
+
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  // ---- Slug live validation ----
+  const slugDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const s = form.slug.trim();
+    if (!s) {
+      setSlugStatus("idle");
+      return;
+    }
+    if (!SLUG_RE.test(s)) {
+      setSlugStatus("idle");
+      return;
+    }
+    if (s === initial.slug) {
+      setSlugStatus("available");
+      return;
+    }
+    setSlugStatus("checking");
+    if (slugDebounce.current) clearTimeout(slugDebounce.current);
+    slugDebounce.current = setTimeout(async () => {
+      try {
+        const { available } = await checkSlugAvailable({ data: { slug: s, excludeId: id } });
+        setSlugStatus(available ? "available" : "taken");
+      } catch {
+        setSlugStatus("idle");
+      }
+    }, 400);
+    return () => {
+      if (slugDebounce.current) clearTimeout(slugDebounce.current);
+    };
+  }, [form.slug, initial.slug, id]);
+
+  const slugInvalid = form.slug.length > 0 && !SLUG_RE.test(form.slug);
+
+  // ---- Validation ----
+  const validate = (): Record<string, string> => {
+    const e: Record<string, string> = {};
+    if (!form.nome_cliente.trim()) e.nome_cliente = "Nome obrigatório.";
+    if (!form.slug.trim()) e.slug = "Slug obrigatório.";
+    else if (!SLUG_RE.test(form.slug)) e.slug = "Use somente a-z, 0-9 e hífen.";
+    else if (slugStatus === "taken") e.slug = "Este slug já está em uso.";
+    if (form.email_principal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_principal))
+      e.email_principal = "Email inválido.";
+    if (form.valor_mensal && Number.isNaN(Number(form.valor_mensal)))
+      e.valor_mensal = "Valor inválido.";
+    return e;
+  };
+
+  const saveAll = async () => {
+    const v = validate();
+    setErrors(v);
+    if (Object.keys(v).length > 0) {
+      toast.error("Revise os campos destacados");
+      return;
+    }
     setSaving(true);
-    setMsg(null);
     try {
       await updateCliente({
         data: {
           id,
-          nome_cliente: form.nome_cliente,
-          slug: form.slug,
+          nome_cliente: form.nome_cliente.trim(),
+          slug: form.slug.trim(),
           empresa: form.empresa || null,
           email_principal: form.email_principal || null,
           telefone: form.telefone || null,
@@ -102,269 +219,11 @@ function ClienteEdit() {
           instagram_ativo: form.instagram_ativo,
         },
       });
-      setMsg("Salvo.");
-      toast.success("Cliente atualizado", { description: form.nome_cliente });
-      await qc.invalidateQueries({ queryKey: ["admin"] });
-    } catch (e) {
-      const m = e instanceof Error ? e.message : "Erro";
-      setMsg(m);
-      toast.error("Falha ao atualizar", { description: m });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <Link to="/admin/clientes" className="text-xs text-muted-foreground hover:underline">
-            ← Voltar
-          </Link>
-          <h2 className="mt-1 text-lg font-semibold">{c.nome_cliente}</h2>
-          <p className="text-xs text-muted-foreground">
-            ID {c.id} · slug <code>{c.slug ?? "—"}</code> · {c.ativo ? "Ativo" : "Inativo"}
-          </p>
-        </div>
-        <button
-          onClick={async () => {
-            if (c.ativo && !confirm(`Desativar "${c.nome_cliente}"?`)) return;
-            try {
-              await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
-              toast.success(c.ativo ? "Cliente desativado" : "Cliente ativado", {
-                description: c.nome_cliente,
-              });
-              await qc.invalidateQueries({ queryKey: ["admin"] });
-              await router.invalidate();
-            } catch (e) {
-              toast.error("Falha", { description: e instanceof Error ? e.message : "Erro" });
-            }
-          }}
-          className="rounded-md border border-input px-3 py-1.5 text-xs hover:bg-accent"
-        >
-          {c.ativo ? "Desativar" : "Reativar"}
-        </button>
-      </div>
-
-      <div className="flex gap-1 border-b border-border text-sm">
-        {(["dados", "plataformas", "servicos", "acessos"] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`-mb-px border-b-2 px-3 py-2 capitalize ${
-              tab === t
-                ? "border-foreground text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {tab === "dados" && (
-        <div className="space-y-3 rounded-md border border-border p-5">
-          <Row>
-            <Field label="Nome">
-              <input
-                value={form.nome_cliente}
-                onChange={(e) => set("nome_cliente", e.target.value)}
-                className="input"
-              />
-            </Field>
-            <Field label="Slug">
-              <input
-                value={form.slug}
-                onChange={(e) => set("slug", e.target.value)}
-                className="input"
-              />
-            </Field>
-          </Row>
-          <Row>
-            <Field label="Empresa">
-              <input
-                value={form.empresa}
-                onChange={(e) => set("empresa", e.target.value)}
-                className="input"
-              />
-            </Field>
-            <Field label="Email principal">
-              <input
-                type="email"
-                value={form.email_principal}
-                onChange={(e) => set("email_principal", e.target.value)}
-                className="input"
-              />
-            </Field>
-          </Row>
-          <Row>
-            <Field label="Telefone">
-              <input
-                value={form.telefone}
-                onChange={(e) => set("telefone", e.target.value)}
-                className="input"
-              />
-            </Field>
-            <Field label="Data de início">
-              <input
-                type="date"
-                value={form.data_inicio ?? ""}
-                onChange={(e) => set("data_inicio", e.target.value)}
-                className="input"
-              />
-            </Field>
-          </Row>
-          <Row>
-            <Field label="Valor mensal (R$)">
-              <input
-                type="number"
-                step="0.01"
-                value={form.valor_mensal as any}
-                onChange={(e) => set("valor_mensal", e.target.value)}
-                className="input"
-              />
-            </Field>
-            <Field label="mLabs URL">
-              <input
-                value={form.mlabs_url}
-                onChange={(e) => set("mlabs_url", e.target.value)}
-                className="input"
-              />
-            </Field>
-          </Row>
-          <Field label="Observações">
-            <textarea
-              value={form.observacoes}
-              onChange={(e) => set("observacoes", e.target.value)}
-              rows={3}
-              className="input"
-            />
-          </Field>
-          <ActionBar saving={saving} msg={msg} onSave={saveDados} />
-        </div>
-      )}
-
-      {tab === "plataformas" && (
-        <div className="space-y-3 rounded-md border border-border p-5">
-          <p className="text-xs text-muted-foreground">
-            Flags armazenadas como texto (<code>"true"/"false"</code>) para compatibilidade com o
-            Make.com.
-          </p>
-          {[
-            ["google_ads_ativo", "Google Ads"],
-            ["meta_ativo", "Meta Ads"],
-            ["ga4_ativo", "Google Analytics 4"],
-            ["google_business_ativo", "Google Meu Negócio"],
-            ["instagram_ativo", "Instagram"],
-          ].map(([k, label]) => (
-            <label key={k} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-              <span className="text-sm">{label}</span>
-              <input
-                type="checkbox"
-                checked={(form as any)[k]}
-                onChange={(e) => set(k, e.target.checked)}
-              />
-            </label>
-          ))}
-          <Field label="Google Business Location ID">
-            <input
-              value={form.google_business_location_id}
-              onChange={(e) => set("google_business_location_id", e.target.value)}
-              className="input"
-            />
-          </Field>
-          <ActionBar saving={saving} msg={msg} onSave={saveDados} />
-        </div>
-      )}
-
-      {tab === "servicos" && (
-        <ServicosTab
-          clienteId={id}
-          servicos={servicos as any[]}
-          current={detail.servicos as any[]}
-        />
-      )}
-
-      {tab === "acessos" && (
-        <AcessosTab
-          clienteId={id}
-          users={users as any[]}
-          acessos={detail.acessos as any[]}
-        />
-      )}
-
-      <style>{`.input{margin-top:.25rem;width:100%;border-radius:.375rem;border:1px solid hsl(var(--input));background:hsl(var(--background));padding:.5rem .75rem;font-size:.875rem}`}</style>
-    </div>
-  );
-}
-
-function Row({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 gap-3 md:grid-cols-2">{children}</div>;
-}
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block text-sm">
-      <span className="font-medium">{label}</span>
-      {children}
-    </label>
-  );
-}
-function ActionBar({
-  saving,
-  msg,
-  onSave,
-}: {
-  saving: boolean;
-  msg: string | null;
-  onSave: () => void;
-}) {
-  return (
-    <div className="flex items-center justify-end gap-3">
-      {msg && <span className="text-xs text-muted-foreground">{msg}</span>}
-      <button
-        onClick={onSave}
-        disabled={saving}
-        className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-      >
-        {saving ? "Salvando…" : "Salvar"}
-      </button>
-    </div>
-  );
-}
-
-function ServicosTab({
-  clienteId,
-  servicos,
-  current,
-}: {
-  clienteId: number;
-  servicos: any[];
-  current: any[];
-}) {
-  const qc = useQueryClient();
-  const [state, setState] = useState(() => {
-    const map = new Map(current.map((c) => [c.servico_id, c]));
-    return servicos.map((s) => {
-      const cur = map.get(s.id);
-      return {
-        servico_id: s.id,
-        nome: s.nome,
-        selected: !!cur && cur.ativo,
-        valor: cur?.valor ?? "",
-      };
-    });
-  });
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  const save = async () => {
-    setSaving(true);
-    setMsg(null);
-    try {
+      // Sync serviços
       await setClienteServicos({
         data: {
-          cadastro_cliente_id: clienteId,
-          items: state
+          cadastro_cliente_id: id,
+          items: form.servicos
             .filter((s) => s.selected)
             .map((s) => ({
               servico_id: s.servico_id,
@@ -373,69 +232,482 @@ function ServicosTab({
             })),
         },
       });
-      setMsg("Salvo.");
-      toast.success("Serviços atualizados");
+      toast.success("Alterações salvas", { description: form.nome_cliente });
       await qc.invalidateQueries({ queryKey: ["admin"] });
+      await router.invalidate();
     } catch (e) {
-      const m = e instanceof Error ? e.message : "Erro";
-      setMsg(m);
-      toast.error("Falha ao salvar serviços", { description: m });
+      toast.error("Falha ao salvar", {
+        description: e instanceof Error ? e.message : "Erro desconhecido",
+      });
     } finally {
       setSaving(false);
     }
   };
 
+  const doToggle = async () => {
+    try {
+      await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
+      toast.success(c.ativo ? "Cliente desativado" : "Cliente reativado", {
+        description: c.nome_cliente,
+      });
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+      await router.invalidate();
+    } catch (e) {
+      toast.error("Falha", { description: e instanceof Error ? e.message : "Erro" });
+    } finally {
+      setToggleDialog(false);
+    }
+  };
+
+  const activeServicos = form.servicos.filter((s) => s.selected).length;
+  const activePlatforms =
+    Number(form.google_ads_ativo) +
+    Number(form.meta_ativo) +
+    Number(form.ga4_ativo) +
+    Number(form.google_business_ativo) +
+    Number(form.instagram_ativo);
+
   return (
-    <div className="space-y-3 rounded-md border border-border p-5">
-      {state.map((s, i) => (
-        <div
-          key={s.servico_id}
-          className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
+    <div className="space-y-5 pb-24">
+      <div className="space-y-3">
+        <Link
+          to="/admin/clientes"
+          className="lotus-focus inline-flex items-center gap-1 rounded-md text-[12px] text-muted-foreground hover:text-foreground"
         >
-          <input
-            type="checkbox"
-            checked={s.selected}
-            onChange={(e) =>
-              setState((prev) =>
-                prev.map((p, j) => (j === i ? { ...p, selected: e.target.checked } : p)),
-              )
+          <ArrowLeft className="h-3.5 w-3.5" /> Voltar para clientes
+        </Link>
+        <PageHeader
+          eyebrow={`ID #${c.id}`}
+          title={c.nome_cliente}
+          description={c.slug ? `/${c.slug}` : undefined}
+          actions={
+            <div className="flex items-center gap-2">
+              <StatusBadge active={c.ativo} />
+              <button
+                onClick={() => setToggleDialog(true)}
+                className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-[12.5px] font-medium text-muted-foreground hover:border-primary-300 hover:text-foreground"
+              >
+                <Power className="h-3.5 w-3.5" />
+                {c.ativo ? "Desativar" : "Reativar"}
+              </button>
+            </div>
+          }
+        />
+      </div>
+
+      {!c.ativo && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-300/50 bg-amber-50/60 px-4 py-3 text-[13px] text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-medium">Cliente inativo</p>
+            <p className="text-[12px] opacity-80">
+              Edições continuam disponíveis, mas o cliente não aparece para usuários finais nem
+              recebe novos dados do Make. Reative quando voltar a operar.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* IDENTIDADE */}
+      <CollapsibleSection
+        eyebrow="01"
+        title="Identidade"
+        description="Nome, URL amigável e contato principal."
+      >
+        <FormRow>
+          <Field label="Nome do cliente" required error={errors.nome_cliente}>
+            <TextInput
+              value={form.nome_cliente}
+              onChange={(e) => {
+                set("nome_cliente", e.target.value);
+                if (!initial.slug && !form.slug) set("slug", slugify(e.target.value));
+              }}
+              invalid={!!errors.nome_cliente}
+            />
+          </Field>
+          <Field
+            label="Empresa"
+            hint="Razão social ou nome fantasia da empresa do cliente."
+          >
+            <TextInput value={form.empresa} onChange={(e) => set("empresa", e.target.value)} />
+          </Field>
+        </FormRow>
+
+        <div className="mt-3">
+          <Field
+            label="Slug (URL)"
+            required
+            error={errors.slug}
+            hint={
+              <span className="inline-flex items-center gap-1.5">
+                <span className="font-mono text-foreground/80">
+                  lotus.app/cliente/{form.slug || "—"}
+                </span>
+                <SlugIndicator status={slugStatus} invalid={slugInvalid} />
+              </span>
             }
+          >
+            <TextInput
+              value={form.slug}
+              onChange={(e) => set("slug", slugify(e.target.value))}
+              placeholder="ex: cliente-acme"
+              invalid={!!errors.slug || slugStatus === "taken" || slugInvalid}
+            />
+          </Field>
+        </div>
+
+        <FormRow className="mt-3">
+          <Field label="Email principal" error={errors.email_principal}>
+            <TextInput
+              type="email"
+              value={form.email_principal}
+              onChange={(e) => set("email_principal", e.target.value)}
+              invalid={!!errors.email_principal}
+              placeholder="contato@empresa.com"
+            />
+          </Field>
+          <Field label="Telefone">
+            <TextInput
+              value={form.telefone}
+              onChange={(e) => set("telefone", e.target.value)}
+              placeholder="(11) 99999-9999"
+            />
+          </Field>
+        </FormRow>
+
+        <div className="mt-3">
+          <Field label="Observações internas" hint="Visível apenas para administradores.">
+            <TextArea
+              rows={3}
+              value={form.observacoes}
+              onChange={(e) => set("observacoes", e.target.value)}
+            />
+          </Field>
+        </div>
+      </CollapsibleSection>
+
+      {/* COMERCIAL */}
+      <CollapsibleSection
+        eyebrow="02"
+        title="Comercial"
+        description="Início do contrato, valor mensal e canais de gestão."
+      >
+        <FormRow>
+          <Field label="Data de início">
+            <TextInput
+              type="date"
+              value={form.data_inicio ?? ""}
+              onChange={(e) => set("data_inicio", e.target.value)}
+            />
+          </Field>
+          <Field label="Valor mensal (R$)" error={errors.valor_mensal}>
+            <TextInput
+              type="number"
+              step="0.01"
+              value={form.valor_mensal}
+              onChange={(e) => set("valor_mensal", e.target.value)}
+              invalid={!!errors.valor_mensal}
+              placeholder="0,00"
+            />
+          </Field>
+        </FormRow>
+        <div className="mt-3">
+          <Field label="mLabs URL" hint="Link da conta no mLabs para o calendário de conteúdo.">
+            <TextInput
+              value={form.mlabs_url}
+              onChange={(e) => set("mlabs_url", e.target.value)}
+              placeholder="https://mlabs.com.br/…"
+            />
+          </Field>
+        </div>
+      </CollapsibleSection>
+
+      {/* PLATAFORMAS */}
+      <CollapsibleSection
+        eyebrow="03"
+        title="Plataformas"
+        description="Quais fontes de dados o Make alimenta para este cliente."
+        badge={
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
+            {activePlatforms} ativa{activePlatforms === 1 ? "" : "s"}
+          </span>
+        }
+      >
+        <div className="space-y-2">
+          <PlatformToggle
+            label="Google Ads"
+            description="Investimento, cliques, conversões."
+            checked={form.google_ads_ativo}
+            onChange={(b) => set("google_ads_ativo", b)}
           />
-          <span className="flex-1 text-sm">{s.nome}</span>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Valor R$"
-            value={s.valor}
-            onChange={(e) =>
-              setState((prev) => prev.map((p, j) => (j === i ? { ...p, valor: e.target.value } : p)))
-            }
-            disabled={!s.selected}
-            className="w-32 rounded-md border border-input bg-background px-2 py-1 text-sm disabled:opacity-50"
+          <PlatformToggle
+            label="Meta Ads"
+            description="Facebook + Instagram Ads."
+            checked={form.meta_ativo}
+            onChange={(b) => set("meta_ativo", b)}
+          />
+          <PlatformToggle
+            label="Google Analytics 4"
+            description="Tráfego do site e conversões orgânicas."
+            checked={form.ga4_ativo}
+            onChange={(b) => set("ga4_ativo", b)}
+          />
+          <PlatformToggle
+            label="Instagram Orgânico"
+            description="Alcance, impressões, engajamento."
+            checked={form.instagram_ativo}
+            onChange={(b) => set("instagram_ativo", b)}
+          />
+          <PlatformToggle
+            label="Google Meu Negócio"
+            description="Buscas e ações no perfil GMB."
+            checked={form.google_business_ativo}
+            onChange={(b) => set("google_business_ativo", b)}
           />
         </div>
-      ))}
-      <ActionBar saving={saving} msg={msg} onSave={save} />
+        {form.google_business_ativo && (
+          <div className="mt-4 rounded-lg border border-border bg-muted/30 p-4">
+            <Field label="Google Business Location ID" hint="ID numérico do perfil no GMB.">
+              <TextInput
+                value={form.google_business_location_id}
+                onChange={(e) => set("google_business_location_id", e.target.value)}
+                placeholder="123456789012345"
+              />
+            </Field>
+          </div>
+        )}
+      </CollapsibleSection>
+
+      {/* SERVIÇOS */}
+      <CollapsibleSection
+        eyebrow="04"
+        title="Serviços contratados"
+        description="Marque os serviços ativos e defina o valor de cada um (opcional)."
+        badge={
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
+            {activeServicos} contratado{activeServicos === 1 ? "" : "s"}
+          </span>
+        }
+      >
+        <div className="space-y-2">
+          {form.servicos.map((s, i) => (
+            <div
+              key={s.servico_id}
+              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2"
+            >
+              <Switch
+                checked={s.selected}
+                onCheckedChange={(v) =>
+                  setForm((f) => ({
+                    ...f,
+                    servicos: f.servicos.map((p, j) => (j === i ? { ...p, selected: v } : p)),
+                  }))
+                }
+              />
+              <span className="flex-1 text-[13px] text-foreground">{s.nome}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[11px] text-muted-foreground">R$</span>
+                <TextInput
+                  type="number"
+                  step="0.01"
+                  placeholder="—"
+                  value={s.valor}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      servicos: f.servicos.map((p, j) => (j === i ? { ...p, valor: e.target.value } : p)),
+                    }))
+                  }
+                  disabled={!s.selected}
+                  className="h-8 w-28"
+                />
+              </div>
+            </div>
+          ))}
+          {form.servicos.length === 0 && (
+            <p className="text-[13px] text-muted-foreground">
+              Nenhum serviço cadastrado. Vá em{" "}
+              <Link to="/admin/servicos" className="text-primary hover:underline">
+                Serviços
+              </Link>{" "}
+              para adicionar.
+            </p>
+          )}
+        </div>
+      </CollapsibleSection>
+
+      {/* ACESSOS */}
+      <CollapsibleSection
+        eyebrow="05"
+        title="Acessos do cliente"
+        description="Usuários que podem visualizar este cliente na área do cliente."
+        badge={
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
+            {detail.acessos.length} usuário{detail.acessos.length === 1 ? "" : "s"}
+          </span>
+        }
+      >
+        <AcessosBlock
+          clienteId={id}
+          clienteNome={c.nome_cliente}
+          users={users as any[]}
+          acessos={detail.acessos as any[]}
+        />
+      </CollapsibleSection>
+
+      {/* STICKY SAVE BAR */}
+      <div className="fixed bottom-4 left-4 right-4 z-30 lg:left-[268px] lg:right-8">
+        <div
+          className={
+            "lotus-surface flex items-center justify-between gap-3 px-4 py-3 shadow-[var(--shadow-lg)] transition-all " +
+            (dirty
+              ? "border-amber-300/60 dark:border-amber-500/40"
+              : "border-border opacity-95")
+          }
+        >
+          <div className="flex items-center gap-2 text-[12.5px]">
+            {dirty ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                </span>
+                <span className="font-medium text-foreground">Alterações não salvas</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                <span className="text-muted-foreground">Tudo salvo</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setForm(initial)}
+              disabled={!dirty || saving}
+              className="lotus-focus inline-flex h-9 items-center rounded-lg border border-border bg-card px-3 text-[12.5px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-40"
+            >
+              Descartar
+            </button>
+            <button
+              onClick={saveAll}
+              disabled={!dirty || saving}
+              className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px disabled:translate-y-0 disabled:opacity-50"
+            >
+              {saving ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              Salvar alterações
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={toggleDialog}
+        onOpenChange={setToggleDialog}
+        title={c.ativo ? `Desativar ${c.nome_cliente}?` : `Reativar ${c.nome_cliente}?`}
+        description={
+          c.ativo
+            ? "O cliente deixa de aparecer para usuários finais e o Make pode parar de enviar dados. O histórico de métricas, serviços e acessos é preservado e pode ser reativado a qualquer momento."
+            : "O cliente volta a aparecer normalmente para usuários autorizados."
+        }
+        confirmLabel={c.ativo ? "Desativar" : "Reativar"}
+        variant={c.ativo ? "destructive" : "default"}
+        onConfirm={doToggle}
+      />
     </div>
   );
 }
 
-function AcessosTab({
+function SlugIndicator({
+  status,
+  invalid,
+}: {
+  status: "idle" | "checking" | "available" | "taken";
+  invalid: boolean;
+}) {
+  if (invalid)
+    return (
+      <span className="inline-flex items-center gap-1 text-destructive">
+        <CircleDashed className="h-3 w-3" /> formato inválido
+      </span>
+    );
+  if (status === "checking")
+    return (
+      <span className="inline-flex items-center gap-1 text-muted-foreground">
+        <Loader2 className="h-3 w-3 animate-spin" /> verificando…
+      </span>
+    );
+  if (status === "available")
+    return (
+      <span className="inline-flex items-center gap-1 text-success">
+        <CheckCircle2 className="h-3 w-3" /> disponível
+      </span>
+    );
+  if (status === "taken")
+    return (
+      <span className="inline-flex items-center gap-1 text-destructive">
+        <AlertTriangle className="h-3 w-3" /> já em uso
+      </span>
+    );
+  return null;
+}
+
+function PlatformToggle({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: (b: boolean) => void;
+}) {
+  return (
+    <div
+      className={
+        "flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 transition-colors " +
+        (checked
+          ? "border-primary/40 bg-primary/5"
+          : "border-border bg-card hover:border-primary-300")
+      }
+    >
+      <div className="min-w-0">
+        <p className="text-[13px] font-medium text-foreground">{label}</p>
+        <p className="text-[11.5px] text-muted-foreground">{description}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+function AcessosBlock({
   clienteId,
+  clienteNome,
   users,
   acessos,
 }: {
   clienteId: number;
+  clienteNome: string;
   users: any[];
   acessos: any[];
 }) {
   const qc = useQueryClient();
   const router = useRouter();
   const [userId, setUserId] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [revokeTarget, setRevokeTarget] = useState<{ id: string; email: string } | null>(null);
 
   const usedIds = useMemo(() => new Set(acessos.map((a) => a.user_id)), [acessos]);
-  const available = users.filter((u) => !usedIds.has(u.id));
+  const available = users.filter(
+    (u) =>
+      !usedIds.has(u.id) &&
+      (search === "" || (u.email ?? "").toLowerCase().includes(search.toLowerCase())),
+  );
 
   const grant = async () => {
     if (!userId) return;
@@ -443,70 +715,114 @@ function AcessosTab({
     try {
       await grantClientAccess({ data: { user_id: userId, cadastro_cliente_id: clienteId } });
       setUserId("");
-      toast.success("Acesso concedido", { description: userEmail });
+      setSearch("");
+      toast.success("Acesso concedido", { description: `${userEmail} → ${clienteNome}` });
       await qc.invalidateQueries({ queryKey: ["admin"] });
       await router.invalidate();
     } catch (e) {
-      const m = e instanceof Error ? e.message : "Erro";
-      setMsg(m);
-      toast.error("Falha ao conceder acesso", { description: m });
+      toast.error("Falha ao conceder acesso", {
+        description: e instanceof Error ? e.message : "Erro",
+      });
     }
   };
-  const revoke = async (id: string, userEmail: string) => {
-    if (!confirm(`Revogar acesso de ${userEmail}?`)) return;
+
+  const doRevoke = async () => {
+    if (!revokeTarget) return;
     try {
-      await revokeClientAccess({ data: { id } });
-      toast.success("Acesso revogado", { description: userEmail });
+      await revokeClientAccess({ data: { id: revokeTarget.id } });
+      toast.success("Acesso revogado", { description: revokeTarget.email });
       await qc.invalidateQueries({ queryKey: ["admin"] });
       await router.invalidate();
     } catch (e) {
-      toast.error("Falha ao revogar", { description: e instanceof Error ? e.message : "Erro" });
+      toast.error("Falha", { description: e instanceof Error ? e.message : "Erro" });
+    } finally {
+      setRevokeTarget(null);
     }
   };
 
   return (
-    <div className="space-y-3 rounded-md border border-border p-5">
-      <div className="flex items-center gap-2">
-        <select
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm"
-        >
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <TextInput
+          placeholder="Buscar usuário por email…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="min-w-0 flex-1"
+        />
+        <Select value={userId} onChange={(e) => setUserId(e.target.value)} className="min-w-0 flex-1">
           <option value="">Selecione um usuário…</option>
           {available.map((u) => (
             <option key={u.id} value={u.id}>
               {u.email}
             </option>
           ))}
-        </select>
+        </Select>
         <button
           onClick={grant}
           disabled={!userId}
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:-translate-y-px disabled:opacity-50"
         >
-          Conceder acesso
+          <Plus className="h-3.5 w-3.5" /> Conceder
         </button>
       </div>
-      {msg && <p className="text-xs text-destructive">{msg}</p>}
-      <ul className="divide-y divide-border rounded-md border border-border">
-        {acessos.length === 0 && (
-          <li className="px-3 py-3 text-sm text-muted-foreground">Nenhum acesso concedido.</li>
-        )}
-        {acessos.map((a) => {
-          const u = users.find((x) => x.id === a.user_id);
-          return (
-            <li key={a.id} className="flex items-center justify-between px-3 py-2 text-sm">
-              <span>{u?.email ?? a.user_id}</span>
-              <button
-                onClick={() => revoke(a.id, u?.email ?? a.user_id)}
-                className="rounded-md border border-input px-2 py-1 text-xs hover:bg-accent"
+
+      {acessos.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[13px] text-muted-foreground">
+          Nenhum usuário tem acesso a este cliente ainda.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border rounded-lg border border-border">
+          {acessos.map((a) => {
+            const u = users.find((x) => x.id === a.user_id);
+            const email = u?.email ?? a.user_id;
+            return (
+              <li
+                key={a.id}
+                className="flex items-center justify-between gap-2 px-3 py-2.5 text-[13px]"
               >
-                Revogar
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/15 text-[10.5px] font-semibold text-primary-700 dark:text-primary-200">
+                    {(email[0] ?? "?").toUpperCase()}
+                  </div>
+                  <span className="truncate font-medium text-foreground">{email}</span>
+                </div>
+                <button
+                  onClick={() => setRevokeTarget({ id: a.id, email })}
+                  className="lotus-focus inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-1 text-[11.5px] font-medium text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                >
+                  <Trash2 className="h-3 w-3" /> Revogar
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <p className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
+        <ExternalLink className="h-3 w-3" />
+        Para cadastrar um novo usuário cliente, vá em{" "}
+        <Link to="/admin/usuarios" className="text-primary hover:underline">
+          Usuários
+        </Link>
+        .
+      </p>
+
+      <ConfirmDialog
+        open={!!revokeTarget}
+        onOpenChange={(o) => !o && setRevokeTarget(null)}
+        title="Revogar acesso?"
+        description={
+          revokeTarget && (
+            <>
+              <strong>{revokeTarget.email}</strong> deixará de ver este cliente. Você pode conceder
+              acesso novamente a qualquer momento.
+            </>
+          )
+        }
+        confirmLabel="Revogar"
+        variant="destructive"
+        onConfirm={doRevoke}
+      />
     </div>
   );
 }

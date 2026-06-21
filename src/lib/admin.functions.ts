@@ -82,6 +82,30 @@ const clienteFields = z.object({
   valor_mensal: z.number().nullable().optional(),
 });
 
+function translatePgError(message: string): string {
+  if (/duplicate key.*slug/i.test(message) || /cadastro_clientes_slug_key/i.test(message)) {
+    return "Este slug já está em uso por outro cliente.";
+  }
+  if (/duplicate key/i.test(message)) return "Registro duplicado.";
+  if (/violates foreign key/i.test(message)) return "Referência inválida.";
+  if (/violates not-null/i.test(message)) return "Campo obrigatório não preenchido.";
+  return message;
+}
+
+export const checkSlugAvailable = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ slug: z.string().min(1), excludeId: z.number().int().optional() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    let q = context.supabase.from("cadastro_clientes").select("id").eq("slug", data.slug);
+    if (data.excludeId) q = q.neq("id", data.excludeId);
+    const { data: rows, error } = await q.limit(1);
+    if (error) throw new Error(translatePgError(error.message));
+    return { available: !rows || rows.length === 0 };
+  });
+
 export const createCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => clienteFields.parse(d))
@@ -93,7 +117,7 @@ export const createCliente = createServerFn({ method: "POST" })
       .insert(payload)
       .select("*")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(translatePgError(error.message));
     return row;
   });
 
@@ -112,7 +136,7 @@ export const updateCliente = createServerFn({ method: "POST" })
       .eq("id", id)
       .select("*")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(translatePgError(error.message));
     return row;
   });
 
@@ -253,6 +277,44 @@ export const listUsers = createServerFn({ method: "GET" })
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
     if (error) throw new Error(error.message);
     return data.users.map((u) => ({ id: u.id, email: u.email, created_at: u.created_at }));
+  });
+
+export const listUsersWithRoles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [usersRes, rolesRes, accessRes] = await Promise.all([
+      supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+      supabaseAdmin.from("user_roles").select("user_id, role"),
+      supabaseAdmin.from("client_access").select("user_id, cliente_nome"),
+    ]);
+    if (usersRes.error) throw new Error(usersRes.error.message);
+    const rolesByUser = new Map<string, string[]>();
+    (rolesRes.data ?? []).forEach((r: any) => {
+      const arr = rolesByUser.get(r.user_id) ?? [];
+      arr.push(r.role);
+      rolesByUser.set(r.user_id, arr);
+    });
+    const accessByUser = new Map<string, string[]>();
+    (accessRes.data ?? []).forEach((a: any) => {
+      const arr = accessByUser.get(a.user_id) ?? [];
+      arr.push(a.cliente_nome);
+      accessByUser.set(a.user_id, arr);
+    });
+    return usersRes.data.users.map((u) => {
+      const roles = rolesByUser.get(u.id) ?? [];
+      const isAdmin = roles.includes("admin");
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at ?? null,
+        is_admin: isAdmin,
+        tipo: isAdmin ? ("admin" as const) : ("cliente" as const),
+        clientes: accessByUser.get(u.id) ?? [],
+      };
+    });
   });
 
 export const grantClientAccess = createServerFn({ method: "POST" })

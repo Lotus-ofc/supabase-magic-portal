@@ -9,6 +9,7 @@ import {
   Briefcase,
   LogOut,
   Sparkles,
+  UserCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -45,6 +46,7 @@ function AuthenticatedLayout() {
       items: [
         { to: "/admin", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
         { to: "/admin/clientes", label: "Clientes", icon: Users },
+        { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },
         { to: "/admin/servicos", label: "Serviços", icon: Briefcase },
       ],
     },
