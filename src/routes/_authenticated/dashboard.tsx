@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
+import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { formatMetric, type OverviewRow } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
@@ -31,18 +33,7 @@ type ClienteAtivo = {
   total_registros: number;
 };
 
-type Overview = {
-  data: string;
-  cliente: string;
-  meta_spend: number | null;
-  google_spend: number | null;
-  total_impressions: number | null;
-  total_clicks: number | null;
-  ga4_sessions: number | null;
-  ga4_conversions: number | null;
-  instagram_reach: number | null;
-  instagram_interactions: number | null;
-};
+type Overview = OverviewRow;
 
 const clientesQuery = queryOptions({
   queryKey: ["vw_clientes_ativos"],
@@ -88,16 +79,11 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   notFoundComponent: () => <div>Não encontrado</div>,
 });
 
-const fmtBRL = (n: number | null | undefined) =>
-  n == null ? "—" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const fmtBRL = (n: number | null | undefined) => formatMetric("spend", n);
 const fmtInt = (n: number | null | undefined) =>
   n == null ? "—" : Math.round(n).toLocaleString("pt-BR");
 
-const PERIODOS = [
-  { d: 7, label: "7 dias" },
-  { d: 30, label: "30 dias" },
-  { d: 90, label: "90 dias" },
-] as const;
+
 
 function ClientHome() {
   const [days, setDays] = useState<7 | 30 | 90>(30);
@@ -108,30 +94,7 @@ function ClientHome() {
         eyebrow="Sua conta na Lotus"
         title="Resultados consolidados"
         description="Uma leitura clara do que está acontecendo nas suas plataformas — sem ruído, com contexto."
-        actions={
-          <div
-            role="tablist"
-            aria-label="Período"
-            className="lotus-surface inline-flex p-0.5"
-          >
-            {PERIODOS.map((p) => (
-              <button
-                key={p.d}
-                role="tab"
-                aria-selected={days === p.d}
-                onClick={() => setDays(p.d)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  days === p.d
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-xs)]"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        }
+        actions={<PeriodToggle value={days} onChange={setDays} />}
       />
 
       <Suspense fallback={<DashboardSkeleton />}>
