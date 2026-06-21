@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminServicosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes.index'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin/usuarios.novo'
+import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
 import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_authenticated/admin/clientes.$id'
 
@@ -88,6 +89,12 @@ const AuthenticatedAdminUsuariosNovoRoute =
     path: '/novo',
     getParentRoute: () => AuthenticatedAdminUsuariosRoute,
   } as any)
+const AuthenticatedAdminDebugViewsRoute =
+  AuthenticatedAdminDebugViewsRouteImport.update({
+    id: '/views',
+    path: '/views',
+    getParentRoute: () => AuthenticatedAdminDebugRoute,
+  } as any)
 const AuthenticatedAdminClientesNovoRoute =
   AuthenticatedAdminClientesNovoRouteImport.update({
     id: '/clientes/novo',
@@ -106,13 +113,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/admin/debug': typeof AuthenticatedAdminDebugRoute
+  '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
 }
@@ -120,13 +128,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/admin/debug': typeof AuthenticatedAdminDebugRoute
+  '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
 }
@@ -137,13 +146,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRoute
+  '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
 }
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
+    | '/admin/debug/views'
     | '/admin/usuarios/novo'
     | '/admin/clientes/'
   fileRoutesByTo: FileRoutesByTo
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
+    | '/admin/debug/views'
     | '/admin/usuarios/novo'
     | '/admin/clientes'
   id:
@@ -191,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/admin/clientes/$id'
     | '/_authenticated/admin/clientes/novo'
+    | '/_authenticated/admin/debug/views'
     | '/_authenticated/admin/usuarios/novo'
     | '/_authenticated/admin/clientes/'
   fileRoutesById: FileRoutesById
@@ -287,6 +300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosNovoRouteImport
       parentRoute: typeof AuthenticatedAdminUsuariosRoute
     }
+    '/_authenticated/admin/debug/views': {
+      id: '/_authenticated/admin/debug/views'
+      path: '/views'
+      fullPath: '/admin/debug/views'
+      preLoaderRoute: typeof AuthenticatedAdminDebugViewsRouteImport
+      parentRoute: typeof AuthenticatedAdminDebugRoute
+    }
     '/_authenticated/admin/clientes/novo': {
       id: '/_authenticated/admin/clientes/novo'
       path: '/clientes/novo'
@@ -304,6 +324,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminDebugRouteChildren {
+  AuthenticatedAdminDebugViewsRoute: typeof AuthenticatedAdminDebugViewsRoute
+}
+
+const AuthenticatedAdminDebugRouteChildren: AuthenticatedAdminDebugRouteChildren =
+  {
+    AuthenticatedAdminDebugViewsRoute: AuthenticatedAdminDebugViewsRoute,
+  }
+
+const AuthenticatedAdminDebugRouteWithChildren =
+  AuthenticatedAdminDebugRoute._addFileChildren(
+    AuthenticatedAdminDebugRouteChildren,
+  )
+
 interface AuthenticatedAdminUsuariosRouteChildren {
   AuthenticatedAdminUsuariosNovoRoute: typeof AuthenticatedAdminUsuariosNovoRoute
 }
@@ -319,7 +353,7 @@ const AuthenticatedAdminUsuariosRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteRouteChildren {
-  AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRoute
+  AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
   AuthenticatedAdminServicosRoute: typeof AuthenticatedAdminServicosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -330,7 +364,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
-    AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRoute,
+    AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
     AuthenticatedAdminServicosRoute: AuthenticatedAdminServicosRoute,
     AuthenticatedAdminUsuariosRoute:
       AuthenticatedAdminUsuariosRouteWithChildren,
