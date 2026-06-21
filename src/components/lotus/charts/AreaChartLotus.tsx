@@ -43,7 +43,10 @@ export function getSeriesColor(tone: AreaSeriesTone) {
 }
 
 interface Props {
-  data: ReadonlyArray<{ date: string } & Record<string, unknown>>;
+  // Aceita qualquer shape de ponto desde que tenha `date`. Os charts usam
+  // apenas `series[].key` para extrair valores, então tipar como any[] aqui
+  // permite passar DailyPoint, etc., sem cast manual em cada call site.
+  data: any[];
   series: AreaSeries[];
   height?: number;
   className?: string;
