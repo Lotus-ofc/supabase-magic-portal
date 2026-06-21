@@ -54,7 +54,10 @@ function AuthenticatedLayout() {
     },
     {
       label: "Diagnóstico",
-      items: [{ to: "/admin/debug", label: "Debug de dados", icon: Bug }],
+      items: [
+        { to: "/admin/debug", label: "Debug de dados", icon: Bug },
+        { to: "/admin/debug/views", label: "Auditoria de views", icon: Bug },
+      ],
     },
   ];
 
