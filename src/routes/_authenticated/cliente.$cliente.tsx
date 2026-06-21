@@ -198,6 +198,3 @@ function PlatformTable({
     </div>
   );
 }
-
-// keep SectionCard import used (tree-shake guard not needed) — noop
-export { SectionCard as _SectionCard };
