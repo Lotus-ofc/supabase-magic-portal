@@ -537,3 +537,129 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
       },
     };
   });
+
+// ---------- AUDITORIA DE VIEWS ----------
+// Compara contagem das views via service_role (bypass RLS, mas filtro interno
+// das views depende de current_user_clientes() => auth.uid()) vs via usuário
+// admin autenticado (auth.uid() válido). Usado em /admin/debug/views.
+const VIEW_SQL: Record<string, string> = {
+  vw_metricas_normalizadas: `CREATE OR REPLACE VIEW public.vw_metricas_normalizadas
+WITH (security_invoker = on) AS
+SELECT bm.id, bm.data, bm.cliente,
+  CASE lower(bm.plataforma)
+    WHEN 'meta ads' THEN 'meta_ads'
+    WHEN 'google ads' THEN 'google_ads'
+    WHEN 'google analytics 4' THEN 'ga4'
+    WHEN 'instagram' THEN 'instagram'
+    WHEN 'google business' THEN 'google_business'
+    WHEN 'tiktok' THEN 'tiktok'
+    ELSE lower(replace(bm.plataforma, ' ', '_'))
+  END AS plataforma,
+  lower(bm.metrica) AS metrica,
+  CASE WHEN lower(bm.plataforma)='google ads' AND lower(bm.metrica)='spend'
+    THEN bm.valor/1000000.0 ELSE bm.valor END AS valor,
+  bm.campanha, bm.created_at
+FROM public.base_metricas bm
+WHERE bm.cliente IN (SELECT cliente_nome FROM public.current_user_clientes());`,
+  vw_overview_cliente: `Filtra: plataforma IN ('meta_ads','google_ads','ga4','instagram')\nMétricas usadas: spend, impressions, clicks, sessions, conversions, reach, total_interactions`,
+  vw_meta_ads_diario: `Filtra: plataforma = 'meta_ads'\nMétricas: reach, impressions, clicks, cpc, cpm, ctr, frequency, spend`,
+  vw_google_ads_diario: `Filtra: plataforma = 'google_ads'\nMétricas: impressions, clicks, spend (com /1000000)`,
+  vw_ga4_diario: `Filtra: plataforma = 'ga4'\nMétricas: activeusers, sessions, engagedsessions, screenpageviews, eventcount, conversions`,
+  vw_instagram_diario: `Filtra: plataforma = 'instagram'\nMétricas: reach, total_interactions, accounts_engaged, likes, comments, saves, shares, profile_links_taps`,
+};
+
+export const getViewsAudit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const safe = async <T,>(p: PromiseLike<{ data: T; error: any; count?: number | null }>) => {
+      try {
+        const r = await p;
+        return { data: (r.data ?? null) as T | null, error: r.error?.message ?? null, count: r.count ?? null };
+      } catch (e: any) {
+        return { data: null as T | null, error: e?.message ?? String(e), count: null };
+      }
+    };
+
+    const viewNames = [
+      "vw_overview_cliente",
+      "vw_meta_ads_diario",
+      "vw_google_ads_diario",
+      "vw_ga4_diario",
+      "vw_instagram_diario",
+    ];
+
+    // 1. Distinct values via service_role (bypass RLS — vê tudo em base_metricas)
+    const [plataformasRaw, metricasRaw, clientesRaw] = await Promise.all([
+      safe(supabaseAdmin.from("base_metricas").select("plataforma")),
+      safe(supabaseAdmin.from("base_metricas").select("metrica")),
+      safe(supabaseAdmin.from("base_metricas").select("cliente")),
+    ]);
+
+    const distinct = (rows: any[] | null, key: string) => {
+      const s = new Set<string>();
+      (rows ?? []).forEach((r) => r?.[key] != null && s.add(String(r[key])));
+      return Array.from(s).sort();
+    };
+    const distinctPlataformas = distinct(plataformasRaw.data as any[] | null, "plataforma");
+    const distinctMetricas = distinct(metricasRaw.data as any[] | null, "metrica");
+    const distinctClientes = distinct(clientesRaw.data as any[] | null, "cliente");
+
+    // 2. current_user_clientes() — para o admin autenticado deve retornar TUDO
+    const cucAuth = await safe(context.supabase.rpc("current_user_clientes"));
+    const cucService = await safe(supabaseAdmin.rpc("current_user_clientes"));
+
+    // 3. Contagem de cada view: service_role (espera 0) vs admin autenticado (espera dados)
+    const viewResults: Record<string, {
+      service: { count: number | null; error: string | null; sample: any[] | null };
+      authed:  { count: number | null; error: string | null; sample: any[] | null };
+      sql: string;
+    }> = {};
+
+    for (const v of viewNames) {
+      const [svc, aut] = await Promise.all([
+        safe(supabaseAdmin.from(v as any).select("*", { count: "exact" }).limit(3)),
+        safe(context.supabase.from(v as any).select("*", { count: "exact" }).limit(3)),
+      ]);
+      viewResults[v] = {
+        service: { count: svc.count, error: svc.error, sample: (svc.data as any[] | null) },
+        authed:  { count: aut.count, error: aut.error, sample: (aut.data as any[] | null) },
+        sql: VIEW_SQL[v] ?? "(definição não capturada)",
+      };
+    }
+
+    // 4. Normalização esperada — quais plataformas do raw mapeariam para algum filtro?
+    const normalize = (p: string) => {
+      const l = p.toLowerCase();
+      const map: Record<string, string> = {
+        "meta ads": "meta_ads",
+        "google ads": "google_ads",
+        "google analytics 4": "ga4",
+        instagram: "instagram",
+        "google business": "google_business",
+        tiktok: "tiktok",
+      };
+      return map[l] ?? l.replace(/ /g, "_");
+    };
+    const normalizationMap = distinctPlataformas.map((p) => ({
+      raw: p,
+      normalized: normalize(p),
+    }));
+
+    return {
+      base_metricas: {
+        distinct_plataformas: distinctPlataformas,
+        distinct_metricas: distinctMetricas,
+        distinct_clientes: distinctClientes,
+        normalization_map: normalizationMap,
+      },
+      current_user_clientes: {
+        as_admin_authenticated: cucAuth,
+        as_service_role: cucService,
+      },
+      base_metricas_view_sql: VIEW_SQL.vw_metricas_normalizadas,
+      views: viewResults,
+    };
+  });
