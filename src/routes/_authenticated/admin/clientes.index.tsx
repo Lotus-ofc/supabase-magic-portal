@@ -194,7 +194,7 @@ function ClientesList() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
-                      onClick={() => toggle(c.id, !c.ativo)}
+                      onClick={() => toggle(c.id, !c.ativo, c.nome_cliente)}
                       className="lotus-focus inline-flex h-7 items-center rounded-md border border-border bg-card px-2.5 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground"
                     >
                       {c.ativo ? "Desativar" : "Reativar"}
