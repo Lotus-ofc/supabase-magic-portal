@@ -128,10 +128,17 @@ function ClienteEdit() {
         </div>
         <button
           onClick={async () => {
-            if (c.ativo && !confirm("Desativar cliente?")) return;
-            await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
-            await qc.invalidateQueries({ queryKey: ["admin"] });
-            await router.invalidate();
+            if (c.ativo && !confirm(`Desativar "${c.nome_cliente}"?`)) return;
+            try {
+              await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
+              toast.success(c.ativo ? "Cliente desativado" : "Cliente ativado", {
+                description: c.nome_cliente,
+              });
+              await qc.invalidateQueries({ queryKey: ["admin"] });
+              await router.invalidate();
+            } catch (e) {
+              toast.error("Falha", { description: e instanceof Error ? e.message : "Erro" });
+            }
           }}
           className="rounded-md border border-input px-3 py-1.5 text-xs hover:bg-accent"
         >
