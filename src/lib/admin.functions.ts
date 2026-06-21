@@ -488,11 +488,14 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
           .order("data", { ascending: false })
           .limit(1),
       ),
-      safe(supabaseAdmin.from("vw_overview_cliente").select("*").limit(20)),
-      safe(supabaseAdmin.from("vw_google_ads_diario").select("*").limit(20)),
-      safe(supabaseAdmin.from("vw_meta_ads_diario").select("*").limit(20)),
-      safe(supabaseAdmin.from("vw_ga4_diario").select("*").limit(20)),
-      safe(supabaseAdmin.from("vw_instagram_diario").select("*").limit(20)),
+      // Views analíticas: SEMPRE via context.supabase (usuário autenticado).
+      // O filtro interno depende de current_user_clientes() => auth.uid().
+      // Com service_role, auth.uid() é NULL e as views retornam 0 linhas.
+      safe(context.supabase.from("vw_overview_cliente").select("*").order("data", { ascending: false }).limit(20)),
+      safe(context.supabase.from("vw_google_ads_diario").select("*").order("data", { ascending: false }).limit(20)),
+      safe(context.supabase.from("vw_meta_ads_diario").select("*").order("data", { ascending: false }).limit(20)),
+      safe(context.supabase.from("vw_ga4_diario").select("*").order("data", { ascending: false }).limit(20)),
+      safe(context.supabase.from("vw_instagram_diario").select("*").order("data", { ascending: false }).limit(20)),
     ]);
 
     const totalRegistros =
