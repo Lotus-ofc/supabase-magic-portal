@@ -1,18 +1,51 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { Suspense, useMemo, useState } from "react";
 import { listClientes, listServicos } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
+import { SectionCard } from "@/components/lotus/SectionCard";
+import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { DeltaPill } from "@/components/lotus/DeltaPill";
+import {
+  ChartFrame,
+  ChartLegendItem,
+} from "@/components/lotus/charts/ChartFrame";
+import {
+  AreaChartLotus,
+  getSeriesColor,
+} from "@/components/lotus/charts/AreaChartLotus";
+import { BarChartLotus } from "@/components/lotus/charts/BarChartLotus";
+import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
+import {
+  PLATFORM_LABEL,
+  aggregateByCliente,
+  dailyFromOverview,
+  deriveCpa,
+  deriveCtr,
+  formatMetric,
+  pctDelta,
+  periodRange,
+  spendShareByPlatform,
+  sumOverview,
+  type OverviewRow,
+} from "@/lib/metrics";
 import {
   Users,
   UserCheck,
-  UserMinus,
   Briefcase,
-  Activity,
   ArrowUpRight,
   RadioTower,
+  DollarSign,
+  Eye,
+  Activity,
+  Target,
+  Compass,
+  Sparkles,
 } from "lucide-react";
+
+// ---------------- Types & queries ----------------
 
 type ClienteAtivo = {
   cliente: string;
@@ -44,12 +77,31 @@ const clientesAtivosQuery = queryOptions({
   },
 });
 
+const overviewAdminQuery = (days: PeriodDays) =>
+  queryOptions({
+    queryKey: ["admin", "overview", days],
+    queryFn: async (): Promise<OverviewRow[]> => {
+      const since = new Date();
+      since.setDate(since.getDate() - days * 2);
+      const { data, error } = await supabase
+        .from("vw_overview_cliente")
+        .select("*")
+        .gte("data", since.toISOString().slice(0, 10))
+        .order("data", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as OverviewRow[];
+    },
+  });
+
+// ---------------- Route ----------------
+
 export const Route = createFileRoute("/_authenticated/admin/")({
-  head: () => ({ meta: [{ title: "Visão geral · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: "Centro executivo · Admin Lotus" }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesAdminQuery);
     void context.queryClient.ensureQueryData(servicosQuery);
     void context.queryClient.ensureQueryData(clientesAtivosQuery);
+    void context.queryClient.ensureQueryData(overviewAdminQuery(30));
   },
   component: AdminOverview,
   errorComponent: ({ error }) => (
@@ -57,6 +109,303 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   ),
   notFoundComponent: () => <div>Não encontrado</div>,
 });
+
+function AdminOverview() {
+  const [days, setDays] = useState<PeriodDays>(30);
+
+  return (
+    <div className="space-y-7">
+      <PageHeader
+        eyebrow="Painel administrativo"
+        title="Centro executivo"
+        description="Visão consolidada da operação Lotus — investimento, performance e portfólio."
+        actions={
+          <div className="flex items-center gap-2">
+            <PeriodToggle value={days} onChange={setDays} />
+            <Link
+              to="/admin/clientes/novo"
+              className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px"
+            >
+              Novo cliente
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        }
+      />
+
+      <Suspense fallback={<ExecutiveSkeleton />}>
+        <ExecutiveBody days={days} />
+      </Suspense>
+    </div>
+  );
+}
+
+function ExecutiveSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="lotus-surface h-28">
+            <div className="lotus-skeleton m-4 h-3 w-1/2" />
+            <div className="lotus-skeleton mx-4 mt-3 h-6 w-2/3" />
+          </div>
+        ))}
+      </div>
+      <div className="lotus-surface h-[320px]">
+        <div className="lotus-skeleton m-5 h-3 w-40" />
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveBody({ days }: { days: PeriodDays }) {
+  const { data: clientes } = useSuspenseQuery(clientesAdminQuery);
+  const { data: servicos } = useSuspenseQuery(servicosQuery);
+  const { data: ativos } = useSuspenseQuery(clientesAtivosQuery);
+  const { data: overview } = useSuspenseQuery(overviewAdminQuery(days));
+
+  const period = useMemo(() => periodRange(days), [days]);
+  const current = overview.filter((r) => r.data >= period.from && r.data <= period.to);
+  const previous = overview.filter((r) => r.data >= period.prevFrom && r.data <= period.prevTo);
+  const cT = sumOverview(current);
+  const pT = sumOverview(previous);
+
+  const daily = dailyFromOverview(current, period);
+  const share = spendShareByPlatform(current);
+  const ctr = deriveCtr(cT.impressions, cT.clicks);
+  const cpa = deriveCpa(cT.spend, cT.conversions);
+
+  const ativosCount = clientes.filter((c: any) => c.ativo).length;
+  const servicosCount = servicos.filter((s: any) => s.ativo).length;
+  const totalAcessos = clientes.reduce(
+    (sum: number, c: any) => sum + (c.qtd_acessos ?? 0),
+    0,
+  );
+  const ultimaSync = ativos
+    .map((a) => a.ultima_ingestao)
+    .filter(Boolean)
+    .sort()
+    .pop() as string | undefined;
+
+  const topClientes = aggregateByCliente(current)
+    .sort((a, b) => b.totals.spend - a.totals.spend)
+    .slice(0, 6);
+
+  return (
+    <div className="space-y-7">
+      {/* HERO KPIs */}
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+        <StatCard
+          label="Investimento total"
+          value={formatMetric("spend", cT.spend)}
+          icon={DollarSign}
+          emphasis="hero"
+          delta={pctDelta(cT.spend, pT.spend)}
+          hint={`Meta ${formatMetric("spend", cT.meta_spend)} · Google ${formatMetric("spend", cT.google_spend)}`}
+          className="lg:col-span-2"
+        />
+        <StatCard
+          label="Clientes ativos"
+          value={ativosCount}
+          icon={UserCheck}
+          hint={`${clientes.length} no total`}
+        />
+        <StatCard
+          label="Alcance Instagram"
+          value={formatMetric("reach", cT.reach)}
+          icon={Eye}
+          delta={pctDelta(cT.reach, pT.reach)}
+        />
+        <StatCard
+          label="Sessões GA4"
+          value={formatMetric("sessions", cT.sessions)}
+          icon={Activity}
+          delta={pctDelta(cT.sessions, pT.sessions)}
+        />
+        <StatCard
+          label="Conversões"
+          value={formatMetric("conversions", cT.conversions)}
+          icon={Target}
+          delta={pctDelta(cT.conversions, pT.conversions)}
+          hint={cpa > 0 ? `CPA ${formatMetric("spend", cpa)}` : undefined}
+        />
+      </section>
+
+      {/* SECUNDÁRIOS — operacional */}
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard
+          label="Serviços ativos"
+          value={servicosCount}
+          icon={Briefcase}
+          emphasis="compact"
+        />
+        <StatCard
+          label="Acessos vinculados"
+          value={totalAcessos}
+          icon={Users}
+          emphasis="compact"
+        />
+        <StatCard
+          label="Última sync"
+          value={relTime(ultimaSync ?? null)}
+          icon={RadioTower}
+          emphasis="compact"
+        />
+        <StatCard
+          label="CTR consolidado"
+          value={cT.impressions > 0 ? `${ctr.toFixed(2)}%` : "—"}
+          icon={Sparkles}
+          emphasis="compact"
+        />
+      </section>
+
+      {/* EVOLUÇÃO + DISTRIBUIÇÃO */}
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <ChartFrame
+          eyebrow="Evolução"
+          title="Investimento diário consolidado"
+          description="Todas as contas Lotus, soma diária Meta + Google + Conversões."
+          headline={formatMetric("spend", cT.spend)}
+          meta={<DeltaPill delta={pctDelta(cT.spend, pT.spend)} showSuffix />}
+          legend={
+            <>
+              <ChartLegendItem
+                color={getSeriesColor("primary")}
+                label="Meta Ads"
+                value={formatMetric("spend", cT.meta_spend)}
+              />
+              <ChartLegendItem
+                color={getSeriesColor("secondary")}
+                label="Google Ads"
+                value={formatMetric("spend", cT.google_spend)}
+              />
+              <ChartLegendItem
+                color={getSeriesColor("success")}
+                label="Conversões"
+                value={formatMetric("conversions", cT.conversions)}
+              />
+            </>
+          }
+          className="xl:col-span-2"
+        >
+          {cT.spend === 0 && cT.conversions === 0 ? (
+            <EmptyChart />
+          ) : (
+            <AreaChartLotus
+              data={daily}
+              yMetric="spend"
+              series={[
+                { key: "meta_spend",   label: "Meta Ads",    metric: "spend",       tone: "primary"   },
+                { key: "google_spend", label: "Google Ads",  metric: "spend",       tone: "secondary" },
+                { key: "conversions",  label: "Conversões",  metric: "conversions", tone: "success"   },
+              ]}
+              height={280}
+            />
+          )}
+        </ChartFrame>
+
+        <ChartFrame
+          eyebrow="Distribuição"
+          title="Mix de investimento"
+          description="Onde o orçamento do portfólio foi alocado."
+        >
+          {share.length === 0 ? (
+            <EmptyMini icon={Compass} text="Sem investimento registrado no período." />
+          ) : (
+            <DonutChartLotus
+              slices={share.map((s) => ({
+                key: s.platform,
+                label: s.label,
+                value: s.value,
+                tone: s.platform === "meta_ads" ? "primary" : "secondary",
+              }))}
+              metric="spend"
+              centerLabel="Total"
+              centerValue={formatMetric("spend", cT.spend)}
+            />
+          )}
+        </ChartFrame>
+      </section>
+
+      {/* TOP CLIENTES + INGESTÃO */}
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <ChartFrame
+          eyebrow="Top clientes"
+          title={`Maior investimento · ${days} dias`}
+          description="Ordenado por orçamento de mídia executado."
+          className="xl:col-span-2"
+        >
+          <BarChartLotus
+            rows={topClientes.map((c, idx) => ({
+              key: c.cliente,
+              label: (
+                <Link
+                  to="/cliente/$cliente"
+                  params={{ cliente: c.cliente }}
+                  className="hover:underline"
+                >
+                  {c.cliente}
+                </Link>
+              ),
+              value: c.totals.spend,
+              metric: "spend",
+              tone: idx === 0 ? "primary" : "secondary",
+              trailing:
+                c.totals.conversions > 0
+                  ? `${formatMetric("conversions", c.totals.conversions)} conv.`
+                  : undefined,
+            }))}
+            empty="Nenhum cliente com investimento no período."
+          />
+        </ChartFrame>
+
+        <SectionCard
+          eyebrow="Ingestão"
+          title="Status das contas"
+          description="Última atualização recebida por cliente."
+          bodyClassName="px-0 py-0"
+        >
+          {ativos.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-muted-foreground">
+              Sem dados em <code>base_metricas</code> ainda.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border/60">
+              {ativos.slice(0, 6).map((a) => (
+                <li key={a.cliente} className="px-5 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <Link
+                      to="/cliente/$cliente"
+                      params={{ cliente: a.cliente }}
+                      className="truncate text-[13px] font-medium text-foreground hover:underline"
+                    >
+                      {a.cliente}
+                    </Link>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {relTime(a.ultima_ingestao)}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {(a.plataformas_ativas ?? []).slice(0, 5).map((p) => (
+                      <span
+                        key={p}
+                        className="inline-flex items-center rounded-md border border-border/60 bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                      >
+                        {PLATFORM_LABEL[p as keyof typeof PLATFORM_LABEL] ?? p}
+                      </span>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </SectionCard>
+      </section>
+    </div>
+  );
+}
+
+// ---------------- Helpers ----------------
 
 function relTime(iso: string | null) {
   if (!iso) return "—";
@@ -70,161 +419,35 @@ function relTime(iso: string | null) {
   return d.toLocaleDateString("pt-BR");
 }
 
-function AdminOverview() {
-  const { data: clientes } = useSuspenseQuery(clientesAdminQuery);
-  const { data: servicos } = useSuspenseQuery(servicosQuery);
-  const { data: ativos } = useSuspenseQuery(clientesAtivosQuery);
-
-  const total = clientes.length;
-  const ativosCount = clientes.filter((c: any) => c.ativo).length;
-  const inativosCount = total - ativosCount;
-  const servicosCount = servicos.filter((s: any) => s.ativo).length;
-  const totalAcessos = clientes.reduce((sum: number, c: any) => sum + (c.qtd_acessos ?? 0), 0);
-  const ultimaSync = ativos
-    .map((a) => a.ultima_ingestao)
-    .filter(Boolean)
-    .sort()
-    .pop() as string | undefined;
-
-  const recentes = [...clientes]
-    .sort((a: any, b: any) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""))
-    .slice(0, 6);
-
-  const topAtivos = [...ativos].slice(0, 5);
-
+function EmptyChart() {
   return (
-    <div className="space-y-7">
-      <PageHeader
-        eyebrow="Painel administrativo"
-        title="Centro de operações"
-        description="Visão executiva do portfólio de clientes, serviços contratados e ingestão de dados."
-        actions={
-          <Link
-            to="/admin/clientes/novo"
-            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px"
-          >
-            Novo cliente
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        }
-      />
+    <div className="flex h-[280px] flex-col items-center justify-center gap-2 text-center">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">
+        <Sparkles className="h-4 w-4" />
+      </div>
+      <p className="font-display text-sm font-semibold">
+        Sem registros no período
+      </p>
+      <p className="max-w-sm text-xs text-muted-foreground">
+        Quando as campanhas começarem a rodar, a evolução aparece aqui.
+      </p>
+    </div>
+  );
+}
 
-      {/* KPI bento: 1 hero + 4 secundários */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
-        <StatCard
-          label="Clientes ativos"
-          value={ativosCount}
-          hint={`${total} no total · ${inativosCount} inativos`}
-          icon={UserCheck}
-          emphasis="hero"
-          className="lg:col-span-2"
-        />
-        <StatCard label="Inativos" value={inativosCount} icon={UserMinus} emphasis="compact" />
-        <StatCard label="Serviços ativos" value={servicosCount} icon={Briefcase} emphasis="compact" />
-        <StatCard label="Acessos vinculados" value={totalAcessos} icon={Users} emphasis="compact" />
-        <StatCard
-          label="Última sync"
-          value={relTime(ultimaSync ?? null)}
-          icon={RadioTower}
-          emphasis="compact"
-        />
-      </section>
-
-      {/* Bento: clientes recentes (grande) + ingestão (compacto) */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lotus-surface lg:col-span-2">
-          <header className="flex items-center justify-between border-b border-border/70 px-5 py-3.5">
-            <div>
-              <h2 className="font-display text-[15px] font-semibold tracking-tight">
-                Clientes recém-atualizados
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Ordenados por última alteração no cadastro
-              </p>
-            </div>
-            <Link
-              to="/admin/clientes"
-              className="text-[12px] font-medium text-primary-600 hover:underline dark:text-primary-300"
-            >
-              Ver todos →
-            </Link>
-          </header>
-          <div className="divide-y divide-border/60">
-            {recentes.length === 0 && (
-              <p className="px-5 py-6 text-sm text-muted-foreground">
-                Nenhum cliente cadastrado ainda.
-              </p>
-            )}
-            {recentes.map((c: any) => (
-              <Link
-                key={c.id}
-                to="/admin/clientes/$id"
-                params={{ id: String(c.id) }}
-                className="lotus-row flex items-center justify-between px-5 py-3"
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {c.nome_cliente}
-                    </span>
-                    <span
-                      className={
-                        c.ativo
-                          ? "inline-flex h-1.5 w-1.5 rounded-full bg-success"
-                          : "inline-flex h-1.5 w-1.5 rounded-full bg-muted-foreground/40"
-                      }
-                    />
-                  </div>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {c.empresa ?? "—"} ·{" "}
-                    {(c.servicos ?? []).slice(0, 3).join(", ") || "sem serviços"}
-                  </p>
-                </div>
-                <div className="text-right text-[11px] text-muted-foreground">
-                  <div>{c.qtd_acessos ?? 0} acessos</div>
-                  <div>{relTime(c.updated_at)}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="lotus-surface">
-          <header className="flex items-center justify-between border-b border-border/70 px-5 py-3.5">
-            <h2 className="font-display text-[15px] font-semibold tracking-tight">
-              Ingestão de dados
-            </h2>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </header>
-          <ul className="divide-y divide-border/60">
-            {topAtivos.length === 0 && (
-              <li className="px-5 py-6 text-sm text-muted-foreground">
-                Sem dados em <code>base_metricas</code> ainda.
-              </li>
-            )}
-            {topAtivos.map((a) => (
-              <li key={a.cliente} className="px-5 py-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-medium">{a.cliente}</span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {relTime(a.ultima_ingestao)}
-                  </span>
-                </div>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {(a.plataformas_ativas ?? []).slice(0, 5).map((p) => (
-                    <span
-                      key={p}
-                      className="inline-flex items-center rounded-md border border-border/60 bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+function EmptyMini({
+  icon: Icon,
+  text,
+}: {
+  icon: typeof Sparkles;
+  text: string;
+}) {
+  return (
+    <div className="flex h-[220px] flex-col items-center justify-center gap-2 text-center">
+      <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">
+        <Icon className="h-4 w-4" />
+      </div>
+      <p className="text-[12.5px] text-muted-foreground">{text}</p>
     </div>
   );
 }
