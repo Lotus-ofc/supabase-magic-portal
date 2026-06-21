@@ -57,8 +57,22 @@ function UsuariosPage() {
       <PageHeader
         eyebrow="Operações"
         title="Usuários"
-        description="Todos os usuários cadastrados na plataforma. Aqui você acompanha quem tem acesso administrativo ou de cliente."
+        description="Administradores e clientes com acesso à plataforma."
+        actions={
+          <Link
+            to="/admin/usuarios/novo"
+            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-primary-foreground"
+          >
+            <UserPlus className="h-3.5 w-3.5" /> Novo usuário
+          </Link>
+        }
       />
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <StatCard label="Total" value={String(counts.todos)} icon={UsersIcon} />
+        <StatCard label="Administradores" value={String(counts.admin)} icon={ShieldCheck} />
+        <StatCard label="Clientes" value={String(counts.cliente)} icon={User} />
+      </div>
 
       <div className="lotus-surface overflow-hidden">
         <div className="flex flex-wrap items-center gap-3 border-b border-border/70 px-4 py-3">
