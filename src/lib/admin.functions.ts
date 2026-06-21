@@ -63,6 +63,9 @@ export const getCliente = createServerFn({ method: "GET" })
     return { cliente, servicos: servicos ?? [], acessos: acessos ?? [] };
   });
 
+const optText = (max = 200) =>
+  z.string().trim().max(max).optional().nullable().or(z.literal(""));
+
 const clienteFields = z.object({
   nome_cliente: z.string().trim().min(1).max(200),
   slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/, "Use somente a-z, 0-9 e hífen"),
@@ -71,12 +74,22 @@ const clienteFields = z.object({
   email_principal: z.string().trim().email().max(255).optional().nullable().or(z.literal("")),
   telefone: z.string().trim().max(50).optional().nullable(),
   observacoes: z.string().trim().max(2000).optional().nullable(),
+  // Flags de plataforma (mantidas como text por compat com o Make existente).
   google_ads_ativo: z.string().optional().nullable(),
   meta_ativo: z.string().optional().nullable(),
   ga4_ativo: z.string().optional().nullable(),
   instagram_ativo: z.boolean().default(false),
   google_business_ativo: z.string().optional().nullable(),
-  google_business_location_id: z.string().trim().max(200).optional().nullable(),
+  tiktok_ativo: z.boolean().default(false),
+  // Identificadores técnicos consumidos pelos cenários do Make.
+  google_ads_customer_id: optText(),
+  meta_ad_account_id: optText(),
+  meta_pixel_id: optText(),
+  instagram_business_account_id: optText(),
+  ga4_property_id: optText(),
+  google_business_location_id: optText(),
+  tiktok_ad_account_id: optText(),
+  // Comercial.
   mlabs_url: z.string().trim().max(500).optional().nullable(),
   data_inicio: z.string().optional().nullable(),
   valor_mensal: z.number().nullable().optional(),
@@ -106,12 +119,20 @@ export const checkSlugAvailable = createServerFn({ method: "POST" })
     return { available: !rows || rows.length === 0 };
   });
 
+function sanitizeClientePayload<T extends Record<string, any>>(input: T): T {
+  const out: any = { ...input };
+  for (const k of Object.keys(out)) {
+    if (typeof out[k] === "string" && out[k].trim() === "") out[k] = null;
+  }
+  return out;
+}
+
 export const createCliente = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => clienteFields.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const payload = { ...data, email_principal: data.email_principal || null };
+    const payload = sanitizeClientePayload(data);
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .insert(payload)
@@ -128,8 +149,8 @@ export const updateCliente = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { id, ...patch } = data;
-    if ("email_principal" in patch && !patch.email_principal) patch.email_principal = null;
+    const { id, ...rest } = data;
+    const patch = sanitizeClientePayload(rest);
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .update(patch)
