@@ -101,30 +101,7 @@ function ClientHome() {
         eyebrow="Sua conta na Lotus"
         title="Resultados consolidados"
         description="Uma leitura clara do que está acontecendo nas suas plataformas — sem ruído, com contexto."
-        actions={
-          <div
-            role="tablist"
-            aria-label="Período"
-            className="lotus-surface inline-flex p-0.5"
-          >
-            {PERIODOS.map((p) => (
-              <button
-                key={p.d}
-                role="tab"
-                aria-selected={days === p.d}
-                onClick={() => setDays(p.d)}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  days === p.d
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-xs)]"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        }
+        actions={<PeriodToggle value={days} onChange={setDays} />}
       />
 
       <Suspense fallback={<DashboardSkeleton />}>
