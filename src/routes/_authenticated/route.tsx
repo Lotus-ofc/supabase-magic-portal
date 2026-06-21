@@ -11,6 +11,7 @@ import {
   LogOut,
   Sparkles,
   UserCircle2,
+  Bug,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -50,6 +51,10 @@ function AuthenticatedLayout() {
         { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },
         { to: "/admin/servicos", label: "Serviços", icon: Briefcase },
       ],
+    },
+    {
+      label: "Diagnóstico",
+      items: [{ to: "/admin/debug", label: "Debug de dados", icon: Bug }],
     },
   ];
 
