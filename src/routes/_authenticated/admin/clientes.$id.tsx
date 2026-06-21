@@ -103,9 +103,12 @@ function ClienteEdit() {
         },
       });
       setMsg("Salvo.");
+      toast.success("Cliente atualizado", { description: form.nome_cliente });
       await qc.invalidateQueries({ queryKey: ["admin"] });
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao atualizar", { description: m });
     } finally {
       setSaving(false);
     }
