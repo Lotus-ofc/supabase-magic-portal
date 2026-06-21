@@ -52,6 +52,10 @@ function AuthenticatedLayout() {
         { to: "/admin/servicos", label: "Serviços", icon: Briefcase },
       ],
     },
+    {
+      label: "Diagnóstico",
+      items: [{ to: "/admin/debug", label: "Debug de dados", icon: Bug }],
+    },
   ];
 
   const clientGroups: NavGroup[] = [
