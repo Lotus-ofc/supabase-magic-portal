@@ -374,9 +374,12 @@ function ServicosTab({
         },
       });
       setMsg("Salvo.");
+      toast.success("Serviços atualizados");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao salvar serviços", { description: m });
     } finally {
       setSaving(false);
     }
