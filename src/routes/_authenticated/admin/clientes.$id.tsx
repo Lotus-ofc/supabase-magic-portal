@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
   getCliente,
   listServicos,
@@ -102,9 +103,12 @@ function ClienteEdit() {
         },
       });
       setMsg("Salvo.");
+      toast.success("Cliente atualizado", { description: form.nome_cliente });
       await qc.invalidateQueries({ queryKey: ["admin"] });
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao atualizar", { description: m });
     } finally {
       setSaving(false);
     }
@@ -124,10 +128,17 @@ function ClienteEdit() {
         </div>
         <button
           onClick={async () => {
-            if (c.ativo && !confirm("Desativar cliente?")) return;
-            await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
-            await qc.invalidateQueries({ queryKey: ["admin"] });
-            await router.invalidate();
+            if (c.ativo && !confirm(`Desativar "${c.nome_cliente}"?`)) return;
+            try {
+              await toggleClienteAtivo({ data: { id, ativo: !c.ativo } });
+              toast.success(c.ativo ? "Cliente desativado" : "Cliente ativado", {
+                description: c.nome_cliente,
+              });
+              await qc.invalidateQueries({ queryKey: ["admin"] });
+              await router.invalidate();
+            } catch (e) {
+              toast.error("Falha", { description: e instanceof Error ? e.message : "Erro" });
+            }
           }}
           className="rounded-md border border-input px-3 py-1.5 text-xs hover:bg-accent"
         >
@@ -363,9 +374,12 @@ function ServicosTab({
         },
       });
       setMsg("Salvo.");
+      toast.success("Serviços atualizados");
       await qc.invalidateQueries({ queryKey: ["admin"] });
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao salvar serviços", { description: m });
     } finally {
       setSaving(false);
     }
@@ -425,20 +439,29 @@ function AcessosTab({
 
   const grant = async () => {
     if (!userId) return;
+    const userEmail = users.find((u) => u.id === userId)?.email ?? userId;
     try {
       await grantClientAccess({ data: { user_id: userId, cadastro_cliente_id: clienteId } });
       setUserId("");
+      toast.success("Acesso concedido", { description: userEmail });
       await qc.invalidateQueries({ queryKey: ["admin"] });
       await router.invalidate();
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Erro");
+      const m = e instanceof Error ? e.message : "Erro";
+      setMsg(m);
+      toast.error("Falha ao conceder acesso", { description: m });
     }
   };
-  const revoke = async (id: string) => {
-    if (!confirm("Revogar acesso deste usuário?")) return;
-    await revokeClientAccess({ data: { id } });
-    await qc.invalidateQueries({ queryKey: ["admin"] });
-    await router.invalidate();
+  const revoke = async (id: string, userEmail: string) => {
+    if (!confirm(`Revogar acesso de ${userEmail}?`)) return;
+    try {
+      await revokeClientAccess({ data: { id } });
+      toast.success("Acesso revogado", { description: userEmail });
+      await qc.invalidateQueries({ queryKey: ["admin"] });
+      await router.invalidate();
+    } catch (e) {
+      toast.error("Falha ao revogar", { description: e instanceof Error ? e.message : "Erro" });
+    }
   };
 
   return (
@@ -475,7 +498,7 @@ function AcessosTab({
             <li key={a.id} className="flex items-center justify-between px-3 py-2 text-sm">
               <span>{u?.email ?? a.user_id}</span>
               <button
-                onClick={() => revoke(a.id)}
+                onClick={() => revoke(a.id, u?.email ?? a.user_id)}
                 className="rounded-md border border-input px-2 py-1 text-xs hover:bg-accent"
               >
                 Revogar

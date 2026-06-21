@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { listClientes, toggleClienteAtivo } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Plus, MoreHorizontal, Filter, X } from "lucide-react";
 
 const clientesQuery = {
   queryKey: ["admin", "clientes"],
@@ -23,27 +24,37 @@ function ClientesList() {
   const { data } = useSuspenseQuery(clientesQuery);
   const qc = useQueryClient();
   const router = useRouter();
-  const [filter, setFilter] = useState<"todos" | "ativos" | "inativos">("ativos");
+  const [filter, setFilter] = useState<"todos" | "ativos" | "inativos">("todos");
   const [search, setSearch] = useState("");
 
-  const rows = (data ?? []).filter((c: any) => {
+  const all = data ?? [];
+  const rows = all.filter((c: any) => {
     if (filter === "ativos" && !c.ativo) return false;
     if (filter === "inativos" && c.ativo) return false;
     if (search && !c.nome_cliente.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
-  const toggle = async (id: number, ativo: boolean) => {
-    if (!ativo && !confirm("Desativar este cliente? O histórico será preservado.")) return;
-    await toggleClienteAtivo({ data: { id, ativo } });
-    await qc.invalidateQueries({ queryKey: ["admin", "clientes"] });
-    await router.invalidate();
+  const hiddenCount = all.length - rows.length;
+  const filterActive = filter !== "todos" || search.length > 0;
+
+  const toggle = async (id: number, ativo: boolean, nome: string) => {
+    if (!ativo && !confirm(`Desativar "${nome}"? O histórico será preservado.`)) return;
+    const promise = toggleClienteAtivo({ data: { id, ativo } }).then(async () => {
+      await qc.invalidateQueries({ queryKey: ["admin", "clientes"] });
+      await router.invalidate();
+    });
+    toast.promise(promise, {
+      loading: ativo ? "Reativando…" : "Desativando…",
+      success: ativo ? `${nome} reativado` : `${nome} desativado`,
+      error: (e) => `Erro: ${e instanceof Error ? e.message : "falha"}`,
+    });
   };
 
   const filters: Array<{ key: typeof filter; label: string; count: number }> = [
-    { key: "ativos", label: "Ativos", count: (data ?? []).filter((c: any) => c.ativo).length },
-    { key: "inativos", label: "Inativos", count: (data ?? []).filter((c: any) => !c.ativo).length },
-    { key: "todos", label: "Todos", count: (data ?? []).length },
+    { key: "todos", label: "Todos", count: all.length },
+    { key: "ativos", label: "Ativos", count: all.filter((c: any) => c.ativo).length },
+    { key: "inativos", label: "Inativos", count: all.filter((c: any) => !c.ativo).length },
   ];
 
   return (
@@ -92,6 +103,36 @@ function ClientesList() {
             ))}
           </div>
         </div>
+
+        {/* Filter banner */}
+        {filterActive && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-4 py-2 text-[12px]">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Filter className="h-3.5 w-3.5" />
+              <span>
+                Exibindo <strong className="text-foreground tabular-nums">{rows.length}</strong> de{" "}
+                <strong className="text-foreground tabular-nums">{all.length}</strong> cliente
+                {all.length === 1 ? "" : "s"}
+                {hiddenCount > 0 && (
+                  <>
+                    {" "}
+                    · <span className="text-foreground">{hiddenCount} oculto{hiddenCount === 1 ? "" : "s"}</span> pelo filtro
+                  </>
+                )}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setFilter("todos");
+                setSearch("");
+              }}
+              className="lotus-focus inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[11.5px] font-medium text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> Limpar filtros
+            </button>
+          </div>
+        )}
+
 
         {/* Table */}
         <div className="overflow-x-auto">
@@ -183,7 +224,7 @@ function ClientesList() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
-                      onClick={() => toggle(c.id, !c.ativo)}
+                      onClick={() => toggle(c.id, !c.ativo, c.nome_cliente)}
                       className="lotus-focus inline-flex h-7 items-center rounded-md border border-border bg-card px-2.5 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground"
                     >
                       {c.ativo ? "Desativar" : "Reativar"}
