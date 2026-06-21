@@ -104,6 +104,36 @@ function ClientesList() {
           </div>
         </div>
 
+        {/* Filter banner */}
+        {filterActive && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-4 py-2 text-[12px]">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Filter className="h-3.5 w-3.5" />
+              <span>
+                Exibindo <strong className="text-foreground tabular-nums">{rows.length}</strong> de{" "}
+                <strong className="text-foreground tabular-nums">{all.length}</strong> cliente
+                {all.length === 1 ? "" : "s"}
+                {hiddenCount > 0 && (
+                  <>
+                    {" "}
+                    · <span className="text-foreground">{hiddenCount} oculto{hiddenCount === 1 ? "" : "s"}</span> pelo filtro
+                  </>
+                )}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setFilter("todos");
+                setSearch("");
+              }}
+              className="lotus-focus inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[11.5px] font-medium text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> Limpar filtros
+            </button>
+          </div>
+        )}
+
+
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
