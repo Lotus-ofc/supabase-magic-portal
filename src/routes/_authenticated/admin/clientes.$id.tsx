@@ -346,11 +346,11 @@ function ClienteEdit() {
         </div>
       )}
 
-      {/* IDENTIDADE */}
+      {/* 01 IDENTIDADE */}
       <CollapsibleSection
         eyebrow="01"
         title="Identidade"
-        description="Nome, URL amigável e contato principal."
+        description="Nome do cliente e razão social."
       >
         <FormRow>
           <Field label="Nome do cliente" required error={errors.nome_cliente}>
@@ -363,38 +363,47 @@ function ClienteEdit() {
               invalid={!!errors.nome_cliente}
             />
           </Field>
-          <Field
-            label="Empresa"
-            hint="Razão social ou nome fantasia da empresa do cliente."
-          >
+          <Field label="Empresa" hint="Razão social ou nome fantasia.">
             <TextInput value={form.empresa} onChange={(e) => set("empresa", e.target.value)} />
           </Field>
         </FormRow>
 
-        <div className="mt-3">
-          <Field
-            label="Slug (URL)"
-            required
-            error={errors.slug}
-            hint={
-              <span className="inline-flex items-center gap-1.5">
-                <span className="font-mono text-foreground/80">
-                  lotus.app/cliente/{form.slug || "—"}
+        <details className="group mt-4 rounded-lg border border-dashed border-border bg-muted/20 px-3 py-2 open:bg-muted/30">
+          <summary className="lotus-focus cursor-pointer select-none text-[11.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground">
+            Avançado — Slug (URL)
+          </summary>
+          <div className="mt-3">
+            <Field
+              label="Slug (URL)"
+              required
+              error={errors.slug}
+              hint={
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="font-mono text-foreground/80">
+                    lotus.app/cliente/{form.slug || "—"}
+                  </span>
+                  <SlugIndicator status={slugStatus} invalid={slugInvalid} />
                 </span>
-                <SlugIndicator status={slugStatus} invalid={slugInvalid} />
-              </span>
-            }
-          >
-            <TextInput
-              value={form.slug}
-              onChange={(e) => set("slug", slugify(e.target.value))}
-              placeholder="ex: cliente-acme"
-              invalid={!!errors.slug || slugStatus === "taken" || slugInvalid}
-            />
-          </Field>
-        </div>
+              }
+            >
+              <TextInput
+                value={form.slug}
+                onChange={(e) => set("slug", slugify(e.target.value))}
+                placeholder="ex: cliente-acme"
+                invalid={!!errors.slug || slugStatus === "taken" || slugInvalid}
+              />
+            </Field>
+          </div>
+        </details>
+      </CollapsibleSection>
 
-        <FormRow className="mt-3">
+      {/* 02 CONTATO */}
+      <CollapsibleSection
+        eyebrow="02"
+        title="Contato"
+        description="Canal principal de comunicação com o cliente."
+      >
+        <FormRow>
           <Field label="Email principal" error={errors.email_principal}>
             <TextInput
               type="email"
@@ -412,23 +421,13 @@ function ClienteEdit() {
             />
           </Field>
         </FormRow>
-
-        <div className="mt-3">
-          <Field label="Observações internas" hint="Visível apenas para administradores.">
-            <TextArea
-              rows={3}
-              value={form.observacoes}
-              onChange={(e) => set("observacoes", e.target.value)}
-            />
-          </Field>
-        </div>
       </CollapsibleSection>
 
-      {/* COMERCIAL */}
+      {/* 03 COMERCIAL */}
       <CollapsibleSection
-        eyebrow="02"
+        eyebrow="03"
         title="Comercial"
-        description="Início do contrato, valor mensal e canais de gestão."
+        description="Início do contrato, valor mensal, mLabs e observações internas."
       >
         <FormRow>
           <Field label="Data de início">
@@ -458,12 +457,21 @@ function ClienteEdit() {
             />
           </Field>
         </div>
+        <div className="mt-3">
+          <Field label="Observações internas" hint="Visível apenas para administradores.">
+            <TextArea
+              rows={3}
+              value={form.observacoes}
+              onChange={(e) => set("observacoes", e.target.value)}
+            />
+          </Field>
+        </div>
       </CollapsibleSection>
 
-      {/* PLATAFORMAS */}
+      {/* 04 PLATAFORMAS ATIVAS */}
       <CollapsibleSection
-        eyebrow="03"
-        title="Plataformas"
+        eyebrow="04"
+        title="Plataformas ativas"
         description="Quais fontes de dados o Make alimenta para este cliente."
         badge={
           <span className="rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
@@ -471,7 +479,7 @@ function ClienteEdit() {
           </span>
         }
       >
-        <div className="space-y-2">
+        <div className="grid gap-2 md:grid-cols-2">
           <PlatformToggle
             label="Google Ads"
             description="Investimento, cliques, conversões."
@@ -485,16 +493,16 @@ function ClienteEdit() {
             onChange={(b) => set("meta_ativo", b)}
           />
           <PlatformToggle
-            label="Google Analytics 4"
-            description="Tráfego do site e conversões orgânicas."
-            checked={form.ga4_ativo}
-            onChange={(b) => set("ga4_ativo", b)}
-          />
-          <PlatformToggle
             label="Instagram Orgânico"
             description="Alcance, impressões, engajamento."
             checked={form.instagram_ativo}
             onChange={(b) => set("instagram_ativo", b)}
+          />
+          <PlatformToggle
+            label="Google Analytics 4"
+            description="Tráfego do site e conversões orgânicas."
+            checked={form.ga4_ativo}
+            onChange={(b) => set("ga4_ativo", b)}
           />
           <PlatformToggle
             label="Google Meu Negócio"
@@ -502,19 +510,39 @@ function ClienteEdit() {
             checked={form.google_business_ativo}
             onChange={(b) => set("google_business_ativo", b)}
           />
+          <PlatformToggle
+            label="TikTok Ads"
+            description="Campanhas pagas no TikTok."
+            checked={form.tiktok_ativo}
+            onChange={(b) => set("tiktok_ativo", b)}
+          />
         </div>
-        {form.google_business_ativo && (
-          <div className="mt-4 rounded-lg border border-border bg-muted/30 p-4">
-            <Field label="Google Business Location ID" hint="ID numérico do perfil no GMB.">
-              <TextInput
-                value={form.google_business_location_id}
-                onChange={(e) => set("google_business_location_id", e.target.value)}
-                placeholder="123456789012345"
-              />
-            </Field>
-          </div>
-        )}
       </CollapsibleSection>
+
+      {/* 05 INTEGRAÇÕES */}
+      <CollapsibleSection
+        eyebrow="05"
+        title="Integrações"
+        description="Identificadores técnicos lidos pelos cenários do Make. Todos opcionais."
+        badge={
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium text-muted-foreground">
+            {integrationsConfigured} / {INTEGRATIONS.length} ok
+          </span>
+        }
+      >
+        <div className="grid gap-3 md:grid-cols-2">
+          {INTEGRATIONS.map((integration) => (
+            <IntegrationCard
+              key={integration.key}
+              integration={integration}
+              active={!!integrationActiveMap[integration.activeField]}
+              values={form as unknown as Record<string, string>}
+              onChange={(col, value) => setForm((f) => ({ ...f, [col]: value }))}
+            />
+          ))}
+        </div>
+      </CollapsibleSection>
+
 
       {/* SERVIÇOS */}
       <CollapsibleSection
