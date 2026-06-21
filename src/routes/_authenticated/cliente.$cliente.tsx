@@ -3,7 +3,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
-import { SectionCard } from "@/components/lotus/SectionCard";
+import { cn } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Inbox } from "lucide-react";
 
