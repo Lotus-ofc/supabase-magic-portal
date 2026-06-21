@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
+import { ImpersonateClienteMenu } from "@/components/lotus/ImpersonateClienteMenu";
 import {
   LayoutDashboard,
   Users,
