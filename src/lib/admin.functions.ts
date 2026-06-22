@@ -83,9 +83,9 @@ const clienteFields = z.object({
   tiktok_ativo: z.boolean().default(false),
   // Identificadores técnicos consumidos pelos cenários do Make.
   google_ads_customer_id: optText(),
-  meta_ad_account_id: optText(),
-  meta_pixel_id: optText(),
-  instagram_business_account_id: optText(),
+  facebook_ad_account_id: optText(),
+  instagram_username: optText(),
+  instagram_page_id: optText(),
   ga4_property_id: optText(),
   google_business_location_id: optText(),
   tiktok_ad_account_id: optText(),
