@@ -12,6 +12,9 @@ import {
   Sparkles,
   UserCircle2,
   Bug,
+  FileBarChart,
+  CalendarDays,
+  ClipboardCheck,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -47,6 +50,8 @@ function AuthenticatedLayout() {
       label: "Operações",
       items: [
         { to: "/admin", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
+        { to: "/admin/relatorios", label: "Relatórios", icon: FileBarChart },
+        { to: "/admin/editorial", label: "Calendário Editorial", icon: CalendarDays },
         { to: "/admin/clientes", label: "Clientes", icon: Users },
         { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },
         { to: "/admin/servicos", label: "Serviços", icon: Briefcase },
@@ -66,6 +71,7 @@ function AuthenticatedLayout() {
       label: "Plataforma",
       items: [
         { to: "/dashboard", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
+        { to: "/aprovacoes", label: "Aprovações", icon: ClipboardCheck },
       ],
     },
     ...(isAdmin

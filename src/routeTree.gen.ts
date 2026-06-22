@@ -13,11 +13,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedClienteClienteRouteImport } from './routes/_authenticated/cliente.$cliente'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedAdminServicosRouteImport } from './routes/_authenticated/admin/servicos'
+import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin/relatorios'
+import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes.index'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin/usuarios.novo'
@@ -42,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAprovacoesRoute = AuthenticatedAprovacoesRouteImport.update({
+  id: '/aprovacoes',
+  path: '/aprovacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -70,6 +78,18 @@ const AuthenticatedAdminServicosRoute =
   AuthenticatedAdminServicosRouteImport.update({
     id: '/servicos',
     path: '/servicos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminRelatoriosRoute =
+  AuthenticatedAdminRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminEditorialRoute =
+  AuthenticatedAdminEditorialRouteImport.update({
+    id: '/editorial',
+    path: '/editorial',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
@@ -112,8 +132,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
+  '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
@@ -127,8 +150,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
+  '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
@@ -145,8 +171,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
+  '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
+  '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
@@ -163,8 +192,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/aprovacoes'
     | '/dashboard'
     | '/admin/debug'
+    | '/admin/editorial'
+    | '/admin/relatorios'
     | '/admin/servicos'
     | '/admin/usuarios'
     | '/cliente/$cliente'
@@ -178,8 +210,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/aprovacoes'
     | '/dashboard'
     | '/admin/debug'
+    | '/admin/editorial'
+    | '/admin/relatorios'
     | '/admin/servicos'
     | '/admin/usuarios'
     | '/cliente/$cliente'
@@ -195,8 +230,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
+    | '/_authenticated/aprovacoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/admin/debug'
+    | '/_authenticated/admin/editorial'
+    | '/_authenticated/admin/relatorios'
     | '/_authenticated/admin/servicos'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/cliente/$cliente'
@@ -244,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/aprovacoes': {
+      id: '/_authenticated/aprovacoes'
+      path: '/aprovacoes'
+      fullPath: '/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -277,6 +322,20 @@ declare module '@tanstack/react-router' {
       path: '/servicos'
       fullPath: '/admin/servicos'
       preLoaderRoute: typeof AuthenticatedAdminServicosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/relatorios': {
+      id: '/_authenticated/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/editorial': {
+      id: '/_authenticated/admin/editorial'
+      path: '/editorial'
+      fullPath: '/admin/editorial'
+      preLoaderRoute: typeof AuthenticatedAdminEditorialRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/debug': {
@@ -354,6 +413,8 @@ const AuthenticatedAdminUsuariosRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
+  AuthenticatedAdminEditorialRoute: typeof AuthenticatedAdminEditorialRoute
+  AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
   AuthenticatedAdminServicosRoute: typeof AuthenticatedAdminServicosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -365,6 +426,8 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
+    AuthenticatedAdminEditorialRoute: AuthenticatedAdminEditorialRoute,
+    AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
     AuthenticatedAdminServicosRoute: AuthenticatedAdminServicosRoute,
     AuthenticatedAdminUsuariosRoute:
       AuthenticatedAdminUsuariosRouteWithChildren,
@@ -381,12 +444,14 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedClienteClienteRoute: typeof AuthenticatedClienteClienteRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedClienteClienteRoute: AuthenticatedClienteClienteRoute,
 }
@@ -402,13 +467,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
