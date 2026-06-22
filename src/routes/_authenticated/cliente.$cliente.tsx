@@ -209,7 +209,7 @@ function ClienteResolved({
         description="Resultados consolidados das suas plataformas, atualizados automaticamente."
         actions={<PeriodToggle value={days} onChange={setDays} />}
       />
-      <ClienteBody cliente={ref.nome} days={days} />
+      <ClienteBody cliente={ref.queryName} days={days} />
     </>
   );
 }
