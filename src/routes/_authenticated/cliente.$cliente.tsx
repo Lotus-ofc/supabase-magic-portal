@@ -251,6 +251,16 @@ function ClienteBody({ cliente, days }: { cliente: string; days: PeriodDays }) {
   const cT = sumOverview(current);
   const pT = sumOverview(previous);
 
+  console.log("[ClienteBody]", {
+    cliente,
+    days,
+    period,
+    rowsTotal: rows.length,
+    currentLen: current.length,
+    sampleClientes: Array.from(new Set(rows.map((r: any) => r.cliente))),
+  });
+
+
   const ctr = deriveCtr(cT.impressions, cT.clicks);
   const ctrPrev = deriveCtr(pT.impressions, pT.clicks);
   const convRate = deriveConvRate(cT.sessions, cT.conversions);
