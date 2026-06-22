@@ -98,12 +98,16 @@ export const clientePlatformsQuery = (queryName: string) =>
       ]);
 
       const rows = (ov.data ?? []) as Array<Record<string, number | null>>;
-      const agg = rows.reduce(
+      const agg = rows.reduce<{
+        meta: number;
+        google: number;
+        ga4: number;
+        ig: number;
+      }>(
         (a, r) => ({
           meta: a.meta + Number(r.meta_spend ?? 0),
           google: a.google + Number(r.google_spend ?? 0),
-          ga4:
-            a.ga4 + Number(r.sessions ?? 0) + Number(r.conversions ?? 0),
+          ga4: a.ga4 + Number(r.sessions ?? 0) + Number(r.conversions ?? 0),
           ig: a.ig + Number(r.reach ?? 0) + Number(r.engagement ?? 0),
         }),
         { meta: 0, google: 0, ga4: 0, ig: 0 },

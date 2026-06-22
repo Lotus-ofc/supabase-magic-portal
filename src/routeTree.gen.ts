@@ -22,7 +22,14 @@ import { Route as AuthenticatedAdminServicosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin/relatorios'
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
+import { Route as AuthenticatedClienteClienteIndexRouteImport } from './routes/_authenticated/cliente.$cliente.index'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes.index'
+import { Route as AuthenticatedClienteClienteTiktokRouteImport } from './routes/_authenticated/cliente.$cliente.tiktok'
+import { Route as AuthenticatedClienteClienteMetaAdsRouteImport } from './routes/_authenticated/cliente.$cliente.meta-ads'
+import { Route as AuthenticatedClienteClienteInstagramRouteImport } from './routes/_authenticated/cliente.$cliente.instagram'
+import { Route as AuthenticatedClienteClienteGoogleBusinessRouteImport } from './routes/_authenticated/cliente.$cliente.google-business'
+import { Route as AuthenticatedClienteClienteGoogleAdsRouteImport } from './routes/_authenticated/cliente.$cliente.google-ads'
+import { Route as AuthenticatedClienteClienteGa4RouteImport } from './routes/_authenticated/cliente.$cliente.ga4'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin/usuarios.novo'
 import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
@@ -97,11 +104,53 @@ const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedClienteClienteIndexRoute =
+  AuthenticatedClienteClienteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
 const AuthenticatedAdminClientesIndexRoute =
   AuthenticatedAdminClientesIndexRouteImport.update({
     id: '/clientes/',
     path: '/clientes/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedClienteClienteTiktokRoute =
+  AuthenticatedClienteClienteTiktokRouteImport.update({
+    id: '/tiktok',
+    path: '/tiktok',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedClienteClienteMetaAdsRoute =
+  AuthenticatedClienteClienteMetaAdsRouteImport.update({
+    id: '/meta-ads',
+    path: '/meta-ads',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedClienteClienteInstagramRoute =
+  AuthenticatedClienteClienteInstagramRouteImport.update({
+    id: '/instagram',
+    path: '/instagram',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedClienteClienteGoogleBusinessRoute =
+  AuthenticatedClienteClienteGoogleBusinessRouteImport.update({
+    id: '/google-business',
+    path: '/google-business',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedClienteClienteGoogleAdsRoute =
+  AuthenticatedClienteClienteGoogleAdsRouteImport.update({
+    id: '/google-ads',
+    path: '/google-ads',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedClienteClienteGa4Route =
+  AuthenticatedClienteClienteGa4RouteImport.update({
+    id: '/ga4',
+    path: '/ga4',
+    getParentRoute: () => AuthenticatedClienteClienteRoute,
   } as any)
 const AuthenticatedAdminUsuariosNovoRoute =
   AuthenticatedAdminUsuariosNovoRouteImport.update({
@@ -139,13 +188,20 @@ export interface FileRoutesByFullPath {
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
-  '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
+  '/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
+  '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
+  '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
+  '/cliente/$cliente/google-business': typeof AuthenticatedClienteClienteGoogleBusinessRoute
+  '/cliente/$cliente/instagram': typeof AuthenticatedClienteClienteInstagramRoute
+  '/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
+  '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -157,13 +213,19 @@ export interface FileRoutesByTo {
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
-  '/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
+  '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
+  '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
+  '/cliente/$cliente/google-business': typeof AuthenticatedClienteClienteGoogleBusinessRoute
+  '/cliente/$cliente/instagram': typeof AuthenticatedClienteClienteInstagramRoute
+  '/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
+  '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
+  '/cliente/$cliente': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,13 +240,20 @@ export interface FileRoutesById {
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
-  '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRoute
+  '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
+  '/_authenticated/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
+  '/_authenticated/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
+  '/_authenticated/cliente/$cliente/google-business': typeof AuthenticatedClienteClienteGoogleBusinessRoute
+  '/_authenticated/cliente/$cliente/instagram': typeof AuthenticatedClienteClienteInstagramRoute
+  '/_authenticated/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
+  '/_authenticated/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/_authenticated/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -205,7 +274,14 @@ export interface FileRouteTypes {
     | '/admin/clientes/novo'
     | '/admin/debug/views'
     | '/admin/usuarios/novo'
+    | '/cliente/$cliente/ga4'
+    | '/cliente/$cliente/google-ads'
+    | '/cliente/$cliente/google-business'
+    | '/cliente/$cliente/instagram'
+    | '/cliente/$cliente/meta-ads'
+    | '/cliente/$cliente/tiktok'
     | '/admin/clientes/'
+    | '/cliente/$cliente/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,13 +293,19 @@ export interface FileRouteTypes {
     | '/admin/relatorios'
     | '/admin/servicos'
     | '/admin/usuarios'
-    | '/cliente/$cliente'
     | '/admin'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
     | '/admin/debug/views'
     | '/admin/usuarios/novo'
+    | '/cliente/$cliente/ga4'
+    | '/cliente/$cliente/google-ads'
+    | '/cliente/$cliente/google-business'
+    | '/cliente/$cliente/instagram'
+    | '/cliente/$cliente/meta-ads'
+    | '/cliente/$cliente/tiktok'
     | '/admin/clientes'
+    | '/cliente/$cliente'
   id:
     | '__root__'
     | '/'
@@ -243,7 +325,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes/novo'
     | '/_authenticated/admin/debug/views'
     | '/_authenticated/admin/usuarios/novo'
+    | '/_authenticated/cliente/$cliente/ga4'
+    | '/_authenticated/cliente/$cliente/google-ads'
+    | '/_authenticated/cliente/$cliente/google-business'
+    | '/_authenticated/cliente/$cliente/instagram'
+    | '/_authenticated/cliente/$cliente/meta-ads'
+    | '/_authenticated/cliente/$cliente/tiktok'
     | '/_authenticated/admin/clientes/'
+    | '/_authenticated/cliente/$cliente/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -345,12 +434,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDebugRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/cliente/$cliente/': {
+      id: '/_authenticated/cliente/$cliente/'
+      path: '/'
+      fullPath: '/cliente/$cliente/'
+      preLoaderRoute: typeof AuthenticatedClienteClienteIndexRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
     '/_authenticated/admin/clientes/': {
       id: '/_authenticated/admin/clientes/'
       path: '/clientes'
       fullPath: '/admin/clientes/'
       preLoaderRoute: typeof AuthenticatedAdminClientesIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/cliente/$cliente/tiktok': {
+      id: '/_authenticated/cliente/$cliente/tiktok'
+      path: '/tiktok'
+      fullPath: '/cliente/$cliente/tiktok'
+      preLoaderRoute: typeof AuthenticatedClienteClienteTiktokRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/cliente/$cliente/meta-ads': {
+      id: '/_authenticated/cliente/$cliente/meta-ads'
+      path: '/meta-ads'
+      fullPath: '/cliente/$cliente/meta-ads'
+      preLoaderRoute: typeof AuthenticatedClienteClienteMetaAdsRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/cliente/$cliente/instagram': {
+      id: '/_authenticated/cliente/$cliente/instagram'
+      path: '/instagram'
+      fullPath: '/cliente/$cliente/instagram'
+      preLoaderRoute: typeof AuthenticatedClienteClienteInstagramRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/cliente/$cliente/google-business': {
+      id: '/_authenticated/cliente/$cliente/google-business'
+      path: '/google-business'
+      fullPath: '/cliente/$cliente/google-business'
+      preLoaderRoute: typeof AuthenticatedClienteClienteGoogleBusinessRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/cliente/$cliente/google-ads': {
+      id: '/_authenticated/cliente/$cliente/google-ads'
+      path: '/google-ads'
+      fullPath: '/cliente/$cliente/google-ads'
+      preLoaderRoute: typeof AuthenticatedClienteClienteGoogleAdsRouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/cliente/$cliente/ga4': {
+      id: '/_authenticated/cliente/$cliente/ga4'
+      path: '/ga4'
+      fullPath: '/cliente/$cliente/ga4'
+      preLoaderRoute: typeof AuthenticatedClienteClienteGa4RouteImport
+      parentRoute: typeof AuthenticatedClienteClienteRoute
     }
     '/_authenticated/admin/usuarios/novo': {
       id: '/_authenticated/admin/usuarios/novo'
@@ -442,18 +580,51 @@ const AuthenticatedAdminRouteRouteWithChildren =
     AuthenticatedAdminRouteRouteChildren,
   )
 
+interface AuthenticatedClienteClienteRouteChildren {
+  AuthenticatedClienteClienteGa4Route: typeof AuthenticatedClienteClienteGa4Route
+  AuthenticatedClienteClienteGoogleAdsRoute: typeof AuthenticatedClienteClienteGoogleAdsRoute
+  AuthenticatedClienteClienteGoogleBusinessRoute: typeof AuthenticatedClienteClienteGoogleBusinessRoute
+  AuthenticatedClienteClienteInstagramRoute: typeof AuthenticatedClienteClienteInstagramRoute
+  AuthenticatedClienteClienteMetaAdsRoute: typeof AuthenticatedClienteClienteMetaAdsRoute
+  AuthenticatedClienteClienteTiktokRoute: typeof AuthenticatedClienteClienteTiktokRoute
+  AuthenticatedClienteClienteIndexRoute: typeof AuthenticatedClienteClienteIndexRoute
+}
+
+const AuthenticatedClienteClienteRouteChildren: AuthenticatedClienteClienteRouteChildren =
+  {
+    AuthenticatedClienteClienteGa4Route: AuthenticatedClienteClienteGa4Route,
+    AuthenticatedClienteClienteGoogleAdsRoute:
+      AuthenticatedClienteClienteGoogleAdsRoute,
+    AuthenticatedClienteClienteGoogleBusinessRoute:
+      AuthenticatedClienteClienteGoogleBusinessRoute,
+    AuthenticatedClienteClienteInstagramRoute:
+      AuthenticatedClienteClienteInstagramRoute,
+    AuthenticatedClienteClienteMetaAdsRoute:
+      AuthenticatedClienteClienteMetaAdsRoute,
+    AuthenticatedClienteClienteTiktokRoute:
+      AuthenticatedClienteClienteTiktokRoute,
+    AuthenticatedClienteClienteIndexRoute:
+      AuthenticatedClienteClienteIndexRoute,
+  }
+
+const AuthenticatedClienteClienteRouteWithChildren =
+  AuthenticatedClienteClienteRoute._addFileChildren(
+    AuthenticatedClienteClienteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedClienteClienteRoute: typeof AuthenticatedClienteClienteRoute
+  AuthenticatedClienteClienteRoute: typeof AuthenticatedClienteClienteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedClienteClienteRoute: AuthenticatedClienteClienteRoute,
+  AuthenticatedClienteClienteRoute:
+    AuthenticatedClienteClienteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
