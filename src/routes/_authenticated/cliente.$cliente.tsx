@@ -48,16 +48,34 @@ import { cn } from "@/lib/utils";
 
 // ---------------- Queries ----------------
 
-const overviewQuery = (cliente: string, days: PeriodDays) =>
+type ClienteRef = { slug: string; nome: string };
+
+const clienteRefQuery = (slug: string) =>
   queryOptions({
-    queryKey: ["cliente-overview", cliente, days],
+    queryKey: ["cliente-ref", slug],
+    queryFn: async (): Promise<ClienteRef | null> => {
+      const { data, error } = await supabase
+        .from("cadastro_clientes")
+        .select("slug, nome_cliente")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return { slug: data.slug, nome: data.nome_cliente };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+const overviewQuery = (nomeCliente: string, days: PeriodDays) =>
+  queryOptions({
+    queryKey: ["cliente-overview", nomeCliente, days],
     queryFn: async (): Promise<OverviewRow[]> => {
       const since = new Date();
       since.setDate(since.getDate() - days * 2);
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
-        .eq("cliente", cliente)
+        .eq("cliente", nomeCliente)
         .gte("data", since.toISOString().slice(0, 10))
         .order("data", { ascending: true });
       if (error) throw error;
@@ -70,9 +88,9 @@ type DailyView = Record<string, unknown> & {
   cliente: string;
 };
 
-const platformDailyQuery = (cliente: string, platform: Platform, days: PeriodDays) =>
+const platformDailyQuery = (nomeCliente: string, platform: Platform, days: PeriodDays) =>
   queryOptions({
-    queryKey: ["cliente-platform", cliente, platform, days],
+    queryKey: ["cliente-platform", nomeCliente, platform, days],
     queryFn: async (): Promise<DailyView[]> => {
       const view =
         platform === "meta_ads"   ? "vw_meta_ads_diario"   :
@@ -85,7 +103,7 @@ const platformDailyQuery = (cliente: string, platform: Platform, days: PeriodDay
       const { data, error } = await supabase
         .from(view)
         .select("*")
-        .eq("cliente", cliente)
+        .eq("cliente", nomeCliente)
         .gte("data", since.toISOString().slice(0, 10))
         .order("data", { ascending: false });
       if (error) throw error;
@@ -109,7 +127,7 @@ export const Route = createFileRoute("/_authenticated/cliente/$cliente")({
 });
 
 function ClientePage() {
-  const { cliente } = Route.useParams();
+  const { cliente: slug } = Route.useParams();
   const [days, setDays] = useState<PeriodDays>(30);
 
   return (
@@ -123,17 +141,42 @@ function ClientePage() {
         </Link>
       </div>
 
+      <Suspense fallback={<ClienteSkeleton />}>
+        <ClienteResolved slug={slug} days={days} setDays={setDays} />
+      </Suspense>
+    </div>
+  );
+}
+
+function ClienteResolved({
+  slug,
+  days,
+  setDays,
+}: {
+  slug: string;
+  days: PeriodDays;
+  setDays: (d: PeriodDays) => void;
+}) {
+  const { data: ref } = useSuspenseQuery(clienteRefQuery(slug));
+
+  if (!ref) {
+    return (
+      <div className="lotus-surface p-6 text-sm text-muted-foreground">
+        Cliente não encontrado para o identificador <strong>{slug}</strong>.
+      </div>
+    );
+  }
+
+  return (
+    <>
       <PageHeader
         eyebrow="Conta cliente"
-        title={cliente}
+        title={ref.nome}
         description="Resultados consolidados das suas plataformas, atualizados automaticamente."
         actions={<PeriodToggle value={days} onChange={setDays} />}
       />
-
-      <Suspense fallback={<ClienteSkeleton />}>
-        <ClienteBody cliente={cliente} days={days} />
-      </Suspense>
-    </div>
+      <ClienteBody cliente={ref.nome} days={days} />
+    </>
   );
 }
 
