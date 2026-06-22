@@ -12,6 +12,7 @@ import {
   Sparkles,
   UserCircle2,
   Bug,
+  FileBarChart,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -47,6 +48,7 @@ function AuthenticatedLayout() {
       label: "Operações",
       items: [
         { to: "/admin", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
+        { to: "/admin/relatorios", label: "Relatórios", icon: FileBarChart },
         { to: "/admin/clientes", label: "Clientes", icon: Users },
         { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },
         { to: "/admin/servicos", label: "Serviços", icon: Briefcase },
