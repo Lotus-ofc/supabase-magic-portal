@@ -46,17 +46,11 @@ export const INTEGRATIONS: readonly IntegrationDef[] = [
     activeField: "meta_ativo",
     fields: [
       {
-        col: "meta_ad_account_id",
-        label: "Ad Account ID",
+        col: "facebook_ad_account_id",
+        label: "Facebook Ad Account ID",
         placeholder: "act_1234567890",
         hint: "Aceita prefixo act_ ou apenas dígitos.",
         primary: true,
-      },
-      {
-        col: "meta_pixel_id",
-        label: "Pixel ID",
-        placeholder: "1234567890123456",
-        hint: "ID do Pixel para conversões e remarketing.",
       },
     ],
   },
@@ -66,10 +60,16 @@ export const INTEGRATIONS: readonly IntegrationDef[] = [
     activeField: "instagram_ativo",
     fields: [
       {
-        col: "instagram_business_account_id",
-        label: "Instagram Business Account ID",
+        col: "instagram_username",
+        label: "Username (@)",
+        placeholder: "lotus.marketing",
+        hint: "Handle público da conta (sem o @).",
+      },
+      {
+        col: "instagram_page_id",
+        label: "Instagram Page ID",
         placeholder: "17841400000000000",
-        hint: "ID numérico da conta IG Business vinculada ao Facebook.",
+        hint: "ID numérico da página/conta IG Business.",
         primary: true,
       },
     ],

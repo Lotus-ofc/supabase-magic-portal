@@ -1,28 +1,34 @@
 -- =========================================================
--- 04_integracoes_make.sql  (aditivo, idempotente)
+-- 05_cadastro_clientes_make_ids.sql  (aditivo, idempotente)
 -- Projeto: ywvhoctcmibjitvwkkhb
 --
--- Adiciona colunas técnicas em cadastro_clientes para que os cenários
--- do Make leiam os IDs das plataformas direto do Supabase, sem hardcode.
+-- Adiciona em cadastro_clientes os identificadores técnicos consumidos
+-- pelos cenários do Make + handle do Instagram, eliminando a dependência
+-- do Google Sheets como fonte de IDs.
 --
--- Regras: apenas ADD COLUMN IF NOT EXISTS e CREATE OR REPLACE VIEW.
--- NÃO altera base_metricas, views analíticas, RLS, GRANTs ou policies.
--- Todas as colunas são opcionais (text NULL) salvo tiktok_ativo (default false).
+-- Regras:
+--   * Apenas ADD COLUMN IF NOT EXISTS e CREATE OR REPLACE VIEW.
+--   * Nenhuma coluna existente é removida ou renomeada.
+--   * Todas as colunas novas são opcionais (text NULL), exceto tiktok_ativo
+--     (boolean NOT NULL DEFAULT false).
+--
+-- IMPORTANTE: substitui e deprecia a tentativa anterior (04_integracoes_make.sql)
+-- que usava nomes diferentes e nunca foi aplicada ao banco.
 -- =========================================================
 
 ALTER TABLE public.cadastro_clientes
-  -- Google Ads
-  ADD COLUMN IF NOT EXISTS google_ads_customer_id        text,
-  -- Meta Ads (Ad Account + Pixel)
-  ADD COLUMN IF NOT EXISTS meta_ad_account_id            text,
-  ADD COLUMN IF NOT EXISTS meta_pixel_id                 text,
   -- Instagram
-  ADD COLUMN IF NOT EXISTS instagram_business_account_id text,
+  ADD COLUMN IF NOT EXISTS instagram_username     text,
+  ADD COLUMN IF NOT EXISTS instagram_page_id      text,
+  -- Meta / Facebook Ads
+  ADD COLUMN IF NOT EXISTS facebook_ad_account_id text,
+  -- Google Ads
+  ADD COLUMN IF NOT EXISTS google_ads_customer_id text,
   -- GA4
-  ADD COLUMN IF NOT EXISTS ga4_property_id               text,
-  -- TikTok Ads
-  ADD COLUMN IF NOT EXISTS tiktok_ad_account_id          text,
-  ADD COLUMN IF NOT EXISTS tiktok_ativo                  boolean NOT NULL DEFAULT false;
+  ADD COLUMN IF NOT EXISTS ga4_property_id        text,
+  -- TikTok Ads (opcional)
+  ADD COLUMN IF NOT EXISTS tiktok_ad_account_id   text,
+  ADD COLUMN IF NOT EXISTS tiktok_ativo           boolean NOT NULL DEFAULT false;
 
 -- Refresh da view administrativa para expor as novas colunas.
 CREATE OR REPLACE VIEW public.vw_clientes_admin
@@ -45,10 +51,10 @@ SELECT
   cc.instagram_ativo,
   cc.google_business_ativo,
   cc.tiktok_ativo,
+  cc.instagram_username,
+  cc.instagram_page_id,
+  cc.facebook_ad_account_id,
   cc.google_ads_customer_id,
-  cc.meta_ad_account_id,
-  cc.meta_pixel_id,
-  cc.instagram_business_account_id,
   cc.ga4_property_id,
   cc.google_business_location_id,
   cc.tiktok_ad_account_id,
