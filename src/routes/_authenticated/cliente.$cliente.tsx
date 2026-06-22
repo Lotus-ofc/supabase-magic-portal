@@ -48,20 +48,54 @@ import { cn } from "@/lib/utils";
 
 // ---------------- Queries ----------------
 
-type ClienteRef = { slug: string; nome: string };
+type ClienteRef = { slug: string; nome: string; queryName: string };
+
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 const clienteRefQuery = (slug: string) =>
   queryOptions({
     queryKey: ["cliente-ref", slug],
     queryFn: async (): Promise<ClienteRef | null> => {
-      const { data, error } = await supabase
+      // 1) Cadastro (display name) — pode não existir para todos
+      const { data: cad } = await supabase
         .from("cadastro_clientes")
         .select("slug, nome_cliente")
         .eq("slug", slug)
         .maybeSingle();
-      if (error) throw error;
-      if (!data) return null;
-      return { slug: data.slug, nome: data.nome_cliente };
+
+      // 2) Nome real usado nas views (vw_clientes_ativos.cliente)
+      const { data: ativos, error: errAtivos } = await supabase
+        .from("vw_clientes_ativos")
+        .select("cliente");
+      if (errAtivos) throw errAtivos;
+
+      const match = (ativos ?? []).find(
+        (r: { cliente: string }) => slugify(r.cliente) === slug,
+      );
+
+      const queryName = match?.cliente ?? cad?.nome_cliente ?? null;
+      if (!queryName) {
+        console.warn("[cliente-ref] sem match para slug", slug, {
+          cadastro: cad?.nome_cliente,
+          ativos: (ativos ?? []).map((r: any) => r.cliente),
+        });
+        return null;
+      }
+
+      const ref = {
+        slug,
+        nome: cad?.nome_cliente ?? queryName,
+        queryName,
+      };
+      console.log("[cliente-ref] resolved", ref);
+      return ref;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -175,7 +209,7 @@ function ClienteResolved({
         description="Resultados consolidados das suas plataformas, atualizados automaticamente."
         actions={<PeriodToggle value={days} onChange={setDays} />}
       />
-      <ClienteBody cliente={ref.nome} days={days} />
+      <ClienteBody cliente={ref.queryName} days={days} />
     </>
   );
 }
@@ -216,6 +250,16 @@ function ClienteBody({ cliente, days }: { cliente: string; days: PeriodDays }) {
   const previous = rows.filter((r) => r.data >= prevPeriod.from && r.data <= prevPeriod.to);
   const cT = sumOverview(current);
   const pT = sumOverview(previous);
+
+  console.log("[ClienteBody]", {
+    cliente,
+    days,
+    period,
+    rowsTotal: rows.length,
+    currentLen: current.length,
+    sampleClientes: Array.from(new Set(rows.map((r: any) => r.cliente))),
+  });
+
 
   const ctr = deriveCtr(cT.impressions, cT.clicks);
   const ctrPrev = deriveCtr(pT.impressions, pT.clicks);
