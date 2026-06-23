@@ -201,12 +201,16 @@ const ZERO_TOTALS: Totals = {
 };
 
 export function sumOverview(rows: OverviewRow[]): Totals {
-  return rows.reduce((acc, r) => {
+  const googleSpendByCliente = new Map<string, number>();
+
+  const totals = rows.reduce((acc, r) => {
     const meta = r.meta_spend ?? 0;
     const google = r.google_spend ?? 0;
     acc.meta_spend += meta;
-    acc.google_spend += google;
-    acc.spend += meta + google;
+    googleSpendByCliente.set(
+      r.cliente,
+      Math.max(googleSpendByCliente.get(r.cliente) ?? 0, google),
+    );
     acc.impressions += r.total_impressions ?? 0;
     acc.clicks += r.total_clicks ?? 0;
     acc.sessions += r.ga4_sessions ?? 0;
@@ -215,6 +219,14 @@ export function sumOverview(rows: OverviewRow[]): Totals {
     acc.engagement += r.instagram_interactions ?? 0;
     return acc;
   }, { ...ZERO_TOTALS });
+
+  totals.google_spend = Array.from(googleSpendByCliente.values()).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
+  totals.spend = totals.meta_spend + totals.google_spend;
+
+  return totals;
 }
 
 /** Variação percentual segura — null quando não há base. */

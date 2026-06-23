@@ -420,10 +420,15 @@ function DashboardBody({ days }: { days: 7 | 30 | 90 }) {
 /* ----------------------- helpers ----------------------- */
 
 function sumOverview(rows: Overview[]) {
-  return rows.reduce(
+  const googleSpendByCliente = new Map<string, number>();
+
+  const totals = rows.reduce(
     (acc, r) => {
       acc.meta += r.meta_spend ?? 0;
-      acc.google += r.google_spend ?? 0;
+      googleSpendByCliente.set(
+        r.cliente,
+        Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
+      );
       acc.impr += r.total_impressions ?? 0;
       acc.clicks += r.total_clicks ?? 0;
       acc.sessions += r.ga4_sessions ?? 0;
@@ -434,6 +439,13 @@ function sumOverview(rows: Overview[]) {
     },
     { meta: 0, google: 0, impr: 0, clicks: 0, sessions: 0, conv: 0, reach: 0, engagement: 0 },
   );
+
+  totals.google = Array.from(googleSpendByCliente.values()).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
+
+  return totals;
 }
 
 function pctDelta(curr: number, prev: number): number | null {
