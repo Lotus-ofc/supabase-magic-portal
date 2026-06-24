@@ -471,11 +471,11 @@ function collectActivePlatforms(t: ReturnType<typeof sumOverview>): Platform[] {
 
 function PlatformDetail({
   cliente,
-  days,
+  period,
   platforms,
 }: {
   cliente: string;
-  days: PeriodDays;
+  period: Period;
   platforms: Platform[];
 }) {
   const [tab, setTab] = useState<Platform>(platforms[0] ?? "meta_ads");
@@ -514,7 +514,7 @@ function PlatformDetail({
           </div>
         }
       >
-        <PlatformTable cliente={cliente} platform={tab} days={days} />
+        <PlatformTable cliente={cliente} platform={tab} period={period} />
       </Suspense>
     </SectionCard>
   );
@@ -523,13 +523,15 @@ function PlatformDetail({
 function PlatformTable({
   cliente,
   platform,
-  days,
+  period,
 }: {
   cliente: string;
   platform: Platform;
-  days: PeriodDays;
+  period: Period;
 }) {
-  const { data } = useSuspenseQuery(platformDailyQuery(cliente, platform, days));
+  const { data } = useSuspenseQuery(
+    platformDailyQuery(cliente, platform, period.from, period.to),
+  );
 
   if (data.length === 0) {
     return (
