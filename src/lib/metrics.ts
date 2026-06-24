@@ -145,25 +145,31 @@ export interface PeriodRange {
   prevTo: string;
 }
 
-function isoDay(d: Date): string {
-  return d.toISOString().slice(0, 10);
+import { brtToday, addDaysISO, diffDaysISO } from "./period";
+
+/**
+ * Janela de N dias contada a partir de "hoje" em America/Sao_Paulo.
+ * NUNCA usar `Date.toISOString()` aqui — esse caminho retorna o dia UTC,
+ * o que desloca o último dia entre 21:00 e 23:59 BRT.
+ */
+export function periodRange(days: number): PeriodRange {
+  const to = brtToday();
+  const from = addDaysISO(to, -(days - 1));
+  const prevTo = addDaysISO(from, -1);
+  const prevFrom = addDaysISO(prevTo, -(days - 1));
+  return { days, from, to, prevFrom, prevTo };
 }
 
-export function periodRange(days: number, today: Date = new Date()): PeriodRange {
-  const to = new Date(today);
-  const from = new Date(today);
-  from.setDate(from.getDate() - (days - 1));
-  const prevTo = new Date(from);
-  prevTo.setDate(prevTo.getDate() - 1);
-  const prevFrom = new Date(prevTo);
-  prevFrom.setDate(prevFrom.getDate() - (days - 1));
-  return {
-    days,
-    from: isoDay(from),
-    to: isoDay(to),
-    prevFrom: isoDay(prevFrom),
-    prevTo: isoDay(prevTo),
-  };
+/**
+ * Constrói uma janela arbitrária a partir de duas datas ISO (BRT date-only).
+ * O período anterior tem o MESMO comprimento e termina no dia anterior a `from`.
+ */
+export function periodFromDates(from: string, to: string): PeriodRange {
+  if (from > to) { const tmp = from; from = to; to = tmp; }
+  const days = diffDaysISO(from, to) + 1;
+  const prevTo = addDaysISO(from, -1);
+  const prevFrom = addDaysISO(prevTo, -(days - 1));
+  return { days, from, to, prevFrom, prevTo };
 }
 
 // ----------------------------------------------------------------------------
