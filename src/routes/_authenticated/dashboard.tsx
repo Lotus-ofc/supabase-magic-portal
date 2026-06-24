@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
-import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { PeriodPicker } from "@/components/lotus/PeriodPicker";
+import { resolvePeriod, type PeriodInput } from "@/lib/period";
 import { formatMetric, type OverviewRow } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
@@ -47,17 +48,16 @@ const clientesQuery = queryOptions({
   },
 });
 
-const overviewQuery = (days: number) =>
+const overviewQuery = (from: string, to: string, prevFrom: string) =>
   queryOptions({
-    queryKey: ["vw_overview_cliente", `${days * 2}d`],
+    queryKey: ["vw_overview_cliente", prevFrom, to],
     queryFn: async (): Promise<Overview[]> => {
-      // Fetch 2× window so we can compute delta vs previous period.
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
+      // Busca a janela atual + a anterior (mesmo comprimento) para o delta.
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Overview[];
@@ -68,7 +68,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Sua conta · Lotus" }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesQuery);
-    void context.queryClient.ensureQueryData(overviewQuery(30));
+    const p = resolvePeriod({ preset: "last_30" });
+    void context.queryClient.ensureQueryData(overviewQuery(p.from, p.to, p.prevFrom));
   },
   component: ClientHome,
   errorComponent: ({ error }) => (
@@ -86,7 +87,8 @@ const fmtInt = (n: number | null | undefined) =>
 
 
 function ClientHome() {
-  const [days, setDays] = useState<7 | 30 | 90>(30);
+  const [period, setPeriod] = useState<PeriodInput>({ preset: "last_30" });
+  const resolved = useMemo(() => resolvePeriod(period), [period]);
 
   return (
     <div className="space-y-9">
@@ -94,11 +96,11 @@ function ClientHome() {
         eyebrow="Sua conta na Lotus"
         title="Resultados consolidados"
         description="Uma leitura clara do que está acontecendo nas suas plataformas — sem ruído, com contexto."
-        actions={<PeriodToggle value={days} onChange={setDays} />}
+        actions={<PeriodPicker value={period} onChange={setPeriod} />}
       />
 
       <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardBody days={days} />
+        <DashboardBody period={resolved} />
       </Suspense>
     </div>
   );
@@ -126,19 +128,18 @@ function DashboardSkeleton() {
   );
 }
 
-function DashboardBody({ days }: { days: 7 | 30 | 90 }) {
-  const { data: overview } = useSuspenseQuery(overviewQuery(days));
+function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> }) {
+  const { data: overview } = useSuspenseQuery(
+    overviewQuery(period.from, period.to, period.prevFrom),
+  );
   const { data: clientes } = useSuspenseQuery(clientesQuery);
 
-  const today = useMemo(() => new Date(), []);
-  const cutoff = useMemo(() => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - days);
-    return d.toISOString().slice(0, 10);
-  }, [today, days]);
-
-  const current = overview.filter((r) => r.data >= cutoff);
-  const previous = overview.filter((r) => r.data < cutoff);
+  const current = overview.filter(
+    (r) => r.data >= period.from && r.data <= period.to,
+  );
+  const previous = overview.filter(
+    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
+  );
 
   const totals = sumOverview(current);
   const prev = sumOverview(previous);
@@ -155,6 +156,7 @@ function DashboardBody({ days }: { days: 7 | 30 | 90 }) {
   const cpa = totals.conv > 0 ? totalSpend / totals.conv : 0;
 
   const evolution = buildEvolution(current);
+  const days = period.days;
   const insights = buildInsights({
     spendDelta,
     convDelta,

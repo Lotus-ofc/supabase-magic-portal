@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
-import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
 import {
   ChartFrame,
@@ -27,10 +27,16 @@ import {
   deriveCtr,
   formatMetric,
   pctDelta,
+  periodFromDates,
   periodRange,
   spendShareByPlatform,
   sumOverview,
 } from "@/lib/metrics";
+import {
+  resolvePeriod,
+  type Period,
+  type PeriodInput,
+} from "@/lib/period";
 import {
   Sparkles,
   Target,
@@ -48,17 +54,16 @@ import { clienteRefQuery } from "./cliente.$cliente";
 
 // ---------------- Queries ----------------
 
-const overviewQuery = (nomeCliente: string, days: PeriodDays) =>
+const overviewQuery = (nomeCliente: string, prevFrom: string, to: string) =>
   queryOptions({
-    queryKey: ["cliente-overview", nomeCliente, days],
+    queryKey: ["cliente-overview", nomeCliente, prevFrom, to],
     queryFn: async (): Promise<OverviewRow[]> => {
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
         .eq("cliente", nomeCliente)
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
@@ -73,10 +78,11 @@ type DailyView = Record<string, unknown> & {
 const platformDailyQuery = (
   nomeCliente: string,
   platform: Platform,
-  days: PeriodDays,
+  from: string,
+  to: string,
 ) =>
   queryOptions({
-    queryKey: ["cliente-platform", nomeCliente, platform, days],
+    queryKey: ["cliente-platform", nomeCliente, platform, from, to],
     queryFn: async (): Promise<DailyView[]> => {
       const view =
         platform === "meta_ads"
@@ -89,13 +95,12 @@ const platformDailyQuery = (
                 ? "vw_instagram_diario"
                 : null;
       if (!view) return [];
-      const since = new Date();
-      since.setDate(since.getDate() - days);
       const { data, error } = await supabase
         .from(view)
         .select("*")
         .eq("cliente", nomeCliente)
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", from)
+        .lte("data", to)
         .order("data", { ascending: false });
       if (error) throw error;
       return (data ?? []) as DailyView[];
@@ -110,23 +115,31 @@ export const Route = createFileRoute("/_authenticated/cliente/$cliente/")({
 
 function ClienteOverviewPage() {
   const { cliente: slug } = Route.useParams();
-  const [days, setDays] = useState<PeriodDays>(30);
+  const [periodInput, setPeriodInput] = useState<PeriodInput>({ preset: "last_30" });
+  const period = useMemo(() => resolvePeriod(periodInput), [periodInput]);
 
   return (
     <Suspense fallback={<ClienteSkeleton />}>
-      <ClienteResolved slug={slug} days={days} setDays={setDays} />
+      <ClienteResolved
+        slug={slug}
+        period={period}
+        periodInput={periodInput}
+        setPeriodInput={setPeriodInput}
+      />
     </Suspense>
   );
 }
 
 function ClienteResolved({
   slug,
-  days,
-  setDays,
+  period,
+  periodInput,
+  setPeriodInput,
 }: {
   slug: string;
-  days: PeriodDays;
-  setDays: (d: PeriodDays) => void;
+  period: Period;
+  periodInput: PeriodInput;
+  setPeriodInput: (v: PeriodInput) => void;
 }) {
   const { data: ref } = useSuspenseQuery(clienteRefQuery(slug));
   if (!ref) {
@@ -142,9 +155,9 @@ function ClienteResolved({
         eyebrow="Conta cliente"
         title={ref.nome}
         description="Resultados consolidados das suas plataformas, atualizados automaticamente."
-        actions={<PeriodToggle value={days} onChange={setDays} />}
+        actions={<PeriodPicker value={periodInput} onChange={setPeriodInput} />}
       />
-      <ClienteBody cliente={ref.queryName} days={days} />
+      <ClienteBody cliente={ref.queryName} period={period} />
     </div>
   );
 }
@@ -169,20 +182,18 @@ function ClienteSkeleton() {
 
 // ---------------- Body ----------------
 
-function ClienteBody({ cliente, days }: { cliente: string; days: PeriodDays }) {
-  const { data: rows } = useSuspenseQuery(overviewQuery(cliente, days));
-
-  const period = useMemo(() => periodRange(days), [days]);
-  const prevPeriod = useMemo(
-    () => ({ from: period.prevFrom, to: period.prevTo }),
-    [period],
+function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
+  const { data: rows } = useSuspenseQuery(
+    overviewQuery(cliente, period.prevFrom, period.to),
   );
+
+  const days = period.days;
 
   const current = rows.filter(
     (r) => r.data >= period.from && r.data <= period.to,
   );
   const previous = rows.filter(
-    (r) => r.data >= prevPeriod.from && r.data <= prevPeriod.to,
+    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
   );
   const cT = sumOverview(current);
   const pT = sumOverview(previous);
@@ -392,29 +403,28 @@ function ClienteBody({ cliente, days }: { cliente: string; days: PeriodDays }) {
         </SectionCard>
       </section>
 
-      <PlatformDetail cliente={cliente} days={days} platforms={platformsActive} />
+      <PlatformDetail cliente={cliente} period={period} platforms={platformsActive} />
     </div>
   );
 }
 
 function ComparisonStrip({ cliente }: { cliente: string }) {
-  const since = new Date();
-  since.setDate(since.getDate() - 90);
+  const since = periodRange(90).from;
 
   const { data } = useSuspenseQuery({
-    queryKey: ["cliente-overview-90", cliente],
+    queryKey: ["cliente-overview-90", cliente, since],
     queryFn: async (): Promise<OverviewRow[]> => {
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
         .eq("cliente", cliente)
-        .gte("data", since.toISOString().slice(0, 10));
+        .gte("data", since);
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
     },
   });
 
-  const windows: PeriodDays[] = [7, 30, 90];
+  const windows: Array<7 | 30 | 90> = [7, 30, 90];
   return (
     <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {windows.map((w) => {
@@ -461,11 +471,11 @@ function collectActivePlatforms(t: ReturnType<typeof sumOverview>): Platform[] {
 
 function PlatformDetail({
   cliente,
-  days,
+  period,
   platforms,
 }: {
   cliente: string;
-  days: PeriodDays;
+  period: Period;
   platforms: Platform[];
 }) {
   const [tab, setTab] = useState<Platform>(platforms[0] ?? "meta_ads");
@@ -504,7 +514,7 @@ function PlatformDetail({
           </div>
         }
       >
-        <PlatformTable cliente={cliente} platform={tab} days={days} />
+        <PlatformTable cliente={cliente} platform={tab} period={period} />
       </Suspense>
     </SectionCard>
   );
@@ -513,13 +523,15 @@ function PlatformDetail({
 function PlatformTable({
   cliente,
   platform,
-  days,
+  period,
 }: {
   cliente: string;
   platform: Platform;
-  days: PeriodDays;
+  period: Period;
 }) {
-  const { data } = useSuspenseQuery(platformDailyQuery(cliente, platform, days));
+  const { data } = useSuspenseQuery(
+    platformDailyQuery(cliente, platform, period.from, period.to),
+  );
 
   if (data.length === 0) {
     return (

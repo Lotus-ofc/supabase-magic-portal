@@ -145,25 +145,31 @@ export interface PeriodRange {
   prevTo: string;
 }
 
-function isoDay(d: Date): string {
-  return d.toISOString().slice(0, 10);
+import { brtToday, addDaysISO, diffDaysISO } from "./period";
+
+/**
+ * Janela de N dias contada a partir de "hoje" em America/Sao_Paulo.
+ * NUNCA usar `Date.toISOString()` aqui — esse caminho retorna o dia UTC,
+ * o que desloca o último dia entre 21:00 e 23:59 BRT.
+ */
+export function periodRange(days: number): PeriodRange {
+  const to = brtToday();
+  const from = addDaysISO(to, -(days - 1));
+  const prevTo = addDaysISO(from, -1);
+  const prevFrom = addDaysISO(prevTo, -(days - 1));
+  return { days, from, to, prevFrom, prevTo };
 }
 
-export function periodRange(days: number, today: Date = new Date()): PeriodRange {
-  const to = new Date(today);
-  const from = new Date(today);
-  from.setDate(from.getDate() - (days - 1));
-  const prevTo = new Date(from);
-  prevTo.setDate(prevTo.getDate() - 1);
-  const prevFrom = new Date(prevTo);
-  prevFrom.setDate(prevFrom.getDate() - (days - 1));
-  return {
-    days,
-    from: isoDay(from),
-    to: isoDay(to),
-    prevFrom: isoDay(prevFrom),
-    prevTo: isoDay(prevTo),
-  };
+/**
+ * Constrói uma janela arbitrária a partir de duas datas ISO (BRT date-only).
+ * O período anterior tem o MESMO comprimento e termina no dia anterior a `from`.
+ */
+export function periodFromDates(from: string, to: string): PeriodRange {
+  if (from > to) { const tmp = from; from = to; to = tmp; }
+  const days = diffDaysISO(from, to) + 1;
+  const prevTo = addDaysISO(from, -1);
+  const prevFrom = addDaysISO(prevTo, -(days - 1));
+  return { days, from, to, prevFrom, prevTo };
 }
 
 // ----------------------------------------------------------------------------
@@ -291,14 +297,12 @@ export function dailyFromOverview(
     cur.engagement += r.instagram_interactions ?? 0;
     byDate.set(r.data, cur);
   }
-  // Preenche dias faltantes
+  // Preenche dias faltantes — iteração 100% string-based para evitar timezone drift
   const out: DailyPoint[] = [];
-  const cur = new Date(period.from + "T00:00:00");
-  const end = new Date(period.to + "T00:00:00");
-  while (cur <= end) {
-    const k = isoDay(cur);
-    out.push(byDate.get(k) ?? emptyPoint(k));
-    cur.setDate(cur.getDate() + 1);
+  let cursor = period.from;
+  while (cursor <= period.to) {
+    out.push(byDate.get(cursor) ?? emptyPoint(cursor));
+    cursor = addDaysISO(cursor, 1);
   }
   return out;
 }
