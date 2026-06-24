@@ -297,14 +297,12 @@ export function dailyFromOverview(
     cur.engagement += r.instagram_interactions ?? 0;
     byDate.set(r.data, cur);
   }
-  // Preenche dias faltantes
+  // Preenche dias faltantes — iteração 100% string-based para evitar timezone drift
   const out: DailyPoint[] = [];
-  const cur = new Date(period.from + "T00:00:00");
-  const end = new Date(period.to + "T00:00:00");
-  while (cur <= end) {
-    const k = isoDay(cur);
-    out.push(byDate.get(k) ?? emptyPoint(k));
-    cur.setDate(cur.getDate() + 1);
+  let cursor = period.from;
+  while (cursor <= period.to) {
+    out.push(byDate.get(cursor) ?? emptyPoint(cursor));
+    cursor = addDaysISO(cursor, 1);
   }
   return out;
 }
