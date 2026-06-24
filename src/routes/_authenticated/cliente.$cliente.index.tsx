@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
-import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
 import {
   ChartFrame,
@@ -27,10 +27,16 @@ import {
   deriveCtr,
   formatMetric,
   pctDelta,
+  periodFromDates,
   periodRange,
   spendShareByPlatform,
   sumOverview,
 } from "@/lib/metrics";
+import {
+  resolvePeriod,
+  type Period,
+  type PeriodInput,
+} from "@/lib/period";
 import {
   Sparkles,
   Target,
