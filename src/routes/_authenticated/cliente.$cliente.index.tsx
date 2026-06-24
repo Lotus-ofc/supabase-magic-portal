@@ -409,23 +409,22 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
 }
 
 function ComparisonStrip({ cliente }: { cliente: string }) {
-  const since = new Date();
-  since.setDate(since.getDate() - 90);
+  const since = periodRange(90).from;
 
   const { data } = useSuspenseQuery({
-    queryKey: ["cliente-overview-90", cliente],
+    queryKey: ["cliente-overview-90", cliente, since],
     queryFn: async (): Promise<OverviewRow[]> => {
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
         .eq("cliente", cliente)
-        .gte("data", since.toISOString().slice(0, 10));
+        .gte("data", since);
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
     },
   });
 
-  const windows: PeriodDays[] = [7, 30, 90];
+  const windows: Array<7 | 30 | 90> = [7, 30, 90];
   return (
     <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {windows.map((w) => {
