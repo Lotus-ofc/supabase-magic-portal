@@ -128,19 +128,18 @@ function DashboardSkeleton() {
   );
 }
 
-function DashboardBody({ days }: { days: 7 | 30 | 90 }) {
-  const { data: overview } = useSuspenseQuery(overviewQuery(days));
+function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> }) {
+  const { data: overview } = useSuspenseQuery(
+    overviewQuery(period.from, period.to, period.prevFrom),
+  );
   const { data: clientes } = useSuspenseQuery(clientesQuery);
 
-  const today = useMemo(() => new Date(), []);
-  const cutoff = useMemo(() => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - days);
-    return d.toISOString().slice(0, 10);
-  }, [today, days]);
-
-  const current = overview.filter((r) => r.data >= cutoff);
-  const previous = overview.filter((r) => r.data < cutoff);
+  const current = overview.filter(
+    (r) => r.data >= period.from && r.data <= period.to,
+  );
+  const previous = overview.filter(
+    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
+  );
 
   const totals = sumOverview(current);
   const prev = sumOverview(previous);
@@ -157,6 +156,7 @@ function DashboardBody({ days }: { days: 7 | 30 | 90 }) {
   const cpa = totals.conv > 0 ? totalSpend / totals.conv : 0;
 
   const evolution = buildEvolution(current);
+  const days = period.days;
   const insights = buildInsights({
     spendDelta,
     convDelta,
