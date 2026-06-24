@@ -68,7 +68,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Sua conta · Lotus" }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesQuery);
-    void context.queryClient.ensureQueryData(overviewQuery(30));
+    const p = resolvePeriod({ preset: "last_30" });
+    void context.queryClient.ensureQueryData(overviewQuery(p.from, p.to, p.prevFrom));
   },
   component: ClientHome,
   errorComponent: ({ error }) => (
@@ -86,7 +87,8 @@ const fmtInt = (n: number | null | undefined) =>
 
 
 function ClientHome() {
-  const [days, setDays] = useState<7 | 30 | 90>(30);
+  const [period, setPeriod] = useState<PeriodInput>({ preset: "last_30" });
+  const resolved = useMemo(() => resolvePeriod(period), [period]);
 
   return (
     <div className="space-y-9">
@@ -94,11 +96,11 @@ function ClientHome() {
         eyebrow="Sua conta na Lotus"
         title="Resultados consolidados"
         description="Uma leitura clara do que está acontecendo nas suas plataformas — sem ruído, com contexto."
-        actions={<PeriodToggle value={days} onChange={setDays} />}
+        actions={<PeriodPicker value={period} onChange={setPeriod} />}
       />
 
       <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardBody days={days} />
+        <DashboardBody period={resolved} />
       </Suspense>
     </div>
   );
