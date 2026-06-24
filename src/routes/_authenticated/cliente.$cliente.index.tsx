@@ -115,23 +115,31 @@ export const Route = createFileRoute("/_authenticated/cliente/$cliente/")({
 
 function ClienteOverviewPage() {
   const { cliente: slug } = Route.useParams();
-  const [days, setDays] = useState<PeriodDays>(30);
+  const [periodInput, setPeriodInput] = useState<PeriodInput>({ preset: "last_30" });
+  const period = useMemo(() => resolvePeriod(periodInput), [periodInput]);
 
   return (
     <Suspense fallback={<ClienteSkeleton />}>
-      <ClienteResolved slug={slug} days={days} setDays={setDays} />
+      <ClienteResolved
+        slug={slug}
+        period={period}
+        periodInput={periodInput}
+        setPeriodInput={setPeriodInput}
+      />
     </Suspense>
   );
 }
 
 function ClienteResolved({
   slug,
-  days,
-  setDays,
+  period,
+  periodInput,
+  setPeriodInput,
 }: {
   slug: string;
-  days: PeriodDays;
-  setDays: (d: PeriodDays) => void;
+  period: Period;
+  periodInput: PeriodInput;
+  setPeriodInput: (v: PeriodInput) => void;
 }) {
   const { data: ref } = useSuspenseQuery(clienteRefQuery(slug));
   if (!ref) {
@@ -147,9 +155,9 @@ function ClienteResolved({
         eyebrow="Conta cliente"
         title={ref.nome}
         description="Resultados consolidados das suas plataformas, atualizados automaticamente."
-        actions={<PeriodToggle value={days} onChange={setDays} />}
+        actions={<PeriodPicker value={periodInput} onChange={setPeriodInput} />}
       />
-      <ClienteBody cliente={ref.queryName} days={days} />
+      <ClienteBody cliente={ref.queryName} period={period} />
     </div>
   );
 }
@@ -174,20 +182,18 @@ function ClienteSkeleton() {
 
 // ---------------- Body ----------------
 
-function ClienteBody({ cliente, days }: { cliente: string; days: PeriodDays }) {
-  const { data: rows } = useSuspenseQuery(overviewQuery(cliente, days));
-
-  const period = useMemo(() => periodRange(days), [days]);
-  const prevPeriod = useMemo(
-    () => ({ from: period.prevFrom, to: period.prevTo }),
-    [period],
+function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
+  const { data: rows } = useSuspenseQuery(
+    overviewQuery(cliente, period.prevFrom, period.to),
   );
+
+  const days = period.days;
 
   const current = rows.filter(
     (r) => r.data >= period.from && r.data <= period.to,
   );
   const previous = rows.filter(
-    (r) => r.data >= prevPeriod.from && r.data <= prevPeriod.to,
+    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
   );
   const cT = sumOverview(current);
   const pT = sumOverview(previous);
