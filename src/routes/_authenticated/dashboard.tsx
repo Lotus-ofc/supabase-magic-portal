@@ -48,17 +48,16 @@ const clientesQuery = queryOptions({
   },
 });
 
-const overviewQuery = (days: number) =>
+const overviewQuery = (from: string, to: string, prevFrom: string) =>
   queryOptions({
-    queryKey: ["vw_overview_cliente", `${days * 2}d`],
+    queryKey: ["vw_overview_cliente", prevFrom, to],
     queryFn: async (): Promise<Overview[]> => {
-      // Fetch 2× window so we can compute delta vs previous period.
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
+      // Busca a janela atual + a anterior (mesmo comprimento) para o delta.
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Overview[];
