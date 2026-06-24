@@ -54,17 +54,16 @@ import { clienteRefQuery } from "./cliente.$cliente";
 
 // ---------------- Queries ----------------
 
-const overviewQuery = (nomeCliente: string, days: PeriodDays) =>
+const overviewQuery = (nomeCliente: string, prevFrom: string, to: string) =>
   queryOptions({
-    queryKey: ["cliente-overview", nomeCliente, days],
+    queryKey: ["cliente-overview", nomeCliente, prevFrom, to],
     queryFn: async (): Promise<OverviewRow[]> => {
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
       const { data, error } = await supabase
         .from("vw_overview_cliente")
         .select("*")
         .eq("cliente", nomeCliente)
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
@@ -79,10 +78,11 @@ type DailyView = Record<string, unknown> & {
 const platformDailyQuery = (
   nomeCliente: string,
   platform: Platform,
-  days: PeriodDays,
+  from: string,
+  to: string,
 ) =>
   queryOptions({
-    queryKey: ["cliente-platform", nomeCliente, platform, days],
+    queryKey: ["cliente-platform", nomeCliente, platform, from, to],
     queryFn: async (): Promise<DailyView[]> => {
       const view =
         platform === "meta_ads"
@@ -95,13 +95,12 @@ const platformDailyQuery = (
                 ? "vw_instagram_diario"
                 : null;
       if (!view) return [];
-      const since = new Date();
-      since.setDate(since.getDate() - days);
       const { data, error } = await supabase
         .from(view)
         .select("*")
         .eq("cliente", nomeCliente)
-        .gte("data", since.toISOString().slice(0, 10))
+        .gte("data", from)
+        .lte("data", to)
         .order("data", { ascending: false });
       if (error) throw error;
       return (data ?? []) as DailyView[];
