@@ -403,7 +403,7 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
         </SectionCard>
       </section>
 
-      <PlatformDetail cliente={cliente} days={days} platforms={platformsActive} />
+      <PlatformDetail cliente={cliente} period={period} platforms={platformsActive} />
     </div>
   );
 }
