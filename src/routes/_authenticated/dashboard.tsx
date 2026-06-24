@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
-import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
+import { PeriodPicker } from "@/components/lotus/PeriodPicker";
+import { resolvePeriod, addDaysISO, type PeriodInput } from "@/lib/period";
 import { formatMetric, type OverviewRow } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
