@@ -8,7 +8,14 @@ import { SectionCard } from "@/components/lotus/SectionCard";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { resolvePeriod, type PeriodInput } from "@/lib/period";
-import { formatMetric, type OverviewRow } from "@/lib/metrics";
+import {
+  formatMetric,
+  pctDelta,
+  sumOverview,
+  dailyFromOverview,
+  type OverviewRow,
+  type Totals,
+} from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
@@ -144,18 +151,22 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
   const totals = sumOverview(current);
   const prev = sumOverview(previous);
 
-  const totalSpend = totals.meta + totals.google;
-  const prevSpend = prev.meta + prev.google;
+  const totalSpend = totals.spend;
+  const prevSpend = prev.spend;
   const spendDelta = pctDelta(totalSpend, prevSpend);
-  const convDelta = pctDelta(totals.conv, prev.conv);
+  const convDelta = pctDelta(totals.conversions, prev.conversions);
   const sessionsDelta = pctDelta(totals.sessions, prev.sessions);
   const clicksDelta = pctDelta(totals.clicks, prev.clicks);
 
-  const ctr = totals.impr > 0 ? (totals.clicks / totals.impr) * 100 : 0;
-  const convRate = totals.sessions > 0 ? (totals.conv / totals.sessions) * 100 : 0;
-  const cpa = totals.conv > 0 ? totalSpend / totals.conv : 0;
+  const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0;
+  const convRate = totals.sessions > 0 ? (totals.conversions / totals.sessions) * 100 : 0;
+  const cpa = totals.conversions > 0 ? totalSpend / totals.conversions : 0;
 
-  const evolution = buildEvolution(current);
+  const evolution: EvolutionPoint[] = dailyFromOverview(current, period).map((d) => ({
+    date: d.date,
+    google: d.google_spend,
+    meta: d.meta_spend,
+  }));
   const days = period.days;
   const insights = buildInsights({
     spendDelta,
@@ -182,14 +193,14 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
         <HeroSpend
           value={totalSpend}
           delta={spendDelta}
-          google={totals.google}
-          meta={totals.meta}
+          google={totals.google_spend}
+          meta={totals.meta_spend}
           days={days}
           className="lg:col-span-3"
         />
         <StatCard
           label="Conversões"
-          value={fmtInt(totals.conv)}
+          value={fmtInt(totals.conversions)}
           icon={Target}
           delta={convDelta}
           hint={`${convRate.toFixed(2)}% taxa · CPA ${cpa > 0 ? fmtBRL(cpa) : "—"}`}
@@ -277,11 +288,11 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           className="xl:col-span-2"
         >
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
-            <Summary label="Impressões" value={fmtInt(totals.impr)} />
+            <Summary label="Impressões" value={fmtInt(totals.impressions)} />
             <Summary label="Cliques" value={fmtInt(totals.clicks)} />
             <Summary label="CTR" value={`${ctr.toFixed(2)}%`} />
             <Summary label="Investimento" value={fmtBRL(totalSpend)} />
-            <Summary label="Conversões" value={fmtInt(totals.conv)} />
+            <Summary label="Conversões" value={fmtInt(totals.conversions)} />
             <Summary label="Taxa de conversão" value={`${convRate.toFixed(2)}%`} />
             <Summary label="Alcance Instagram" value={fmtInt(totals.reach)} />
             <Summary label="Engajamento Instagram" value={fmtInt(totals.engagement)} />
@@ -421,54 +432,10 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
 
 /* ----------------------- helpers ----------------------- */
 
-function sumOverview(rows: Overview[]) {
-  const googleSpendByCliente = new Map<string, number>();
+// sumOverview / pctDelta / buildEvolution moved to src/lib/metrics.ts —
+// fonte única de verdade de agregação. Não recriar localmente.
 
-  const totals = rows.reduce(
-    (acc, r) => {
-      acc.meta += r.meta_spend ?? 0;
-      googleSpendByCliente.set(
-        r.cliente,
-        Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
-      );
-      acc.impr += r.total_impressions ?? 0;
-      acc.clicks += r.total_clicks ?? 0;
-      acc.sessions += r.ga4_sessions ?? 0;
-      acc.conv += r.ga4_conversions ?? 0;
-      acc.reach += r.instagram_reach ?? 0;
-      acc.engagement += r.instagram_interactions ?? 0;
-      return acc;
-    },
-    { meta: 0, google: 0, impr: 0, clicks: 0, sessions: 0, conv: 0, reach: 0, engagement: 0 },
-  );
 
-  totals.google = Array.from(googleSpendByCliente.values()).reduce(
-    (sum, value) => sum + value,
-    0,
-  );
-
-  return totals;
-}
-
-function pctDelta(curr: number, prev: number): number | null {
-  if (!Number.isFinite(curr) || !Number.isFinite(prev)) return null;
-  if (prev <= 0 && curr <= 0) return null;
-  if (prev <= 0) return 100;
-  return ((curr - prev) / prev) * 100;
-}
-
-function buildEvolution(rows: Overview[]): EvolutionPoint[] {
-  const byDate = new Map<string, { google: number; meta: number }>();
-  for (const r of rows) {
-    const cur = byDate.get(r.data) ?? { google: 0, meta: 0 };
-    cur.google += r.google_spend ?? 0;
-    cur.meta += r.meta_spend ?? 0;
-    byDate.set(r.data, cur);
-  }
-  return Array.from(byDate.entries())
-    .sort(([a], [b]) => (a < b ? -1 : 1))
-    .map(([date, v]) => ({ date, google: v.google, meta: v.meta }));
-}
 
 type Insight = {
   title: string;
@@ -484,7 +451,7 @@ function buildInsights(args: {
   ctr: number;
   convRate: number;
   cpa: number;
-  totals: ReturnType<typeof sumOverview>;
+  totals: Totals;
   days: number;
 }): Insight[] {
   const out: Insight[] = [];
@@ -526,14 +493,14 @@ function buildInsights(args: {
     });
   }
 
-  if (cpa > 0 && totals.conv >= 5) {
+  if (cpa > 0 && totals.conversions >= 5) {
     out.push({
       title: `Custo por conversão: ${cpa.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL",
         maximumFractionDigits: 2,
       })}`,
-      detail: `Base: ${totals.conv} conversões nos últimos ${days} dias.`,
+      detail: `Base: ${totals.conversions} conversões nos últimos ${days} dias.`,
       tone: "neutral",
       icon: Target,
     });
