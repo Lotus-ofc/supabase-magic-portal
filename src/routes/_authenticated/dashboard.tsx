@@ -432,54 +432,10 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
 
 /* ----------------------- helpers ----------------------- */
 
-function sumOverview(rows: Overview[]) {
-  const googleSpendByCliente = new Map<string, number>();
+// sumOverview / pctDelta / buildEvolution moved to src/lib/metrics.ts —
+// fonte única de verdade de agregação. Não recriar localmente.
 
-  const totals = rows.reduce(
-    (acc, r) => {
-      acc.meta += r.meta_spend ?? 0;
-      googleSpendByCliente.set(
-        r.cliente,
-        Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
-      );
-      acc.impr += r.total_impressions ?? 0;
-      acc.clicks += r.total_clicks ?? 0;
-      acc.sessions += r.ga4_sessions ?? 0;
-      acc.conv += r.ga4_conversions ?? 0;
-      acc.reach += r.instagram_reach ?? 0;
-      acc.engagement += r.instagram_interactions ?? 0;
-      return acc;
-    },
-    { meta: 0, google: 0, impr: 0, clicks: 0, sessions: 0, conv: 0, reach: 0, engagement: 0 },
-  );
 
-  totals.google = Array.from(googleSpendByCliente.values()).reduce(
-    (sum, value) => sum + value,
-    0,
-  );
-
-  return totals;
-}
-
-function pctDelta(curr: number, prev: number): number | null {
-  if (!Number.isFinite(curr) || !Number.isFinite(prev)) return null;
-  if (prev <= 0 && curr <= 0) return null;
-  if (prev <= 0) return 100;
-  return ((curr - prev) / prev) * 100;
-}
-
-function buildEvolution(rows: Overview[]): EvolutionPoint[] {
-  const byDate = new Map<string, { google: number; meta: number }>();
-  for (const r of rows) {
-    const cur = byDate.get(r.data) ?? { google: 0, meta: 0 };
-    cur.google += r.google_spend ?? 0;
-    cur.meta += r.meta_spend ?? 0;
-    byDate.set(r.data, cur);
-  }
-  return Array.from(byDate.entries())
-    .sort(([a], [b]) => (a < b ? -1 : 1))
-    .map(([date, v]) => ({ date, google: v.google, meta: v.meta }));
-}
 
 type Insight = {
   title: string;
