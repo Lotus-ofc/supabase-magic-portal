@@ -151,18 +151,22 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
   const totals = sumOverview(current);
   const prev = sumOverview(previous);
 
-  const totalSpend = totals.meta + totals.google;
-  const prevSpend = prev.meta + prev.google;
+  const totalSpend = totals.spend;
+  const prevSpend = prev.spend;
   const spendDelta = pctDelta(totalSpend, prevSpend);
-  const convDelta = pctDelta(totals.conv, prev.conv);
+  const convDelta = pctDelta(totals.conversions, prev.conversions);
   const sessionsDelta = pctDelta(totals.sessions, prev.sessions);
   const clicksDelta = pctDelta(totals.clicks, prev.clicks);
 
-  const ctr = totals.impr > 0 ? (totals.clicks / totals.impr) * 100 : 0;
-  const convRate = totals.sessions > 0 ? (totals.conv / totals.sessions) * 100 : 0;
-  const cpa = totals.conv > 0 ? totalSpend / totals.conv : 0;
+  const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : 0;
+  const convRate = totals.sessions > 0 ? (totals.conversions / totals.sessions) * 100 : 0;
+  const cpa = totals.conversions > 0 ? totalSpend / totals.conversions : 0;
 
-  const evolution = buildEvolution(current);
+  const evolution: EvolutionPoint[] = dailyFromOverview(current, period).map((d) => ({
+    date: d.date,
+    google: d.google_spend,
+    meta: d.meta_spend,
+  }));
   const days = period.days;
   const insights = buildInsights({
     spendDelta,
