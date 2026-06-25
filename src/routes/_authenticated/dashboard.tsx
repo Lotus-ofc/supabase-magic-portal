@@ -451,7 +451,7 @@ function buildInsights(args: {
   ctr: number;
   convRate: number;
   cpa: number;
-  totals: ReturnType<typeof sumOverview>;
+  totals: Totals;
   days: number;
 }): Insight[] {
   const out: Insight[] = [];
