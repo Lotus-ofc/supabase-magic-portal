@@ -207,26 +207,36 @@ const ZERO_TOTALS: Totals = {
 };
 
 export function sumOverview(rows: OverviewRow[]): Totals {
+  // Métricas "unique-count" no período: NÃO somar entre dias.
+  // - google_spend: integrações enviam cumulativo do período → usar MAX por cliente.
+  // - instagram_reach: reach representa contas únicas → usar MAX por cliente
+  //   (best-effort lower bound; somar entre dias contaria a mesma conta várias vezes).
   const googleSpendByCliente = new Map<string, number>();
+  const instagramReachByCliente = new Map<string, number>();
 
   const totals = rows.reduce((acc, r) => {
-    const meta = r.meta_spend ?? 0;
-    const google = r.google_spend ?? 0;
-    acc.meta_spend += meta;
+    acc.meta_spend += r.meta_spend ?? 0;
     googleSpendByCliente.set(
       r.cliente,
-      Math.max(googleSpendByCliente.get(r.cliente) ?? 0, google),
+      Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
+    );
+    instagramReachByCliente.set(
+      r.cliente,
+      Math.max(instagramReachByCliente.get(r.cliente) ?? 0, r.instagram_reach ?? 0),
     );
     acc.impressions += r.total_impressions ?? 0;
     acc.clicks += r.total_clicks ?? 0;
     acc.sessions += r.ga4_sessions ?? 0;
     acc.conversions += r.ga4_conversions ?? 0;
-    acc.reach += r.instagram_reach ?? 0;
     acc.engagement += r.instagram_interactions ?? 0;
     return acc;
   }, { ...ZERO_TOTALS });
 
   totals.google_spend = Array.from(googleSpendByCliente.values()).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
+  totals.reach = Array.from(instagramReachByCliente.values()).reduce(
     (sum, value) => sum + value,
     0,
   );
