@@ -193,14 +193,14 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
         <HeroSpend
           value={totalSpend}
           delta={spendDelta}
-          google={totals.google}
-          meta={totals.meta}
+          google={totals.google_spend}
+          meta={totals.meta_spend}
           days={days}
           className="lg:col-span-3"
         />
         <StatCard
           label="Conversões"
-          value={fmtInt(totals.conv)}
+          value={fmtInt(totals.conversions)}
           icon={Target}
           delta={convDelta}
           hint={`${convRate.toFixed(2)}% taxa · CPA ${cpa > 0 ? fmtBRL(cpa) : "—"}`}
@@ -288,11 +288,11 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           className="xl:col-span-2"
         >
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
-            <Summary label="Impressões" value={fmtInt(totals.impr)} />
+            <Summary label="Impressões" value={fmtInt(totals.impressions)} />
             <Summary label="Cliques" value={fmtInt(totals.clicks)} />
             <Summary label="CTR" value={`${ctr.toFixed(2)}%`} />
             <Summary label="Investimento" value={fmtBRL(totalSpend)} />
-            <Summary label="Conversões" value={fmtInt(totals.conv)} />
+            <Summary label="Conversões" value={fmtInt(totals.conversions)} />
             <Summary label="Taxa de conversão" value={`${convRate.toFixed(2)}%`} />
             <Summary label="Alcance Instagram" value={fmtInt(totals.reach)} />
             <Summary label="Engajamento Instagram" value={fmtInt(totals.engagement)} />
@@ -493,14 +493,14 @@ function buildInsights(args: {
     });
   }
 
-  if (cpa > 0 && totals.conv >= 5) {
+  if (cpa > 0 && totals.conversions >= 5) {
     out.push({
       title: `Custo por conversão: ${cpa.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL",
         maximumFractionDigits: 2,
       })}`,
-      detail: `Base: ${totals.conv} conversões nos últimos ${days} dias.`,
+      detail: `Base: ${totals.conversions} conversões nos últimos ${days} dias.`,
       tone: "neutral",
       icon: Target,
     });
