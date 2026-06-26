@@ -8,5 +8,10 @@ export const Route = createFileRoute("/")({
     const { data } = await supabase.auth.getUser();
     throw redirect({ to: data.user ? "/dashboard" : "/auth" });
   },
+  pendingComponent: () => (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <p className="text-sm text-muted-foreground">Carregando…</p>
+    </div>
+  ),
   component: () => null,
 });

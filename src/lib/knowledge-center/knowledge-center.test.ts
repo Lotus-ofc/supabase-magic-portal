@@ -44,6 +44,23 @@ Content here.
     expect(doc.toc).toHaveLength(1);
     expect(doc.toc[0].text).toBe("Section One");
   });
+
+  it("parses multiline list frontmatter", () => {
+    const raw = `---
+title: Related Doc
+related:
+  - 06-engine/platform-catalog
+  - 06-engine/formulas
+---
+
+# Related Doc
+`;
+    const doc = parseMarkdownFile("06-dashboards/platforms/google-ads.md", raw);
+    expect(doc.frontmatter.related).toEqual([
+      "06-engine/platform-catalog",
+      "06-engine/formulas",
+    ]);
+  });
 });
 
 describe("knowledge-center link resolver", () => {

@@ -1,6 +1,69 @@
-import matter from "gray-matter";
 import type { DocEntry, DocFrontmatter, TocItem } from "./types";
 import { filePathToSlug } from "./slug";
+
+/** Browser-safe frontmatter parser (gray-matter pulls Node `Buffer` into the client bundle). */
+function parseScalarValue(raw: string): unknown {
+  const v = raw.trim();
+  if (!v) return "";
+  if (v.startsWith("[") && v.endsWith("]")) {
+    const inner = v.slice(1, -1).trim();
+    if (!inner) return [];
+    return inner.split(",").map((s) => s.trim().replace(/^["']|["']$/g, ""));
+  }
+  if (
+    (v.startsWith('"') && v.endsWith('"')) ||
+    (v.startsWith("'") && v.endsWith("'"))
+  ) {
+    return v.slice(1, -1);
+  }
+  return v;
+}
+
+function parseFrontmatter(raw: string): { data: Record<string, unknown>; content: string } {
+  if (!raw.startsWith("---")) {
+    return { data: {}, content: raw };
+  }
+
+  const end = raw.indexOf("\n---", 3);
+  if (end === -1) return { data: {}, content: raw };
+
+  const yamlBlock = raw.slice(3, end).replace(/^\r?\n/, "");
+  const content = raw.slice(end + 4).replace(/^\r?\n?/, "");
+  const data: Record<string, unknown> = {};
+  const lines = yamlBlock.split(/\r?\n/);
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim() || line.trim().startsWith("#")) {
+      i++;
+      continue;
+    }
+
+    const listKey = line.match(/^([\w_]+):\s*$/);
+    if (listKey) {
+      const items: string[] = [];
+      i++;
+      while (i < lines.length && /^\s+-\s+/.test(lines[i])) {
+        items.push(
+          lines[i]
+            .replace(/^\s+-\s+/, "")
+            .trim()
+            .replace(/^["']|["']$/g, ""),
+        );
+        i++;
+      }
+      data[listKey[1]] = items;
+      continue;
+    }
+
+    const kv = line.match(/^([\w_]+):\s*(.*)$/);
+    if (kv) data[kv[1]] = parseScalarValue(kv[2]);
+    i++;
+  }
+
+  return { data, content };
+}
 
 const HEADING_RE = /^(#{1,6})\s+(.+?)\s*$/gm;
 
@@ -91,8 +154,8 @@ function stripMarkdownForSearch(body: string): string {
 }
 
 export function parseMarkdownFile(relativePath: string, raw: string): DocEntry {
-  const { data, content } = matter(raw);
-  const frontmatter = normalizeFrontmatter(data as Record<string, unknown>);
+  const { data, content } = parseFrontmatter(raw);
+  const frontmatter = normalizeFrontmatter(data);
   const body = content.trim();
   const path = filePathToSlug(relativePath);
   const slug = path;
