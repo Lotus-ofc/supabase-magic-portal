@@ -279,20 +279,14 @@ const ZERO_TOTALS: Totals = {
 };
 
 export function sumOverview(rows: OverviewRow[]): Totals {
-  // Métricas "unique-count" no período: NÃO somar entre dias.
-  // - google_spend: integrações enviam cumulativo do período → usar MAX por cliente.
-  // - instagram_reach: reach representa contas únicas → usar MAX por cliente
-  //   (best-effort lower bound; somar entre dias contaria a mesma conta várias vezes).
-  const googleSpendByCliente = new Map<string, number>();
+  // google_spend e meta_spend: somatório diário (views já agregam por dia).
+  // instagram_reach: contas únicas — MAX por cliente no período (não somar dias).
   const instagramReachByCliente = new Map<string, number>();
 
   const totals = rows.reduce(
     (acc, r) => {
       acc.meta_spend += r.meta_spend ?? 0;
-      googleSpendByCliente.set(
-        r.cliente,
-        Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
-      );
+      acc.google_spend += r.google_spend ?? 0;
       instagramReachByCliente.set(
         r.cliente,
         Math.max(instagramReachByCliente.get(r.cliente) ?? 0, r.instagram_reach ?? 0),
@@ -307,10 +301,6 @@ export function sumOverview(rows: OverviewRow[]): Totals {
     { ...ZERO_TOTALS },
   );
 
-  totals.google_spend = Array.from(googleSpendByCliente.values()).reduce(
-    (sum, value) => sum + value,
-    0,
-  );
   totals.reach = Array.from(instagramReachByCliente.values()).reduce(
     (sum, value) => sum + value,
     0,

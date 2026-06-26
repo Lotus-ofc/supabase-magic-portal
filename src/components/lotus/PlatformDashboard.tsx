@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PlatformDef, ValueFormat } from "@/lib/platforms/types";
+import type { CommonMetric } from "@/lib/metrics";
 import { aggregatePeriod, pctDelta } from "@/lib/platforms/engine";
 import type { Period } from "@/lib/period";
 import { formatBR } from "@/lib/period";
@@ -57,6 +58,19 @@ function formatValue(format: ValueFormat, value: number | null | undefined): str
     default:
       return _int.format(Math.round(value));
   }
+}
+
+/** Mapeia métrica da plataforma para formatação do gráfico (tooltip/eixo). */
+function metricToChartCommon(metricKey: string, format: ValueFormat): CommonMetric {
+  if (format === "currency") return "spend";
+  if (format === "percent") return "ctr";
+  if (metricKey.includes("reach") || metricKey.includes("engaged") || metricKey.includes("users"))
+    return "reach";
+  if (metricKey.includes("session")) return "sessions";
+  if (metricKey.includes("conversion")) return "conversions";
+  if (metricKey.includes("click")) return "clicks";
+  if (metricKey.includes("engagement") || metricKey.includes("interaction")) return "engagement";
+  return "impressions";
 }
 
 // ---------- Query -----------------------------------------------------------
@@ -230,23 +244,18 @@ function ChartsSection({
   return (
     <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {def.charts.map((chart) => {
-        const yMetric = def.metrics.find((m) => m.key === chart.yMetric);
-        const total = chart.series.reduce((sum, s) => sum + (agg.current[s.metric] ?? 0), 0);
-        // Mapeia formato ValueFormat → CommonMetric usado pelo AreaChartLotus
-        // para formatar tooltip/eixo. Usamos "spend" para currency, "int" para int.
-        const commonMetric =
-          yMetric?.format === "currency"
-            ? "spend"
-            : yMetric?.format === "percent"
-              ? "ctr"
-              : "impressions";
+        const yMetricDef = def.metrics.find((m) => m.key === chart.yMetric);
+        const yChartMetric = yMetricDef
+          ? metricToChartCommon(yMetricDef.key, yMetricDef.format)
+          : "impressions";
+        const headlineVal = yMetricDef ? (agg.current[chart.yMetric] ?? 0) : 0;
         return (
           <ChartFrame
             key={chart.key}
             eyebrow="Evolução"
             title={chart.title}
             description={chart.description}
-            headline={yMetric ? formatValue(yMetric.format, total) : undefined}
+            headline={yMetricDef ? formatValue(yMetricDef.format, headlineVal) : undefined}
             legend={
               <>
                 {chart.series.map((s) => {
@@ -265,14 +274,18 @@ function ChartsSection({
           >
             <AreaChartLotus
               data={agg.daily}
-              yMetric={commonMetric as never}
+              yMetric={yChartMetric}
               height={chart.height ?? 260}
-              series={chart.series.map((s) => ({
-                key: s.metric,
-                label: s.label,
-                metric: commonMetric as never,
-                tone: s.tone,
-              }))}
+              series={chart.series.map((s) => {
+                const m = def.metrics.find((mm) => mm.key === s.metric);
+                const chartMetric = m ? metricToChartCommon(m.key, m.format) : yChartMetric;
+                return {
+                  key: s.metric,
+                  label: s.label,
+                  metric: chartMetric,
+                  tone: s.tone,
+                };
+              })}
             />
           </ChartFrame>
         );

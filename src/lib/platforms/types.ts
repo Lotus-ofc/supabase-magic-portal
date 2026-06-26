@@ -50,7 +50,7 @@ export interface KpiDef {
    * Calculado a partir dos TOTAIS já agregados do período.
    * NUNCA média de médias — sempre fórmula oficial sobre os totais.
    */
-  compute: (totals: Record<string, number>) => number;
+  compute: (totals: Record<string, number>, period: Period) => number;
   description?: string;
   icon?: LucideIcon;
 }

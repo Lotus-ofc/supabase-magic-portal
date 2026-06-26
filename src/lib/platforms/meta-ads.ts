@@ -52,10 +52,11 @@ export const metaAdsDef: PlatformDef = {
       column: "reach",
       label: "Alcance",
       format: "int",
-      aggregation: { kind: "sum" },
+      aggregation: { kind: "max" },
       icon: Users,
       positiveIsGood: true,
-      description: "Soma do reach diário entregue pela Meta. Pessoas únicas POR DIA.",
+      description:
+        "Maior alcance diário no período (aproximação de pessoas únicas; não somar dias).",
     },
     {
       key: "impressions",

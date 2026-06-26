@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { detectClientPlatforms, type ClientPlatformRouteKey } from "@/lib/platform-availability";
 
 // ---------------- Shared helpers (used by child routes) ----------------
 
@@ -58,61 +59,12 @@ export const clienteRefQuery = (slug: string) =>
     staleTime: 5 * 60 * 1000,
   });
 
-export type PlatformKey =
-  | "instagram"
-  | "meta-ads"
-  | "google-ads"
-  | "ga4"
-  | "google-business"
-  | "tiktok";
+export type PlatformKey = ClientPlatformRouteKey;
 
 export const clientePlatformsQuery = (queryName: string) =>
   queryOptions({
     queryKey: ["cliente-platforms", queryName],
-    queryFn: async (): Promise<PlatformKey[]> => {
-      const since = new Date();
-      since.setDate(since.getDate() - 90);
-      const sinceStr = since.toISOString().slice(0, 10);
-
-      const [ov, gbp] = await Promise.all([
-        supabase
-          .from("vw_overview_cliente")
-          .select("meta_spend, google_spend, sessions, conversions, reach, engagement")
-          .eq("cliente", queryName)
-          .gte("data", sinceStr),
-        supabase
-          .from("vw_google_business_diario")
-          .select("cliente")
-          .eq("cliente", queryName)
-          .gte("data", sinceStr)
-          .limit(1),
-      ]);
-
-      const rows = (ov.data ?? []) as Array<Record<string, number | null>>;
-      const agg = rows.reduce<{
-        meta: number;
-        google: number;
-        ga4: number;
-        ig: number;
-      }>(
-        (a, r) => ({
-          meta: a.meta + Number(r.meta_spend ?? 0),
-          google: a.google + Number(r.google_spend ?? 0),
-          ga4: a.ga4 + Number(r.sessions ?? 0) + Number(r.conversions ?? 0),
-          ig: a.ig + Number(r.reach ?? 0) + Number(r.engagement ?? 0),
-        }),
-        { meta: 0, google: 0, ga4: 0, ig: 0 },
-      );
-
-      const out: PlatformKey[] = [];
-      if (agg.ig > 0) out.push("instagram");
-      if (agg.meta > 0) out.push("meta-ads");
-      if (agg.google > 0) out.push("google-ads");
-      if (agg.ga4 > 0) out.push("ga4");
-      if ((gbp.data ?? []).length > 0) out.push("google-business");
-      // TikTok: ainda sem view própria — só aparece quando houver dados.
-      return out;
-    },
+    queryFn: () => detectClientPlatforms(queryName),
     staleTime: 5 * 60 * 1000,
   });
 

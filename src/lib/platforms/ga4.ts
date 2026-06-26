@@ -30,10 +30,11 @@ export const ga4Def: PlatformDef = {
       column: "active_users",
       label: "Usuários ativos",
       format: "int",
-      aggregation: { kind: "sum" },
+      aggregation: { kind: "max" },
       icon: Users,
       positiveIsGood: true,
-      description: "Somatório diário de active users reportados pelo GA4.",
+      description:
+        "Maior valor diário de usuários ativos no período (aproximação; GA4 reporta por dia).",
     },
     {
       key: "sessions",

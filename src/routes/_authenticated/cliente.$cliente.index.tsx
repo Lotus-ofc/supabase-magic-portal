@@ -26,6 +26,8 @@ import {
   spendShareByPlatform,
   sumOverview,
 } from "@/lib/metrics";
+import { getPlatformDef } from "@/lib/platforms/registry";
+import { clientePlatformsQuery, type PlatformKey } from "./cliente.$cliente";
 import { resolvePeriod, type Period, type PeriodInput } from "@/lib/period";
 import {
   Sparkles,
@@ -42,7 +44,13 @@ import {
 import { cn } from "@/lib/utils";
 import { clienteRefQuery } from "./cliente.$cliente";
 
-// ---------------- Queries ----------------
+const ROUTE_TO_PLATFORM: Partial<Record<PlatformKey, Platform>> = {
+  instagram: "instagram",
+  "meta-ads": "meta_ads",
+  "google-ads": "google_ads",
+  ga4: "ga4",
+  "google-business": "google_business",
+};
 
 const overviewQuery = (nomeCliente: string, prevFrom: string, to: string) =>
   queryOptions({
@@ -69,19 +77,10 @@ const platformDailyQuery = (nomeCliente: string, platform: Platform, from: strin
   queryOptions({
     queryKey: ["cliente-platform", nomeCliente, platform, from, to],
     queryFn: async (): Promise<DailyView[]> => {
-      const view =
-        platform === "meta_ads"
-          ? "vw_meta_ads_diario"
-          : platform === "google_ads"
-            ? "vw_google_ads_diario"
-            : platform === "ga4"
-              ? "vw_ga4_diario"
-              : platform === "instagram"
-                ? "vw_instagram_diario"
-                : null;
-      if (!view) return [];
+      const def = getPlatformDef(platform);
+      if (!def) return [];
       const { data, error } = await supabase
-        .from(view)
+        .from(def.view)
         .select("*")
         .eq("cliente", nomeCliente)
         .gte("data", from)
@@ -169,6 +168,7 @@ function ClienteSkeleton() {
 
 function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
   const { data: rows } = useSuspenseQuery(overviewQuery(cliente, period.prevFrom, period.to));
+  const { data: detectedRoutes } = useSuspenseQuery(clientePlatformsQuery(cliente));
 
   const days = period.days;
 
@@ -186,8 +186,12 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
   const insights = buildInsights({ current: cT, previous: pT, days });
   const share = spendShareByPlatform(current);
 
-  const platformsActive = collectActivePlatforms(cT);
-  const hasData = current.length > 0;
+  const fromOverview = collectActivePlatforms(cT);
+  const fromDetection = detectedRoutes
+    .map((k) => ROUTE_TO_PLATFORM[k])
+    .filter((p): p is Platform => !!p);
+  const platformsActive = [...new Set([...fromOverview, ...fromDetection])];
+  const hasData = current.length > 0 || platformsActive.length > 0;
 
   if (!hasData) return <EmptyAccount />;
 

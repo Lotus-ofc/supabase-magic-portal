@@ -30,10 +30,11 @@ export function aggregate(def: PlatformDef, rows: Row[], period: Period): Record
 export function deriveKpis(
   def: PlatformDef,
   totals: Record<string, number>,
+  period: Period,
 ): Record<string, number> {
   const out: Record<string, number> = {};
   for (const k of def.kpis) {
-    out[k.key] = k.compute(totals);
+    out[k.key] = k.compute(totals, period);
   }
   return out;
 }
@@ -44,8 +45,6 @@ export interface DailyPoint extends Record<string, number | string> {
 }
 
 export function dailySeries(def: PlatformDef, rows: Row[], period: Period): DailyPoint[] {
-  // Index por dia → soma diária por métrica (sempre SUM dentro do dia para o
-  // gráfico de evolução; o agregador de período respeita a estratégia da métrica).
   const byDate = new Map<string, Record<string, number>>();
   for (const r of rows) {
     if (r.data < period.from || r.data > period.to) continue;
@@ -55,7 +54,14 @@ export function dailySeries(def: PlatformDef, rows: Row[], period: Period): Dail
       if (v == null) continue;
       const n = Number(v);
       if (!Number.isFinite(n)) continue;
-      acc[m.key] = (acc[m.key] ?? 0) + n;
+      const kind = m.aggregation.kind;
+      if (kind === "max") {
+        acc[m.key] = Math.max(acc[m.key] ?? Number.NEGATIVE_INFINITY, n);
+      } else if (kind === "min") {
+        acc[m.key] = Math.min(acc[m.key] ?? Number.POSITIVE_INFINITY, n);
+      } else {
+        acc[m.key] = (acc[m.key] ?? 0) + n;
+      }
     }
     byDate.set(r.data, acc);
   }
@@ -90,7 +96,7 @@ export function byCampaign(def: PlatformDef, rows: Row[], period: Period): Campa
   }
   return Array.from(groups.entries()).map(([campanha, rs]) => {
     const totals = aggregate(def, rs, period);
-    const kpis = deriveKpis(def, totals);
+    const kpis = deriveKpis(def, totals, period);
     return { campanha, totals, kpis };
   });
 }
@@ -121,8 +127,12 @@ export function aggregatePeriod(def: PlatformDef, rows: Row[], period: Period): 
     from: period.prevFrom,
     to: period.prevTo,
   });
-  const currentKpis = deriveKpis(def, current);
-  const previousKpis = deriveKpis(def, previous);
+  const currentKpis = deriveKpis(def, current, period);
+  const previousKpis = deriveKpis(def, previous, {
+    ...period,
+    from: period.prevFrom,
+    to: period.prevTo,
+  });
   const daily = dailySeries(def, rows, period);
   const campaigns = byCampaign(def, rows, period);
   const lastSync = rows.reduce<string | null>(

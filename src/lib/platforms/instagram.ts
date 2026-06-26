@@ -133,9 +133,8 @@ export const instagramDef: PlatformDef = {
       label: "Média diária de interações",
       format: "decimal",
       positiveIsGood: true,
-      compute: (t) => t.interactions,
-      description:
-        "Total de interações no período (média diária é exibida pelo motor de comparação).",
+      compute: (t, period) => f.dailyAverage(t.interactions, period.days),
+      description: "Interações totais ÷ dias do período.",
       icon: TrendingUp,
     },
   ],
