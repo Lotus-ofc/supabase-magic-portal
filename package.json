@@ -8,12 +8,17 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "setup": "node scripts/setup-dev.mjs",
+    "deploy:cloudflare": "node scripts/deploy-cloudflare.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:engineering": "node scripts/validate-engineering.mjs",
     "check": "npm run validate:engineering && npm run lint && npm run test && npm run build"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "dependencies": {
     "@fontsource-variable/epilogue": "^5.2.8",

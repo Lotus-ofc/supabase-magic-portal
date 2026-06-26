@@ -24,6 +24,9 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 - **Knowledge Center:** módulo admin `/admin/knowledge` — renderiza `docs/**/*.md` com busca,
   navegação colapsável, Mermaid, favoritos, recentes e metadados YAML. Documentação de
   plataformas em `06-dashboards/platforms/`.
+- **Setup interno:** `SETUP.md`, `npm run setup`, ADR-0012, deploy Cloudflare manual
+  (`deploy.yml`, `npm run deploy:cloudflare`), `error-reporting.ts` genérico.
+- **Segurança:** `.env` adicionado ao `.gitignore`.
 
 ### Alterado
 

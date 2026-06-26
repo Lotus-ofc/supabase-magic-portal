@@ -24,7 +24,8 @@ last_review: 2026-06-26
 
 | Item     | Valor                                  |
 | -------- | -------------------------------------- |
-| Comando  | `npm run dev`                          |
+| Comando  | `npm run dev` · ver [SETUP.md](../../../SETUP.md) |
+| Setup    | `npm run setup` — valida Node e `.env`              |
 | URL      | `http://localhost:5173` (Vite default) |
 | Env      | `.env` (copiar de `.env.example`)      |
 | Supabase | Projeto `ywvhoctcmibjitvwkkhb`         |
@@ -46,7 +47,9 @@ Em dev, **duplicar** URL e anon key com e sem prefixo `VITE_`:
 | ------ | ------------------------------------------------- |
 | Build  | `npm run build` → Nitro → Cloudflare              |
 | Preset | `@lovable.dev/vite-tanstack-config` (transitório) |
-| Deploy | Via Lovable conectado ao branch Git               |
+| Deploy | Via Lovable (transitório) **ou** GitHub Actions → Cloudflare (`deploy.yml`) |
+
+Deploy proprietário: [CI/CD](./cicd.md) · ADR-0012.
 
 > ⚠️ **INFORMAÇÃO NÃO ENCONTRADA:** domínio de produção, URL pública do Portal Lotus,
 > mapeamento de secrets no Cloudflare/Lovable dashboard.

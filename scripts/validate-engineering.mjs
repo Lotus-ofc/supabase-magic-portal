@@ -14,11 +14,14 @@ const requiredPaths = [
   "docs/00-company/engineering-system.md",
   "docs/09-standards/governance.md",
   ".env.example",
+  "SETUP.md",
   "CONTRIBUTING.md",
   ".github/workflows/ci.yml",
+  ".github/workflows/deploy.yml",
   ".cursor/rules/lotus-engineering.mdc",
   ".cursor/rules/docs-maintenance.mdc",
   ".cursor/rules/lotus-governance.mdc",
+  ".cursor/rules/lotus-internal-dev.mdc",
 ];
 
 const errors = [];
@@ -31,8 +34,12 @@ for (const rel of requiredPaths) {
 
 // ADR-0011 deve existir após fundação do sistema de engenharia
 const adr11 = "docs/02-architecture/adr/0011-engineering-system-foundation.md";
+const adr12 = "docs/02-architecture/adr/0012-internal-infrastructure-transition.md";
 if (!fs.existsSync(path.join(root, adr11))) {
   errors.push(`ADR ausente: ${adr11}`);
+}
+if (!fs.existsSync(path.join(root, adr12))) {
+  errors.push(`ADR ausente: ${adr12}`);
 }
 
 if (errors.length > 0) {

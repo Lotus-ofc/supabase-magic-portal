@@ -5,7 +5,7 @@ Obrigado por contribuir. A Lotus trata **documentação como produto** e **engen
 ## Antes de começar
 
 1. Leia **[docs/START_HERE.md](docs/START_HERE.md)** (~1h)
-2. Configure o ambiente: [Onboarding](docs/10-onboarding/onboarding.md)
+2. Configure o ambiente: **[SETUP.md](SETUP.md)** · `npm run setup` · [Onboarding](docs/10-onboarding/onboarding.md)
 3. Entenda o fluxo oficial: [development-workflow](docs/09-standards/development-workflow.md)
 
 ## Fluxo de trabalho

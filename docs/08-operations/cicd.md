@@ -20,7 +20,8 @@ last_review: 2026-06-26
 | Build no PR            | ✅ `npm run build`                  |
 | Validação engenharia   | ✅ `npm run validate:engineering`   |
 | Gate local             | ✅ `npm run check`                  |
-| Deploy automático      | ❌ Manual via Lovable (transitório) |
+| Deploy automático      | ❌ Manual (Lovable transitório)     |
+| Deploy proprietário    | 🟡 Preparado — `deploy.yml` (manual) |
 | Migrations automáticas | ❌ Manual no Supabase dashboard     |
 
 ---
@@ -66,21 +67,32 @@ Checklist alinhado ao handbook: `.github/pull_request_template.md`
 
 ---
 
-## Deploy (transitório)
+## Deploy
+
+### Transitório (hoje)
 
 Deploy de produção ainda via Lovable/Nitro/Cloudflare. Ver [Deployment](./deployment.md).
 
-### Pipeline alvo (deploy proprietário)
+### Proprietário (preparado — ADR-0012)
+
+Workflow **manual**: `.github/workflows/deploy.yml`
+
+1. Configure secrets no GitHub: `CLOUDFLARE_API_TOKEN` + variáveis `OFFICIAL_*` / `VITE_OFFICIAL_*`
+2. Actions → **Deploy (Cloudflare)** → confirmar com `deploy`
+3. Local: `npm run build && npm run deploy:cloudflare`
+
+> Mantenha Lovable ativo até validar paridade em produção.
+
+### Pipeline alvo (pós-cutover)
 
 ```yaml
-# Futuro — após desacoplar Lovable
 steps:
   - npm run check
   - deploy Cloudflare (secrets reais)
   - smoke test
 ```
 
-Ver [ADR-0009](../02-architecture/adr/0009-platform-proprietary-infrastructure.md).
+Ver [ADR-0012](../02-architecture/adr/0012-internal-infrastructure-transition.md).
 
 ---
 
