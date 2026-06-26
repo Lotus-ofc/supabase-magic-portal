@@ -23,7 +23,7 @@ Módulo administrativo que renderiza `docs/**/*.md` como experiência de leitura
 
 ```
 src/lib/knowledge-center/
-  parse.ts          # gray-matter + TOC
+  parse.ts          # frontmatter parser (browser-safe) + TOC
   registry.ts       # glob docs/**/*.md
   navigation.ts     # árvore colapsável
   search.ts         # Fuse.js
