@@ -1,235 +1,189 @@
+## Visão de produto
 
-# Central de Integrações — Estrutura Final (revisão pós-ajustes)
+Lotus é um SaaS de Business Intelligence para Marketing. Cada dashboard de plataforma precisa responder perguntas de negócio — não apenas listar métricas — e ser construído sobre uma arquitetura **declarativa**, na qual adicionar uma plataforma futura (LinkedIn, Pinterest, YouTube…) significa **escrever uma configuração**, não tocar componentes.
 
-Plano consolidado já com os 6 ajustes solicitados. Nenhuma implementação iniciada — aprovação em duas frentes: **banco** e **interface**.
-
----
-
-## 1. Estrutura final do banco
-
-Uma única migration aditiva e idempotente: `supabase/migrations-official/04_integracoes_make.sql`.
-
-```sql
-ALTER TABLE public.cadastro_clientes
-  -- Google Ads
-  ADD COLUMN IF NOT EXISTS google_ads_customer_id        text,
-  -- Meta Ads (Ad Account + Pixel)
-  ADD COLUMN IF NOT EXISTS meta_ad_account_id            text,
-  ADD COLUMN IF NOT EXISTS meta_pixel_id                 text,
-  -- Instagram
-  ADD COLUMN IF NOT EXISTS instagram_business_account_id text,
-  -- GA4
-  ADD COLUMN IF NOT EXISTS ga4_property_id               text,
-  -- TikTok
-  ADD COLUMN IF NOT EXISTS tiktok_ad_account_id          text,
-  ADD COLUMN IF NOT EXISTS tiktok_ativo                  boolean NOT NULL DEFAULT false;
-
--- Re-expor todas as colunas de integração em vw_clientes_admin
-CREATE OR REPLACE VIEW public.vw_clientes_admin
-WITH (security_invoker = on) AS
-SELECT
-  cc.*,
-  COALESCE((
-    SELECT array_agg(s.nome ORDER BY s.nome)
-    FROM public.cliente_servicos cs
-    JOIN public.servicos s ON s.id = cs.servico_id
-    WHERE cs.cadastro_cliente_id = cc.id AND cs.ativo = true
-  ), ARRAY[]::text[]) AS servicos,
-  (SELECT count(*) FROM public.client_access ca
-     WHERE ca.cliente_nome = cc.nome_cliente) AS qtd_acessos
-FROM public.cadastro_clientes cc;
-
-GRANT SELECT ON public.vw_clientes_admin TO authenticated;
-```
-
-Regras respeitadas:
-- Apenas `ADD COLUMN IF NOT EXISTS` / `CREATE OR REPLACE VIEW`.
-- Sem `DROP`, sem `ALTER TYPE`, sem renomear, sem `DELETE`.
-- `base_metricas`, views analíticas (`vw_*_diario`, `vw_overview_cliente`), RLS, GRANTs e policies permanecem intactos — as policies de `cadastro_clientes` já cobrem qualquer coluna nova.
-- `google_business_location_id` é preservada (foi criada na migration 01) e simplesmente passa a ser editada na nova seção Integrações.
-- `tiktok_ativo` é a única flag boolean nova; as demais flags antigas (`google_ads_ativo`, `meta_ativo`, `ga4_ativo`, `instagram_ativo`, `google_business_ativo`) continuam como `text` (compat Make) e o frontend já normaliza.
-
-### Mapa final por plataforma (banco ↔ Make)
-
-| Plataforma       | Flag de ativação            | Colunas técnicas lidas pelo Make                  |
-| ---------------- | --------------------------- | ------------------------------------------------- |
-| Google Ads       | `google_ads_ativo`          | `google_ads_customer_id`                          |
-| Meta Ads         | `meta_ativo`                | `meta_ad_account_id`, `meta_pixel_id`             |
-| Instagram        | `instagram_ativo`           | `instagram_business_account_id`                   |
-| GA4              | `ga4_ativo`                 | `ga4_property_id`                                 |
-| Google Business  | `google_business_ativo`     | `google_business_location_id`                     |
-| TikTok Ads       | `tiktok_ativo` (novo)       | `tiktok_ad_account_id`                            |
-
-Tudo opcional. Cenário Make padrão:
-`Search Rows em cadastro_clientes WHERE ativo = true AND <flag>=true AND <id_col> IS NOT NULL` → Iterator → grava em `base_metricas` usando `nome_cliente`.
+Nada de infra: Make, Supabase, views e banco permanecem como estão. Tudo acontece na camada de aplicação.
 
 ---
 
-## 2. Estrutura final da interface
-
-### 2.1 Tela de **criação** (`/admin/clientes/novo`)
-
-Fluxo "cadastro rápido" + opção de já configurar tudo numa só operação.
+## 1. Núcleo declarativo (`src/lib/platforms/`)
 
 ```text
-┌─ Novo cliente ───────────────────────────────────────┐
-│                                                      │
-│ Identidade & contato                                 │
-│   Nome do cliente *        Empresa                   │
-│   E-mail                   Telefone                  │
-│                                                      │
-│   [ + Mostrar configurações avançadas ▾ ]            │
-│                                                      │
-│   ─── (expandido) ──────────────────────────────     │
-│   Slug avançado                                      │
-│     Slug (URL)  ← auto-gerado a partir do nome       │
-│                                                      │
-│   Comercial                                          │
-│     Data início   Valor mensal   mLabs URL           │
-│     Observações                                      │
-│                                                      │
-│   Plataformas ativas (toggles)                       │
-│     Google Ads · Meta Ads · Instagram · GA4 ·        │
-│     Google Business · TikTok Ads                     │
-│                                                      │
-│   Integrações  (cards modulares — ver §2.3)          │
-│     [Google Ads] [Meta Ads] [Instagram] [GA4]        │
-│     [Google Business] [TikTok Ads]                   │
-│   ──────────────────────────────────────────────     │
-│                                                      │
-│              [Cancelar]   [Criar cliente]            │
-└──────────────────────────────────────────────────────┘
+src/lib/platforms/
+  types.ts          PlatformDef, MetricDef, KpiDef, AggStrategy, ChartDef
+  aggregations.ts   estratégias: SUM, MAX, MIN, LAST, FIRST, AVG, CUSTOM
+  formulas.ts       fórmulas oficiais reutilizáveis (CTR, CPC, CPM, CPA, ConvRate,
+                    Frequency, EngagementRate, EventsPerSession, ViewsPerUser…)
+  registry.ts       lista única de PlatformDef + lookup por chave
+  google-ads.ts     PlatformDef
+  meta-ads.ts       PlatformDef
+  instagram.ts      PlatformDef (reach e accounts_engaged como estratégia configurável)
+  ga4.ts            PlatformDef
 ```
 
-Comportamento:
-- Bloco superior (Identidade & contato) sempre visível.
-- Botão "Mostrar configurações avançadas" expande Slug + Comercial + Plataformas + Integrações na mesma página, sem redirect.
-- Slug auto-gerado a partir do Nome; campo só editável dentro do bloco Avançado.
-- Salvar grava tudo em uma única chamada `createCliente`. Após salvar, vai para `/admin/clientes/$id`.
-
-### 2.2 Tela de **edição** (`/admin/clientes/$id`)
-
-Seções colapsáveis, na ordem definitiva:
-
-```text
-[Header: nome + StatusBadge + Desativar/Reativar]
-
-01 Identidade               Nome · Empresa · (▸ Avançado: Slug)
-02 Contato                  E-mail · Telefone
-03 Comercial                Data início · Valor mensal · mLabs URL · Observações
-04 Plataformas ativas       6 toggles (Google Ads, Meta, IG, GA4, GBP, TikTok)
-05 Integrações              6 cards modulares (ver §2.3)
-06 Serviços contratados     (sem mudança)
-07 Acessos                  (sem mudança)
-```
-
-### 2.3 Seção **Integrações** — layout modular
-
-Grid de cards independentes, um por plataforma, todos com o mesmo molde. Adicionar uma nova plataforma no futuro = **um novo card no array**, zero refactor de layout.
-
-```text
-┌──────────────────────────────────────────────────────┐
-│ 05  Integrações                          5 / 6 ok    │
-│ Identificadores consumidos pelos cenários do Make.   │
-├──────────────────────────────────────────────────────┤
-│ ┌────────────────────────┐ ┌────────────────────────┐│
-│ │ ▣ Google Ads     🟢    │ │ ▣ Meta Ads        🟡    ││
-│ │ Configurado            │ │ Parcialmente config.   ││
-│ │                        │ │                        ││
-│ │ Customer ID            │ │ Ad Account ID          ││
-│ │ [ 123-456-7890       ] │ │ [ act_123…           ] ││
-│ │                        │ │ Pixel ID               ││
-│ │                        │ │ [                    ] ││
-│ └────────────────────────┘ └────────────────────────┘│
-│ ┌────────────────────────┐ ┌────────────────────────┐│
-│ │ ▣ Instagram      🔵    │ │ ▣ GA4             ⚪    ││
-│ │ Pré-configurado        │ │ Não configurado        ││
-│ │ ...                    │ │ ...                    ││
-│ └────────────────────────┘ └────────────────────────┘│
-│ ┌────────────────────────┐ ┌────────────────────────┐│
-│ │ ▣ Google Business      │ │ ▣ TikTok Ads           ││
-│ │ ...                    │ │ ...                    ││
-│ └────────────────────────┘ └────────────────────────┘│
-└──────────────────────────────────────────────────────┘
-```
-
-Cada card contém:
-- Ícone + nome da plataforma.
-- **Pill de status** (regra abaixo).
-- 1+ campos de ID (texto livre, max 200, opcionais).
-- Hint inline quando faltar configurar (ex.: "Ative a plataforma para coletar dados" ou "Preencha o ID para o Make rodar").
-
-### 2.4 Regra do indicador visual de status (Ajuste 3)
-
-Calculado por plataforma com base em `(ativo, id_principal)`. Para Meta, `id_principal = meta_ad_account_id` (o Pixel é secundário).
-
-| Estado                | Condição                          | Cor / Pill          |
-| --------------------- | --------------------------------- | ------------------- |
-| 🟢 Configurado         | ativo = true  · ID preenchido     | `success`           |
-| 🟡 Parcialmente config.| ativo = true  · ID vazio          | `warning` (âmbar)   |
-| 🔵 Pré-configurado     | ativo = false · ID preenchido     | `info` (azul)       |
-| ⚪ Não configurado     | ativo = false · ID vazio          | `muted`             |
-
-Componente novo reutilizável: `src/components/lotus/IntegrationStatusPill.tsx`. Toda a seção Integrações também mostra um contador agregado no header (`5 / 6 ok` = quantos cards em verde).
-
-### 2.5 Preparação para crescimento (Ajuste 4)
-
-A seção Integrações é renderizada a partir de um array declarativo:
+### 1.1 `PlatformDef` — o contrato
 
 ```ts
-// src/lib/integrations-catalog.ts
-export const INTEGRATIONS = [
-  { key: 'google_ads',  label: 'Google Ads',
-    activeField: 'google_ads_ativo',
-    fields: [{ col: 'google_ads_customer_id', label: 'Customer ID', primary: true }] },
-  { key: 'meta',        label: 'Meta Ads',
-    activeField: 'meta_ativo',
-    fields: [
-      { col: 'meta_ad_account_id', label: 'Ad Account ID', primary: true },
-      { col: 'meta_pixel_id',      label: 'Pixel ID' },
-    ] },
-  { key: 'instagram',   label: 'Instagram',
-    activeField: 'instagram_ativo',
-    fields: [{ col: 'instagram_business_account_id', label: 'Instagram Business Account ID', primary: true }] },
-  { key: 'ga4',         label: 'Google Analytics 4',
-    activeField: 'ga4_ativo',
-    fields: [{ col: 'ga4_property_id', label: 'Property ID', primary: true }] },
-  { key: 'gbp',         label: 'Google Business',
-    activeField: 'google_business_ativo',
-    fields: [{ col: 'google_business_location_id', label: 'Location ID', primary: true }] },
-  { key: 'tiktok',      label: 'TikTok Ads',
-    activeField: 'tiktok_ativo',
-    fields: [{ col: 'tiktok_ad_account_id', label: 'Ad Account ID', primary: true }] },
-] as const;
+type AggStrategy =
+  | { kind: 'sum' } | { kind: 'max' } | { kind: 'min' }
+  | { kind: 'last' } | { kind: 'first' } | { kind: 'avg' }
+  | { kind: 'custom'; fn: (rows: Row[], period: Period) => number };
+
+interface MetricDef {
+  key: string;                  // ex.: 'reach', 'impressions'
+  label: string;
+  column: string;               // coluna na view
+  format: 'int' | 'currency' | 'percent' | 'decimal';
+  aggregation: AggStrategy;     // ← decisão por métrica
+  positiveIsGood?: boolean;
+  description?: string;         // explicação oficial da API
+}
+
+interface KpiDef {
+  key: string;
+  label: string;
+  format: 'percent' | 'currency' | 'decimal';
+  positiveIsGood: boolean;
+  /** Calculado a partir dos TOTAIS já agregados do período. Nunca média de médias. */
+  compute: (t: Record<string, number>) => number;
+  description?: string;
+}
+
+interface ChartDef {
+  kind: 'area' | 'bar' | 'donut';
+  title: string;
+  series: { metric: string; label: string; tone: 'primary' | 'secondary' | 'success' | 'warning' }[];
+}
+
+interface PlatformDef {
+  key: 'google_ads' | 'meta_ads' | 'instagram' | 'ga4' | string;
+  label: string;
+  icon: LucideIcon;
+  view: string;                 // ex.: 'vw_google_ads_diario'
+  campaignField?: string;       // quando houver ranking de campanhas
+  metrics: MetricDef[];         // métricas brutas exibidas em cards
+  kpis: KpiDef[];               // KPIs derivados
+  charts: ChartDef[];           // evolução(ões)
+  questions: string[];          // perguntas que o dashboard responde (header narrativo)
+}
 ```
 
-Adicionar LinkedIn, YouTube, Search Console, Microsoft Ads, RD Station ou HubSpot no futuro = uma migration aditiva (`ADD COLUMN`) + uma entrada nesse array. Sem mudar a tela.
+### 1.2 Estratégias de agregação (sem heurísticas escondidas)
+
+Implementadas em `aggregations.ts` e aplicadas pelo motor — `Reach`, `Accounts Engaged` e qualquer outra métrica não-acumulativa **deixam de ter regra hardcoded**. Cada `MetricDef` declara explicitamente sua estratégia. A decisão de `SUM` vs `MAX` vs `LAST` é responsabilidade da `PlatformDef` e pode ser ajustada por métrica sem tocar o motor.
+
+### 1.3 Fórmulas oficiais — uma única fonte
+
+`formulas.ts` exporta funções puras: `ctr(impressions, clicks)`, `cpc(spend, clicks)`, `cpm(spend, impressions)`, `cpa(spend, conversions)`, `convRate(num, den)`, `frequency(impressions, reach)`, `engagementRate(interactions, reach)`, `eventsPerSession(events, sessions)`, etc.
+
+Toda KPI declarada em qualquer `PlatformDef` usa essas funções. `src/lib/metrics.ts` (consumido pelo Dashboard Executivo e Visão Geral do Cliente) passa a importar daqui — **uma única fonte de verdade** para a plataforma inteira.
 
 ---
 
-## 3. Arquivos que serão alterados/criados
+## 2. Motor de agregação (`src/lib/platforms/engine.ts`)
 
-**Banco**
-- `supabase/migrations-official/04_integracoes_make.sql` (novo)
+Funções puras que recebem `PlatformDef` + `rows` + `period`:
 
-**Frontend**
-- `src/lib/integrations-catalog.ts` (novo — array declarativo)
-- `src/components/lotus/IntegrationStatusPill.tsx` (novo)
-- `src/components/lotus/IntegrationCard.tsx` (novo — molde do card)
-- `src/lib/admin.functions.ts` — Zod + selects incluem as 6 colunas novas e `tiktok_ativo`
-- `src/routes/_authenticated/admin/clientes.$id.tsx` — nova seção 05 Integrações, Slug movido para "Avançado" em Identidade, toggle TikTok adicionado
-- `src/routes/_authenticated/admin/clientes.novo.tsx` — refeito com "cadastro rápido + Mostrar configurações avançadas"
+- `aggregate(def, rows, period)` → totais por métrica, aplicando a `AggStrategy` declarada.
+- `deriveKpis(def, totals)` → executa cada `KpiDef.compute`.
+- `dailySeries(def, rows, period)` → série diária preenchida (string-based, sem TZ drift).
+- `byCampaign(def, rows)` → ranking quando `campaignField` existe.
+- `deltaVsPrev(def, currRows, prevRows, period)` → totais + KPIs para comparação.
 
-**Não tocados:** `base_metricas`, views analíticas, dashboards, `/cliente/$cliente`, cenários Make, RLS, policies.
+Nenhum componente React faz cálculo. Tudo passa pelo engine.
 
 ---
 
-## 4. Checklist final
+## 3. Componente genérico (`PlatformDashboard`)
 
-- Migration: 6 novas colunas (`google_ads_customer_id`, `meta_ad_account_id`, `meta_pixel_id`, `instagram_business_account_id`, `ga4_property_id`, `tiktok_ad_account_id`) + 1 flag (`tiktok_ativo`) + refresh de `vw_clientes_admin`.
-- Cadastro rápido com expansor "Mostrar configurações avançadas" cobrindo Slug, Comercial, Plataformas e Integrações.
-- Status pill 🟢🟡🔵⚪ em cada card + contador agregado.
-- Layout 100% data-driven a partir de `INTEGRATIONS`.
-- Make pode ler tudo direto de `cadastro_clientes` sem hardcode.
+`src/components/lotus/PlatformDashboard.tsx` — recebe `def: PlatformDef`, `cliente`, `period`. Faz **uma única** query a `def.view` cobrindo `[prevFrom, to]` e renderiza, na mesma ordem para qualquer plataforma:
 
-Aprove para eu rodar a migration e refatorar o cadastro, ou aponte ajustes finais.
+1. **Header narrativo** — título, descrição, período analisado, última sincronização, lista de perguntas que o dashboard responde.
+2. **Cards principais** — `def.metrics` com delta vs período anterior.
+3. **KPIs derivados** — `def.kpis` com delta vs período anterior.
+4. **Evolução diária** — cada `ChartDef` vira um gráfico.
+5. **Comparativo período atual × anterior** — bloco lado a lado.
+6. **Tabela diária** — todas as métricas + KPIs por dia.
+7. **Ranking de campanhas** — quando `campaignField` existe.
+8. **Insights automáticos** — regras baseadas nos KPIs do `def` (variações ≥ limiar, CTR/CPA fora da faixa saudável, etc.). Sem invenção.
+
+Adicionar LinkedIn no futuro = criar `linkedin-ads.ts` com a `PlatformDef`, registrar no `registry.ts`, criar a rota. Zero alteração no componente.
+
+---
+
+## 4. Período absoluto
+
+Cada página de plataforma tem seu `PeriodPicker` próprio e passa `period` resolvido ao `PlatformDashboard`. Dentro do componente e do engine **só existem** `period.from`, `period.to`, `period.prevFrom`, `period.prevTo`. Nenhuma chamada a `new Date()`, `today()`, `now()` ou cálculo de offset.
+
+A query Supabase de cada dashboard busca exatamente `[prevFrom, to]` em **uma chamada**, garantindo que cards, gráficos, tabela, ranking e insights consumam o **mesmo dataset** — consistência absoluta entre componentes.
+
+---
+
+## 5. Definições iniciais por plataforma
+
+**Google Ads** (`view: vw_google_ads_diario`)
+- Métricas brutas: impressions (SUM), clicks (SUM), spend (SUM), conversions (SUM).
+- KPIs: CTR, CPC, CPM, CPA, Taxa de Conversão.
+- Ranking por `campanha`.
+- Perguntas: Quanto investi? Quantos cliques? Quanto custou cada clique? Qual campanha performou melhor? Como evoluiu vs período anterior?
+
+**Meta Ads** (`view: vw_meta_ads_diario`)
+- Métricas: impressions (SUM), reach (SUM diário), clicks (SUM), spend (SUM), conversions (SUM).
+- KPIs: CTR, CPC, CPM, CPA, **Frequência** = impressions/reach, Taxa de Conversão, Custo por Resultado.
+- Ranking por `campanha`.
+
+**Instagram** (`view: vw_instagram_diario`)
+- Estratégia **explícita por métrica**, configurável sem mexer em componente:
+  - `reach`, `accounts_engaged`: estratégia inicial `MAX` — **revisável a qualquer momento** alterando apenas a `MetricDef`.
+  - `total_interactions`, `likes`, `comments`, `saves`, `shares`, `profile_links_taps`: `SUM`.
+- KPIs: Taxa de Engajamento, Média diária, Variação vs período anterior.
+
+**Google Analytics 4** (`view: vw_ga4_diario`)
+- Métricas: sessions, users, events, views, conversions (todas SUM).
+- KPIs: Engagement Rate, Eventos por Sessão, Visualizações por Usuário, Conversão por Sessão, Conversão por Usuário.
+
+`google_business` e `tiktok` ficam preparados — basta criar `PlatformDef` quando houver dados, sem mudar rota ou componente.
+
+---
+
+## 6. Páginas (apenas configuração)
+
+Cada rota se reduz a:
+
+```tsx
+// src/routes/_authenticated/cliente.$cliente.google-ads.tsx
+import { googleAdsDef } from '@/lib/platforms/google-ads';
+import { PlatformDashboardPage } from '@/components/lotus/PlatformDashboardPage';
+
+export const Route = createFileRoute('/_authenticated/cliente/$cliente/google-ads')({
+  component: () => <PlatformDashboardPage def={googleAdsDef} />,
+});
+```
+
+Mesma forma para `meta-ads`, `instagram`, `ga4`.
+
+---
+
+## 7. Convergência com telas existentes
+
+`src/lib/metrics.ts` passa a re-exportar de `platforms/formulas.ts` (`deriveCtr`, `deriveCpa`, `deriveConvRate` viram thin wrappers). Dashboard Executivo e Visão Geral do Cliente continuam visualmente iguais, mas consumindo a mesma fonte de cálculo — eliminando definitivamente divergências.
+
+---
+
+## 8. Entregáveis
+
+**Novos**
+- `src/lib/platforms/{types,aggregations,formulas,engine,registry,google-ads,meta-ads,instagram,ga4}.ts`
+- `src/components/lotus/PlatformDashboard.tsx`
+- `src/components/lotus/PlatformDashboardPage.tsx` (PageHeader + PeriodPicker + Suspense)
+
+**Editados**
+- 4 rotas de plataforma (substituem `PlatformPlaceholder`)
+- `src/lib/metrics.ts` (re-export das fórmulas)
+
+**Intocados**
+- Banco, views, índices, Make, RLS, autenticação, sidebar, dashboard executivo, visão geral do cliente.
+
+---
+
+Confirme se a direção está alinhada e eu sigo para a implementação.
