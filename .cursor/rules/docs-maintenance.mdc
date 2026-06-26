@@ -1,0 +1,53 @@
+---
+description: Mantém o Centro de Conhecimento (docs/) atualizado a cada mudança de código
+alwaysApply: true
+---
+
+# Documentação como código (Lotus)
+
+O Centro de Conhecimento vive em `docs/`. **Ponto de entrada:** `docs/START_HERE.md`.
+
+**Toda mudança de comportamento deve atualizar a documentação correspondente no mesmo
+trabalho/PR.** Processo completo em `docs/09-standards/documentation.md`.
+
+## Regras de conclusão de feature
+
+1. **Nenhuma feature está concluída sem documentação** do comportamento, contrato ou decisão.
+2. **Decisões arquiteturais relevantes** geram ADR em `docs/02-architecture/adr/`.
+3. Diferencie sempre **estado atual** (fato no código) vs **visão futura** (recomendação).
+4. Nunca invente: marque lacunas com `> ⚠️ INFORMAÇÃO NÃO ENCONTRADA`.
+5. Ferramentas transitórias (Make, Lovable) devem ser identificadas como tal.
+
+## Matriz: mudou isto → atualize aquilo
+
+| Mudou em… | Atualize |
+|-----------|----------|
+| Decisão de fluxo / ambiente de dev | `docs/09-standards/development-workflow.md`, `START_HERE.md`, `deployment.md` |
+| Visão estratégica / missão / posicionamento | `docs/00-company/mission.md`, `philosophy.md` |
+| `src/lib/*.functions.ts` (server functions) | `docs/03-backend/api-reference.md` |
+| `supabase/migrations-official/**` | `docs/04-database/schema.md`, `views.md`, `migrations.md`, `metrics-model.md` |
+| Métricas oficiais vs derivadas / fórmulas | `docs/04-database/metrics-model.md`, `docs/06-dashboards/dashboards.md` |
+| `src/lib/platforms/**` (PlatformDef/engine/fórmulas) | `docs/06-engine/*`, `docs/05-frontend/component-system.md`, `docs/06-dashboards/dashboards.md` |
+| `src/lib/metrics.ts` / `period.ts` | `docs/06-engine/overview-aggregation.md`, `period.md` |
+| Auth / RLS / policies | `docs/03-backend/auth.md`, `security.md`, `docs/04-database/rls-policies.md` |
+| `src/lib/integrations-catalog.ts` | `docs/07-integrations/integrations.md` |
+| Pipeline Make (externo) ou coletores | `docs/07-integrations/current-pipeline-make.md`, `target-collectors.md` |
+| `src/routes/**` (rotas/auth) | `docs/05-frontend/routing.md`, `docs/06-dashboards/admin-modules.md` |
+| Erros / observabilidade | `docs/05-frontend/observability-errors.md`, `docs/08-operations/observability.md` |
+| `.env` / ambientes | `.env.example`, `docs/08-operations/environments.md` |
+| Nova seção docs / lacuna resolvida | `docs/AUDIT.md`, `docs/README.md` |
+| Arquitetura / fluxo de dados | `docs/02-architecture/current-state.md`, `data-flow.md`; se alvo mudar: `target-architecture.md` |
+| Variáveis de ambiente / build / Lovable | `docs/08-operations/deployment.md` |
+| Decisão estrutural / difícil de reverter | novo ADR em `docs/02-architecture/adr/` + `decisions.md` |
+| Dívidas resolvidas ou novas | `docs/11-roadmap/roadmap.md` |
+| Qualquer coisa visível ao usuário | `docs/12-changelog/changelog.md` (seção "Não lançado") |
+| Índice do handbook | `docs/README.md` |
+
+## Regras adicionais
+
+- Atualize o `last_review` (frontmatter) dos docs que tocar.
+- Não duplique conteúdo entre docs — referencie com link relativo.
+- Não recriar fórmulas fora de `src/lib/platforms/formulas.ts` (alvo: pacote compartilhado).
+- Ao resolver uma dívida do roadmap, mova a linha para o changelog.
+
+Se um PR muda comportamento e não toca `docs/`, isso é um erro — sinalize e corrija.

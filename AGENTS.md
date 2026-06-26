@@ -1,3 +1,13 @@
+<!-- LOTUS:BEGIN -->
+> [!IMPORTANT]
+> **Engenharia oficial Lotus:** todo desenvolvimento acontece neste repositório via **Cursor**.
+> Fluxo: Desenvolvimento → Commit → Git → GitHub → Deploy → Portal Lotus.
+>
+> Documentação: `docs/09-standards/development-workflow.md` · ADR-0010
+>
+> Lovable é **transitório** (build/deploy apenas) — não implemente features no editor Lovable.
+<!-- LOTUS:END -->
+
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
