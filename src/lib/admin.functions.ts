@@ -2,6 +2,7 @@
 // Todas exigem auth + role 'admin'. Soft delete sempre — nunca DELETE físico de clientes.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import { z } from "zod";
 
 async function assertAdmin(ctx: { supabase: any; userId: string }) {
@@ -441,7 +442,7 @@ export const createUserAccount = createServerFn({ method: "POST" })
 
     if (!userId) throw new Error("Falha ao obter id do usuário criado.");
 
-    if (data.tipo === "admin") {
+    if (data.tipo === "admin" || isPlatformOwnerEmail(data.email)) {
       const { error: er } = await supabaseAdmin
         .from("user_roles")
         .insert({ user_id: userId, role: "admin" });

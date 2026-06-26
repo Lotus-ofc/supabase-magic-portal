@@ -50,8 +50,25 @@ Cards zerados, gráficos flat, "—" nos KPIs.
 
 | Causa                    | Solução                                     |
 | ------------------------ | ------------------------------------------- |
-| Usuário sem role `admin` | Inserir em `user_roles` via admin existente |
+| Usuário sem role `admin` | Ver seção **Restaurar admin do dono** abaixo |
 | Guard de rota            | Esperado — cliente não acessa `/admin`      |
+
+### Restaurar admin do dono (`leandromajr@gmail.com`)
+
+O dono da plataforma deve ter role `admin` permanente. Migration `09_owner_admin_guard.sql`
+garante isso no banco (trigger + bootstrap).
+
+**Opção A — SQL Editor (Supabase Dashboard):**
+
+Execute o arquivo `supabase/migrations-official/09_owner_admin_guard.sql` inteiro.
+
+**Opção B — script local (requer service-role no `.env`):**
+
+```bash
+npm run ensure:owner-admin
+```
+
+Depois: logout → login novamente em `/auth` para atualizar a sessão.
 
 ---
 

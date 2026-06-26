@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "setup": "node scripts/setup-dev.mjs",
+    "ensure:owner-admin": "node scripts/ensure-owner-admin.mjs",
     "deploy:cloudflare": "node scripts/deploy-cloudflare.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
