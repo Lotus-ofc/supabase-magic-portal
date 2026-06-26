@@ -19,6 +19,12 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ## [Não lançado]
 
+### Adicionado
+
+- **Knowledge Center:** módulo admin `/admin/knowledge` — renderiza `docs/**/*.md` com busca,
+  navegação colapsável, Mermaid, favoritos, recentes e metadados YAML. Documentação de
+  plataformas em `06-dashboards/platforms/`.
+
 ### Alterado
 
 - **Sistema de Engenharia fundado (ADR-0011):** CI, Vitest, CONTRIBUTING, governança, `npm run check`.

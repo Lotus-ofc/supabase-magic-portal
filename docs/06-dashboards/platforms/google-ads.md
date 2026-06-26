@@ -1,0 +1,56 @@
+---
+title: Google Ads — Dashboard
+description: Origem dos dados, métricas, fórmulas e comportamento do dashboard Google Ads na Lotus.
+status: living
+owner: Engenharia / Dados Lotus
+tags: [dashboard, google-ads, platformdef]
+difficulty: intermediate
+last_review: 2026-06-26
+related:
+  - 06-engine/platform-catalog
+  - 06-engine/formulas
+---
+
+# Google Ads
+
+## Origem dos dados
+
+| Item | Valor |
+| ---- | ----- |
+| Platform key | `google_ads` |
+| View SQL | `vw_google_ads_diario` |
+| PlatformDef | `src/lib/platforms/google-ads.ts` |
+| Ingestão atual | Make → Supabase (transitório) |
+| Granularidade | Diária por campanha (`campanha`) |
+
+## Métricas oficiais
+
+| Key | Coluna | Agregação | Formato |
+| --- | ------ | --------- | ------- |
+| spend | spend | sum | currency |
+| impressions | impressions | sum | int |
+| clicks | clicks | sum | int |
+
+## KPIs derivados
+
+| KPI | Fórmula |
+| --- | ------- |
+| CTR | `ctr(impressions, clicks)` |
+| CPC | `cpc(spend, clicks)` |
+| CPM | `cpm(spend, impressions)` |
+
+## Limitações
+
+- **Conversões** não estão na view hoje — CPA e taxa de conversão dependem de migration futura.
+- Dados históricos dependem da janela sincronizada pelo Make/coletor.
+
+## Comportamento na UI
+
+- Cards e gráficos seguem `PlatformDef` em `google-ads.ts`.
+- Período e comparação com período anterior usam `resolvePeriod` (timezone BRT).
+- Gráficos declarados em `charts` renderizam via `PlatformDashboard`.
+
+## Referências
+
+- [Catálogo de plataformas](../06-engine/platform-catalog.md)
+- [Formula Engine](../06-engine/formulas.md)

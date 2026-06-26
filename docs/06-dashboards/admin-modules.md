@@ -24,6 +24,7 @@ flowchart TB
     A --> S["/admin/servicos"]
     A --> D["/admin/debug"]
     D --> DV["/admin/debug/views"]
+    A --> K["/admin/knowledge"]
 ```
 
 ---
@@ -132,6 +133,20 @@ Catálogo de serviços contratáveis (`servicos` + `cliente_servicos`).
 | `/admin/debug/views` | `getViewsAudit`    | Security + amostra de cada view |
 
 Ferramentas operacionais de primeira classe. Ver [Runbook](../08-operations/runbook.md).
+
+---
+
+## Knowledge Center (`/admin/knowledge`)
+
+| Item | Detalhe |
+| ---- | ------- |
+| Rotas | `admin/knowledge/`, `admin/knowledge/$` (splat) |
+| Código | `src/lib/knowledge-center/`, `src/components/knowledge-center/` |
+| Fonte | `docs/**/*.md` via `import.meta.glob` — auto-discovery |
+| Acesso | Somente admin |
+
+Centro de conhecimento integrado: navegação estilo GitBook, busca ⌘K, Mermaid, favoritos,
+recentes, breadcrumb e TOC. Ver [knowledge-center.md](./knowledge-center.md).
 
 ### `countPostsAguardando`
 

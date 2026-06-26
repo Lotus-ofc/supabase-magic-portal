@@ -21,6 +21,7 @@ import {
   FileBarChart,
   CalendarDays,
   ClipboardCheck,
+  BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -69,6 +70,10 @@ function AuthenticatedLayout() {
         { to: "/admin/debug", label: "Debug de dados", icon: Bug },
         { to: "/admin/debug/views", label: "Auditoria de views", icon: Bug },
       ],
+    },
+    {
+      label: "Conhecimento",
+      items: [{ to: "/admin/knowledge", label: "📚 Knowledge Center", icon: BookOpen }],
     },
   ];
 

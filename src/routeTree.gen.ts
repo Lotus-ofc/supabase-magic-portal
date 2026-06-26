@@ -22,7 +22,9 @@ import { Route as AuthenticatedAdminServicosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin/relatorios'
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
+import { Route as AuthenticatedAdminKnowledgeRouteRouteImport } from './routes/_authenticated/admin/knowledge/route'
 import { Route as AuthenticatedClienteClienteIndexRouteImport } from './routes/_authenticated/cliente.$cliente.index'
+import { Route as AuthenticatedAdminKnowledgeIndexRouteImport } from './routes/_authenticated/admin/knowledge/index'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes.index'
 import { Route as AuthenticatedClienteClienteTiktokRouteImport } from './routes/_authenticated/cliente.$cliente.tiktok'
 import { Route as AuthenticatedClienteClienteMetaAdsRouteImport } from './routes/_authenticated/cliente.$cliente.meta-ads'
@@ -31,6 +33,7 @@ import { Route as AuthenticatedClienteClienteGoogleBusinessRouteImport } from '.
 import { Route as AuthenticatedClienteClienteGoogleAdsRouteImport } from './routes/_authenticated/cliente.$cliente.google-ads'
 import { Route as AuthenticatedClienteClienteGa4RouteImport } from './routes/_authenticated/cliente.$cliente.ga4'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin/usuarios.novo'
+import { Route as AuthenticatedAdminKnowledgeSplatRouteImport } from './routes/_authenticated/admin/knowledge/$'
 import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
 import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_authenticated/admin/clientes.$id'
@@ -104,11 +107,23 @@ const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminKnowledgeRouteRoute =
+  AuthenticatedAdminKnowledgeRouteRouteImport.update({
+    id: '/knowledge',
+    path: '/knowledge',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedClienteClienteIndexRoute =
   AuthenticatedClienteClienteIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedClienteClienteRoute,
+  } as any)
+const AuthenticatedAdminKnowledgeIndexRoute =
+  AuthenticatedAdminKnowledgeIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminKnowledgeRouteRoute,
   } as any)
 const AuthenticatedAdminClientesIndexRoute =
   AuthenticatedAdminClientesIndexRouteImport.update({
@@ -158,6 +173,12 @@ const AuthenticatedAdminUsuariosNovoRoute =
     path: '/novo',
     getParentRoute: () => AuthenticatedAdminUsuariosRoute,
   } as any)
+const AuthenticatedAdminKnowledgeSplatRoute =
+  AuthenticatedAdminKnowledgeSplatRouteImport.update({
+    id: '/$',
+    path: '/$',
+    getParentRoute: () => AuthenticatedAdminKnowledgeRouteRoute,
+  } as any)
 const AuthenticatedAdminDebugViewsRoute =
   AuthenticatedAdminDebugViewsRouteImport.update({
     id: '/views',
@@ -183,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -193,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
+  '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -201,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
   '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRoutesByTo {
@@ -217,6 +241,7 @@ export interface FileRoutesByTo {
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
+  '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -225,6 +250,7 @@ export interface FileRoutesByTo {
   '/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
   '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
+  '/admin/knowledge': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/cliente/$cliente': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRoutesById {
@@ -235,6 +261,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -245,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
+  '/_authenticated/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/_authenticated/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/_authenticated/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -253,6 +281,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
   '/_authenticated/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/_authenticated/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/_authenticated/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
 }
 export interface FileRouteTypes {
@@ -263,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/aprovacoes'
     | '/dashboard'
+    | '/admin/knowledge'
     | '/admin/debug'
     | '/admin/editorial'
     | '/admin/relatorios'
@@ -273,6 +303,7 @@ export interface FileRouteTypes {
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
     | '/admin/debug/views'
+    | '/admin/knowledge/$'
     | '/admin/usuarios/novo'
     | '/cliente/$cliente/ga4'
     | '/cliente/$cliente/google-ads'
@@ -281,6 +312,7 @@ export interface FileRouteTypes {
     | '/cliente/$cliente/meta-ads'
     | '/cliente/$cliente/tiktok'
     | '/admin/clientes/'
+    | '/admin/knowledge/'
     | '/cliente/$cliente/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
     | '/admin/debug/views'
+    | '/admin/knowledge/$'
     | '/admin/usuarios/novo'
     | '/cliente/$cliente/ga4'
     | '/cliente/$cliente/google-ads'
@@ -305,6 +338,7 @@ export interface FileRouteTypes {
     | '/cliente/$cliente/meta-ads'
     | '/cliente/$cliente/tiktok'
     | '/admin/clientes'
+    | '/admin/knowledge'
     | '/cliente/$cliente'
   id:
     | '__root__'
@@ -314,6 +348,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/aprovacoes'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/knowledge'
     | '/_authenticated/admin/debug'
     | '/_authenticated/admin/editorial'
     | '/_authenticated/admin/relatorios'
@@ -324,6 +359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes/$id'
     | '/_authenticated/admin/clientes/novo'
     | '/_authenticated/admin/debug/views'
+    | '/_authenticated/admin/knowledge/$'
     | '/_authenticated/admin/usuarios/novo'
     | '/_authenticated/cliente/$cliente/ga4'
     | '/_authenticated/cliente/$cliente/google-ads'
@@ -332,6 +368,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente/$cliente/meta-ads'
     | '/_authenticated/cliente/$cliente/tiktok'
     | '/_authenticated/admin/clientes/'
+    | '/_authenticated/admin/knowledge/'
     | '/_authenticated/cliente/$cliente/'
   fileRoutesById: FileRoutesById
 }
@@ -434,12 +471,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDebugRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/knowledge': {
+      id: '/_authenticated/admin/knowledge'
+      path: '/knowledge'
+      fullPath: '/admin/knowledge'
+      preLoaderRoute: typeof AuthenticatedAdminKnowledgeRouteRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/cliente/$cliente/': {
       id: '/_authenticated/cliente/$cliente/'
       path: '/'
       fullPath: '/cliente/$cliente/'
       preLoaderRoute: typeof AuthenticatedClienteClienteIndexRouteImport
       parentRoute: typeof AuthenticatedClienteClienteRoute
+    }
+    '/_authenticated/admin/knowledge/': {
+      id: '/_authenticated/admin/knowledge/'
+      path: '/'
+      fullPath: '/admin/knowledge/'
+      preLoaderRoute: typeof AuthenticatedAdminKnowledgeIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminKnowledgeRouteRoute
     }
     '/_authenticated/admin/clientes/': {
       id: '/_authenticated/admin/clientes/'
@@ -497,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosNovoRouteImport
       parentRoute: typeof AuthenticatedAdminUsuariosRoute
     }
+    '/_authenticated/admin/knowledge/$': {
+      id: '/_authenticated/admin/knowledge/$'
+      path: '/$'
+      fullPath: '/admin/knowledge/$'
+      preLoaderRoute: typeof AuthenticatedAdminKnowledgeSplatRouteImport
+      parentRoute: typeof AuthenticatedAdminKnowledgeRouteRoute
+    }
     '/_authenticated/admin/debug/views': {
       id: '/_authenticated/admin/debug/views'
       path: '/views'
@@ -520,6 +578,24 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedAdminKnowledgeRouteRouteChildren {
+  AuthenticatedAdminKnowledgeSplatRoute: typeof AuthenticatedAdminKnowledgeSplatRoute
+  AuthenticatedAdminKnowledgeIndexRoute: typeof AuthenticatedAdminKnowledgeIndexRoute
+}
+
+const AuthenticatedAdminKnowledgeRouteRouteChildren: AuthenticatedAdminKnowledgeRouteRouteChildren =
+  {
+    AuthenticatedAdminKnowledgeSplatRoute:
+      AuthenticatedAdminKnowledgeSplatRoute,
+    AuthenticatedAdminKnowledgeIndexRoute:
+      AuthenticatedAdminKnowledgeIndexRoute,
+  }
+
+const AuthenticatedAdminKnowledgeRouteRouteWithChildren =
+  AuthenticatedAdminKnowledgeRouteRoute._addFileChildren(
+    AuthenticatedAdminKnowledgeRouteRouteChildren,
+  )
 
 interface AuthenticatedAdminDebugRouteChildren {
   AuthenticatedAdminDebugViewsRoute: typeof AuthenticatedAdminDebugViewsRoute
@@ -550,6 +626,7 @@ const AuthenticatedAdminUsuariosRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminKnowledgeRouteRoute: typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
   AuthenticatedAdminEditorialRoute: typeof AuthenticatedAdminEditorialRoute
   AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
@@ -563,6 +640,8 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminKnowledgeRouteRoute:
+      AuthenticatedAdminKnowledgeRouteRouteWithChildren,
     AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
     AuthenticatedAdminEditorialRoute: AuthenticatedAdminEditorialRoute,
     AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
