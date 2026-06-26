@@ -17,9 +17,9 @@ export type AggStrategy =
   | { kind: "sum" }
   | { kind: "max" }
   | { kind: "min" }
-  | { kind: "last" }   // último dia não-nulo no período
-  | { kind: "first" }  // primeiro dia não-nulo
-  | { kind: "avg" }    // média aritmética dos dias não-nulos
+  | { kind: "last" } // último dia não-nulo no período
+  | { kind: "first" } // primeiro dia não-nulo
+  | { kind: "avg" } // média aritmética dos dias não-nulos
   | { kind: "custom"; fn: (values: number[], rows: Row[], period: Period) => number };
 
 export type ValueFormat = "int" | "currency" | "percent" | "decimal";

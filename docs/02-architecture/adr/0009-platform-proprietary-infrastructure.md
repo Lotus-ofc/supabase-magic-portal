@@ -11,11 +11,11 @@ deciders: Engenharia Lotus / Liderança
 
 A Lotus foi prototipada com ferramentas que aceleraram time-to-market:
 
-| Ferramenta | Uso observado |
-|------------|---------------|
-| **Lovable** | Editor visual, sync de branch, `@lovable.dev/vite-tanstack-config` |
-| **Make** | Ingestão de dados (externo ao repo) |
-| **Horizons** | Citado na visão estratégica — **não encontrado no repositório** |
+| Ferramenta   | Uso observado                                                      |
+| ------------ | ------------------------------------------------------------------ |
+| **Lovable**  | Editor visual, sync de branch, `@lovable.dev/vite-tanstack-config` |
+| **Make**     | Ingestão de dados (externo ao repo)                                |
+| **Horizons** | Citado na visão estratégica — **não encontrado no repositório**    |
 
 A visão de longo prazo é uma plataforma **100% proprietária**, onde toda inteligência
 operacional e analítica reside no ecossistema Lotus.
@@ -31,10 +31,10 @@ operacional e analítica reside no ecossistema Lotus.
 
 ## Alternativas consideradas
 
-| Alternativa | Avaliação |
-|-------------|-----------|
+| Alternativa                | Avaliação                                              |
+| -------------------------- | ------------------------------------------------------ |
 | Manter Lovable para sempre | Rápido, mas limita controle de infra e custo em escala |
-| Rewrite completo | Alto risco; migração incremental preferida |
+| Rewrite completo           | Alto risco; migração incremental preferida             |
 
 ## Consequências
 
@@ -51,13 +51,13 @@ operacional e analítica reside no ecossistema Lotus.
 
 ## Estado de implementação
 
-| Item | Status |
-|------|--------|
-| Cursor como ambiente oficial de dev | ✅ ADR-0010 |
-| Dependência Lovable no build | ✅ Ativa (`vite.config.ts`) — transitório |
-| CI/CD documentado | ⚠️ INFORMAÇÃO NÃO ENCONTRADA |
-| Coletores proprietários | ❌ Pendente |
-| Make desligado | ❌ Não |
+| Item                                | Status                                    |
+| ----------------------------------- | ----------------------------------------- |
+| Cursor como ambiente oficial de dev | ✅ ADR-0010                               |
+| Dependência Lovable no build        | ✅ Ativa (`vite.config.ts`) — transitório |
+| CI/CD documentado                   | ⚠️ INFORMAÇÃO NÃO ENCONTRADA              |
+| Coletores proprietários             | ❌ Pendente                               |
+| Make desligado                      | ❌ Não                                    |
 
 ## Critérios de saída do Lovable (recomendação)
 

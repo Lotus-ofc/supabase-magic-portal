@@ -15,30 +15,30 @@ Complementa [Padrões de desenvolvimento](./development.md) e
 
 ## Onde colocar código novo
 
-| Se você está… | Coloque em… |
-|---------------|-------------|
-| Adicionando rota/tela | `src/routes/` |
-| Adicionando componente de produto | `src/components/lotus/` |
-| Adicionando primitivo UI genérico | `src/components/ui/` |
-| Adicionando cálculo/KPI | `src/lib/platforms/formulas.ts` ou `engine.ts` |
-| Adicionando plataforma | `src/lib/platforms/{nome}.ts` + `registry.ts` |
-| Adicionando server function | `src/lib/*.functions.ts` |
-| Adicionando hook reutilizável | `src/hooks/` |
-| Adicionando integração (campo admin) | `integrations-catalog.ts` + migration |
-| Adicionando tabela/view | `supabase/migrations-official/` |
+| Se você está…                        | Coloque em…                                    |
+| ------------------------------------ | ---------------------------------------------- |
+| Adicionando rota/tela                | `src/routes/`                                  |
+| Adicionando componente de produto    | `src/components/lotus/`                        |
+| Adicionando primitivo UI genérico    | `src/components/ui/`                           |
+| Adicionando cálculo/KPI              | `src/lib/platforms/formulas.ts` ou `engine.ts` |
+| Adicionando plataforma               | `src/lib/platforms/{nome}.ts` + `registry.ts`  |
+| Adicionando server function          | `src/lib/*.functions.ts`                       |
+| Adicionando hook reutilizável        | `src/hooks/`                                   |
+| Adicionando integração (campo admin) | `integrations-catalog.ts` + migration          |
+| Adicionando tabela/view              | `supabase/migrations-official/`                |
 
 ---
 
 ## Naming
 
-| Tipo | Convenção | Exemplo |
-|------|-----------|---------|
-| Rotas | kebab-case arquivo | `cliente.$cliente.meta-ads.tsx` |
-| Componentes | PascalCase | `PlatformDashboard` |
-| Server functions | camelCase verb | `createCliente` |
-| PlatformDef export | camelCase + Def | `googleAdsDef` |
-| Views SQL | snake_case `vw_*` | `vw_meta_ads_diario` |
-| Migrations | `NN_descricao.sql` | `08_aliases_e_null_guard.sql` |
+| Tipo               | Convenção          | Exemplo                         |
+| ------------------ | ------------------ | ------------------------------- |
+| Rotas              | kebab-case arquivo | `cliente.$cliente.meta-ads.tsx` |
+| Componentes        | PascalCase         | `PlatformDashboard`             |
+| Server functions   | camelCase verb     | `createCliente`                 |
+| PlatformDef export | camelCase + Def    | `googleAdsDef`                  |
+| Views SQL          | snake*case `vw*\*` | `vw_meta_ads_diario`            |
+| Migrations         | `NN_descricao.sql` | `08_aliases_e_null_guard.sql`   |
 
 ---
 
@@ -46,10 +46,10 @@ Complementa [Padrões de desenvolvimento](./development.md) e
 
 ```typescript
 // Preferir alias
-import { ctr } from "@/lib/platforms/formulas"
+import { ctr } from "@/lib/platforms/formulas";
 
 // Service-role — dynamic import no server only
-const { getAdminClient } = await import("@/integrations/supabase/client.server")
+const { getAdminClient } = await import("@/integrations/supabase/client.server");
 ```
 
 ---
@@ -113,13 +113,13 @@ Bons exemplos: `instagram.ts` (MAX vs SUM), `period.ts` (BRT), migrations (causa
 
 ## Anti-patterns
 
-| ❌ Evitar | ✅ Fazer |
-|----------|---------|
-| CTR calculado em componente | `formulas.ts` + `KpiDef` |
-| Tela nova por plataforma | `PlatformDef` + rota thin |
-| `toISOString()` para hoje | `brtToday()` |
-| `any` em server functions | Tipos gerados Supabase |
-| Feature no editor Lovable | Cursor + este repo |
+| ❌ Evitar                   | ✅ Fazer                  |
+| --------------------------- | ------------------------- |
+| CTR calculado em componente | `formulas.ts` + `KpiDef`  |
+| Tela nova por plataforma    | `PlatformDef` + rota thin |
+| `toISOString()` para hoje   | `brtToday()`              |
+| `any` em server functions   | Tipos gerados Supabase    |
+| Feature no editor Lovable   | Cursor + este repo        |
 
 ---
 

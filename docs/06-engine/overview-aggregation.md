@@ -17,23 +17,23 @@ Camada de agregação **cross-platform** para overview executivo, dashboard do c
 
 ## Consumidores
 
-| Tela | Funções principais |
-|------|-------------------|
-| `/dashboard` | `sumOverview`, insights |
-| `/admin` | `sumOverview`, `aggregateByCliente` |
-| `/admin/relatorios` | `aggregateByCliente`, `deriveCtr`, `deriveCpa`, `periodRange` |
-| `/cliente/{slug}` (index) | Overview por cliente |
+| Tela                      | Funções principais                                            |
+| ------------------------- | ------------------------------------------------------------- |
+| `/dashboard`              | `sumOverview`, insights                                       |
+| `/admin`                  | `sumOverview`, `aggregateByCliente`                           |
+| `/admin/relatorios`       | `aggregateByCliente`, `deriveCtr`, `deriveCpa`, `periodRange` |
+| `/cliente/{slug}` (index) | Overview por cliente                                          |
 
 ---
 
 ## Tipos exportados
 
-| Tipo | Uso |
-|------|-----|
-| `Platform` | Enum de plataformas (inclui GBP, TikTok) |
-| `CommonMetric` | Métricas canônicas cross-channel |
-| `OverviewRow` | Linha de `vw_overview_cliente` tipada |
-| `MetricMeta` | Labels, formato, tom visual |
+| Tipo           | Uso                                      |
+| -------------- | ---------------------------------------- |
+| `Platform`     | Enum de plataformas (inclui GBP, TikTok) |
+| `CommonMetric` | Métricas canônicas cross-channel         |
+| `OverviewRow`  | Linha de `vw_overview_cliente` tipada    |
+| `MetricMeta`   | Labels, formato, tom visual              |
 
 ---
 
@@ -47,26 +47,26 @@ Camada de agregação **cross-platform** para overview executivo, dashboard do c
 
 ## Funções principais
 
-| Função | Descrição |
-|--------|-----------|
-| `formatMetric(metric, value)` | Formatação pt-BR/BRL |
-| `sumOverview(rows, period)` | Totais consolidados do overview |
-| `aggregateByCliente(rows, days)` | Agregação por cliente (relatórios) |
-| `deriveCtr(rows)` | CTR derivado para overview |
-| `deriveCpa(spend, conversions)` | CPA |
-| `pctDelta(current, prev)` | Delta % entre períodos |
-| `periodRange(days)` | Janela 7/30/90 dias — **paralelo a period.ts** |
-| `buildInsights(...)` | Textos automáticos de insights |
+| Função                           | Descrição                                      |
+| -------------------------------- | ---------------------------------------------- |
+| `formatMetric(metric, value)`    | Formatação pt-BR/BRL                           |
+| `sumOverview(rows, period)`      | Totais consolidados do overview                |
+| `aggregateByCliente(rows, days)` | Agregação por cliente (relatórios)             |
+| `deriveCtr(rows)`                | CTR derivado para overview                     |
+| `deriveCpa(spend, conversions)`  | CPA                                            |
+| `pctDelta(current, prev)`        | Delta % entre períodos                         |
+| `periodRange(days)`              | Janela 7/30/90 dias — **paralelo a period.ts** |
+| `buildInsights(...)`             | Textos automáticos de insights                 |
 
 ---
 
 ## Semânticas especiais em `sumOverview`
 
-| Métrica | Estratégia | Motivo |
-|---------|------------|--------|
-| `google_spend` | **MAX** por cliente | Spend cumulativo/reportado |
+| Métrica           | Estratégia          | Motivo                      |
+| ----------------- | ------------------- | --------------------------- |
+| `google_spend`    | **MAX** por cliente | Spend cumulativo/reportado  |
 | `instagram_reach` | **MAX** por cliente | Contagem única, não somável |
-| Demais | **SUM** | Acumulativas |
+| Demais            | **SUM**             | Acumulativas                |
 
 Comentado no código — crítico para não "corrigir" sem entender.
 

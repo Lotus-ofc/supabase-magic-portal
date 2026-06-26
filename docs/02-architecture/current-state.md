@@ -25,17 +25,17 @@ do Supabase (Auth, RLS, views, funções SQL).
 
 ## Stack (observada em `package.json` e código)
 
-| Camada | Tecnologia | Notas |
-|--------|-----------|-------|
-| Framework | TanStack Start + TanStack Router | Roteamento file-based em `src/routes/` |
-| UI | React 19, Tailwind v4, Radix, Recharts | Componentes Lotus em `src/components/lotus/` |
-| Estado servidor | TanStack React Query | Cache e refetch de views Supabase |
-| Backend lógico | Server functions | `admin.functions.ts`, `editorial.functions.ts` |
-| Banco/Auth | Supabase | Project ID: `ywvhoctcmibjitvwkkhb` |
-| Build | Vite 8 + Nitro | Via `@lovable.dev/vite-tanstack-config` (transitório) |
-| Ingestão | **Make** (externo) | Não versionado neste repo |
-| Dev oficial | **Cursor** + Git | [ADR-0010](./adr/0010-cursor-official-development-environment.md) |
-| Build/deploy transitório | Lovable | Pipeline apenas; features implementadas no repo |
+| Camada                   | Tecnologia                             | Notas                                                             |
+| ------------------------ | -------------------------------------- | ----------------------------------------------------------------- |
+| Framework                | TanStack Start + TanStack Router       | Roteamento file-based em `src/routes/`                            |
+| UI                       | React 19, Tailwind v4, Radix, Recharts | Componentes Lotus em `src/components/lotus/`                      |
+| Estado servidor          | TanStack React Query                   | Cache e refetch de views Supabase                                 |
+| Backend lógico           | Server functions                       | `admin.functions.ts`, `editorial.functions.ts`                    |
+| Banco/Auth               | Supabase                               | Project ID: `ywvhoctcmibjitvwkkhb`                                |
+| Build                    | Vite 8 + Nitro                         | Via `@lovable.dev/vite-tanstack-config` (transitório)             |
+| Ingestão                 | **Make** (externo)                     | Não versionado neste repo                                         |
+| Dev oficial              | **Cursor** + Git                       | [ADR-0010](./adr/0010-cursor-official-development-environment.md) |
+| Build/deploy transitório | Lovable                                | Pipeline apenas; features implementadas no repo                   |
 
 ---
 
@@ -105,14 +105,14 @@ Migration 07 alterou views para `SECURITY DEFINER` (workaround RLS). Ver
 
 ### 3. Camada de aplicação (TypeScript)
 
-| Módulo | Função |
-|--------|--------|
-| `src/lib/platforms/registry.ts` | Registro de plataformas ativas |
-| `src/lib/platforms/*Def.ts` | Config declarativa por plataforma |
-| `src/lib/platforms/formulas.ts` | Fórmulas puras de KPI |
-| `src/lib/platforms/engine.ts` | Agregação e cálculo sobre rows das views |
-| `src/lib/metrics.ts` | Overview cross-platform (heurísticas MAX para alguns KPIs) |
-| `src/lib/period.ts` | Timezone America/Sao_Paulo |
+| Módulo                          | Função                                                     |
+| ------------------------------- | ---------------------------------------------------------- |
+| `src/lib/platforms/registry.ts` | Registro de plataformas ativas                             |
+| `src/lib/platforms/*Def.ts`     | Config declarativa por plataforma                          |
+| `src/lib/platforms/formulas.ts` | Fórmulas puras de KPI                                      |
+| `src/lib/platforms/engine.ts`   | Agregação e cálculo sobre rows das views                   |
+| `src/lib/metrics.ts`            | Overview cross-platform (heurísticas MAX para alguns KPIs) |
+| `src/lib/period.ts`             | Timezone America/Sao_Paulo                                 |
 
 **Dívida observada:** duplicação parcial entre `metrics.ts` e `engine.ts`; insights
 duplicados em `dashboard.tsx`.
@@ -133,13 +133,13 @@ duplicados em `dashboard.tsx`.
 
 ## Rotas principais
 
-| Rota | Propósito |
-|------|-----------|
-| `/dashboard` | Overview do cliente logado |
-| `/cliente/$cliente/*` | Dashboards por plataforma |
-| `/admin` | Painel administrativo |
-| `/aprovacoes` | Fluxo editorial |
-| `/auth` | Login |
+| Rota                  | Propósito                  |
+| --------------------- | -------------------------- |
+| `/dashboard`          | Overview do cliente logado |
+| `/cliente/$cliente/*` | Dashboards por plataforma  |
+| `/admin`              | Painel administrativo      |
+| `/aprovacoes`         | Fluxo editorial            |
+| `/auth`               | Login                      |
 
 Detalhes: [Roteamento](../05-frontend/routing.md)
 
@@ -158,13 +158,13 @@ Detalhes: [Roteamento](../05-frontend/routing.md)
 
 ## O que NÃO existe hoje
 
-| Componente (visão futura) | Status |
-|---------------------------|--------|
-| Coletores proprietários | Não implementado |
-| Fila de processamento | Não implementado |
-| Workers de sync | Não implementado |
-| API interna dedicada | Não implementado (server functions parciais) |
-| Motor de métricas isolado como serviço | Parcial (`engine.ts` no frontend bundle) |
+| Componente (visão futura)              | Status                                       |
+| -------------------------------------- | -------------------------------------------- |
+| Coletores proprietários                | Não implementado                             |
+| Fila de processamento                  | Não implementado                             |
+| Workers de sync                        | Não implementado                             |
+| API interna dedicada                   | Não implementado (server functions parciais) |
+| Motor de métricas isolado como serviço | Parcial (`engine.ts` no frontend bundle)     |
 
 ---
 

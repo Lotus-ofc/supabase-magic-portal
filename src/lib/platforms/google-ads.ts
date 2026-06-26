@@ -6,7 +6,15 @@
 // uma nova MetricDef + KPIs (CPA, ConvRate) sem mexer em nenhum componente.
 // ============================================================================
 
-import { BarChart3, DollarSign, MousePointerClick, Eye, Target, Activity, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  DollarSign,
+  MousePointerClick,
+  Eye,
+  Target,
+  Activity,
+  TrendingUp,
+} from "lucide-react";
 import type { PlatformDef } from "./types";
 import * as f from "./formulas";
 
@@ -27,15 +35,66 @@ export const googleAdsDef: PlatformDef = {
     "Como tudo evoluiu vs o período anterior?",
   ],
   metrics: [
-    { key: "spend",       column: "spend",       label: "Investimento", format: "currency", aggregation: { kind: "sum" }, icon: DollarSign, positiveIsGood: true,  description: "Somatório do gasto declarado pelo Google Ads no período." },
-    { key: "impressions", column: "impressions", label: "Impressões",   format: "int",      aggregation: { kind: "sum" }, icon: Eye,        positiveIsGood: true,  description: "Total de impressões servidas pelas campanhas no período." },
-    { key: "clicks",      column: "clicks",      label: "Cliques",      format: "int",      aggregation: { kind: "sum" }, icon: MousePointerClick, positiveIsGood: true, description: "Cliques registrados nas campanhas." },
+    {
+      key: "spend",
+      column: "spend",
+      label: "Investimento",
+      format: "currency",
+      aggregation: { kind: "sum" },
+      icon: DollarSign,
+      positiveIsGood: true,
+      description: "Somatório do gasto declarado pelo Google Ads no período.",
+    },
+    {
+      key: "impressions",
+      column: "impressions",
+      label: "Impressões",
+      format: "int",
+      aggregation: { kind: "sum" },
+      icon: Eye,
+      positiveIsGood: true,
+      description: "Total de impressões servidas pelas campanhas no período.",
+    },
+    {
+      key: "clicks",
+      column: "clicks",
+      label: "Cliques",
+      format: "int",
+      aggregation: { kind: "sum" },
+      icon: MousePointerClick,
+      positiveIsGood: true,
+      description: "Cliques registrados nas campanhas.",
+    },
   ],
   heroMetrics: ["spend", "impressions", "clicks"],
   kpis: [
-    { key: "ctr", label: "CTR",       format: "percent",  positiveIsGood: true,  compute: (t) => f.ctr(t.impressions, t.clicks),       icon: Target,     description: "Clicks ÷ Impressions × 100." },
-    { key: "cpc", label: "CPC médio", format: "currency", positiveIsGood: false, compute: (t) => f.cpc(t.spend, t.clicks),             icon: Activity,   description: "Spend ÷ Clicks." },
-    { key: "cpm", label: "CPM médio", format: "currency", positiveIsGood: false, compute: (t) => f.cpm(t.spend, t.impressions),        icon: TrendingUp, description: "Spend ÷ Impressions × 1000." },
+    {
+      key: "ctr",
+      label: "CTR",
+      format: "percent",
+      positiveIsGood: true,
+      compute: (t) => f.ctr(t.impressions, t.clicks),
+      icon: Target,
+      description: "Clicks ÷ Impressions × 100.",
+    },
+    {
+      key: "cpc",
+      label: "CPC médio",
+      format: "currency",
+      positiveIsGood: false,
+      compute: (t) => f.cpc(t.spend, t.clicks),
+      icon: Activity,
+      description: "Spend ÷ Clicks.",
+    },
+    {
+      key: "cpm",
+      label: "CPM médio",
+      format: "currency",
+      positiveIsGood: false,
+      compute: (t) => f.cpm(t.spend, t.impressions),
+      icon: TrendingUp,
+      description: "Spend ÷ Impressions × 1000.",
+    },
   ],
   charts: [
     {
@@ -55,7 +114,7 @@ export const googleAdsDef: PlatformDef = {
       yMetric: "impressions",
       series: [
         { metric: "impressions", label: "Impressões", tone: "secondary" },
-        { metric: "clicks",      label: "Cliques",    tone: "success" },
+        { metric: "clicks", label: "Cliques", tone: "success" },
       ],
       height: 240,
     },

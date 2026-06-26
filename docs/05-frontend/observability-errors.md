@@ -24,14 +24,14 @@ flowchart TB
     Root --> LER
 ```
 
-| Módulo | Arquivo | Quando |
-|--------|---------|--------|
-| Captura SSR | `src/lib/error-capture.ts` | h3 engole stack traces |
-| Página 500 | `src/lib/error-page.ts` | HTML amigável no servidor |
-| Entry SSR | `src/server.ts` | Normaliza exceções na renderização |
-| Error boundary | `src/routes/__root.tsx` | Erros React no client |
+| Módulo            | Arquivo                              | Quando                                 |
+| ----------------- | ------------------------------------ | -------------------------------------- |
+| Captura SSR       | `src/lib/error-capture.ts`           | h3 engole stack traces                 |
+| Página 500        | `src/lib/error-page.ts`              | HTML amigável no servidor              |
+| Entry SSR         | `src/server.ts`                      | Normaliza exceções na renderização     |
+| Error boundary    | `src/routes/__root.tsx`              | Erros React no client                  |
 | Lovable reporting | `src/lib/lovable-error-reporting.ts` | `window.__lovableEvents` (transitório) |
-| Console | `start.ts`, rotas | `console.error` / `console.warn` |
+| Console           | `start.ts`, rotas                    | `console.error` / `console.warn`       |
 
 ---
 
@@ -69,10 +69,10 @@ Parte da integração Lovable — **substituir** por APM proprietário (Sentry/D
 
 ## Logging no client
 
-| Local | Nível | Exemplo |
-|-------|-------|---------|
-| `cliente.$cliente.tsx` | `warn` | Slug não resolvido |
-| Server functions | throw `Response` | 401/403 com mensagem |
+| Local                  | Nível            | Exemplo              |
+| ---------------------- | ---------------- | -------------------- |
+| `cliente.$cliente.tsx` | `warn`           | Slug não resolvido   |
+| Server functions       | throw `Response` | 401/403 com mensagem |
 
 Não há structured logging centralizado no frontend hoje.
 
@@ -80,11 +80,11 @@ Não há structured logging centralizado no frontend hoje.
 
 ## Saúde de dados (operacional)
 
-| Sinal | Onde |
-|-------|------|
-| `ultima_ingestao` | `vw_clientes_ativos` |
-| Debug snapshot | `/admin/debug` → `getDebugSnapshot` |
-| Audit de views | `/admin/debug/views` → `getViewsAudit` |
+| Sinal             | Onde                                   |
+| ----------------- | -------------------------------------- |
+| `ultima_ingestao` | `vw_clientes_ativos`                   |
+| Debug snapshot    | `/admin/debug` → `getDebugSnapshot`    |
+| Audit de views    | `/admin/debug/views` → `getViewsAudit` |
 
 Ver [Runbook](../08-operations/runbook.md) e [Observabilidade (Ops)](../08-operations/observability.md).
 

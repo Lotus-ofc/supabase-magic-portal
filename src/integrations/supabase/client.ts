@@ -11,13 +11,10 @@ const SUPABASE_PUBLISHABLE_KEY =
   (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_ANON_KEY : undefined);
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error(
-    "Missing VITE_OFFICIAL_SUPABASE_URL / VITE_OFFICIAL_SUPABASE_ANON_KEY env vars",
-  );
+  throw new Error("Missing VITE_OFFICIAL_SUPABASE_URL / VITE_OFFICIAL_SUPABASE_ANON_KEY env vars");
 }
 
-const PROJECT_ID =
-  import.meta.env.VITE_OFFICIAL_SUPABASE_PROJECT_ID ?? "ywvhoctcmibjitvwkkhb";
+const PROJECT_ID = import.meta.env.VITE_OFFICIAL_SUPABASE_PROJECT_ID ?? "ywvhoctcmibjitvwkkhb";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {

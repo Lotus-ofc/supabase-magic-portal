@@ -30,13 +30,13 @@ flowchart LR
     DEV --> COMMIT --> GIT --> GH --> DEPLOY --> PORTAL
 ```
 
-| Etapa | Onde | Responsabilidade |
-|-------|------|------------------|
-| Desenvolvimento | Cursor, neste repositório | Implementação, testes locais, documentação |
-| Commit | Git local | Mensagem clara; código pronto para produção |
-| GitHub | Remote | PR, revisão, histórico versionado |
-| Deploy | Pipeline (Lovable/Nitro/Cloudflare hoje) | Build e publicação |
-| Portal Lotus | Produção | Usuários finais |
+| Etapa           | Onde                                     | Responsabilidade                            |
+| --------------- | ---------------------------------------- | ------------------------------------------- |
+| Desenvolvimento | Cursor, neste repositório                | Implementação, testes locais, documentação  |
+| Commit          | Git local                                | Mensagem clara; código pronto para produção |
+| GitHub          | Remote                                   | PR, revisão, histórico versionado           |
+| Deploy          | Pipeline (Lovable/Nitro/Cloudflare hoje) | Build e publicação                          |
+| Portal Lotus    | Produção                                 | Usuários finais                             |
 
 **Regra:** toda implementação é feita **aqui**, no código. Não desenvolver no editor Lovable.
 
@@ -66,15 +66,15 @@ Não pular direto para implementação. Não entregar atalhos que aumentem dívi
 
 Prioridades em toda implementação:
 
-| Princípio | Prática na Lotus |
-|-----------|------------------|
-| Simplicidade | Menor diff que resolve o problema |
-| Clareza | Nomes explícitos; comentários só para o *porquê* |
-| Escalabilidade | Engine declarativo; coletores isolados (futuro) |
-| Performance | Queries enxutas; React Query com keys corretas |
-| Reutilização | `PlatformDef`, componentes `lotus/`, `formulas.ts` |
-| Tipagem forte | TypeScript estrito; evitar `any` |
-| Baixo acoplamento | Lógica em `src/lib/`; UI só consome |
+| Princípio         | Prática na Lotus                                   |
+| ----------------- | -------------------------------------------------- |
+| Simplicidade      | Menor diff que resolve o problema                  |
+| Clareza           | Nomes explícitos; comentários só para o _porquê_   |
+| Escalabilidade    | Engine declarativo; coletores isolados (futuro)    |
+| Performance       | Queries enxutas; React Query com keys corretas     |
+| Reutilização      | `PlatformDef`, componentes `lotus/`, `formulas.ts` |
+| Tipagem forte     | TypeScript estrito; evitar `any`                   |
+| Baixo acoplamento | Lógica em `src/lib/`; UI só consome                |
 
 ---
 
@@ -99,7 +99,7 @@ Este projeto é **totalmente versionado**. Toda alteração deve ser enviável a
 
 ### Boas práticas
 
-- Commits descritivos (o *porquê*, não só o *o quê*).
+- Commits descritivos (o _porquê_, não só o _o quê_).
 - PRs pequenos, focados e revisáveis.
 - Branch sempre em estado funcional (`lint` + `build` passam).
 - Evitar alterações experimentais no branch conectado ao deploy.
@@ -156,7 +156,7 @@ Ver [Missão](../00-company/mission.md) · [Roadmap](../11-roadmap/roadmap.md)
 
 O agente e desenvolvedores no Cursor devem seguir:
 
-| Regra | Arquivo |
-|-------|---------|
+| Regra                      | Arquivo                               |
+| -------------------------- | ------------------------------------- |
 | Engenharia e fluxo oficial | `.cursor/rules/lotus-engineering.mdc` |
-| Manutenção de documentação | `.cursor/rules/docs-maintenance.mdc` |
+| Manutenção de documentação | `.cursor/rules/docs-maintenance.mdc`  |

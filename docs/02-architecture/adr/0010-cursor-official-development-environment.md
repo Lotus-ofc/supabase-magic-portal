@@ -37,10 +37,10 @@ vive e como features devem ser entregues.
 
 ## Alternativas consideradas
 
-| Alternativa | Por que não |
-|-------------|-------------|
-| Continuar Lovable como IDE principal | Divergência com Git; difícil enforcear docs/ADRs/arquitetura |
-| Desligar Lovable imediatamente | Build/deploy ainda depende do preset; risco operacional |
+| Alternativa                              | Por que não                                                   |
+| ---------------------------------------- | ------------------------------------------------------------- |
+| Continuar Lovable como IDE principal     | Divergência com Git; difícil enforcear docs/ADRs/arquitetura  |
+| Desligar Lovable imediatamente           | Build/deploy ainda depende do preset; risco operacional       |
 | Desenvolvimento só via GitHub Codespaces | Cursor já adotado; sem necessidade de mudança adicional agora |
 
 ## Consequências
@@ -60,13 +60,13 @@ vive e como features devem ser entregues.
 
 ## Estado de implementação
 
-| Item | Status |
-|------|--------|
-| Cursor como ambiente oficial | ✅ Decisão aceita |
-| Regra Cursor `lotus-engineering.mdc` | ✅ Criada |
-| Doc `development-workflow.md` | ✅ Criada |
+| Item                                 | Status                       |
+| ------------------------------------ | ---------------------------- |
+| Cursor como ambiente oficial         | ✅ Decisão aceita            |
+| Regra Cursor `lotus-engineering.mdc` | ✅ Criada                    |
+| Doc `development-workflow.md`        | ✅ Criada                    |
 | Remoção dependência Lovable no build | ❌ Pendente (Fase 6 roadmap) |
-| CI/CD GitHub Actions | ⚠️ INFORMAÇÃO NÃO ENCONTRADA |
+| CI/CD GitHub Actions                 | ✅ ADR-0011                  |
 
 ## Critérios de conclusão da transição Lovable → deploy proprietário
 

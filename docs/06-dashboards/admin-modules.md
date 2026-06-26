@@ -30,12 +30,12 @@ flowchart TB
 
 ## Dashboard executivo (`/admin`)
 
-| Item | Detalhe |
-|------|---------|
-| Arquivo | `admin/index.tsx` |
-| Dados | `vw_overview_cliente`, `vw_clientes_ativos` |
-| Motor | `metrics.ts` — `sumOverview`, agregações |
-| Período | `PeriodSelector` + `resolvePeriod` |
+| Item    | Detalhe                                     |
+| ------- | ------------------------------------------- |
+| Arquivo | `admin/index.tsx`                           |
+| Dados   | `vw_overview_cliente`, `vw_clientes_ativos` |
+| Motor   | `metrics.ts` — `sumOverview`, agregações    |
+| Período | `PeriodSelector` + `resolvePeriod`          |
 
 Visão de portfólio: investimento total, clientes ativos, comparativo de período.
 
@@ -43,13 +43,13 @@ Visão de portfólio: investimento total, clientes ativos, comparativo de perío
 
 ## Relatórios (`/admin/relatorios`)
 
-| Item | Detalhe |
-|------|---------|
-| Arquivo | `admin/relatorios.tsx` |
-| Propósito | Hub de relatórios — **não** duplica dashboards |
-| Dados | `vw_clientes_ativos`, `vw_overview_cliente` |
-| Motor | `metrics.ts` — `aggregateByCliente`, `deriveCtr`, `deriveCpa` |
-| Período | `PeriodToggle` (7/30/90 dias) |
+| Item      | Detalhe                                                       |
+| --------- | ------------------------------------------------------------- |
+| Arquivo   | `admin/relatorios.tsx`                                        |
+| Propósito | Hub de relatórios — **não** duplica dashboards                |
+| Dados     | `vw_clientes_ativos`, `vw_overview_cliente`                   |
+| Motor     | `metrics.ts` — `aggregateByCliente`, `deriveCtr`, `deriveCpa` |
+| Período   | `PeriodToggle` (7/30/90 dias)                                 |
 
 Funcionalidades:
 
@@ -61,10 +61,10 @@ Funcionalidades:
 
 ## Editorial (`/admin/editorial`)
 
-| Item | Detalhe |
-|------|---------|
-| Arquivo | `admin/editorial.tsx` |
-| Backend | `editorial.functions.ts` |
+| Item    | Detalhe                             |
+| ------- | ----------------------------------- |
+| Arquivo | `admin/editorial.tsx`               |
+| Backend | `editorial.functions.ts`            |
 | Tabelas | `posts_editorial`, `post_revisions` |
 
 Calendário de conteúdo: criar, editar, transicionar status, comentários.
@@ -75,10 +75,10 @@ Status do fluxo (enum): rascunho → aguardando_aprovacao → aprovado / rejeita
 
 ## Aprovações (`/aprovacoes`)
 
-| Item | Detalhe |
-|------|---------|
-| Arquivo | `aprovacoes.tsx` |
-| Persona | **Cliente final** |
+| Item    | Detalhe                                     |
+| ------- | ------------------------------------------- |
+| Arquivo | `aprovacoes.tsx`                            |
+| Persona | **Cliente final**                           |
 | Backend | `listPosts`, `transitionPost` (RLS cliente) |
 
 Cliente aprova ou solicita alteração em posts com status `aguardando_aprovacao`.
@@ -89,11 +89,11 @@ Policy SQL: `posts_client_update` (migration 06).
 
 ## Clientes (`/admin/clientes`)
 
-| Rota | Arquivo | Função |
-|------|---------|--------|
-| Lista | `clientes.index.tsx` | `listClientes` |
-| Novo | `clientes.novo.tsx` | `createCliente` |
-| Editar | `clientes.$id.tsx` | `getCliente`, `updateCliente`, integrações |
+| Rota   | Arquivo              | Função                                     |
+| ------ | -------------------- | ------------------------------------------ |
+| Lista  | `clientes.index.tsx` | `listClientes`                             |
+| Novo   | `clientes.novo.tsx`  | `createCliente`                            |
+| Editar | `clientes.$id.tsx`   | `getCliente`, `updateCliente`, integrações |
 
 ### Integrações no formulário
 
@@ -108,10 +108,10 @@ Hook em `clientes.$id.tsx` — bloqueia navegação com alterações não salvas
 
 ## Usuários (`/admin/usuarios`)
 
-| Rota | Função |
-|------|--------|
-| Lista | `listUsersWithRoles` |
-| Novo | `createUserAccount` (service-role) |
+| Rota  | Função                             |
+| ----- | ---------------------------------- |
+| Lista | `listUsersWithRoles`               |
+| Novo  | `createUserAccount` (service-role) |
 
 Gerencia papéis (`admin`/`cliente`) e `client_access`.
 
@@ -126,10 +126,10 @@ Catálogo de serviços contratáveis (`servicos` + `cliente_servicos`).
 
 ## Debug (`/admin/debug`, `/admin/debug/views`)
 
-| Rota | Server function | Propósito |
-|------|-----------------|-----------|
-| `/admin/debug` | `getDebugSnapshot` | Amostra de ingestão por cliente |
-| `/admin/debug/views` | `getViewsAudit` | Security + amostra de cada view |
+| Rota                 | Server function    | Propósito                       |
+| -------------------- | ------------------ | ------------------------------- |
+| `/admin/debug`       | `getDebugSnapshot` | Amostra de ingestão por cliente |
+| `/admin/debug/views` | `getViewsAudit`    | Security + amostra de cada view |
 
 Ferramentas operacionais de primeira classe. Ver [Runbook](../08-operations/runbook.md).
 

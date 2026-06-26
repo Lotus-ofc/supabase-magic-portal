@@ -24,57 +24,57 @@ evolução de definições de KPI sem migrations de schema.
 
 ### Google Ads
 
-| Métrica | Tipo |
-|---------|------|
-| impressions | contagem |
-| clicks | contagem |
-| spend | monetário (API em micros → normalizar na ingestão) |
-| conversions | contagem |
+| Métrica     | Tipo                                               |
+| ----------- | -------------------------------------------------- |
+| impressions | contagem                                           |
+| clicks      | contagem                                           |
+| spend       | monetário (API em micros → normalizar na ingestão) |
+| conversions | contagem                                           |
 
 ### Meta Ads
 
-| Métrica | Tipo |
-|---------|------|
-| impressions | contagem |
-| reach | contagem |
-| clicks | contagem |
-| spend | monetário |
-| conversions | contagem |
+| Métrica     | Tipo      |
+| ----------- | --------- |
+| impressions | contagem  |
+| reach       | contagem  |
+| clicks      | contagem  |
+| spend       | monetário |
+| conversions | contagem  |
 
 ### Instagram
 
-| Métrica | Tipo |
-|---------|------|
-| reach | contagem |
-| accounts_engaged | contagem |
-| likes | contagem |
-| comments | contagem |
-| saves | contagem |
-| shares | contagem |
+| Métrica            | Tipo     |
+| ------------------ | -------- |
+| reach              | contagem |
+| accounts_engaged   | contagem |
+| likes              | contagem |
+| comments           | contagem |
+| saves              | contagem |
+| shares             | contagem |
 | total_interactions | contagem |
 
 ### GA4
 
-| Métrica | Tipo |
-|---------|------|
-| users | contagem |
-| sessions | contagem |
-| events | contagem |
+| Métrica     | Tipo     |
+| ----------- | -------- |
+| users       | contagem |
+| sessions    | contagem |
+| events      | contagem |
 | conversions | contagem |
 
 ---
 
 ## Métricas derivadas (NUNCA persistir — calcular na app)
 
-| Métrica | Fórmula típica |
-|---------|----------------|
-| CTR | (clicks / impressions) × 100 |
-| CPC | spend / clicks |
-| CPA | spend / conversions |
-| CPM | (spend / impressions) × 1000 |
-| Taxa de conversão | (conversions / clicks) × 100 |
-| Engagement Rate | (interações / reach ou impressions) × 100 |
-| Frequency | impressions / reach |
+| Métrica           | Fórmula típica                            |
+| ----------------- | ----------------------------------------- |
+| CTR               | (clicks / impressions) × 100              |
+| CPC               | spend / clicks                            |
+| CPA               | spend / conversions                       |
+| CPM               | (spend / impressions) × 1000              |
+| Taxa de conversão | (conversions / clicks) × 100              |
+| Engagement Rate   | (interações / reach ou impressions) × 100 |
+| Frequency         | impressions / reach                       |
 
 Implementação alvo: módulo único compartilhado. Ponto de partida atual:
 `src/lib/platforms/formulas.ts`.
@@ -130,14 +130,14 @@ Tabela tipada por plataforma ou tabela genérica com:
 
 ## Onde cada camada calcula hoje
 
-| Camada | O que faz | Alinhado ao alvo? |
-|--------|-----------|-------------------|
-| Make | Grava métricas oficiais (inferido) | Parcial — não auditável no repo |
-| Views SQL | Agrega + **calcula derivadas** | ❌ Dívida |
-| `formulas.ts` | Calcula KPIs derivados | ✅ Correto |
-| `engine.ts` | Agrega rows + aplica fórmulas | ✅ Correto |
-| `metrics.ts` | Overview com heurísticas MAX | ⚠️ Duplica lógica parcial |
-| Componentes React | Consomem valores | ✅ (não calculam diretamente) |
+| Camada            | O que faz                          | Alinhado ao alvo?               |
+| ----------------- | ---------------------------------- | ------------------------------- |
+| Make              | Grava métricas oficiais (inferido) | Parcial — não auditável no repo |
+| Views SQL         | Agrega + **calcula derivadas**     | ❌ Dívida                       |
+| `formulas.ts`     | Calcula KPIs derivados             | ✅ Correto                      |
+| `engine.ts`       | Agrega rows + aplica fórmulas      | ✅ Correto                      |
+| `metrics.ts`      | Overview com heurísticas MAX       | ⚠️ Duplica lógica parcial       |
+| Componentes React | Consomem valores                   | ✅ (não calculam diretamente)   |
 
 ---
 

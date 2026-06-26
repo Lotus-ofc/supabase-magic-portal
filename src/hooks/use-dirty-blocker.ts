@@ -5,7 +5,10 @@ import { useBlocker } from "@tanstack/react-router";
  * Blocks router navigation + tab close while `when` is true.
  * Uses TanStack Router's useBlocker so it integrates with Link clicks.
  */
-export function useDirtyBlocker(when: boolean, message = "Você tem alterações não salvas. Sair mesmo assim?") {
+export function useDirtyBlocker(
+  when: boolean,
+  message = "Você tem alterações não salvas. Sair mesmo assim?",
+) {
   useBlocker({
     shouldBlockFn: () => {
       if (!when) return false;

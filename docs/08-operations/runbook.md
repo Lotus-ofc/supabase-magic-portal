@@ -21,6 +21,7 @@ Ferramentas de diagnóstico embutidas:
 **Sintoma:** admin e clientes veem dashboards sem dados.
 
 **Causas prováveis e checagem:**
+
 1. **Views sem dados por RLS** — esse foi o incidente histórico que originou
    [ADR-0003](../02-architecture/adr/0003-views-security-definer.md). Verifique em
    `/admin/debug/views` se a contagem via admin autenticado é > 0. Se as views voltaram a ser
@@ -90,5 +91,6 @@ flowchart TD
 ---
 
 ## Contatos / donos
+
 > ⚠️ **INFORMAÇÃO NÃO ENCONTRADA** — não há, no repositório, definição de on-call,
 > responsáveis por incidente ou SLA. Preencher com Eng/Ops.

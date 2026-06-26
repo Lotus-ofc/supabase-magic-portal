@@ -31,11 +31,11 @@ workers, retries, UPSERT e monitoramento.
 
 ## Alternativas consideradas
 
-| Alternativa | Por que não (longo prazo) |
-|-------------|---------------------------|
-| Manter Make indefinidamente | Sem controle, sem escala, bus factor |
-| Zapier/n8n/outro iPaaS | Mesmos problemas de propriedade intelectual |
-| ETL batch externo (Airbyte, Fivetran) | Custo, menos controle sobre regras Lotus |
+| Alternativa                           | Por que não (longo prazo)                   |
+| ------------------------------------- | ------------------------------------------- |
+| Manter Make indefinidamente           | Sem controle, sem escala, bus factor        |
+| Zapier/n8n/outro iPaaS                | Mesmos problemas de propriedade intelectual |
+| ETL batch externo (Airbyte, Fivetran) | Custo, menos controle sobre regras Lotus    |
 
 Make permanece **aceitável no curto prazo** enquanto coletores não existem.
 
@@ -55,12 +55,12 @@ Make permanece **aceitável no curto prazo** enquanto coletores não existem.
 
 ## Estado de implementação
 
-| Item | Status |
-|------|--------|
-| Coletores Lotus | ❌ Não implementado |
-| Fila/workers | ❌ Não implementado |
-| Make operacional | ✅ (externo, inferido) |
-| IDs técnicos em `cadastro_clientes` | ✅ Migration 05 |
+| Item                                | Status                 |
+| ----------------------------------- | ---------------------- |
+| Coletores Lotus                     | ❌ Não implementado    |
+| Fila/workers                        | ❌ Não implementado    |
+| Make operacional                    | ✅ (externo, inferido) |
+| IDs técnicos em `cadastro_clientes` | ✅ Migration 05        |
 
 ## Referências
 

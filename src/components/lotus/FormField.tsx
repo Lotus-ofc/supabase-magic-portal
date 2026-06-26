@@ -1,7 +1,20 @@
 import { cn } from "@/lib/utils";
-import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes, SelectHTMLAttributes } from "react";
+import type {
+  InputHTMLAttributes,
+  ReactNode,
+  TextareaHTMLAttributes,
+  SelectHTMLAttributes,
+} from "react";
 
-export function FormRow({ children, cols = 2, className }: { children: ReactNode; cols?: 1 | 2 | 3; className?: string }) {
+export function FormRow({
+  children,
+  cols = 2,
+  className,
+}: {
+  children: ReactNode;
+  cols?: 1 | 2 | 3;
+  className?: string;
+}) {
   const map = { 1: "md:grid-cols-1", 2: "md:grid-cols-2", 3: "md:grid-cols-3" } as const;
   return <div className={cn("grid grid-cols-1 gap-3", map[cols], className)}>{children}</div>;
 }

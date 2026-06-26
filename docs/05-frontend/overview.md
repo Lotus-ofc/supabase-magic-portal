@@ -9,6 +9,7 @@ last_review: 2026-06-26
 # Frontend — Visão Geral
 
 ## Stack
+
 - **React 19** + **TanStack Start** (SSR + file-based routing via `@tanstack/react-router`).
 - **TanStack React Query** para data fetching/cache.
 - **Tailwind CSS v4** + **Radix UI** + componentes shadcn-style (`src/components/ui`).
@@ -41,7 +42,9 @@ src/
 ```
 
 ## Providers e shell
+
 `src/routes/__root.tsx` monta o app:
+
 - `QueryClientProvider` (React Query).
 - `ThemeProvider` (`src/components/lotus/theme-provider.tsx`) + `Toaster` (sonner).
 - Meta tags da Lotus (título, OG, theme-color `#9769b1`).
@@ -49,17 +52,20 @@ src/
 - Escuta `supabase.auth.onAuthStateChange` para invalidar rotas/queries em login/logout.
 
 ## Padrões de data fetching
+
 - Queries declaradas como `queryOptions` com `queryKey` que inclui parâmetros relevantes
   (cliente, período) para cache correto.
 - Rotas usam `loader` para `ensureQueryData` (prefetch) e `useSuspenseQuery` no corpo.
 - `<Suspense>` + _skeletons_ (`lotus-skeleton`) para carregamento; _empty states_ dedicados.
 
 ## Estado de UI
+
 - Período é estado local da página (`useState<PeriodInput>`) resolvido por `resolvePeriod`.
 - Não há store global (Redux/Zustand); o estado de servidor é o React Query e o estado de
   sessão é o Supabase.
 
 ## Tema
+
 - Claro/escuro via classe `dark` no `<html>`, persistido em `localStorage`.
 - Tokens de cor/spacing definidos em `src/styles.css` (Tailwind v4) e usados via utilitários
   `lotus-*` (ex.: `lotus-surface`, `lotus-skeleton`, `lotus-focus`).

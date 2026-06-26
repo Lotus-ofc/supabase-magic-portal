@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export type PeriodDays = 7 | 30 | 90;
 
 const OPTIONS: { value: PeriodDays; label: string }[] = [
-  { value: 7,  label: "7 dias"  },
+  { value: 7, label: "7 dias" },
   { value: 30, label: "30 dias" },
   { value: 90, label: "90 dias" },
 ];

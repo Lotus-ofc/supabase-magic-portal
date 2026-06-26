@@ -35,13 +35,13 @@ sequenceDiagram
 
 ## O que sabemos (observado / inferido)
 
-| Fato | Fonte |
-|------|-------|
-| Make grava em `base_metricas` | Análise de views + docs de integrações |
-| IDs técnicos em `cadastro_clientes` | Migration 05 (`google_ads_customer_id`, etc.) |
-| Spend Google Ads chega em micros | Views convertem `/ 1_000_000` |
-| Chave de cliente por **nome** (+ aliases) | Migration 08, ADR-0004 |
-| Make **não está versionado** neste repo | Ausência de cenários/config |
+| Fato                                      | Fonte                                         |
+| ----------------------------------------- | --------------------------------------------- |
+| Make grava em `base_metricas`             | Análise de views + docs de integrações        |
+| IDs técnicos em `cadastro_clientes`       | Migration 05 (`google_ads_customer_id`, etc.) |
+| Spend Google Ads chega em micros          | Views convertem `/ 1_000_000`                 |
+| Chave de cliente por **nome** (+ aliases) | Migration 08, ADR-0004                        |
+| Make **não está versionado** neste repo   | Ausência de cenários/config                   |
 
 ---
 
@@ -63,13 +63,13 @@ para coletores Lotus; ou exportar definição como artefato versionado.
 
 ## Riscos do estado atual
 
-| Risco | Impacto |
-|-------|---------|
-| Sem versionamento | Mudança no Make quebra dashboards silenciosamente |
-| Sem observabilidade | Falhas de sync descobertas tarde |
-| Chave por nome | Duplicatas, aliases, dados órfãos |
-| Métricas derivadas no SQL | Divergência com engine TS |
-| Dependência de pessoa/processo | Bus factor alto |
+| Risco                          | Impacto                                           |
+| ------------------------------ | ------------------------------------------------- |
+| Sem versionamento              | Mudança no Make quebra dashboards silenciosamente |
+| Sem observabilidade            | Falhas de sync descobertas tarde                  |
+| Chave por nome                 | Duplicatas, aliases, dados órfãos                 |
+| Métricas derivadas no SQL      | Divergência com engine TS                         |
+| Dependência de pessoa/processo | Bus factor alto                                   |
 
 ---
 

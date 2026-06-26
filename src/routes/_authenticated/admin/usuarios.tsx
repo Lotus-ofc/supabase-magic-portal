@@ -5,7 +5,15 @@ import { listUsersWithRoles } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { TextInput } from "@/components/lotus/FormField";
-import { Search, ShieldCheck, User, UserPlus, Users as UsersIcon, CheckCircle2, Clock3 } from "lucide-react";
+import {
+  Search,
+  ShieldCheck,
+  User,
+  UserPlus,
+  Users as UsersIcon,
+  CheckCircle2,
+  Clock3,
+} from "lucide-react";
 
 const usersQuery = {
   queryKey: ["admin", "users-with-roles"],

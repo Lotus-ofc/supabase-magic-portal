@@ -25,24 +25,28 @@ src/lib/platforms/
 
 ```ts
 type AggStrategy =
-  | { kind: 'sum' } | { kind: 'max' } | { kind: 'min' }
-  | { kind: 'last' } | { kind: 'first' } | { kind: 'avg' }
-  | { kind: 'custom'; fn: (rows: Row[], period: Period) => number };
+  | { kind: "sum" }
+  | { kind: "max" }
+  | { kind: "min" }
+  | { kind: "last" }
+  | { kind: "first" }
+  | { kind: "avg" }
+  | { kind: "custom"; fn: (rows: Row[], period: Period) => number };
 
 interface MetricDef {
-  key: string;                  // ex.: 'reach', 'impressions'
+  key: string; // ex.: 'reach', 'impressions'
   label: string;
-  column: string;               // coluna na view
-  format: 'int' | 'currency' | 'percent' | 'decimal';
-  aggregation: AggStrategy;     // ← decisão por métrica
+  column: string; // coluna na view
+  format: "int" | "currency" | "percent" | "decimal";
+  aggregation: AggStrategy; // ← decisão por métrica
   positiveIsGood?: boolean;
-  description?: string;         // explicação oficial da API
+  description?: string; // explicação oficial da API
 }
 
 interface KpiDef {
   key: string;
   label: string;
-  format: 'percent' | 'currency' | 'decimal';
+  format: "percent" | "currency" | "decimal";
   positiveIsGood: boolean;
   /** Calculado a partir dos TOTAIS já agregados do período. Nunca média de médias. */
   compute: (t: Record<string, number>) => number;
@@ -50,21 +54,25 @@ interface KpiDef {
 }
 
 interface ChartDef {
-  kind: 'area' | 'bar' | 'donut';
+  kind: "area" | "bar" | "donut";
   title: string;
-  series: { metric: string; label: string; tone: 'primary' | 'secondary' | 'success' | 'warning' }[];
+  series: {
+    metric: string;
+    label: string;
+    tone: "primary" | "secondary" | "success" | "warning";
+  }[];
 }
 
 interface PlatformDef {
-  key: 'google_ads' | 'meta_ads' | 'instagram' | 'ga4' | string;
+  key: "google_ads" | "meta_ads" | "instagram" | "ga4" | string;
   label: string;
   icon: LucideIcon;
-  view: string;                 // ex.: 'vw_google_ads_diario'
-  campaignField?: string;       // quando houver ranking de campanhas
-  metrics: MetricDef[];         // métricas brutas exibidas em cards
-  kpis: KpiDef[];               // KPIs derivados
-  charts: ChartDef[];           // evolução(ões)
-  questions: string[];          // perguntas que o dashboard responde (header narrativo)
+  view: string; // ex.: 'vw_google_ads_diario'
+  campaignField?: string; // quando houver ranking de campanhas
+  metrics: MetricDef[]; // métricas brutas exibidas em cards
+  kpis: KpiDef[]; // KPIs derivados
+  charts: ChartDef[]; // evolução(ões)
+  questions: string[]; // perguntas que o dashboard responde (header narrativo)
 }
 ```
 
@@ -122,23 +130,27 @@ A query Supabase de cada dashboard busca exatamente `[prevFrom, to]` em **uma ch
 ## 5. Definições iniciais por plataforma
 
 **Google Ads** (`view: vw_google_ads_diario`)
+
 - Métricas brutas: impressions (SUM), clicks (SUM), spend (SUM), conversions (SUM).
 - KPIs: CTR, CPC, CPM, CPA, Taxa de Conversão.
 - Ranking por `campanha`.
 - Perguntas: Quanto investi? Quantos cliques? Quanto custou cada clique? Qual campanha performou melhor? Como evoluiu vs período anterior?
 
 **Meta Ads** (`view: vw_meta_ads_diario`)
+
 - Métricas: impressions (SUM), reach (SUM diário), clicks (SUM), spend (SUM), conversions (SUM).
 - KPIs: CTR, CPC, CPM, CPA, **Frequência** = impressions/reach, Taxa de Conversão, Custo por Resultado.
 - Ranking por `campanha`.
 
 **Instagram** (`view: vw_instagram_diario`)
+
 - Estratégia **explícita por métrica**, configurável sem mexer em componente:
   - `reach`, `accounts_engaged`: estratégia inicial `MAX` — **revisável a qualquer momento** alterando apenas a `MetricDef`.
   - `total_interactions`, `likes`, `comments`, `saves`, `shares`, `profile_links_taps`: `SUM`.
 - KPIs: Taxa de Engajamento, Média diária, Variação vs período anterior.
 
 **Google Analytics 4** (`view: vw_ga4_diario`)
+
 - Métricas: sessions, users, events, views, conversions (todas SUM).
 - KPIs: Engagement Rate, Eventos por Sessão, Visualizações por Usuário, Conversão por Sessão, Conversão por Usuário.
 
@@ -152,10 +164,10 @@ Cada rota se reduz a:
 
 ```tsx
 // src/routes/_authenticated/cliente.$cliente.google-ads.tsx
-import { googleAdsDef } from '@/lib/platforms/google-ads';
-import { PlatformDashboardPage } from '@/components/lotus/PlatformDashboardPage';
+import { googleAdsDef } from "@/lib/platforms/google-ads";
+import { PlatformDashboardPage } from "@/components/lotus/PlatformDashboardPage";
 
-export const Route = createFileRoute('/_authenticated/cliente/$cliente/google-ads')({
+export const Route = createFileRoute("/_authenticated/cliente/$cliente/google-ads")({
   component: () => <PlatformDashboardPage def={googleAdsDef} />,
 });
 ```
@@ -173,15 +185,18 @@ Mesma forma para `meta-ads`, `instagram`, `ga4`.
 ## 8. Entregáveis
 
 **Novos**
+
 - `src/lib/platforms/{types,aggregations,formulas,engine,registry,google-ads,meta-ads,instagram,ga4}.ts`
 - `src/components/lotus/PlatformDashboard.tsx`
 - `src/components/lotus/PlatformDashboardPage.tsx` (PageHeader + PeriodPicker + Suspense)
 
 **Editados**
+
 - 4 rotas de plataforma (substituem `PlatformPlaceholder`)
 - `src/lib/metrics.ts` (re-export das fórmulas)
 
 **Intocados**
+
 - Banco, views, índices, Make, RLS, autenticação, sidebar, dashboard executivo, visão geral do cliente.
 
 ---

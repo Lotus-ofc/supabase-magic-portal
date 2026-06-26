@@ -16,8 +16,7 @@ export interface StatCardProps {
   className?: string;
 }
 
-const numberFmt = (v: string | number) =>
-  typeof v === "number" ? v.toLocaleString("pt-BR") : v;
+const numberFmt = (v: string | number) => (typeof v === "number" ? v.toLocaleString("pt-BR") : v);
 
 /**
  * StatCard — KPI card with optional delta + context. Solid surface (no glass),
@@ -35,10 +34,7 @@ export function StatCard({
 }: StatCardProps) {
   const hasDelta = typeof delta === "number" && Number.isFinite(delta);
   const trend = hasDelta ? (delta === 0 ? "flat" : delta > 0 ? "up" : "down") : null;
-  const good =
-    trend === "flat" || trend === null
-      ? null
-      : (trend === "up") === positiveIsGood;
+  const good = trend === "flat" || trend === null ? null : (trend === "up") === positiveIsGood;
 
   const isHero = emphasis === "hero";
   const isCompact = emphasis === "compact";
@@ -87,10 +83,8 @@ export function StatCard({
             className={cn(
               "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums",
               good === null && "bg-muted text-muted-foreground",
-              good === true &&
-                "bg-success/12 text-[color:var(--success)]",
-              good === false &&
-                "bg-danger/12 text-[color:var(--danger)]",
+              good === true && "bg-success/12 text-[color:var(--success)]",
+              good === false && "bg-danger/12 text-[color:var(--danger)]",
             )}
           >
             {trend === "flat" ? (
@@ -105,9 +99,7 @@ export function StatCard({
         )}
       </div>
 
-      {hint && (
-        <p className="mt-2 text-xs text-muted-foreground">{hint}</p>
-      )}
+      {hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }

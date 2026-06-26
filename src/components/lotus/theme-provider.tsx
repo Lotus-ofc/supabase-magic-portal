@@ -23,9 +23,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Hydrate from localStorage / system preference after mount (SSR-safe).
   useEffect(() => {
-    const stored = (typeof window !== "undefined" && window.localStorage.getItem(STORAGE_KEY)) as
-      | Theme
-      | null;
+    const stored = (typeof window !== "undefined" &&
+      window.localStorage.getItem(STORAGE_KEY)) as Theme | null;
     const prefersDark =
       typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches;
     const initial: Theme = stored ?? (prefersDark ? "dark" : "light");
@@ -44,7 +43,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggle: () => setTheme(theme === "dark" ? "light" : "dark") }}>
+    <ThemeContext.Provider
+      value={{ theme, setTheme, toggle: () => setTheme(theme === "dark" ? "light" : "dark") }}
+    >
       {children}
     </ThemeContext.Provider>
   );

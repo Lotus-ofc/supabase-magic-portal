@@ -13,16 +13,14 @@ export const ctr = (impressions: number, clicks: number): number =>
   safeDiv(clicks, impressions) * 100;
 
 /** CPC — Custo por Clique. */
-export const cpc = (spend: number, clicks: number): number =>
-  safeDiv(spend, clicks);
+export const cpc = (spend: number, clicks: number): number => safeDiv(spend, clicks);
 
 /** CPM — Custo por Mil Impressões. */
 export const cpm = (spend: number, impressions: number): number =>
   safeDiv(spend, impressions) * 1000;
 
 /** CPA — Custo por Aquisição (custo por conversão). */
-export const cpa = (spend: number, conversions: number): number =>
-  safeDiv(spend, conversions);
+export const cpa = (spend: number, conversions: number): number => safeDiv(spend, conversions);
 
 /** Conversion Rate (0–100). */
 export const convRate = (numerator: number, denominator: number): number =>
@@ -41,9 +39,7 @@ export const eventsPerSession = (events: number, sessions: number): number =>
   safeDiv(events, sessions);
 
 /** Visualizações por usuário (GA4). */
-export const viewsPerUser = (views: number, users: number): number =>
-  safeDiv(views, users);
+export const viewsPerUser = (views: number, users: number): number => safeDiv(views, users);
 
 /** Média diária — total / quantidade de dias do período. */
-export const dailyAverage = (total: number, days: number): number =>
-  days > 0 ? total / days : 0;
+export const dailyAverage = (total: number, days: number): number => (days > 0 ? total / days : 0);

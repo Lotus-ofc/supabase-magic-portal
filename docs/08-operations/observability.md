@@ -12,15 +12,15 @@ last_review: 2026-06-26
 
 ## Estado atual
 
-| Capacidade | Implementação | Maturidade |
-|------------|---------------|------------|
-| Logs SSR | `console.error` em `server.ts`, `start.ts` | Básico |
-| Logs client | `console.warn/error` pontuais | Básico |
-| Error reporting | `lovable-error-reporting.ts` | Transitório |
-| APM / tracing | Não existe | — |
-| Alertas | Não existe | — |
-| Saúde ingestão | `vw_clientes_ativos.ultima_ingestao` | Manual |
-| Debug interno | `/admin/debug*` | ✅ Ferramenta de produto |
+| Capacidade      | Implementação                              | Maturidade               |
+| --------------- | ------------------------------------------ | ------------------------ |
+| Logs SSR        | `console.error` em `server.ts`, `start.ts` | Básico                   |
+| Logs client     | `console.warn/error` pontuais              | Básico                   |
+| Error reporting | `lovable-error-reporting.ts`               | Transitório              |
+| APM / tracing   | Não existe                                 | —                        |
+| Alertas         | Não existe                                 | —                        |
+| Saúde ingestão  | `vw_clientes_ativos.ultima_ingestao`       | Manual                   |
+| Debug interno   | `/admin/debug*`                            | ✅ Ferramenta de produto |
 
 ---
 
@@ -28,12 +28,12 @@ last_review: 2026-06-26
 
 ### `vw_clientes_ativos`
 
-| Coluna | Significado |
-|--------|-------------|
-| `ultima_data_recebida` | Última data com métricas no banco |
-| `ultima_ingestao` | Última execução de ingestão (inferida) |
-| `plataformas_ativas` | Plataformas com dados |
-| `total_registros` | Volume em `base_metricas` |
+| Coluna                 | Significado                            |
+| ---------------------- | -------------------------------------- |
+| `ultima_data_recebida` | Última data com métricas no banco      |
+| `ultima_ingestao`      | Última execução de ingestão (inferida) |
+| `plataformas_ativas`   | Plataformas com dados                  |
+| `total_registros`      | Volume em `base_metricas`              |
 
 **Uso:** `/admin`, `/admin/relatorios`, runbook de diagnóstico.
 
@@ -47,10 +47,10 @@ last_review: 2026-06-26
 
 ## Ferramentas de debug (produto)
 
-| Ferramenta | Rota | Função |
-|------------|------|--------|
-| Data snapshot | `/admin/debug` | `getDebugSnapshot` |
-| Views audit | `/admin/debug/views` | `getViewsAudit` — RLS, security, amostras |
+| Ferramenta    | Rota                 | Função                                    |
+| ------------- | -------------------- | ----------------------------------------- |
+| Data snapshot | `/admin/debug`       | `getDebugSnapshot`                        |
+| Views audit   | `/admin/debug/views` | `getViewsAudit` — RLS, security, amostras |
 
 Documentar resposta: ver [API Reference](../03-backend/api-reference.md).
 
@@ -60,9 +60,9 @@ Documentar resposta: ver [API Reference](../03-backend/api-reference.md).
 
 ### Onde olhar hoje
 
-| Ambiente | Onde |
-|----------|------|
-| Local | Terminal do `npm run dev` |
+| Ambiente | Onde                                                   |
+| -------- | ------------------------------------------------------ |
+| Local    | Terminal do `npm run dev`                              |
 | Produção | ⚠️ INFORMAÇÃO NÃO ENCONTRADA — logs Cloudflare/Lovable |
 
 ### Formato
@@ -81,12 +81,12 @@ flowchart TB
     MET --> ALERT["Alertas\n(PagerDuty/Slack)"]
 ```
 
-| Componente | Recomendação |
-|--------------|--------------|
-| Frontend errors | Sentry ou equivalente |
-| Server functions | Trace ID por request |
-| Coletores | Log estruturado por `run_id` |
-| Ingestão | SLA dashboard por cliente/plataforma |
+| Componente       | Recomendação                         |
+| ---------------- | ------------------------------------ |
+| Frontend errors  | Sentry ou equivalente                |
+| Server functions | Trace ID por request                 |
+| Coletores        | Log estruturado por `run_id`         |
+| Ingestão         | SLA dashboard por cliente/plataforma |
 
 Ver [Coletores alvo](../07-integrations/target-collectors.md).
 

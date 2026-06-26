@@ -46,6 +46,7 @@ flowchart TD
 ## Guarda de autenticação
 
 `src/routes/_authenticated/route.tsx`:
+
 - `ssr: false` + `beforeLoad` chama `supabase.auth.getUser()`. Sem usuário → `redirect({ to: "/auth" })`.
 - Em `/` (`index.tsx`), redireciona para `/dashboard` (logado) ou `/auth`.
 
@@ -68,6 +69,7 @@ sequenceDiagram
 ## Navegação por papel
 
 No layout autenticado, `checkIsAdmin` (server fn) define os grupos de navegação:
+
 - **Cliente:** Visão geral (`/dashboard`), Aprovações (`/aprovacoes`).
 - **Admin:** Operações (visão geral, relatórios, editorial, clientes, usuários, serviços) +
   Diagnóstico (debug, auditoria de views).
@@ -82,6 +84,7 @@ No layout autenticado, `checkIsAdmin` (server fn) define os grupos de navegaçã
 ---
 
 ## Resolução de cliente (slug → nome canônico)
+
 `/cliente/$cliente` usa `slug`. `clienteRefQuery`
 (`src/routes/_authenticated/cliente.$cliente.tsx`) resolve o `slug` para o **nome canônico**
 (`queryName`) usado nas queries das views, casando por `cadastro_clientes.slug` ou por

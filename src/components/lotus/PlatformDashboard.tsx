@@ -8,7 +8,15 @@
 
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useMemo } from "react";
-import { CalendarRange, Inbox, Sparkles, TrendingDown, TrendingUp, RefreshCw, Trophy } from "lucide-react";
+import {
+  CalendarRange,
+  Inbox,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  RefreshCw,
+  Trophy,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { PlatformDef, ValueFormat } from "@/lib/platforms/types";
 import { aggregatePeriod, pctDelta } from "@/lib/platforms/engine";
@@ -23,19 +31,31 @@ import { cn } from "@/lib/utils";
 
 // ---------- Formatadores (locais para evitar coupling com metrics.ts) -------
 
-const _int  = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
-const _dec  = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
-const _brl  = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const _brlC = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+const _int = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
+const _dec = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+const _brl = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
+const _brlC = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 2,
+});
 
 function formatValue(format: ValueFormat, value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value)) return "—";
   switch (format) {
-    case "currency": return Math.abs(value) < 100 ? _brlC.format(value) : _brl.format(value);
-    case "percent":  return `${value.toFixed(2)}%`;
-    case "decimal":  return _dec.format(value);
+    case "currency":
+      return Math.abs(value) < 100 ? _brlC.format(value) : _brl.format(value);
+    case "percent":
+      return `${value.toFixed(2)}%`;
+    case "decimal":
+      return _dec.format(value);
     case "int":
-    default:         return _int.format(Math.round(value));
+    default:
+      return _int.format(Math.round(value));
   }
 }
 
@@ -105,8 +125,14 @@ function PlatformDashboardBody({ def, cliente, period }: Props) {
 // ---------- Header narrativo -----------------------------------------------
 
 function NarrativeHeader({
-  def, period, lastSync,
-}: { def: PlatformDef; period: Period; lastSync: string | null }) {
+  def,
+  period,
+  lastSync,
+}: {
+  def: PlatformDef;
+  period: Period;
+  lastSync: string | null;
+}) {
   return (
     <SectionCard
       eyebrow={def.label}
@@ -194,21 +220,26 @@ function KpiCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggre
 
 // ---------- Charts ---------------------------------------------------------
 
-function ChartsSection({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod> }) {
+function ChartsSection({
+  def,
+  agg,
+}: {
+  def: PlatformDef;
+  agg: ReturnType<typeof aggregatePeriod>;
+}) {
   return (
     <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {def.charts.map((chart) => {
         const yMetric = def.metrics.find((m) => m.key === chart.yMetric);
-        const total = chart.series.reduce(
-          (sum, s) => sum + (agg.current[s.metric] ?? 0),
-          0,
-        );
+        const total = chart.series.reduce((sum, s) => sum + (agg.current[s.metric] ?? 0), 0);
         // Mapeia formato ValueFormat → CommonMetric usado pelo AreaChartLotus
         // para formatar tooltip/eixo. Usamos "spend" para currency, "int" para int.
         const commonMetric =
-          yMetric?.format === "currency" ? "spend"
-          : yMetric?.format === "percent" ? "ctr"
-          : "impressions";
+          yMetric?.format === "currency"
+            ? "spend"
+            : yMetric?.format === "percent"
+              ? "ctr"
+              : "impressions";
         return (
           <ChartFrame
             key={chart.key}
@@ -253,11 +284,23 @@ function ChartsSection({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof 
 // ---------- Comparativo período atual × anterior ---------------------------
 
 function ComparisonBlock({
-  def, agg, period,
-}: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod>; period: Period }) {
-  const rows = [...def.metrics, ...def.kpis.map((k) => ({
-    key: k.key, label: k.label, format: k.format, positiveIsGood: k.positiveIsGood,
-  }))];
+  def,
+  agg,
+  period,
+}: {
+  def: PlatformDef;
+  agg: ReturnType<typeof aggregatePeriod>;
+  period: Period;
+}) {
+  const rows = [
+    ...def.metrics,
+    ...def.kpis.map((k) => ({
+      key: k.key,
+      label: k.label,
+      format: k.format,
+      positiveIsGood: k.positiveIsGood,
+    })),
+  ];
   return (
     <SectionCard
       eyebrow="Comparativo"
@@ -277,14 +320,18 @@ function ComparisonBlock({
           </thead>
           <tbody>
             {rows.map((row) => {
-              const cur  = (agg.current[row.key] ?? agg.currentKpis[row.key]) ?? 0;
-              const prev = (agg.previous[row.key] ?? agg.previousKpis[row.key]) ?? 0;
+              const cur = agg.current[row.key] ?? agg.currentKpis[row.key] ?? 0;
+              const prev = agg.previous[row.key] ?? agg.previousKpis[row.key] ?? 0;
               const positiveIsGood = (row as { positiveIsGood?: boolean }).positiveIsGood ?? true;
               return (
                 <tr key={row.key} className="border-t border-border/50 hover:bg-muted/10">
                   <td className="px-4 py-2.5 text-foreground">{row.label}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-foreground">{formatValue(row.format, cur)}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{formatValue(row.format, prev)}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
+                    {formatValue(row.format, cur)}
+                  </td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                    {formatValue(row.format, prev)}
+                  </td>
                   <td className="px-4 py-2.5 text-right">
                     <DeltaPill delta={pctDelta(cur, prev)} positiveIsGood={positiveIsGood} />
                   </td>
@@ -300,7 +347,13 @@ function ComparisonBlock({
 
 // ---------- Ranking de campanhas -------------------------------------------
 
-function CampaignRanking({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod> }) {
+function CampaignRanking({
+  def,
+  agg,
+}: {
+  def: PlatformDef;
+  agg: ReturnType<typeof aggregatePeriod>;
+}) {
   if (agg.campaigns.length === 0) return null;
   // Ordenação default: por primeira métrica hero (geralmente spend).
   const sortKey = def.heroMetrics[0];
@@ -323,10 +376,14 @@ function CampaignRanking({ def, agg }: { def: PlatformDef; agg: ReturnType<typeo
               <th className="px-4 py-2.5 font-medium">#</th>
               <th className="px-4 py-2.5 font-medium">Campanha</th>
               {cols.map((c) => (
-                <th key={c.key} className="px-4 py-2.5 text-right font-medium">{c.label}</th>
+                <th key={c.key} className="px-4 py-2.5 text-right font-medium">
+                  {c.label}
+                </th>
               ))}
               {kpiCols.map((k) => (
-                <th key={k.key} className="px-4 py-2.5 text-right font-medium">{k.label}</th>
+                <th key={k.key} className="px-4 py-2.5 text-right font-medium">
+                  {k.label}
+                </th>
               ))}
             </tr>
           </thead>
@@ -334,10 +391,14 @@ function CampaignRanking({ def, agg }: { def: PlatformDef; agg: ReturnType<typeo
             {ranked.map((c, i) => (
               <tr key={c.campanha} className="border-t border-border/50 hover:bg-muted/10">
                 <td className="px-4 py-2.5">
-                  <span className={cn(
-                    "inline-flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-semibold tabular-nums",
-                    i === 0 ? "bg-primary/15 text-primary-700 dark:text-primary-200" : "bg-muted text-muted-foreground",
-                  )}>
+                  <span
+                    className={cn(
+                      "inline-flex h-6 w-6 items-center justify-center rounded-md text-[11px] font-semibold tabular-nums",
+                      i === 0
+                        ? "bg-primary/15 text-primary-700 dark:text-primary-200"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
                     {i === 0 ? <Trophy className="h-3 w-3" /> : i + 1}
                   </span>
                 </td>
@@ -348,7 +409,10 @@ function CampaignRanking({ def, agg }: { def: PlatformDef; agg: ReturnType<typeo
                   </td>
                 ))}
                 {kpiCols.map((k) => (
-                  <td key={k.key} className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                  <td
+                    key={k.key}
+                    className="px-4 py-2.5 text-right tabular-nums text-muted-foreground"
+                  >
                     {formatValue(k.format, c.kpis[k.key] ?? 0)}
                   </td>
                 ))}
@@ -364,8 +428,14 @@ function CampaignRanking({ def, agg }: { def: PlatformDef; agg: ReturnType<typeo
 // ---------- Tabela diária --------------------------------------------------
 
 function DailyTable({
-  def, agg, period,
-}: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod>; period: Period }) {
+  def,
+  agg,
+  period,
+}: {
+  def: PlatformDef;
+  agg: ReturnType<typeof aggregatePeriod>;
+  period: Period;
+}) {
   // Ordem mais recente primeiro.
   const rows = [...agg.daily].sort((a, b) => (a.date < b.date ? 1 : -1));
   return (
@@ -381,16 +451,23 @@ function DailyTable({
             <tr>
               <th className="px-4 py-2.5 font-medium">Dia</th>
               {def.metrics.map((m) => (
-                <th key={m.key} className="px-4 py-2.5 text-right font-medium">{m.short ?? m.label}</th>
+                <th key={m.key} className="px-4 py-2.5 text-right font-medium">
+                  {m.short ?? m.label}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.date as string} className="border-t border-border/50 hover:bg-muted/10">
-                <td className="whitespace-nowrap px-4 py-2 tabular-nums text-foreground">{formatBR(r.date as string)}</td>
+                <td className="whitespace-nowrap px-4 py-2 tabular-nums text-foreground">
+                  {formatBR(r.date as string)}
+                </td>
                 {def.metrics.map((m) => (
-                  <td key={m.key} className="whitespace-nowrap px-4 py-2 text-right tabular-nums text-foreground">
+                  <td
+                    key={m.key}
+                    className="whitespace-nowrap px-4 py-2 text-right tabular-nums text-foreground"
+                  >
                     {formatValue(m.format, r[m.key] as number)}
                   </td>
                 ))}
@@ -406,9 +483,20 @@ function DailyTable({
 // ---------- Insights automáticos -------------------------------------------
 
 function InsightsBlock({
-  def, agg, period,
-}: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod>; period: Period }) {
-  const insights: Array<{ id: string; title: string; detail: string; tone: "positive" | "negative" | "neutral" }> = [];
+  def,
+  agg,
+  period,
+}: {
+  def: PlatformDef;
+  agg: ReturnType<typeof aggregatePeriod>;
+  period: Period;
+}) {
+  const insights: Array<{
+    id: string;
+    title: string;
+    detail: string;
+    tone: "positive" | "negative" | "neutral";
+  }> = [];
 
   // Regras baseadas em variações significativas dos KPIs declarados.
   for (const k of def.kpis) {
@@ -461,16 +549,25 @@ function InsightsBlock({
     >
       <ul className="space-y-3">
         {insights.slice(0, 6).map((i) => (
-          <li key={i.id} className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/40 p-3">
-            <span className={cn(
-              "mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md",
-              i.tone === "positive" && "bg-success/12 text-[color:var(--success)]",
-              i.tone === "negative" && "bg-danger/12 text-[color:var(--danger)]",
-              i.tone === "neutral"  && "bg-primary/10 text-primary-600 dark:text-primary-300",
-            )}>
-              {i.tone === "positive" ? <TrendingUp className="h-3.5 w-3.5" />
-                : i.tone === "negative" ? <TrendingDown className="h-3.5 w-3.5" />
-                : <Sparkles className="h-3.5 w-3.5" />}
+          <li
+            key={i.id}
+            className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/40 p-3"
+          >
+            <span
+              className={cn(
+                "mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md",
+                i.tone === "positive" && "bg-success/12 text-[color:var(--success)]",
+                i.tone === "negative" && "bg-danger/12 text-[color:var(--danger)]",
+                i.tone === "neutral" && "bg-primary/10 text-primary-600 dark:text-primary-300",
+              )}
+            >
+              {i.tone === "positive" ? (
+                <TrendingUp className="h-3.5 w-3.5" />
+              ) : i.tone === "negative" ? (
+                <TrendingDown className="h-3.5 w-3.5" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
             </span>
             <div className="min-w-0">
               <p className="text-[13px] font-medium text-foreground">{i.title}</p>
@@ -487,7 +584,11 @@ function InsightsBlock({
 
 function EmptyState() {
   return (
-    <SectionCard eyebrow="Sem dados" title="Nada para mostrar no período selecionado" description="Quando a integração registrar novos dados, eles aparecem aqui automaticamente.">
+    <SectionCard
+      eyebrow="Sem dados"
+      title="Nada para mostrar no período selecionado"
+      description="Quando a integração registrar novos dados, eles aparecem aqui automaticamente."
+    >
       <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
         <div className="grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
           <Inbox className="h-5 w-5" />

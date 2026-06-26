@@ -8,18 +8,10 @@ interface PlatformPlaceholderProps {
   description?: string;
 }
 
-export function PlatformPlaceholder({
-  icon: Icon,
-  title,
-  description,
-}: PlatformPlaceholderProps) {
+export function PlatformPlaceholder({ icon: Icon, title, description }: PlatformPlaceholderProps) {
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Plataforma"
-        title={title}
-        description={description}
-      />
+      <PageHeader eyebrow="Plataforma" title={title} description={description} />
       <SectionCard
         eyebrow="Em construção"
         title="Conteúdo em breve"
@@ -30,8 +22,8 @@ export function PlatformPlaceholder({
             <Icon className="h-6 w-6" />
           </div>
           <p className="max-w-sm text-sm text-muted-foreground">
-            A visualização detalhada de <strong>{title}</strong> chega em uma
-            próxima etapa. Por enquanto, consulte a visão geral da conta.
+            A visualização detalhada de <strong>{title}</strong> chega em uma próxima etapa. Por
+            enquanto, consulte a visão geral da conta.
           </p>
         </div>
       </SectionCard>

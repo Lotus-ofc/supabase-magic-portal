@@ -12,28 +12,29 @@ last_review: 2026-06-26
 
 ## Mapa de ambientes
 
-| Ambiente | Propósito | Status documentado |
-|----------|-----------|-------------------|
-| **Local** | Desenvolvimento no Cursor | ✅ |
-| **Produção** | Portal Lotus (usuários) | Parcial |
-| **Staging** | Pré-produção | ⚠️ INFORMAÇÃO NÃO ENCONTRADA |
+| Ambiente     | Propósito                 | Status documentado           |
+| ------------ | ------------------------- | ---------------------------- |
+| **Local**    | Desenvolvimento no Cursor | ✅                           |
+| **Produção** | Portal Lotus (usuários)   | Parcial                      |
+| **Staging**  | Pré-produção              | ⚠️ INFORMAÇÃO NÃO ENCONTRADA |
 
 ---
 
 ## Local (desenvolvimento)
 
-| Item | Valor |
-|------|-------|
-| Comando | `npm run dev` |
-| URL | `http://localhost:5173` (Vite default) |
-| Env | `.env` (copiar de `.env.example`) |
-| Supabase | Projeto `ywvhoctcmibjitvwkkhb` |
+| Item     | Valor                                  |
+| -------- | -------------------------------------- |
+| Comando  | `npm run dev`                          |
+| URL      | `http://localhost:5173` (Vite default) |
+| Env      | `.env` (copiar de `.env.example`)      |
+| Supabase | Projeto `ywvhoctcmibjitvwkkhb`         |
 
 ### Variáveis necessárias
 
 Ver `.env.example` e [Deployment](./deployment.md).
 
 Em dev, **duplicar** URL e anon key com e sem prefixo `VITE_`:
+
 - Browser lê `VITE_OFFICIAL_*`
 - Server functions leem `OFFICIAL_*` (sem VITE)
 
@@ -41,11 +42,11 @@ Em dev, **duplicar** URL e anon key com e sem prefixo `VITE_`:
 
 ## Produção
 
-| Item | Observado |
-|------|-----------|
-| Build | `npm run build` → Nitro → Cloudflare |
+| Item   | Observado                                         |
+| ------ | ------------------------------------------------- |
+| Build  | `npm run build` → Nitro → Cloudflare              |
 | Preset | `@lovable.dev/vite-tanstack-config` (transitório) |
-| Deploy | Via Lovable conectado ao branch Git |
+| Deploy | Via Lovable conectado ao branch Git               |
 
 > ⚠️ **INFORMAÇÃO NÃO ENCONTRADA:** domínio de produção, URL pública do Portal Lotus,
 > mapeamento de secrets no Cloudflare/Lovable dashboard.
@@ -65,8 +66,8 @@ Ver [CI/CD](./cicd.md).
 
 ## Supabase
 
-| Ambiente | Project ID |
-|----------|------------|
+| Ambiente                | Project ID             |
+| ----------------------- | ---------------------- |
 | Atual (único observado) | `ywvhoctcmibjitvwkkhb` |
 
 Migrations aplicadas manualmente hoje — ver [Migrations](../04-database/migrations.md).

@@ -116,7 +116,11 @@ function ClientesList() {
                 {hiddenCount > 0 && (
                   <>
                     {" "}
-                    · <span className="text-foreground">{hiddenCount} oculto{hiddenCount === 1 ? "" : "s"}</span> pelo filtro
+                    ·{" "}
+                    <span className="text-foreground">
+                      {hiddenCount} oculto{hiddenCount === 1 ? "" : "s"}
+                    </span>{" "}
+                    pelo filtro
                   </>
                 )}
               </span>
@@ -132,7 +136,6 @@ function ClientesList() {
             </button>
           </div>
         )}
-
 
         {/* Table */}
         <div className="overflow-x-auto">

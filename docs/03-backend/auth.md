@@ -40,13 +40,13 @@ sequenceDiagram
 
 ## Login e sessão
 
-| Item | Detalhe |
-|------|---------|
-| Rota | `/auth` (`src/routes/auth.tsx`) |
-| Métodos | `signInWithPassword`, `signUp` (público hoje) |
-| SSR | Desabilitado na rota (`ssr: false`) |
-| Storage | `localStorage` key `sb-{projectId}-auth-token` |
-| Redirect pós-login | `/dashboard` |
+| Item               | Detalhe                                        |
+| ------------------ | ---------------------------------------------- |
+| Rota               | `/auth` (`src/routes/auth.tsx`)                |
+| Métodos            | `signInWithPassword`, `signUp` (público hoje)  |
+| SSR                | Desabilitado na rota (`ssr: false`)            |
+| Storage            | `localStorage` key `sb-{projectId}-auth-token` |
+| Redirect pós-login | `/dashboard`                                   |
 
 ### Política de cadastro
 
@@ -64,10 +64,10 @@ Relação oficial não documentada no negócio — ver [Glossário](../00-compan
 
 ## Papéis (`app_role`)
 
-| Papel | Enum | Capacidades |
-|-------|------|-------------|
-| **Admin** | `admin` | CRUD clientes/usuários/serviços, editorial, debug, todas as views |
-| **Cliente** | `cliente` | Dashboards dos clientes vinculados, aprovações editorial |
+| Papel       | Enum      | Capacidades                                                       |
+| ----------- | --------- | ----------------------------------------------------------------- |
+| **Admin**   | `admin`   | CRUD clientes/usuários/serviços, editorial, debug, todas as views |
+| **Cliente** | `cliente` | Dashboards dos clientes vinculados, aprovações editorial          |
 
 Verificação: RPC `has_role(user_id, role)` (migration `01_auth_roles_access.sql`).
 
@@ -75,10 +75,10 @@ Verificação: RPC `has_role(user_id, role)` (migration `01_auth_roles_access.sq
 
 ## Guards de rota (frontend)
 
-| Guard | Arquivo | Comportamento |
-|-------|---------|---------------|
-| Autenticado | `_authenticated/route.tsx` | Sem user → `/auth` |
-| Admin | `admin/route.tsx` | `checkIsAdmin()` false → `/dashboard` |
+| Guard       | Arquivo                    | Comportamento                         |
+| ----------- | -------------------------- | ------------------------------------- |
+| Autenticado | `_authenticated/route.tsx` | Sem user → `/auth`                    |
+| Admin       | `admin/route.tsx`          | `checkIsAdmin()` false → `/dashboard` |
 
 > Guards de rota são **UX**, não segurança. A barreira real é RLS + `assertAdmin` nas server functions.
 
@@ -126,14 +126,14 @@ Aliases: `cliente_aliases` reconcilia nomes divergentes do Make. Ver [ADR-0004](
 
 ## Matriz de acesso por recurso
 
-| Recurso | Admin | Cliente |
-|---------|-------|---------|
-| `vw_overview_cliente`, `vw_*_diario` | ✅ (todos clientes) | ✅ (clientes vinculados) |
-| `cadastro_clientes` SELECT | ✅ all | ✅ próprios |
-| `cadastro_clientes` INSERT/UPDATE | ✅ | ❌ |
-| `posts_editorial` | ✅ all | SELECT + UPDATE limitado (aprovação) |
-| Server functions admin | ✅ | ❌ (403) |
-| `/admin/*` | ✅ | ❌ (redirect) |
+| Recurso                              | Admin               | Cliente                              |
+| ------------------------------------ | ------------------- | ------------------------------------ |
+| `vw_overview_cliente`, `vw_*_diario` | ✅ (todos clientes) | ✅ (clientes vinculados)             |
+| `cadastro_clientes` SELECT           | ✅ all              | ✅ próprios                          |
+| `cadastro_clientes` INSERT/UPDATE    | ✅                  | ❌                                   |
+| `posts_editorial`                    | ✅ all              | SELECT + UPDATE limitado (aprovação) |
+| Server functions admin               | ✅                  | ❌ (403)                             |
+| `/admin/*`                           | ✅                  | ❌ (redirect)                        |
 
 Detalhes de policies: [RLS Policies](../04-database/rls-policies.md).
 

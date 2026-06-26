@@ -74,14 +74,14 @@ export interface PeriodInput {
 }
 
 export const PERIOD_PRESETS: { value: PeriodPreset; label: string }[] = [
-  { value: "today",      label: "Hoje" },
-  { value: "yesterday",  label: "Ontem" },
-  { value: "last_7",     label: "Últimos 7 dias" },
-  { value: "last_30",    label: "Últimos 30 dias" },
-  { value: "last_90",    label: "Últimos 90 dias" },
+  { value: "today", label: "Hoje" },
+  { value: "yesterday", label: "Ontem" },
+  { value: "last_7", label: "Últimos 7 dias" },
+  { value: "last_30", label: "Últimos 30 dias" },
+  { value: "last_90", label: "Últimos 90 dias" },
   { value: "this_month", label: "Este mês" },
   { value: "last_month", label: "Mês passado" },
-  { value: "custom",     label: "Personalizado" },
+  { value: "custom", label: "Personalizado" },
 ];
 
 const PRESET_LABEL: Record<PeriodPreset, string> = Object.fromEntries(
@@ -97,15 +97,25 @@ export function resolvePeriod(input: PeriodInput, refToday?: string): Period {
 
   switch (input.preset) {
     case "today":
-      from = today; to = today; break;
+      from = today;
+      to = today;
+      break;
     case "yesterday":
-      from = yesterday; to = yesterday; break;
+      from = yesterday;
+      to = yesterday;
+      break;
     case "last_7":
-      from = addDaysISO(today, -6); to = today; break;
+      from = addDaysISO(today, -6);
+      to = today;
+      break;
     case "last_30":
-      from = addDaysISO(today, -29); to = today; break;
+      from = addDaysISO(today, -29);
+      to = today;
+      break;
     case "last_90":
-      from = addDaysISO(today, -89); to = today; break;
+      from = addDaysISO(today, -89);
+      to = today;
+      break;
     case "this_month": {
       from = today.slice(0, 7) + "-01";
       to = today;
@@ -125,11 +135,16 @@ export function resolvePeriod(input: PeriodInput, refToday?: string): Period {
     case "custom": {
       from = input.customFrom || today;
       to = input.customTo || today;
-      if (from > to) { const tmp = from; from = to; to = tmp; }
+      if (from > to) {
+        const tmp = from;
+        from = to;
+        to = tmp;
+      }
       break;
     }
     default:
-      from = today; to = today;
+      from = today;
+      to = today;
   }
 
   const days = diffDaysISO(from, to) + 1;
@@ -137,9 +152,7 @@ export function resolvePeriod(input: PeriodInput, refToday?: string): Period {
   const prevFrom = addDaysISO(prevTo, -(days - 1));
 
   const label =
-    input.preset === "custom"
-      ? `${formatBR(from)} – ${formatBR(to)}`
-      : PRESET_LABEL[input.preset];
+    input.preset === "custom" ? `${formatBR(from)} – ${formatBR(to)}` : PRESET_LABEL[input.preset];
 
   return { preset: input.preset, from, to, prevFrom, prevTo, days, label };
 }

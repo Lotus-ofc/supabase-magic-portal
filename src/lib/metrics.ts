@@ -66,26 +66,88 @@ export interface MetricMeta {
 }
 
 export const METRIC_META: Record<CommonMetric, MetricMeta> = {
-  spend:       { label: "Investimento",      short: "Invest.",  format: "currency", positiveIsGood: true,  tone: "primary"   },
-  impressions: { label: "Impressões",        short: "Impr.",    format: "int",      positiveIsGood: true,  tone: "secondary" },
-  clicks:      { label: "Cliques",           short: "Cliques",  format: "int",      positiveIsGood: true,  tone: "secondary" },
-  ctr:         { label: "CTR",               short: "CTR",      format: "percent",  positiveIsGood: true,  tone: "neutral"   },
-  cpc:         { label: "CPC médio",         short: "CPC",      format: "currency", positiveIsGood: false, tone: "warning"   },
-  cpm:         { label: "CPM médio",         short: "CPM",      format: "currency", positiveIsGood: false, tone: "warning"   },
-  reach:       { label: "Alcance",           short: "Alcance",  format: "int",      positiveIsGood: true,  tone: "secondary" },
-  engagement:  { label: "Engajamento",       short: "Engaj.",   format: "int",      positiveIsGood: true,  tone: "primary"   },
-  sessions:    { label: "Sessões",           short: "Sessões",  format: "int",      positiveIsGood: true,  tone: "secondary" },
-  conversions: { label: "Conversões",        short: "Conv.",    format: "int",      positiveIsGood: true,  tone: "success"   },
-  leads:       { label: "Leads",             short: "Leads",    format: "int",      positiveIsGood: true,  tone: "success"   },
+  spend: {
+    label: "Investimento",
+    short: "Invest.",
+    format: "currency",
+    positiveIsGood: true,
+    tone: "primary",
+  },
+  impressions: {
+    label: "Impressões",
+    short: "Impr.",
+    format: "int",
+    positiveIsGood: true,
+    tone: "secondary",
+  },
+  clicks: {
+    label: "Cliques",
+    short: "Cliques",
+    format: "int",
+    positiveIsGood: true,
+    tone: "secondary",
+  },
+  ctr: { label: "CTR", short: "CTR", format: "percent", positiveIsGood: true, tone: "neutral" },
+  cpc: {
+    label: "CPC médio",
+    short: "CPC",
+    format: "currency",
+    positiveIsGood: false,
+    tone: "warning",
+  },
+  cpm: {
+    label: "CPM médio",
+    short: "CPM",
+    format: "currency",
+    positiveIsGood: false,
+    tone: "warning",
+  },
+  reach: {
+    label: "Alcance",
+    short: "Alcance",
+    format: "int",
+    positiveIsGood: true,
+    tone: "secondary",
+  },
+  engagement: {
+    label: "Engajamento",
+    short: "Engaj.",
+    format: "int",
+    positiveIsGood: true,
+    tone: "primary",
+  },
+  sessions: {
+    label: "Sessões",
+    short: "Sessões",
+    format: "int",
+    positiveIsGood: true,
+    tone: "secondary",
+  },
+  conversions: {
+    label: "Conversões",
+    short: "Conv.",
+    format: "int",
+    positiveIsGood: true,
+    tone: "success",
+  },
+  leads: { label: "Leads", short: "Leads", format: "int", positiveIsGood: true, tone: "success" },
 };
 
 // ----------------------------------------------------------------------------
 // Formatadores — sempre em pt-BR / BRL.
 // ----------------------------------------------------------------------------
-const _intFmt    = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
-const _decFmt    = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
-const _brlFmt    = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const _brlCenFmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+const _intFmt = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
+const _decFmt = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+const _brlFmt = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
+const _brlCenFmt = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 2,
+});
 
 export function formatMetric(metric: CommonMetric, value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value)) return "—";
@@ -165,7 +227,11 @@ export function periodRange(days: number): PeriodRange {
  * O período anterior tem o MESMO comprimento e termina no dia anterior a `from`.
  */
 export function periodFromDates(from: string, to: string): PeriodRange {
-  if (from > to) { const tmp = from; from = to; to = tmp; }
+  if (from > to) {
+    const tmp = from;
+    from = to;
+    to = tmp;
+  }
   const days = diffDaysISO(from, to) + 1;
   const prevTo = addDaysISO(from, -1);
   const prevFrom = addDaysISO(prevTo, -(days - 1));
@@ -201,9 +267,15 @@ export interface Totals {
 }
 
 const ZERO_TOTALS: Totals = {
-  spend: 0, meta_spend: 0, google_spend: 0,
-  impressions: 0, clicks: 0, sessions: 0,
-  conversions: 0, reach: 0, engagement: 0,
+  spend: 0,
+  meta_spend: 0,
+  google_spend: 0,
+  impressions: 0,
+  clicks: 0,
+  sessions: 0,
+  conversions: 0,
+  reach: 0,
+  engagement: 0,
 };
 
 export function sumOverview(rows: OverviewRow[]): Totals {
@@ -214,23 +286,26 @@ export function sumOverview(rows: OverviewRow[]): Totals {
   const googleSpendByCliente = new Map<string, number>();
   const instagramReachByCliente = new Map<string, number>();
 
-  const totals = rows.reduce((acc, r) => {
-    acc.meta_spend += r.meta_spend ?? 0;
-    googleSpendByCliente.set(
-      r.cliente,
-      Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
-    );
-    instagramReachByCliente.set(
-      r.cliente,
-      Math.max(instagramReachByCliente.get(r.cliente) ?? 0, r.instagram_reach ?? 0),
-    );
-    acc.impressions += r.total_impressions ?? 0;
-    acc.clicks += r.total_clicks ?? 0;
-    acc.sessions += r.ga4_sessions ?? 0;
-    acc.conversions += r.ga4_conversions ?? 0;
-    acc.engagement += r.instagram_interactions ?? 0;
-    return acc;
-  }, { ...ZERO_TOTALS });
+  const totals = rows.reduce(
+    (acc, r) => {
+      acc.meta_spend += r.meta_spend ?? 0;
+      googleSpendByCliente.set(
+        r.cliente,
+        Math.max(googleSpendByCliente.get(r.cliente) ?? 0, r.google_spend ?? 0),
+      );
+      instagramReachByCliente.set(
+        r.cliente,
+        Math.max(instagramReachByCliente.get(r.cliente) ?? 0, r.instagram_reach ?? 0),
+      );
+      acc.impressions += r.total_impressions ?? 0;
+      acc.clicks += r.total_clicks ?? 0;
+      acc.sessions += r.ga4_sessions ?? 0;
+      acc.conversions += r.ga4_conversions ?? 0;
+      acc.engagement += r.instagram_interactions ?? 0;
+      return acc;
+    },
+    { ...ZERO_TOTALS },
+  );
 
   totals.google_spend = Array.from(googleSpendByCliente.values()).reduce(
     (sum, value) => sum + value,
@@ -293,10 +368,7 @@ export interface DailyPoint {
  * Agrupa OverviewRows por data, somando todos os clientes.
  * Preenche dias faltantes com zeros para garantir continuidade no chart.
  */
-export function dailyFromOverview(
-  rows: OverviewRow[],
-  period: PeriodRange,
-): DailyPoint[] {
+export function dailyFromOverview(rows: OverviewRow[], period: PeriodRange): DailyPoint[] {
   const byDate = new Map<string, DailyPoint>();
   for (const r of rows) {
     if (r.data < period.from || r.data > period.to) continue;
@@ -325,9 +397,15 @@ export function dailyFromOverview(
 function emptyPoint(date: string): DailyPoint {
   return {
     date,
-    meta_spend: 0, google_spend: 0, spend: 0,
-    conversions: 0, sessions: 0, clicks: 0,
-    impressions: 0, reach: 0, engagement: 0,
+    meta_spend: 0,
+    google_spend: 0,
+    spend: 0,
+    conversions: 0,
+    sessions: 0,
+    clicks: 0,
+    impressions: 0,
+    reach: 0,
+    engagement: 0,
   };
 }
 
@@ -408,10 +486,10 @@ export function buildInsights(args: {
   const out: Insight[] = [];
 
   const spendD = pctDelta(current.spend, previous.spend);
-  const convD  = pctDelta(current.conversions, previous.conversions);
-  const sessD  = pctDelta(current.sessions, previous.sessions);
-  const ctr    = deriveCtr(current.impressions, current.clicks);
-  const cpa    = deriveCpa(current.spend, current.conversions);
+  const convD = pctDelta(current.conversions, previous.conversions);
+  const sessD = pctDelta(current.sessions, previous.sessions);
+  const ctr = deriveCtr(current.impressions, current.clicks);
+  const cpa = deriveCpa(current.spend, current.conversions);
 
   if (convD != null && Math.abs(convD) >= 5) {
     const up = convD > 0;

@@ -78,11 +78,7 @@ export function ChartLegendItem({
 }) {
   return (
     <span className="inline-flex items-center gap-2 text-[11.5px] text-muted-foreground">
-      <span
-        className="h-2.5 w-2.5 rounded-sm"
-        style={{ background: color }}
-        aria-hidden
-      />
+      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} aria-hidden />
       <span className="font-medium text-foreground">{label}</span>
       {value && <span className="tabular-nums">· {value}</span>}
     </span>

@@ -30,11 +30,11 @@ flowchart TB
 
 ## Segredos e variáveis
 
-| Variável | Exposição | Risco se vazar |
-|----------|-----------|----------------|
-| `VITE_OFFICIAL_SUPABASE_ANON_KEY` | Bundle browser | Baixo (RLS protege) |
-| `OFFICIAL_SUPABASE_ANON_KEY` | Servidor | Baixo |
-| `OFFICIAL_SERVICE_ROLE_KEY` | **Só servidor** | **Crítico** — bypass total RLS |
+| Variável                          | Exposição       | Risco se vazar                 |
+| --------------------------------- | --------------- | ------------------------------ |
+| `VITE_OFFICIAL_SUPABASE_ANON_KEY` | Bundle browser  | Baixo (RLS protege)            |
+| `OFFICIAL_SUPABASE_ANON_KEY`      | Servidor        | Baixo                          |
+| `OFFICIAL_SERVICE_ROLE_KEY`       | **Só servidor** | **Crítico** — bypass total RLS |
 
 Regras:
 

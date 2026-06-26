@@ -45,14 +45,14 @@ Cenários no Make leem os **IDs técnicos** de cada cliente em `cadastro_cliente
 `instagram_page_id`, `google_business_location_id`, `tiktok_ad_account_id`), chamam as APIs
 e gravam em `base_metricas` no formato _long_:
 
-| coluna | exemplo |
-|--------|---------|
-| `data` | `2026-06-25` |
-| `cliente` | `Antena` |
-| `plataforma` | `Google Ads` |
-| `metrica` | `spend` |
-| `valor` | `164824476` (micros) |
-| `campanha` | `Branding - Junho` |
+| coluna       | exemplo              |
+| ------------ | -------------------- |
+| `data`       | `2026-06-25`         |
+| `cliente`    | `Antena`             |
+| `plataforma` | `Google Ads`         |
+| `metrica`    | `spend`              |
+| `valor`      | `164824476` (micros) |
+| `campanha`   | `Branding - Junho`   |
 
 > ⚠️ **INFORMAÇÃO NÃO ENCONTRADA** — o schema de `base_metricas` e os cenários do Make não
 > estão versionados no repositório. O formato acima é **inferido** das views e migrations.

@@ -7,14 +7,8 @@ import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
-import {
-  ChartFrame,
-  ChartLegendItem,
-} from "@/components/lotus/charts/ChartFrame";
-import {
-  AreaChartLotus,
-  getSeriesColor,
-} from "@/components/lotus/charts/AreaChartLotus";
+import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFrame";
+import { AreaChartLotus, getSeriesColor } from "@/components/lotus/charts/AreaChartLotus";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
 import {
   PLATFORM_LABEL,
@@ -32,11 +26,7 @@ import {
   spendShareByPlatform,
   sumOverview,
 } from "@/lib/metrics";
-import {
-  resolvePeriod,
-  type Period,
-  type PeriodInput,
-} from "@/lib/period";
+import { resolvePeriod, type Period, type PeriodInput } from "@/lib/period";
 import {
   Sparkles,
   Target,
@@ -75,12 +65,7 @@ type DailyView = Record<string, unknown> & {
   cliente: string;
 };
 
-const platformDailyQuery = (
-  nomeCliente: string,
-  platform: Platform,
-  from: string,
-  to: string,
-) =>
+const platformDailyQuery = (nomeCliente: string, platform: Platform, from: string, to: string) =>
   queryOptions({
     queryKey: ["cliente-platform", nomeCliente, platform, from, to],
     queryFn: async (): Promise<DailyView[]> => {
@@ -183,18 +168,12 @@ function ClienteSkeleton() {
 // ---------------- Body ----------------
 
 function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
-  const { data: rows } = useSuspenseQuery(
-    overviewQuery(cliente, period.prevFrom, period.to),
-  );
+  const { data: rows } = useSuspenseQuery(overviewQuery(cliente, period.prevFrom, period.to));
 
   const days = period.days;
 
-  const current = rows.filter(
-    (r) => r.data >= period.from && r.data <= period.to,
-  );
-  const previous = rows.filter(
-    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
-  );
+  const current = rows.filter((r) => r.data >= period.from && r.data <= period.to);
+  const previous = rows.filter((r) => r.data >= period.prevFrom && r.data <= period.prevTo);
   const cT = sumOverview(current);
   const pT = sumOverview(previous);
 
@@ -376,10 +355,8 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
                   <span
                     className={cn(
                       "mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md",
-                      i.tone === "positive" &&
-                        "bg-success/12 text-[color:var(--success)]",
-                      i.tone === "negative" &&
-                        "bg-danger/12 text-[color:var(--danger)]",
+                      i.tone === "positive" && "bg-success/12 text-[color:var(--success)]",
+                      i.tone === "negative" && "bg-danger/12 text-[color:var(--danger)]",
                       i.tone === "neutral" &&
                         "bg-primary/10 text-primary-600 dark:text-primary-300",
                     )}
@@ -430,16 +407,11 @@ function ComparisonStrip({ cliente }: { cliente: string }) {
       {windows.map((w) => {
         const p = periodRange(w);
         const cur = data.filter((r) => r.data >= p.from && r.data <= p.to);
-        const prev = data.filter(
-          (r) => r.data >= p.prevFrom && r.data <= p.prevTo,
-        );
+        const prev = data.filter((r) => r.data >= p.prevFrom && r.data <= p.prevTo);
         const cT = sumOverview(cur);
         const pT = sumOverview(prev);
         return (
-          <div
-            key={w}
-            className="lotus-surface flex items-center justify-between gap-3 p-4"
-          >
+          <div key={w} className="lotus-surface flex items-center justify-between gap-3 p-4">
             <div className="min-w-0">
               <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                 Últimos {w} dias
@@ -529,9 +501,7 @@ function PlatformTable({
   platform: Platform;
   period: Period;
 }) {
-  const { data } = useSuspenseQuery(
-    platformDailyQuery(cliente, platform, period.from, period.to),
-  );
+  const { data } = useSuspenseQuery(platformDailyQuery(cliente, platform, period.from, period.to));
 
   if (data.length === 0) {
     return (
@@ -540,9 +510,7 @@ function PlatformTable({
           <Inbox className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-[13.5px] font-medium text-foreground">
-            Sem dados neste período
-          </p>
+          <p className="text-[13.5px] font-medium text-foreground">Sem dados neste período</p>
           <p className="mt-1 text-[12px] text-muted-foreground">
             Quando a integração enviar novos registros, eles aparecem aqui.
           </p>
@@ -609,9 +577,7 @@ function Summary({
       <dd className="mt-1 font-display text-lg font-semibold tabular-nums text-foreground">
         {value}
       </dd>
-      {compareValue && (
-        <p className="mt-0.5 text-[10.5px] text-muted-foreground">{compareValue}</p>
-      )}
+      {compareValue && <p className="mt-0.5 text-[10.5px] text-muted-foreground">{compareValue}</p>}
     </div>
   );
 }
@@ -622,9 +588,7 @@ function EmptyChart() {
       <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">
         <Sparkles className="h-4 w-4" />
       </div>
-      <p className="font-display text-sm font-semibold">
-        Sem registros no período
-      </p>
+      <p className="font-display text-sm font-semibold">Sem registros no período</p>
       <p className="max-w-sm text-xs text-muted-foreground">
         Quando suas campanhas começarem a rodar, a evolução aparece aqui automaticamente.
       </p>

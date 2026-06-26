@@ -51,9 +51,7 @@ export function EvolutionChart({ data }: { data: EvolutionPoint[] }) {
           />
           <YAxis
             tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-            tickFormatter={(v) =>
-              v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`
-            }
+            tickFormatter={(v) => (v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`)}
             tickLine={false}
             axisLine={false}
             width={50}

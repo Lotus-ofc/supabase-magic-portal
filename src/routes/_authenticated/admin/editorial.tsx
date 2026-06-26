@@ -38,18 +38,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Plus, Trash2, MessageSquare, CheckCircle2, RotateCcw } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Trash2,
+  MessageSquare,
+  CheckCircle2,
+  RotateCcw,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ---------- Status meta ----------
 const STATUS_META: Record<PostStatus, { label: string; chip: string; dot: string }> = {
-  rascunho:               { label: "Rascunho",            chip: "bg-muted text-muted-foreground border-border",          dot: "bg-muted-foreground" },
-  em_producao:            { label: "Em produção",         chip: "bg-secondary/15 text-secondary-700 dark:text-secondary-200 border-secondary/30", dot: "bg-[color:var(--secondary-500)]" },
-  aguardando_aprovacao:   { label: "Aguardando aprovação", chip: "bg-warning/15 text-[color:var(--warning)] border-warning/30", dot: "bg-[color:var(--warning)]" },
-  aprovado:               { label: "Aprovado",            chip: "bg-success/15 text-[color:var(--success)] border-success/30", dot: "bg-[color:var(--success)]" },
-  publicado:              { label: "Publicado",           chip: "bg-primary/15 text-primary-700 dark:text-primary-200 border-primary/30",       dot: "bg-primary" },
+  rascunho: {
+    label: "Rascunho",
+    chip: "bg-muted text-muted-foreground border-border",
+    dot: "bg-muted-foreground",
+  },
+  em_producao: {
+    label: "Em produção",
+    chip: "bg-secondary/15 text-secondary-700 dark:text-secondary-200 border-secondary/30",
+    dot: "bg-[color:var(--secondary-500)]",
+  },
+  aguardando_aprovacao: {
+    label: "Aguardando aprovação",
+    chip: "bg-warning/15 text-[color:var(--warning)] border-warning/30",
+    dot: "bg-[color:var(--warning)]",
+  },
+  aprovado: {
+    label: "Aprovado",
+    chip: "bg-success/15 text-[color:var(--success)] border-success/30",
+    dot: "bg-[color:var(--success)]",
+  },
+  publicado: {
+    label: "Publicado",
+    chip: "bg-primary/15 text-primary-700 dark:text-primary-200 border-primary/30",
+    dot: "bg-primary",
+  },
 };
-const STATUS_ORDER: PostStatus[] = ["rascunho", "em_producao", "aguardando_aprovacao", "aprovado", "publicado"];
+const STATUS_ORDER: PostStatus[] = [
+  "rascunho",
+  "em_producao",
+  "aguardando_aprovacao",
+  "aprovado",
+  "publicado",
+];
 
 type Post = {
   id: string;
@@ -81,9 +115,7 @@ function EditorialPage() {
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [filterCli, setFilterCli] = useState<string>("all");
   const [drawer, setDrawer] = useState<
-    | { mode: "create"; date: string }
-    | { mode: "edit"; id: string }
-    | null
+    { mode: "create"; date: string } | { mode: "edit"; id: string } | null
   >(null);
 
   const monthStart = useMemo(() => isoDay(cursor), [cursor]);
@@ -105,14 +137,17 @@ function EditorialPage() {
         data: {
           from: monthStart,
           to: monthEnd,
-          cadastro_cliente_id:
-            filterCli === "all" ? null : Number(filterCli),
+          cadastro_cliente_id: filterCli === "all" ? null : Number(filterCli),
         },
       }),
   });
 
   const posts = (postsQ.data ?? []) as Post[];
-  const clientes = (clientesQ.data ?? []) as Array<{ id: number; nome_cliente: string; ativo: boolean }>;
+  const clientes = (clientesQ.data ?? []) as Array<{
+    id: number;
+    nome_cliente: string;
+    ativo: boolean;
+  }>;
   const clientesAtivos = clientes.filter((c) => c.ativo);
 
   const byDay = useMemo(() => {
@@ -173,9 +208,7 @@ function EditorialPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              onClick={() => setDrawer({ mode: "create", date: isoDay(today) })}
-            >
+            <Button onClick={() => setDrawer({ mode: "create", date: isoDay(today) })}>
               <Plus /> Novo post
             </Button>
           </div>
@@ -199,7 +232,10 @@ function EditorialPage() {
       {/* Legenda de status */}
       <div className="flex flex-wrap gap-3">
         {STATUS_ORDER.map((s) => (
-          <span key={s} className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <span
+            key={s}
+            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
+          >
             <span className={cn("h-2 w-2 rounded-full", STATUS_META[s].dot)} />
             {STATUS_META[s].label}
           </span>
@@ -207,11 +243,7 @@ function EditorialPage() {
       </div>
 
       {drawer && (
-        <PostDrawer
-          drawer={drawer}
-          clientes={clientesAtivos}
-          onClose={() => setDrawer(null)}
-        />
+        <PostDrawer drawer={drawer} clientes={clientesAtivos} onClose={() => setDrawer(null)} />
       )}
     </div>
   );
@@ -293,9 +325,7 @@ function MonthGrid({
                 </button>
               ))}
               {posts.length > 3 && (
-                <p className="px-1 text-[10px] text-muted-foreground">
-                  +{posts.length - 3} outros
-                </p>
+                <p className="px-1 text-[10px] text-muted-foreground">+{posts.length - 3} outros</p>
               )}
             </div>
           </div>
@@ -440,9 +470,7 @@ function PostDrawer({
     <Sheet open onOpenChange={(o) => !o && onClose()}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>
-            {drawer.mode === "create" ? "Novo post" : "Editar post"}
-          </SheetTitle>
+          <SheetTitle>{drawer.mode === "create" ? "Novo post" : "Editar post"}</SheetTitle>
           <SheetDescription>
             {drawer.mode === "create"
               ? "Planeje um novo conteúdo no calendário."
@@ -476,10 +504,14 @@ function PostDrawer({
                   value={String(form.cadastro_cliente_id)}
                   onValueChange={(v) => setForm({ ...form, cadastro_cliente_id: Number(v) })}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {clientes.map((c) => (
-                      <SelectItem key={c.id} value={String(c.id)}>{c.nome_cliente}</SelectItem>
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.nome_cliente}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -500,7 +532,9 @@ function PostDrawer({
                   value={form.plataforma}
                   onValueChange={(v) => setForm({ ...form, plataforma: v })}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="instagram">Instagram</SelectItem>
                     <SelectItem value="facebook">Facebook</SelectItem>
@@ -519,7 +553,9 @@ function PostDrawer({
                   value={form.formato || "_"}
                   onValueChange={(v) => setForm({ ...form, formato: v === "_" ? "" : v })}
                 >
-                  <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="—" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="_">—</SelectItem>
                     <SelectItem value="feed">Feed</SelectItem>
@@ -536,10 +572,14 @@ function PostDrawer({
                     value={form.status}
                     onValueChange={(v) => setForm({ ...form, status: v as PostStatus })}
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {STATUS_ORDER.map((s) => (
-                        <SelectItem key={s} value={s}>{STATUS_META[s].label}</SelectItem>
+                        <SelectItem key={s} value={s}>
+                          {STATUS_META[s].label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -575,7 +615,7 @@ function PostDrawer({
                   src={form.capa_url}
                   alt=""
                   className="mt-1 max-h-48 w-full rounded-md border border-border/60 object-cover"
-                  onError={(e) => ((e.currentTarget.style.display = "none"))}
+                  onError={(e) => (e.currentTarget.style.display = "none")}
                 />
               )}
             </div>
@@ -604,7 +644,9 @@ function PostDrawer({
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_ORDER.map((s) => (
-                      <SelectItem key={s} value={s}>{STATUS_META[s].label}</SelectItem>
+                      <SelectItem key={s} value={s}>
+                        {STATUS_META[s].label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -618,7 +660,9 @@ function PostDrawer({
                 </Button>
               </>
             )}
-            <Button variant="ghost" onClick={onClose}>Fechar</Button>
+            <Button variant="ghost" onClick={onClose}>
+              Fechar
+            </Button>
           </div>
 
           {/* Aprovação rápida (atalho admin) */}
@@ -720,9 +764,7 @@ function PostDrawer({
                   </li>
                 ))}
                 {revisions.length === 0 && (
-                  <li className="text-[12px] text-muted-foreground">
-                    Sem registros ainda.
-                  </li>
+                  <li className="text-[12px] text-muted-foreground">Sem registros ainda.</li>
                 )}
               </ul>
             </div>

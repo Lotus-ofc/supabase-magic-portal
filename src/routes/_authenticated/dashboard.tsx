@@ -91,8 +91,6 @@ const fmtBRL = (n: number | null | undefined) => formatMetric("spend", n);
 const fmtInt = (n: number | null | undefined) =>
   n == null ? "—" : Math.round(n).toLocaleString("pt-BR");
 
-
-
 function ClientHome() {
   const [period, setPeriod] = useState<PeriodInput>({ preset: "last_30" });
   const resolved = useMemo(() => resolvePeriod(period), [period]);
@@ -141,12 +139,8 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
   );
   const { data: clientes } = useSuspenseQuery(clientesQuery);
 
-  const current = overview.filter(
-    (r) => r.data >= period.from && r.data <= period.to,
-  );
-  const previous = overview.filter(
-    (r) => r.data >= period.prevFrom && r.data <= period.prevTo,
-  );
+  const current = overview.filter((r) => r.data >= period.from && r.data <= period.to);
+  const previous = overview.filter((r) => r.data >= period.prevFrom && r.data <= period.prevTo);
 
   const totals = sumOverview(current);
   const prev = sumOverview(previous);
@@ -228,11 +222,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           description="Meta Ads e Google Ads consolidados no período selecionado."
           className="xl:col-span-2"
         >
-          {evolution.length > 0 ? (
-            <EvolutionChart data={evolution} />
-          ) : (
-            <EmptyChart />
-          )}
+          {evolution.length > 0 ? <EvolutionChart data={evolution} /> : <EmptyChart />}
         </SectionCard>
 
         <SectionCard
@@ -254,10 +244,8 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                   <span
                     className={cn(
                       "mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md",
-                      i.tone === "positive" &&
-                        "bg-success/12 text-[color:var(--success)]",
-                      i.tone === "negative" &&
-                        "bg-danger/12 text-[color:var(--danger)]",
+                      i.tone === "positive" && "bg-success/12 text-[color:var(--success)]",
+                      i.tone === "negative" && "bg-danger/12 text-[color:var(--danger)]",
                       i.tone === "neutral" &&
                         "bg-primary/10 text-primary-600 dark:text-primary-300",
                     )}
@@ -265,12 +253,8 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                     <i.icon className="h-3.5 w-3.5" />
                   </span>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-foreground">
-                      {i.title}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {i.detail}
-                    </p>
+                    <p className="text-[13px] font-medium text-foreground">{i.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{i.detail}</p>
                   </div>
                 </li>
               ))}
@@ -319,9 +303,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                     <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/10 text-primary-600 dark:text-primary-300">
                       <Plug className="h-3.5 w-3.5" />
                     </span>
-                    <span className="text-[13px] font-medium text-foreground">
-                      {p.label}
-                    </span>
+                    <span className="text-[13px] font-medium text-foreground">{p.label}</span>
                   </div>
                   <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[color:var(--success)]">
                     <CheckCircle2 className="h-3 w-3" />
@@ -351,9 +333,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                     <Clock3 className="h-3 w-3" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium text-foreground">
-                      {c.cliente}
-                    </p>
+                    <p className="truncate text-[13px] font-medium text-foreground">{c.cliente}</p>
                     <p className="text-[11.5px] text-muted-foreground">
                       Dados até {c.ultima_data_recebida ?? "—"} ·{" "}
                       {(c.plataformas_ativas ?? []).length} plataforma
@@ -397,9 +377,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                       </div>
                       <div className="mt-0.5 flex flex-wrap items-center gap-1">
                         {(c.plataformas_ativas ?? []).length === 0 ? (
-                          <span className="text-[11px] text-muted-foreground">
-                            Sem plataformas
-                          </span>
+                          <span className="text-[11px] text-muted-foreground">Sem plataformas</span>
                         ) : (
                           (c.plataformas_ativas ?? []).map((p) => (
                             <span
@@ -413,9 +391,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                       </div>
                     </div>
                     <div className="hidden text-right text-[11px] text-muted-foreground sm:block">
-                      <div className="tabular-nums">
-                        {fmtInt(c.total_registros)} registros
-                      </div>
+                      <div className="tabular-nums">{fmtInt(c.total_registros)} registros</div>
                       <div>Última: {c.ultima_data_recebida ?? "—"}</div>
                     </div>
                     <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-300" />
@@ -434,8 +410,6 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
 
 // sumOverview / pctDelta / buildEvolution moved to src/lib/metrics.ts —
 // fonte única de verdade de agregação. Não recriar localmente.
-
-
 
 type Insight = {
   title: string;
@@ -584,11 +558,7 @@ function HeroSpend({
                 : "bg-danger/12 text-[color:var(--danger)]",
             )}
           >
-            {up ? (
-              <TrendingUp className="h-3 w-3" />
-            ) : (
-              <TrendingDown className="h-3 w-3" />
-            )}
+            {up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
             {Math.abs(delta!).toFixed(1)}% vs período anterior
           </span>
         )}
@@ -620,9 +590,7 @@ function SplitMetric({
         )}
       />
       <div className="min-w-0">
-        <p className="text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
-          {label}
-        </p>
+        <p className="text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
         <p className="font-display text-[15px] font-semibold tabular-nums text-foreground">
           {value}
         </p>
@@ -650,12 +618,9 @@ function EmptyChart() {
       <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">
         <Sparkles className="h-4 w-4" />
       </div>
-      <p className="font-display text-sm font-semibold">
-        Sem investimento registrado no período
-      </p>
+      <p className="font-display text-sm font-semibold">Sem investimento registrado no período</p>
       <p className="max-w-sm text-xs text-muted-foreground">
-        Quando suas campanhas começarem a rodar, a evolução diária aparece aqui em
-        tempo quase real.
+        Quando suas campanhas começarem a rodar, a evolução diária aparece aqui em tempo quase real.
       </p>
     </div>
   );
@@ -669,8 +634,7 @@ function EmptyPlatforms() {
       </div>
       <p className="font-display text-sm font-semibold">Nenhuma fonte ativa</p>
       <p className="max-w-xs text-xs text-muted-foreground">
-        Assim que uma plataforma começar a enviar métricas, ela aparece aqui
-        automaticamente.
+        Assim que uma plataforma começar a enviar métricas, ela aparece aqui automaticamente.
       </p>
     </div>
   );
@@ -684,8 +648,8 @@ function EmptyClientes() {
       </div>
       <p className="font-display text-sm font-semibold">Nenhuma conta vinculada</p>
       <p className="max-w-md text-xs text-muted-foreground">
-        Sua equipe Lotus ainda não vinculou nenhuma conta ao seu acesso. Assim que
-        isso for feito, ela aparece aqui automaticamente.
+        Sua equipe Lotus ainda não vinculou nenhuma conta ao seu acesso. Assim que isso for feito,
+        ela aparece aqui automaticamente.
       </p>
     </div>
   );
@@ -701,8 +665,8 @@ function EmptyAccount() {
         Sua conta está sendo preparada
       </h2>
       <p className="max-w-md text-sm text-muted-foreground">
-        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe Lotus
-        está configurando integrações, fontes e relatórios da sua operação.
+        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe Lotus está configurando
+        integrações, fontes e relatórios da sua operação.
       </p>
     </div>
   );

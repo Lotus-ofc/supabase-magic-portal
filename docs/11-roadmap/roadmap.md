@@ -29,10 +29,10 @@ flowchart LR
     F5 --> F6["Fase 6\nInfra proprietária"]
 ```
 
-| Fase | Foco | Relaciona-se a |
-|------|------|----------------|
-| 1–3 | Estado atual estável | Código existente |
-| 4–6 | Arquitetura alvo | Visão estratégica |
+| Fase | Foco                 | Relaciona-se a    |
+| ---- | -------------------- | ----------------- |
+| 1–3  | Estado atual estável | Código existente  |
+| 4–6  | Arquitetura alvo     | Visão estratégica |
 
 ---
 
@@ -42,6 +42,8 @@ flowchart LR
   Ver [ADR-0010](../02-architecture/adr/0010-cursor-official-development-environment.md).
 - 🎯 **Fluxo oficial documentado:** `docs/09-standards/development-workflow.md` +
   `.cursor/rules/lotus-engineering.mdc`.
+- 🎯 **Sistema de Engenharia fundado:** CI, Vitest, CONTRIBUTING, governança.
+  Ver [ADR-0011](../02-architecture/adr/0011-engineering-system-foundation.md).
 
 ## Fase 1 — Fundações de dados (alta prioridade)
 
@@ -55,7 +57,7 @@ flowchart LR
 ## Fase 2 — Confiabilidade & segurança
 
 - 🔧 **Reavaliar `SECURITY DEFINER` das views.** Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md).
-- 🔧 **Testes automatizados** para `formulas.ts`, `engine.ts`, `period.ts` + RLS.
+- 🔧 **Testes automatizados** — `formulas.ts` + `period.ts` ✅; expandir `engine.ts` + RLS.
 - 🔧 **Tipagem Supabase** (`supabase gen types`).
 - ✨ **Endurecer cadastro de usuários** (limitar `signUp` público).
 - 🔧 **Observabilidade de ingestão** (alertas por `ultima_ingestao`).
@@ -91,7 +93,7 @@ flowchart LR
 
 > Ver [ADR-0009](../02-architecture/adr/0009-platform-proprietary-infrastructure.md).
 
-- 🎯 **CI/CD completo** (lint, test, build, deploy, migrations).
+- 🎯 **CI/CD completo** — lint/test/build ✅; deploy + migrations automáticas pendente.
 - 🎯 **Desacoplar Lovable** — remover `@lovable.dev/vite-tanstack-config`.
 - 🔧 **Materializar views pesadas** quando volume exigir.
 - ✨ **Relatórios/export agendados.**
@@ -100,23 +102,23 @@ flowchart LR
 
 ## Tabela de dívidas técnicas (rastreável)
 
-| # | Dívida | Impacto | Esforço | Fase |
-|---|--------|---------|---------|------|
-| D1 | Junção de cliente por nome | Alto | Alto | 1 |
-| D2 | `base_metricas`/Make fora de versão | Alto | Médio | 1 |
-| D3 | `DISTINCT` em runtime no multi-tenant | Médio | Médio | 1 |
-| D4 | Views `SECURITY DEFINER` | Alto | Médio | 2 |
-| D5 | Ausência de testes | Alto | Médio | 2 |
-| D6 | `any` em server functions | Médio | Baixo | 2 |
-| D7 | `signUp` público aberto | Médio | Baixo | 2 |
-| D8 | Insights duplicados | Baixo | Baixo | 3 |
-| D9 | TikTok/GBP incompletos | Médio | Médio | 3 |
-| D10 | Marca Majrá/Lotus | Baixo | Baixo | 3 |
-| D11 | Métricas derivadas no SQL | Alto | Médio | 5 |
-| D12 | Make como único pipeline | Alto | Alto | 4 |
-| D13 | Sem coletores proprietários | Alto | Alto | 4 |
-| D14 | Lovable acoplado ao build | Médio | Médio | 6 |
-| D15 | Sem CI/CD | Médio | Médio | 6 |
+| #   | Dívida                                | Impacto         | Esforço | Fase |
+| --- | ------------------------------------- | --------------- | ------- | ---- |
+| D1  | Junção de cliente por nome            | Alto            | Alto    | 1    |
+| D2  | `base_metricas`/Make fora de versão   | Alto            | Médio   | 1    |
+| D3  | `DISTINCT` em runtime no multi-tenant | Médio           | Médio   | 1    |
+| D4  | Views `SECURITY DEFINER`              | Alto            | Médio   | 2    |
+| D5  | Ausência de testes                    | Alto            | Médio   | 2    |
+| D6  | `any` em server functions             | Médio           | Baixo   | 2    |
+| D7  | `signUp` público aberto               | Médio           | Baixo   | 2    |
+| D8  | Insights duplicados                   | Baixo           | Baixo   | 3    |
+| D9  | TikTok/GBP incompletos                | Médio           | Médio   | 3    |
+| D10 | Marca Majrá/Lotus                     | Baixo           | Baixo   | 3    |
+| D11 | Métricas derivadas no SQL             | Alto            | Médio   | 5    |
+| D12 | Make como único pipeline              | Alto            | Alto    | 4    |
+| D13 | Sem coletores proprietários           | Alto            | Alto    | 4    |
+| D14 | Lovable acoplado ao build             | Médio           | Médio   | 6    |
+| D11 | Sem CI/CD                             | ~~Médio~~ ✅ CI | —       | 6    |
 
 > Ao resolver uma dívida, mova para o [Changelog](../12-changelog/changelog.md).
 

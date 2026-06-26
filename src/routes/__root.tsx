@@ -80,16 +80,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lotus · Plataforma" },
-      { name: "description", content: "Plataforma Lotus — gestão de clientes, performance e operações." },
+      {
+        name: "description",
+        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+      },
       { name: "theme-color", content: "#9769b1" },
       { property: "og:title", content: "Lotus · Plataforma" },
-      { property: "og:description", content: "Plataforma Lotus — gestão de clientes, performance e operações." },
+      {
+        property: "og:description",
+        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Lotus · Plataforma" },
-      { name: "twitter:description", content: "Plataforma Lotus — gestão de clientes, performance e operações." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp" },
+      {
+        name: "twitter:description",
+        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp",
+      },
     ],
     links: [
       {

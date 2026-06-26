@@ -22,12 +22,13 @@ flowchart LR
     CF --> PORTAL["Portal Lotus"]
 ```
 
-| Etapa | Ferramenta atual | Status |
-|-------|------------------|--------|
-| Desenvolvimento | **Cursor** | ✅ Oficial |
-| Versionamento | Git / GitHub | ✅ Oficial |
-| Build | Vite + `@lovable.dev/vite-tanstack-config` | ⚠️ Transitório |
-| Deploy | Lovable → Nitro/Cloudflare | ⚠️ Transitório |
+| Etapa           | Ferramenta atual                           | Status         |
+| --------------- | ------------------------------------------ | -------------- |
+| Desenvolvimento | **Cursor**                                 | ✅ Oficial     |
+| Versionamento   | Git / GitHub                               | ✅ Oficial     |
+| Build           | Vite + `@lovable.dev/vite-tanstack-config` | ⚠️ Transitório |
+| Deploy          | Lovable → Nitro/Cloudflare                 | ⚠️ Transitório |
+
 - **Bundler:** Vite 8, configurado via `@lovable.dev/vite-tanstack-config` (`vite.config.ts`).
 - O preset já inclui: `tanstackStart`, `viteReact`, `tailwindcss`, `tsConfigPaths`, **Nitro**
   (build, alvo padrão **Cloudflare**), injeção de `VITE_*`, alias `@`, dedupe e plugins de
@@ -36,14 +37,15 @@ flowchart LR
   envolve a renderização com tratamento de erro robusto.
 
 ## Scripts (`package.json`)
-| Script | Comando | Uso |
-|--------|---------|-----|
-| `dev` | `vite dev` | Desenvolvimento local |
-| `build` | `vite build` | Build de produção |
-| `build:dev` | `vite build --mode development` | Build com modo dev |
-| `preview` | `vite preview` | Servir o build localmente |
-| `lint` | `eslint .` | Lint |
-| `format` | `prettier --write .` | Formatação |
+
+| Script      | Comando                         | Uso                       |
+| ----------- | ------------------------------- | ------------------------- |
+| `dev`       | `vite dev`                      | Desenvolvimento local     |
+| `build`     | `vite build`                    | Build de produção         |
+| `build:dev` | `vite build --mode development` | Build com modo dev        |
+| `preview`   | `vite preview`                  | Servir o build localmente |
+| `lint`      | `eslint .`                      | Lint                      |
+| `format`    | `prettier --write .`            | Formatação                |
 
 ## Plataforma Lovable (transitória — build/deploy apenas)
 
@@ -64,22 +66,24 @@ Este projeto ainda está **conectado ao Lovable** para build (ver `AGENTS.md`). 
 > O prefixo é `OFFICIAL_` (não `SUPABASE_`, reservado pelo Lovable). Template: `.env.example`.
 > Detalhes por ambiente: [Ambientes](./environments.md).
 
-| Variável | Onde | Uso |
-|----------|------|-----|
-| `VITE_OFFICIAL_SUPABASE_URL` / `OFFICIAL_SUPABASE_URL` | client/server | URL do projeto Supabase |
-| `VITE_OFFICIAL_SUPABASE_ANON_KEY` / `OFFICIAL_SUPABASE_ANON_KEY` | client/server | Chave anônima (RLS) |
-| `VITE_OFFICIAL_SUPABASE_PROJECT_ID` | client | ID do projeto (default `ywvhoctcmibjitvwkkhb`) |
-| `OFFICIAL_SERVICE_ROLE_KEY` | **só servidor** | Chave service-role (bypass RLS) |
+| Variável                                                         | Onde            | Uso                                            |
+| ---------------------------------------------------------------- | --------------- | ---------------------------------------------- |
+| `VITE_OFFICIAL_SUPABASE_URL` / `OFFICIAL_SUPABASE_URL`           | client/server   | URL do projeto Supabase                        |
+| `VITE_OFFICIAL_SUPABASE_ANON_KEY` / `OFFICIAL_SUPABASE_ANON_KEY` | client/server   | Chave anônima (RLS)                            |
+| `VITE_OFFICIAL_SUPABASE_PROJECT_ID`                              | client          | ID do projeto (default `ywvhoctcmibjitvwkkhb`) |
+| `OFFICIAL_SERVICE_ROLE_KEY`                                      | **só servidor** | Chave service-role (bypass RLS)                |
 
 - O client anon falha no boot se faltarem URL/anon key (`client.ts`).
 - O client admin falha no boot se faltarem URL/service-role (`client.server.ts`).
 
 ### Segurança de segredos
+
 - `OFFICIAL_SERVICE_ROLE_KEY` **nunca** pode ser exposta com prefixo `VITE_` (iria para o
   bundle do browser). Ver [ADR-0005](../02-architecture/adr/0005-server-functions-anon-vs-service-role.md).
 - Arquivos `.server.ts` não podem ser importados pelo client.
 
 ## Banco de dados
+
 - Projeto Supabase `ywvhoctcmibjitvwkkhb`.
 - Migrations em `supabase/migrations-official/`. Ver [migrations](../04-database/migrations.md).
 
@@ -89,6 +93,7 @@ Este projeto ainda está **conectado ao Lovable** para build (ver `AGENTS.md`). 
 > Ops e registrar.
 
 ## Checklist de deploy (proposto)
+
 - [ ] `npm run lint` e `npm run build` passam localmente.
 - [ ] Migrations novas aplicadas no Supabase e validadas (bloco de validação da migration).
 - [ ] Variáveis de ambiente presentes no ambiente de destino.

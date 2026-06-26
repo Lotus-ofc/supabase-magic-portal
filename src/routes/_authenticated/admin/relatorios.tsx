@@ -150,9 +150,7 @@ function ShortcutCard({
         <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
           {eyebrow}
         </p>
-        <h3 className="mt-0.5 font-display text-[15px] font-semibold text-foreground">
-          {title}
-        </h3>
+        <h3 className="mt-0.5 font-display text-[15px] font-semibold text-foreground">{title}</h3>
         <p className="mt-1 text-[12.5px] text-muted-foreground">{description}</p>
       </div>
       <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -191,9 +189,7 @@ function HubBody({ days }: { days: PeriodDays }) {
   const ctr = deriveCtr(cT.impressions, cT.clicks);
   const cpa = deriveCpa(cT.spend, cT.conversions);
 
-  const agregados = aggregateByCliente(current).sort(
-    (a, b) => b.totals.spend - a.totals.spend,
-  );
+  const agregados = aggregateByCliente(current).sort((a, b) => b.totals.spend - a.totals.spend);
   const prevByCliente = useMemo(() => {
     const m = new Map<string, ReturnType<typeof sumOverview>>();
     for (const c of aggregateByCliente(previous)) m.set(c.cliente, c.totals);

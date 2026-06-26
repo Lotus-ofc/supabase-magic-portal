@@ -23,10 +23,10 @@ Documentação dedicada: [Autenticação](./auth.md) · [Segurança](./security.
 
 ## Clients Supabase
 
-| Client | Arquivo | Onde roda | Privilégio |
-|--------|---------|-----------|-----------|
-| **anon** | `src/integrations/supabase/client.ts` | Browser + SSR | Sujeito a RLS |
-| **service-role** | `src/integrations/supabase/client.server.ts` | Só servidor | Bypass de RLS |
+| Client           | Arquivo                                      | Onde roda     | Privilégio    |
+| ---------------- | -------------------------------------------- | ------------- | ------------- |
+| **anon**         | `src/integrations/supabase/client.ts`        | Browser + SSR | Sujeito a RLS |
+| **service-role** | `src/integrations/supabase/client.server.ts` | Só servidor   | Bypass de RLS |
 
 - O client anon persiste sessão em `localStorage` (`storageKey: sb-<projectId>-auth-token`),
   com auto-refresh de token.
@@ -76,19 +76,23 @@ Todas seguem o mesmo formato (exemplo real, `createCliente`):
 
 ```ts
 export const createCliente = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])              // 1. exige token válido
-  .inputValidator((d) => clienteFields.parse(d))  // 2. valida input com Zod
+  .middleware([requireSupabaseAuth]) // 1. exige token válido
+  .inputValidator((d) => clienteFields.parse(d)) // 2. valida input com Zod
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);                    // 3. checa papel quando preciso
-    const payload = sanitizeClientePayload(data);  // 4. normaliza ("" -> null)
+    await assertAdmin(context); // 3. checa papel quando preciso
+    const payload = sanitizeClientePayload(data); // 4. normaliza ("" -> null)
     const { data: row, error } = await context.supabase
-      .from("cadastro_clientes").insert(payload).select("*").single();
+      .from("cadastro_clientes")
+      .insert(payload)
+      .select("*")
+      .single();
     if (error) throw new Error(translatePgError(error.message)); // 5. erro amigável
     return row;
   });
 ```
 
 Convenções observadas:
+
 - **`assertAdmin(ctx)`** chama a RPC `has_role` e lança `Forbidden` se não for admin.
 - **`translatePgError`** converte erros do Postgres em mensagens pt-BR (ex.: slug duplicado).
 - **Soft delete** para clientes: `deactivateCliente` apenas seta `ativo = false`. `DELETE`
@@ -111,15 +115,15 @@ Convenções observadas:
 
 ## Onde está o quê
 
-| Arquivo | Responsabilidade |
-|---------|------------------|
-| `src/lib/admin.functions.ts` | CRUD de clientes, serviços, usuários, acessos, diagnóstico |
-| `src/lib/editorial.functions.ts` | Calendário editorial e aprovação de conteúdo |
-| `src/integrations/supabase/client.ts` | Client anon |
-| `src/integrations/supabase/client.server.ts` | Client service-role |
-| `src/integrations/supabase/auth-middleware.ts` | `requireSupabaseAuth` |
-| `src/integrations/supabase/auth-attacher.ts` | `attachSupabaseAuth` |
-| `src/start.ts` | Registro de middlewares globais |
-| `src/server.ts` | Entrypoint SSR + normalização de erro |
+| Arquivo                                        | Responsabilidade                                           |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| `src/lib/admin.functions.ts`                   | CRUD de clientes, serviços, usuários, acessos, diagnóstico |
+| `src/lib/editorial.functions.ts`               | Calendário editorial e aprovação de conteúdo               |
+| `src/integrations/supabase/client.ts`          | Client anon                                                |
+| `src/integrations/supabase/client.server.ts`   | Client service-role                                        |
+| `src/integrations/supabase/auth-middleware.ts` | `requireSupabaseAuth`                                      |
+| `src/integrations/supabase/auth-attacher.ts`   | `attachSupabaseAuth`                                       |
+| `src/start.ts`                                 | Registro de middlewares globais                            |
+| `src/server.ts`                                | Entrypoint SSR + normalização de erro                      |
 
 A referência completa de cada função está em [API Reference](./api-reference.md).

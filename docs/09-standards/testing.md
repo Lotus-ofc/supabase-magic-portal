@@ -12,15 +12,24 @@ last_review: 2026-06-26
 
 ## Estado atual
 
-| Tipo | Status |
-|------|--------|
-| Unitários | ❌ Nenhum (`*.test.ts` ausente) |
-| Integração | ❌ |
-| E2E (Playwright) | ❌ |
-| RLS / SQL | ❌ |
-| CI enforcement | ❌ |
+| Tipo             | Status                                           |
+| ---------------- | ------------------------------------------------ |
+| Unitários        | ✅ Vitest — `formulas.test.ts`, `period.test.ts` |
+| Integração       | ❌                                               |
+| E2E (Playwright) | ❌                                               |
+| RLS / SQL        | ❌                                               |
+| CI enforcement   | ✅ `npm run test` no GitHub Actions              |
 
-`package.json` não inclui `vitest`, `jest` ou `playwright`.
+Framework: **Vitest** (`vitest.config.ts`). Comandos: `npm test`, `npm run test:watch`.
+
+---
+
+## Testes implementados
+
+| Arquivo                              | Cobre                                                      |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `src/lib/platforms/formulas.test.ts` | CTR, CPC, CPM, CPA, convRate, frequency, engagementRate, … |
+| `src/lib/period.test.ts`             | `resolvePeriod`, `addDaysISO`, `diffDaysISO`, `brtToday`   |
 
 ---
 
@@ -41,35 +50,37 @@ flowchart TB
 
 Módulos **puros**, sem I/O:
 
-| Módulo | Casos críticos |
-|--------|----------------|
-| `formulas.ts` | Divisão por zero, CTR, CPC, CPM |
-| `engine.ts` | `aggregate` sum vs max, `pctDelta`, `dailySeries` |
-| `aggregations.ts` | Cada estratégia |
-| `period.ts` | `brtToday`, presets, `prevFrom/prevTo` |
-| `integrations-catalog.ts` | `getIntegrationStatus` matrix |
+| Módulo                    | Casos críticos                                    |
+| ------------------------- | ------------------------------------------------- |
+| `formulas.ts`             | Divisão por zero, CTR, CPC, CPM                   |
+| `engine.ts`               | `aggregate` sum vs max, `pctDelta`, `dailySeries` |
+| `aggregations.ts`         | Cada estratégia                                   |
+| `period.ts`               | `brtToday`, presets, `prevFrom/prevTo`            |
+| `integrations-catalog.ts` | `getIntegrationStatus` matrix                     |
 
-### Setup recomendado
+### Setup
+
+```bash
+# Já configurado — Vitest + path alias @/
+npm run test
+npm run test:watch
+```
+
+~~Setup recomendado~~ (concluído em ADR-0011):
 
 ```bash
 npm install -D vitest @vitest/coverage-v8
-```
-
-```json
-// package.json scripts (futuro)
-"test": "vitest run",
-"test:watch": "vitest"
 ```
 
 ---
 
 ## Prioridade 2 — Integração
 
-| Alvo | Abordagem |
-|------|-----------|
-| Server functions | Mock Supabase client |
-| RLS policies | Supabase local ou test project |
-| Views SQL | Fixture data + snapshot queries |
+| Alvo             | Abordagem                       |
+| ---------------- | ------------------------------- |
+| Server functions | Mock Supabase client            |
+| RLS policies     | Supabase local ou test project  |
+| Views SQL        | Fixture data + snapshot queries |
 
 ---
 
@@ -97,13 +108,13 @@ Quando suite existir:
 
 ## Cobertura mínima alvo
 
-| Área | Meta inicial |
-|------|--------------|
-| `formulas.ts` | 100% |
-| `engine.ts` | >90% |
-| `period.ts` | >90% |
+| Área             | Meta inicial                 |
+| ---------------- | ---------------------------- |
+| `formulas.ts`    | 100%                         |
+| `engine.ts`      | >90%                         |
+| `period.ts`      | >90%                         |
 | Server functions | Casos críticos (auth, admin) |
-| UI components | Smoke E2E apenas |
+| UI components    | Smoke E2E apenas             |
 
 ---
 

@@ -11,9 +11,9 @@ import { ga4Def } from "./ga4";
 
 export const PLATFORM_REGISTRY: Record<string, PlatformDef> = {
   google_ads: googleAdsDef,
-  meta_ads:   metaAdsDef,
-  instagram:  instagramDef,
-  ga4:        ga4Def,
+  meta_ads: metaAdsDef,
+  instagram: instagramDef,
+  ga4: ga4Def,
 };
 
 export const PLATFORMS = Object.values(PLATFORM_REGISTRY);

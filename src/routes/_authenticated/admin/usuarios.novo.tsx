@@ -56,9 +56,7 @@ function NovoUsuarioPage() {
       });
       setResult(res);
       toast.success(
-        res.invite_sent
-          ? "Convite enviado por email."
-          : "Usuário criado com senha temporária.",
+        res.invite_sent ? "Convite enviado por email." : "Usuário criado com senha temporária.",
       );
     } catch (err: any) {
       toast.error(err?.message ?? "Falha ao criar usuário.");
@@ -173,10 +171,7 @@ function NovoUsuarioPage() {
                   : "Vincule o cliente para liberar o acesso ao painel."
               }
             >
-              <Select
-                value={clienteId}
-                onChange={(e) => setClienteId(e.target.value)}
-              >
+              <Select value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
                 <option value="">— sem vínculo —</option>
                 {(clientes as any[]).map((c) => (
                   <option key={c.id} value={c.id}>
@@ -188,10 +183,7 @@ function NovoUsuarioPage() {
           </FormRow>
         </SectionCard>
 
-        <SectionCard
-          eyebrow="Acesso"
-          title="Como o usuário receberá a senha?"
-        >
+        <SectionCard eyebrow="Acesso" title="Como o usuário receberá a senha?">
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {(
               [

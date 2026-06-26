@@ -53,9 +53,7 @@ export function DeltaPill({
         <ArrowDownRight className="h-3 w-3" />
       )}
       {Math.abs(delta).toFixed(1)}%
-      {showSuffix && (
-        <span className="font-normal opacity-80"> vs período anterior</span>
-      )}
+      {showSuffix && <span className="font-normal opacity-80"> vs período anterior</span>}
     </span>
   );
 }

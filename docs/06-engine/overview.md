@@ -10,10 +10,10 @@ last_review: 2026-06-26
 
 A Lotus possui **dois motores complementares** de agregação:
 
-| Motor | Módulo | Uso |
-|-------|--------|-----|
+| Motor               | Módulo               | Uso                                       |
+| ------------------- | -------------------- | ----------------------------------------- |
 | **Platform engine** | `src/lib/platforms/` | Dashboards por plataforma (`PlatformDef`) |
-| **Overview engine** | `src/lib/metrics.ts` | Overview consolidado, relatórios admin |
+| **Overview engine** | `src/lib/metrics.ts` | Overview consolidado, relatórios admin    |
 
 **Meta de longo prazo:** convergir em um único pacote `@lotus/metrics`. Dívida D8 no roadmap.
 
@@ -42,14 +42,14 @@ flowchart LR
 
 ## Módulos
 
-| Arquivo | Função |
-|---------|--------|
-| `types.ts` | Contrato `PlatformDef`, `MetricDef`, `KpiDef`, `ChartDef` |
-| `registry.ts` | `PLATFORM_REGISTRY` — plataformas ativas |
-| `engine.ts` | `aggregate`, `deriveKpis`, `dailySeries`, `byCampaign`, `aggregatePeriod` |
-| `formulas.ts` | Fórmulas oficiais (CTR, CPC, …) |
-| `aggregations.ts` | Estratégias sum/max/min/avg/first/last/custom |
-| `{platform}.ts` | Um `PlatformDef` por plataforma |
+| Arquivo           | Função                                                                    |
+| ----------------- | ------------------------------------------------------------------------- |
+| `types.ts`        | Contrato `PlatformDef`, `MetricDef`, `KpiDef`, `ChartDef`                 |
+| `registry.ts`     | `PLATFORM_REGISTRY` — plataformas ativas                                  |
+| `engine.ts`       | `aggregate`, `deriveKpis`, `dailySeries`, `byCampaign`, `aggregatePeriod` |
+| `formulas.ts`     | Fórmulas oficiais (CTR, CPC, …)                                           |
+| `aggregations.ts` | Estratégias sum/max/min/avg/first/last/custom                             |
+| `{platform}.ts`   | Um `PlatformDef` por plataforma                                           |
 
 Documentação detalhada:
 
@@ -64,7 +64,7 @@ Documentação detalhada:
 
 ```typescript
 // src/lib/platforms/registry.ts
-google_ads | meta_ads | instagram | ga4
+google_ads | meta_ads | instagram | ga4;
 ```
 
 GBP e TikTok: view SQL existe; **sem** `PlatformDef` — usam `PlatformPlaceholder`.

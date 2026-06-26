@@ -75,30 +75,30 @@ flowchart TB
 
 Cada plataforma terá um coletor dedicado. Exemplos (nomenclatura alvo):
 
-| Coletor | Plataforma |
-|---------|-----------|
-| `GoogleAdsCollector` | Google Ads |
-| `MetaCollector` | Meta Ads |
-| `InstagramCollector` | Instagram |
-| `GA4Collector` | Google Analytics 4 |
+| Coletor                   | Plataforma              |
+| ------------------------- | ----------------------- |
+| `GoogleAdsCollector`      | Google Ads              |
+| `MetaCollector`           | Meta Ads                |
+| `InstagramCollector`      | Instagram               |
+| `GA4Collector`            | Google Analytics 4      |
 | `GoogleBusinessCollector` | Google Business Profile |
-| `TikTokCollector` | TikTok |
-| `LinkedInCollector` | LinkedIn Ads |
-| `PinterestCollector` | Pinterest |
+| `TikTokCollector`         | TikTok                  |
+| `LinkedInCollector`       | LinkedIn Ads            |
+| `PinterestCollector`      | Pinterest               |
 
 ### Responsabilidades de cada coletor
 
-| Capacidade | Descrição |
-|------------|-----------|
-| Autenticação | OAuth / service accounts conforme API |
-| Renovação de tokens | Refresh automático antes de expirar |
-| Retries | Backoff exponencial, dead-letter queue |
-| Logs | Structured logging por sync run |
-| Monitoramento | Métricas de sucesso/falha/latência |
-| Scheduler | Cron ou fila com prioridade por cliente |
-| UPSERT | Idempotência por (cliente, plataforma, métrica, data) |
-| Tratamento de erros | Classificação retentável vs fatal |
-| Observabilidade | Traces, alertas, dashboard operacional |
+| Capacidade          | Descrição                                             |
+| ------------------- | ----------------------------------------------------- |
+| Autenticação        | OAuth / service accounts conforme API                 |
+| Renovação de tokens | Refresh automático antes de expirar                   |
+| Retries             | Backoff exponencial, dead-letter queue                |
+| Logs                | Structured logging por sync run                       |
+| Monitoramento       | Métricas de sucesso/falha/latência                    |
+| Scheduler           | Cron ou fila com prioridade por cliente               |
+| UPSERT              | Idempotência por (cliente, plataforma, métrica, data) |
+| Tratamento de erros | Classificação retentável vs fatal                     |
+| Observabilidade     | Traces, alertas, dashboard operacional                |
 
 **Status atual:** nenhum coletor implementado neste repositório. Make cumpre papel parcial
 de forma externa. Ver [Coletores alvo](../07-integrations/target-collectors.md).
@@ -152,12 +152,12 @@ Adicionar plataforma = três passos:
 
 ## Métricas oficiais por plataforma (alvo)
 
-| Plataforma | Armazenar no banco |
-|------------|-------------------|
-| Google Ads | impressions, clicks, spend, conversions |
-| Meta Ads | impressions, reach, clicks, spend, conversions |
-| Instagram | reach, accounts_engaged, likes, comments, saves, shares, total_interactions |
-| GA4 | users, sessions, events, conversions |
+| Plataforma | Armazenar no banco                                                          |
+| ---------- | --------------------------------------------------------------------------- |
+| Google Ads | impressions, clicks, spend, conversions                                     |
+| Meta Ads   | impressions, reach, clicks, spend, conversions                              |
+| Instagram  | reach, accounts_engaged, likes, comments, saves, shares, total_interactions |
+| GA4        | users, sessions, events, conversions                                        |
 
 Todo o restante é calculado pelo motor de métricas.
 
@@ -181,14 +181,14 @@ leitura analítica vai direto do browser → Supabase views.
 
 ## Escalabilidade (requisitos de design)
 
-| Dimensão | Meta |
-|----------|------|
-| Clientes | Centenas |
-| Plataformas | Dezenas |
-| Sincronizações | Milhares/dia |
-| Manutenção | Coletores isolados, testáveis |
-| Performance | Agregação incremental, índices por (cliente, data, plataforma) |
-| Testes | Unit (fórmulas), integração (coletores mock), contrato (APIs) |
+| Dimensão       | Meta                                                           |
+| -------------- | -------------------------------------------------------------- |
+| Clientes       | Centenas                                                       |
+| Plataformas    | Dezenas                                                        |
+| Sincronizações | Milhares/dia                                                   |
+| Manutenção     | Coletores isolados, testáveis                                  |
+| Performance    | Agregação incremental, índices por (cliente, data, plataforma) |
+| Testes         | Unit (fórmulas), integração (coletores mock), contrato (APIs)  |
 
 ---
 
@@ -209,11 +209,11 @@ Roadmap detalhado: [../11-roadmap/roadmap.md](../11-roadmap/roadmap.md)
 
 ## ADRs relacionados (alvo)
 
-| ADR | Tema |
-|-----|------|
-| [0007](./adr/0007-derived-metrics-in-application-layer.md) | Métricas derivadas só na aplicação |
-| [0008](./adr/0008-proprietary-data-collectors.md) | Coletores proprietários substituem Make |
-| [0009](./adr/0009-platform-proprietary-infrastructure.md) | Infraestrutura proprietária (sem Lovable/Make) |
+| ADR                                                        | Tema                                           |
+| ---------------------------------------------------------- | ---------------------------------------------- |
+| [0007](./adr/0007-derived-metrics-in-application-layer.md) | Métricas derivadas só na aplicação             |
+| [0008](./adr/0008-proprietary-data-collectors.md)          | Coletores proprietários substituem Make        |
+| [0009](./adr/0009-platform-proprietary-infrastructure.md)  | Infraestrutura proprietária (sem Lovable/Make) |
 
 ---
 

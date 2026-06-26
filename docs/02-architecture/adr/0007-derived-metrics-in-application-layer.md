@@ -40,12 +40,12 @@ calcula esses KPIs. Isso cria risco de divergência.
 
 ## Estado de implementação
 
-| Item | Status |
-|------|--------|
+| Item                       | Status          |
+| -------------------------- | --------------- |
 | `formulas.ts` centralizado | ✅ Parcialmente |
-| Views sem derivadas | ❌ Pendente |
-| Pacote compartilhado | ❌ Não existe |
-| Testes de paridade | ❌ Não existe |
+| Views sem derivadas        | ❌ Pendente     |
+| Pacote compartilhado       | ❌ Não existe   |
+| Testes de paridade         | ❌ Não existe   |
 
 ## Referências
 

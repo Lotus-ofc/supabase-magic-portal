@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useRouterState,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, type ComponentType } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,9 +43,7 @@ export const clienteRefQuery = (slug: string) =>
         .select("cliente");
       if (errAtivos) throw errAtivos;
 
-      const match = (ativos ?? []).find(
-        (r: { cliente: string }) => slugify(r.cliente) === slug,
-      );
+      const match = (ativos ?? []).find((r: { cliente: string }) => slugify(r.cliente) === slug);
       const queryName = match?.cliente ?? cad?.nome_cliente ?? null;
       if (!queryName) {
         console.warn("[cliente-ref] sem match para slug", slug);
@@ -84,9 +77,7 @@ export const clientePlatformsQuery = (queryName: string) =>
       const [ov, gbp] = await Promise.all([
         supabase
           .from("vw_overview_cliente")
-          .select(
-            "meta_spend, google_spend, sessions, conversions, reach, engagement",
-          )
+          .select("meta_spend, google_spend, sessions, conversions, reach, engagement")
           .eq("cliente", queryName)
           .gte("data", sinceStr),
         supabase
@@ -125,11 +116,8 @@ export const clientePlatformsQuery = (queryName: string) =>
     staleTime: 5 * 60 * 1000,
   });
 
-const PLATFORM_META: Record<
-  PlatformKey,
-  { label: string; icon: LucideIcon; path: string }
-> = {
-  "instagram": {
+const PLATFORM_META: Record<PlatformKey, { label: string; icon: LucideIcon; path: string }> = {
+  instagram: {
     label: "Instagram",
     icon: Instagram,
     path: "/cliente/$cliente/instagram",
@@ -144,7 +132,7 @@ const PLATFORM_META: Record<
     icon: Megaphone,
     path: "/cliente/$cliente/google-ads",
   },
-  "ga4": {
+  ga4: {
     label: "Google Analytics 4",
     icon: BarChart3,
     path: "/cliente/$cliente/ga4",
@@ -154,7 +142,7 @@ const PLATFORM_META: Record<
     icon: Globe,
     path: "/cliente/$cliente/google-business",
   },
-  "tiktok": {
+  tiktok: {
     label: "TikTok",
     icon: Music2,
     path: "/cliente/$cliente/tiktok",
@@ -167,14 +155,10 @@ export const Route = createFileRoute("/_authenticated/cliente/$cliente")({
   head: ({ params }) => ({ meta: [{ title: `${params.cliente} · Lotus` }] }),
   component: ClienteLayout,
   errorComponent: ({ error }) => (
-    <div className="lotus-surface p-4 text-sm text-danger">
-      Erro: {error.message}
-    </div>
+    <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>
   ),
   notFoundComponent: () => (
-    <div className="lotus-surface p-6 text-sm text-muted-foreground">
-      Cliente não encontrado.
-    </div>
+    <div className="lotus-surface p-6 text-sm text-muted-foreground">Cliente não encontrado.</div>
   ),
 });
 
@@ -222,9 +206,7 @@ function ClienteShell({ slug }: { slug: string }) {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
       <aside className="lg:sticky lg:top-20 lg:self-start">
-        <Suspense
-          fallback={<div className="lotus-skeleton h-48 w-full rounded-xl" />}
-        >
+        <Suspense fallback={<div className="lotus-skeleton h-48 w-full rounded-xl" />}>
           <PlatformSideNav slug={slug} queryName={ref.queryName} />
         </Suspense>
       </aside>
@@ -235,16 +217,8 @@ function ClienteShell({ slug }: { slug: string }) {
   );
 }
 
-function PlatformSideNav({
-  slug,
-  queryName,
-}: {
-  slug: string;
-  queryName: string;
-}) {
-  const { data: platforms } = useSuspenseQuery(
-    clientePlatformsQuery(queryName),
-  );
+function PlatformSideNav({ slug, queryName }: { slug: string; queryName: string }) {
+  const { data: platforms } = useSuspenseQuery(clientePlatformsQuery(queryName));
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
@@ -308,9 +282,7 @@ function SubNavLink({
   pathname: string;
   exact?: boolean;
 }) {
-  const active = exact
-    ? pathname === href
-    : pathname === href || pathname.startsWith(href + "/");
+  const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
   return (
     <Link
       to={to as never}

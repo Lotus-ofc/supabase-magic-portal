@@ -40,8 +40,14 @@ export function PlatformDashboardPage({ def }: Props) {
 }
 
 function PlatformResolved({
-  def, slug, period,
-}: { def: PlatformDef; slug: string; period: ReturnType<typeof resolvePeriod> }) {
+  def,
+  slug,
+  period,
+}: {
+  def: PlatformDef;
+  slug: string;
+  period: ReturnType<typeof resolvePeriod>;
+}) {
   const { data: ref } = useSuspenseQuery(clienteRefQuery(slug));
   if (!ref) {
     return (

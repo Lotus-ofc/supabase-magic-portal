@@ -31,17 +31,17 @@ desacoplando Lovable. Detalhes em [Arquitetura alvo](./target-architecture.md).
 
 ## Stack tecnológica (estado atual)
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Framework | TanStack Start (`@tanstack/react-start`, `@tanstack/react-router`) |
-| UI | React 19, Tailwind CSS v4, Radix UI, componentes shadcn-style, Recharts, lucide-react, sonner, motion |
-| Estado de dados | TanStack React Query |
-| Backend | Server functions (TanStack Start) |
-| Banco/Auth | Supabase (Postgres, Auth, RLS) |
-| Validação | Zod |
-| Build/Runtime | Vite 8 + Nitro (via `@lovable.dev/vite-tanstack-config`), alvo Cloudflare |
-| Dev oficial | **Cursor** + Git ([ADR-0010](./adr/0010-cursor-official-development-environment.md)) |
-| Build/deploy transitório | Lovable (pipeline; não implementar features lá) |
+| Camada                   | Tecnologia                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Framework                | TanStack Start (`@tanstack/react-start`, `@tanstack/react-router`)                                    |
+| UI                       | React 19, Tailwind CSS v4, Radix UI, componentes shadcn-style, Recharts, lucide-react, sonner, motion |
+| Estado de dados          | TanStack React Query                                                                                  |
+| Backend                  | Server functions (TanStack Start)                                                                     |
+| Banco/Auth               | Supabase (Postgres, Auth, RLS)                                                                        |
+| Validação                | Zod                                                                                                   |
+| Build/Runtime            | Vite 8 + Nitro (via `@lovable.dev/vite-tanstack-config`), alvo Cloudflare                             |
+| Dev oficial              | **Cursor** + Git ([ADR-0010](./adr/0010-cursor-official-development-environment.md))                  |
+| Build/deploy transitório | Lovable (pipeline; não implementar features lá)                                                       |
 
 Versões exatas em `package.json`.
 
@@ -84,24 +84,28 @@ flowchart TB
 ## Componentes e responsabilidades
 
 ### Frontend (`src/routes`, `src/components`)
+
 - Renderiza dashboards e telas de operação.
 - Lê **views analíticas diretamente** com o client Supabase anon (sujeito a RLS).
 - Usa server functions para operações de escrita/privilegiadas.
 - Não calcula KPIs: delega ao engine (`src/lib`).
 
 ### Server Functions (`src/lib/admin.functions.ts`, `src/lib/editorial.functions.ts`)
+
 - Executam no servidor.
 - Validam o **Bearer token** do usuário (`requireSupabaseAuth`).
 - Validam input com Zod.
 - Usam o client com RLS do usuário ou, quando necessário, o **admin client service-role**.
 
 ### Camada de dados (Supabase / Postgres)
+
 - **Tabelas de domínio** com RLS por papel.
 - **Views analíticas** que normalizam `base_metricas`.
 - **Funções `SECURITY DEFINER`** (`has_role`, `current_user_clientes`) que sustentam a
   segurança multi-tenant.
 
 ### Ingestão (Make — externo)
+
 - Lê IDs técnicos de `cadastro_clientes`, chama as APIs, grava em `base_metricas`.
 - **Não versionado neste repositório.** Ver [Integrações](../07-integrations/integrations.md).
 

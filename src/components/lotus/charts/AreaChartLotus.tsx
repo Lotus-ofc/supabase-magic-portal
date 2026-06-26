@@ -12,12 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { cn } from "@/lib/utils";
-import {
-  type CommonMetric,
-  formatCompact,
-  formatDayLong,
-  formatMetric,
-} from "@/lib/metrics";
+import { type CommonMetric, formatCompact, formatDayLong, formatMetric } from "@/lib/metrics";
 
 export type AreaSeriesTone = "primary" | "secondary" | "success" | "neutral";
 
@@ -32,10 +27,18 @@ export interface AreaSeries {
 }
 
 const TONE: Record<AreaSeriesTone, { stroke: string; fillFrom: string; legend: string }> = {
-  primary:   { stroke: "var(--primary-500)",   fillFrom: "var(--primary-500)",   legend: "#9769b1" },
-  secondary: { stroke: "var(--secondary-600)", fillFrom: "var(--secondary-500)", legend: "#67bee7" },
-  success:   { stroke: "var(--success)",       fillFrom: "var(--success)",       legend: "#22c55e" },
-  neutral:   { stroke: "var(--muted-foreground)", fillFrom: "var(--muted-foreground)", legend: "#a1a1aa" },
+  primary: { stroke: "var(--primary-500)", fillFrom: "var(--primary-500)", legend: "#9769b1" },
+  secondary: {
+    stroke: "var(--secondary-600)",
+    fillFrom: "var(--secondary-500)",
+    legend: "#67bee7",
+  },
+  success: { stroke: "var(--success)", fillFrom: "var(--success)", legend: "#22c55e" },
+  neutral: {
+    stroke: "var(--muted-foreground)",
+    fillFrom: "var(--muted-foreground)",
+    legend: "#a1a1aa",
+  },
 };
 
 export function getSeriesColor(tone: AreaSeriesTone) {
@@ -54,13 +57,7 @@ interface Props {
   yMetric?: CommonMetric;
 }
 
-export function AreaChartLotus({
-  data,
-  series,
-  height = 260,
-  className,
-  yMetric,
-}: Props) {
+export function AreaChartLotus({ data, series, height = 260, className, yMetric }: Props) {
   const uid = useId().replace(/:/g, "");
   const points = useMemo(() => data, [data]);
   const yFmtMetric = yMetric ?? series[0]?.metric ?? "spend";
@@ -76,7 +73,10 @@ export function AreaChartLotus({
                 <linearGradient
                   id={`lotus-area-${uid}-${s.key}`}
                   key={s.key}
-                  x1="0" y1="0" x2="0" y2="1"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
                 >
                   <stop offset="0%" stopColor={c.fillFrom} stopOpacity={0.32} />
                   <stop offset="100%" stopColor={c.fillFrom} stopOpacity={0} />

@@ -13,7 +13,9 @@ tomada, as alternativas consideradas e as consequências (boas e ruins). Usamos 
 [MADR](https://adr.github.io/madr/) simplificado.
 
 ## Quando criar um ADR
+
 Crie um ADR quando a decisão:
+
 - é difícil de reverter (estrutural);
 - afeta segurança, modelo de dados ou limites do sistema;
 - escolhe entre alternativas com trade-offs significativos;
@@ -21,18 +23,19 @@ Crie um ADR quando a decisão:
 
 ## Índice
 
-| ADR | Título | Status |
-|-----|--------|--------|
-| [0001](./0001-tanstack-start-supabase.md) | TanStack Start + Supabase como base | Aceito |
-| [0002](./0002-engine-declarativo-de-plataformas.md) | Engine declarativo de plataformas | Aceito |
-| [0003](./0003-views-security-definer.md) | Views analíticas como SECURITY DEFINER | Aceito (com dívida) |
-| [0004](./0004-chave-de-cliente-por-nome-e-aliases.md) | Chave de cliente por nome + aliases | Aceito (com dívida) |
-| [0005](./0005-server-functions-anon-vs-service-role.md) | Separação anon vs service-role | Aceito |
-| [0006](./0006-timezone-america-sao-paulo.md) | Timezone fixo America/Sao_Paulo | Aceito |
-| [0007](./0007-derived-metrics-in-application-layer.md) | Métricas derivadas na camada de aplicação | Proposto (alvo) |
-| [0008](./0008-proprietary-data-collectors.md) | Coletores proprietários substituem Make | Proposto (alvo) |
-| [0009](./0009-platform-proprietary-infrastructure.md) | Infraestrutura proprietária (sem Lovable/Make) | Proposto (alvo) |
-| [0010](./0010-cursor-official-development-environment.md) | Cursor como ambiente oficial de engenharia | Aceito |
+| ADR                                                       | Título                                         | Status              |
+| --------------------------------------------------------- | ---------------------------------------------- | ------------------- |
+| [0001](./0001-tanstack-start-supabase.md)                 | TanStack Start + Supabase como base            | Aceito              |
+| [0002](./0002-engine-declarativo-de-plataformas.md)       | Engine declarativo de plataformas              | Aceito              |
+| [0003](./0003-views-security-definer.md)                  | Views analíticas como SECURITY DEFINER         | Aceito (com dívida) |
+| [0004](./0004-chave-de-cliente-por-nome-e-aliases.md)     | Chave de cliente por nome + aliases            | Aceito (com dívida) |
+| [0005](./0005-server-functions-anon-vs-service-role.md)   | Separação anon vs service-role                 | Aceito              |
+| [0006](./0006-timezone-america-sao-paulo.md)              | Timezone fixo America/Sao_Paulo                | Aceito              |
+| [0007](./0007-derived-metrics-in-application-layer.md)    | Métricas derivadas na camada de aplicação      | Proposto (alvo)     |
+| [0008](./0008-proprietary-data-collectors.md)             | Coletores proprietários substituem Make        | Proposto (alvo)     |
+| [0009](./0009-platform-proprietary-infrastructure.md)     | Infraestrutura proprietária (sem Lovable/Make) | Proposto (alvo)     |
+| [0010](./0010-cursor-official-development-environment.md) | Cursor como ambiente oficial de engenharia     | Aceito              |
+| [0011](./0011-engineering-system-foundation.md)           | Fundação do Sistema de Engenharia              | Aceito              |
 
 ## Template
 
@@ -46,16 +49,21 @@ date: AAAA-MM-DD
 # ADR-XXXX — Título
 
 ## Contexto
+
 Qual problema/força motivou a decisão.
 
 ## Decisão
+
 O que foi decidido (no presente, afirmativo).
 
 ## Alternativas consideradas
+
 - Alternativa A — por que não.
 - Alternativa B — por que não.
 
 ## Consequências
+
 ### Positivas
+
 ### Negativas / dívidas
 ```

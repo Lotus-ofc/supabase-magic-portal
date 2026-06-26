@@ -40,16 +40,17 @@ Make e motor de métricas unificado. Ver [Arquitetura alvo](../02-architecture/t
 
 ## Personas
 
-| Persona | Quem é | O que precisa | Onde vive no app |
-|---------|--------|---------------|------------------|
-| **Admin (agência)** | Gestor/operador interno | Visão de portfólio, gestão de clientes/serviços/usuários, aprovação e produção de conteúdo, diagnóstico | `/admin/*` + `/dashboard` |
-| **Cliente final** | Empresa atendida | Ver os próprios resultados, aprovar conteúdo | `/dashboard`, `/cliente/{slug}`, `/aprovacoes` |
+| Persona             | Quem é                  | O que precisa                                                                                           | Onde vive no app                               |
+| ------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **Admin (agência)** | Gestor/operador interno | Visão de portfólio, gestão de clientes/serviços/usuários, aprovação e produção de conteúdo, diagnóstico | `/admin/*` + `/dashboard`                      |
+| **Cliente final**   | Empresa atendida        | Ver os próprios resultados, aprovar conteúdo                                                            | `/dashboard`, `/cliente/{slug}`, `/aprovacoes` |
 
 ---
 
 ## Capacidades principais
 
 ### 1. Dashboards de performance
+
 - **Visão executiva (admin):** investimento total, clientes ativos, alcance, sessões,
   conversões, mix de investimento por plataforma, top clientes, status de ingestão.
 - **Visão do cliente:** resultados consolidados, comparativos 7/30/90 dias, detalhamento
@@ -60,19 +61,23 @@ Make e motor de métricas unificado. Ver [Arquitetura alvo](../02-architecture/t
 Detalhes em [Dashboards](../06-dashboards/dashboards.md).
 
 ### 2. Gestão de clientes e serviços
+
 CRUD de clientes (com _soft delete_), catálogo de serviços e vínculo cliente↔serviço,
 gestão de IDs técnicos de integração. Ver [API Reference](../03-backend/api-reference.md).
 
 ### 3. Gestão de usuários e acessos
+
 Criação de usuários (convite ou senha), atribuição de papel (admin/cliente) e concessão de
 acesso a clientes específicos.
 
 ### 4. Calendário editorial & aprovação
+
 Produção de posts, fluxo de status (`rascunho → em_producao → aguardando_aprovacao →
 aprovado → publicado`), com o cliente aprovando ou solicitando alterações e histórico de
 revisões/comentários.
 
 ### 5. Central de integrações
+
 Catálogo declarativo de plataformas e seus IDs técnicos, com status visual
 (configurado/parcial/pré/off). Ver [Integrações](../07-integrations/integrations.md).
 
@@ -81,6 +86,7 @@ Catálogo declarativo de plataformas e seus IDs técnicos, com status visual
 ## Jornadas de uso
 
 ### Jornada do cliente final
+
 ```mermaid
 journey
     title Cliente acompanha resultados
@@ -97,6 +103,7 @@ journey
 ```
 
 ### Jornada do admin
+
 ```mermaid
 journey
     title Admin opera o portfólio

@@ -1,14 +1,17 @@
 <!-- LOTUS:BEGIN -->
+
 > [!IMPORTANT]
-> **Engenharia oficial Lotus:** todo desenvolvimento acontece neste repositório via **Cursor**.
-> Fluxo: Desenvolvimento → Commit → Git → GitHub → Deploy → Portal Lotus.
+> **Engenharia oficial Lotus:** desenvolvimento no **Cursor** + repositório Git.
+> **Sistema de Engenharia:** `docs/00-company/engineering-system.md` · `npm run check`
 >
-> Documentação: `docs/09-standards/development-workflow.md` · ADR-0010
+> Fluxo: Desenvolvimento → Commit → Git → GitHub → CI → Deploy → Portal Lotus
 >
-> Lovable é **transitório** (build/deploy apenas) — não implemente features no editor Lovable.
+> Contribuir: [CONTRIBUTING.md](./CONTRIBUTING.md)
+
 <!-- LOTUS:END -->
 
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -17,4 +20,5 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->

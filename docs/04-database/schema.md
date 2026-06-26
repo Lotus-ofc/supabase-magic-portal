@@ -105,6 +105,7 @@ erDiagram
 ## Tabelas
 
 ### `base_metricas` (legada, externa)
+
 Fonte bruta das métricas, em formato _long_: `(id, data, cliente, plataforma, metrica, valor,
 campanha, created_at)`. Populada pelo Make.
 
@@ -114,6 +115,7 @@ campanha, created_at)`. Populada pelo Make.
 > constraints são inferidos do uso nas views.
 
 ### `cadastro_clientes` (fonte oficial de clientes)
+
 - `id bigint` (PK legada, com sequence), `nome_cliente`, `slug` (único), `ativo`.
 - Dados comerciais: `empresa`, `email_principal`, `telefone`, `observacoes`, `data_inicio`,
   `valor_mensal`, `mlabs_url`.
@@ -126,27 +128,34 @@ campanha, created_at)`. Populada pelo Make.
 - Trigger `tg_set_updated_at` mantém `updated_at`.
 
 ### `profiles`
+
 1:1 com `auth.users` (PK = FK). Criada automaticamente pelo trigger `handle_new_user` no
 INSERT de `auth.users`. Usuário só lê/atualiza o próprio (`id = auth.uid()`).
 
 ### `user_roles`
+
 Papéis do usuário. Enum `app_role` = `{ admin, cliente }`. Unicidade `(user_id, role)`.
 
 ### `client_access`
+
 Concede a um usuário acesso a um cliente (por `cliente_nome`; com `cadastro_cliente_id`
 opcional, preenchido por trigger `tg_client_access_link_cadastro` quando o nome bate).
 
 ### `servicos` + `cliente_servicos`
+
 Catálogo de serviços (seed: Gestão de Tráfego, Social Media, Desenvolvimento Web, Google Meu
 Negócio, SEO, Consultoria, Automação) e o vínculo N:N com clientes (com `valor` e
 `observacoes` por contrato).
 
 ### `posts_editorial` + `post_revisions`
+
 Calendário editorial e histórico. Enums:
+
 - `post_status` = `{ rascunho, em_producao, aguardando_aprovacao, aprovado, publicado }`.
 - `post_revision_tipo` = `{ comentario, solicitacao_alteracao, aprovacao, mudanca_status }`.
 
 ### `cliente_aliases`
+
 Reconcilia `base_metricas.cliente` (texto do Make) ↔ `cadastro_clientes.nome_cliente`
 (canônico). Seeds: `Antena → Antena Imobiliária`, `Big Frio juec → BigFrioJuec`,
 `Rafa Teo → Rafa Teo Ferreira`.
@@ -156,10 +165,13 @@ Reconcilia `base_metricas.cliente` (texto do Make) ↔ `cadastro_clientes.nome_c
 ## Funções importantes (`SECURITY DEFINER`)
 
 ### `has_role(_user_id, _role) → boolean`
+
 Checa papel sem cair em recursão de RLS. Usada nas policies e em `assertAdmin`.
 
 ### `current_user_clientes() → setof text`
+
 **Coração do multi-tenant.** Retorna os nomes (canônicos) de clientes visíveis ao usuário:
+
 ```sql
 -- cliente: o que está em client_access
 SELECT cliente_nome FROM client_access WHERE user_id = auth.uid()
@@ -170,6 +182,7 @@ FROM base_metricas bm
 LEFT JOIN cliente_aliases al ON al.alias_metricas = bm.cliente
 WHERE has_role(auth.uid(), 'admin');
 ```
+
 > **Dívida:** para admin, faz `SELECT DISTINCT` em `base_metricas` em runtime — comentado no
 > SQL como ponto a substituir por catálogo dedicado quando a base crescer.
 
@@ -190,6 +203,7 @@ flowchart TD
 ```
 
 Padrão geral das policies:
+
 - **Admin** → `FOR ALL USING/ WITH CHECK has_role(auth.uid(),'admin')`.
 - **Cliente** → `SELECT` restrito a `nome_cliente IN (current_user_clientes())` (e variações
   para `cliente_servicos`, `posts_editorial`, `post_revisions`).

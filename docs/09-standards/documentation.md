@@ -18,6 +18,7 @@ da Definition of Done.
 ---
 
 ## Princípios
+
 1. **Mesma mudança, mesmo PR.** Código e docs andam juntos. PR que muda comportamento sem
    tocar docs deve ser questionado na revisão.
 2. **Fonte única por assunto.** Cada tema tem um lar (ver índice em
@@ -33,22 +34,22 @@ da Definition of Done.
 
 ## Matriz: o que muda → o que documentar
 
-| Você mudou… | Atualize |
-|-------------|----------|
-| Uma server function (nova/assinatura) | [API Reference](../03-backend/api-reference.md) |
-| Auth / roles / signup policy | [Auth](../03-backend/auth.md), [Segurança](../03-backend/security.md) |
-| Tabela/coluna/RLS | [Schema](../04-database/schema.md), [RLS](../04-database/rls-policies.md), [Migrations](../04-database/migrations.md) |
-| Uma view `vw_*` | [Views](../04-database/views.md) |
-| PlatformDef / engine / fórmulas | [06-engine/](../06-engine/overview.md), [Dashboards](../06-dashboards/dashboards.md) |
-| `metrics.ts` / `period.ts` | [overview-aggregation](../06-engine/overview-aggregation.md), [period](../06-engine/period.md) |
-| Integração / ID técnico / Make | [Integrações](../07-integrations/integrations.md) |
-| Rota nova / tela admin | [Roteamento](../05-frontend/routing.md), [admin-modules](../06-dashboards/admin-modules.md) |
-| Variável de ambiente / deploy / CI | [Deployment](../08-operations/deployment.md), [environments](../08-operations/environments.md), [cicd](../08-operations/cicd.md) |
-| Erros / logging | [observability-errors](../05-frontend/observability-errors.md), [observability](../08-operations/observability.md) |
-| Estratégia de testes | [testing](../09-standards/testing.md) |
-| Decisão estrutural | Novo [ADR](../02-architecture/adr/README.md) |
-| Qualquer coisa visível ao usuário | [Changelog](../12-changelog/changelog.md) |
-| Nova seção ou lacuna resolvida | [AUDIT](../AUDIT.md), [README](../README.md) |
+| Você mudou…                           | Atualize                                                                                                                         |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Uma server function (nova/assinatura) | [API Reference](../03-backend/api-reference.md)                                                                                  |
+| Auth / roles / signup policy          | [Auth](../03-backend/auth.md), [Segurança](../03-backend/security.md)                                                            |
+| Tabela/coluna/RLS                     | [Schema](../04-database/schema.md), [RLS](../04-database/rls-policies.md), [Migrations](../04-database/migrations.md)            |
+| Uma view `vw_*`                       | [Views](../04-database/views.md)                                                                                                 |
+| PlatformDef / engine / fórmulas       | [06-engine/](../06-engine/overview.md), [Dashboards](../06-dashboards/dashboards.md)                                             |
+| `metrics.ts` / `period.ts`            | [overview-aggregation](../06-engine/overview-aggregation.md), [period](../06-engine/period.md)                                   |
+| Integração / ID técnico / Make        | [Integrações](../07-integrations/integrations.md)                                                                                |
+| Rota nova / tela admin                | [Roteamento](../05-frontend/routing.md), [admin-modules](../06-dashboards/admin-modules.md)                                      |
+| Variável de ambiente / deploy / CI    | [Deployment](../08-operations/deployment.md), [environments](../08-operations/environments.md), [cicd](../08-operations/cicd.md) |
+| Erros / logging                       | [observability-errors](../05-frontend/observability-errors.md), [observability](../08-operations/observability.md)               |
+| Estratégia de testes                  | [testing](../09-standards/testing.md)                                                                                            |
+| Decisão estrutural                    | Novo [ADR](../02-architecture/adr/README.md)                                                                                     |
+| Qualquer coisa visível ao usuário     | [Changelog](../12-changelog/changelog.md)                                                                                        |
+| Nova seção ou lacuna resolvida        | [AUDIT](../AUDIT.md), [README](../README.md)                                                                                     |
 
 ---
 
@@ -56,6 +57,7 @@ da Definition of Done.
 
 ```md
 ### Documentação
+
 - [ ] Atualizei a(s) página(s) de docs afetada(s) (ver matriz em 09-standards/documentation.md)
 - [ ] Criei um ADR se a decisão é estrutural
 - [ ] Adicionei entrada no Changelog (se visível ao usuário)
@@ -69,10 +71,10 @@ da Definition of Done.
 
 Regras de projeto em `.cursor/rules/`:
 
-| Regra | Função |
-|-------|--------|
+| Regra                                                                | Função                                                    |
+| -------------------------------------------------------------------- | --------------------------------------------------------- |
 | [`lotus-engineering.mdc`](../../.cursor/rules/lotus-engineering.mdc) | Fluxo oficial, qualidade, arquitetura, Definition of Done |
-| [`docs-maintenance.mdc`](../../.cursor/rules/docs-maintenance.mdc) | Matriz código → docs; doc-as-code |
+| [`docs-maintenance.mdc`](../../.cursor/rules/docs-maintenance.mdc)   | Matriz código → docs; doc-as-code                         |
 
 Elas instruem o agente a manter código e documentação alinhados no mesmo trabalho.
 
@@ -83,6 +85,7 @@ Elas instruem o agente a manter código e documentação alinhados no mesmo trab
 ---
 
 ## Revisão periódica
+
 Cada documento tem `last_review`. Revisão trimestral sugerida: percorrer os docs, validar
 contra o código e atualizar a data. Documentos `status: living` são esperados mudar com
 frequência.

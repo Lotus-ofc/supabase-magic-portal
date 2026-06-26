@@ -44,7 +44,9 @@ function Pill({
     muted: "border-border bg-muted/40 text-muted-foreground",
   }[tone];
   return (
-    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${cls}`}
+    >
       {children}
     </span>
   );
@@ -53,7 +55,8 @@ function Pill({
 function ViewsAuditPage() {
   const { data } = useSuspenseQuery(auditQuery);
 
-  const cucAdminRows = (data.current_user_clientes.as_admin_authenticated.data as any[] | null) ?? [];
+  const cucAdminRows =
+    (data.current_user_clientes.as_admin_authenticated.data as any[] | null) ?? [];
   const cucServiceRows = (data.current_user_clientes.as_service_role.data as any[] | null) ?? [];
 
   const rootCauseDetected =
@@ -78,19 +81,22 @@ function ViewsAuditPage() {
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div className="space-y-2">
               <p className="font-medium text-foreground">
-                Todas as views usam <code className="rounded bg-muted px-1">security_invoker=on</code> e filtram por{" "}
-                <code className="rounded bg-muted px-1">current_user_clientes()</code>, que depende de{" "}
-                <code className="rounded bg-muted px-1">auth.uid()</code>.
+                Todas as views usam{" "}
+                <code className="rounded bg-muted px-1">security_invoker=on</code> e filtram por{" "}
+                <code className="rounded bg-muted px-1">current_user_clientes()</code>, que depende
+                de <code className="rounded bg-muted px-1">auth.uid()</code>.
               </p>
               <p className="text-muted-foreground">
-                Quando consultamos via <strong>service_role</strong> (supabaseAdmin), <code>auth.uid()</code> é{" "}
-                <code>null</code> → a função retorna 0 clientes → o <code>WHERE cliente IN (...)</code> dentro de{" "}
-                <code>vw_metricas_normalizadas</code> elimina <strong>todos</strong> os registros → todas as views derivadas retornam 0.
+                Quando consultamos via <strong>service_role</strong> (supabaseAdmin),{" "}
+                <code>auth.uid()</code> é <code>null</code> → a função retorna 0 clientes → o{" "}
+                <code>WHERE cliente IN (...)</code> dentro de <code>vw_metricas_normalizadas</code>{" "}
+                elimina <strong>todos</strong> os registros → todas as views derivadas retornam 0.
               </p>
               <p className="text-muted-foreground">
                 Quando consultamos via <strong>admin autenticado</strong>, o ramo{" "}
-                <code>has_role(auth.uid(), 'admin')</code> de <code>current_user_clientes()</code> retorna todos os{" "}
-                <code>DISTINCT cliente</code> de <code>base_metricas</code> → as views retornam dados normalmente.
+                <code>has_role(auth.uid(), 'admin')</code> de <code>current_user_clientes()</code>{" "}
+                retorna todos os <code>DISTINCT cliente</code> de <code>base_metricas</code> → as
+                views retornam dados normalmente.
               </p>
             </div>
           </div>
@@ -99,10 +105,14 @@ function ViewsAuditPage() {
             <div className="rounded-md border border-border p-3">
               <div className="mb-1 flex items-center gap-2">
                 <Pill tone={cucServiceRows.length === 0 ? "err" : "ok"}>service_role</Pill>
-                <span className="text-xs text-muted-foreground">supabaseAdmin.rpc('current_user_clientes')</span>
+                <span className="text-xs text-muted-foreground">
+                  supabaseAdmin.rpc('current_user_clientes')
+                </span>
               </div>
               <div className="text-2xl font-semibold tabular-nums">{cucServiceRows.length}</div>
-              <div className="text-xs text-muted-foreground">clientes retornados (esperado: 0 — confirma a hipótese)</div>
+              <div className="text-xs text-muted-foreground">
+                clientes retornados (esperado: 0 — confirma a hipótese)
+              </div>
             </div>
             <div className="rounded-md border border-border p-3">
               <div className="mb-1 flex items-center gap-2">
@@ -110,7 +120,9 @@ function ViewsAuditPage() {
                 <span className="text-xs text-muted-foreground">context.supabase.rpc(...)</span>
               </div>
               <div className="text-2xl font-semibold tabular-nums">{cucAdminRows.length}</div>
-              <div className="text-xs text-muted-foreground">clientes visíveis (esperado: todos)</div>
+              <div className="text-xs text-muted-foreground">
+                clientes visíveis (esperado: todos)
+              </div>
             </div>
           </div>
 
@@ -120,8 +132,9 @@ function ViewsAuditPage() {
               <div>
                 <p className="font-medium text-foreground">Hipótese confirmada</p>
                 <p className="text-muted-foreground">
-                  Os 0 rows reportados em <code>/admin/debug</code> são esperados — aquele painel consulta via service_role.
-                  Os dados existem e as views funcionam para usuários autenticados.
+                  Os 0 rows reportados em <code>/admin/debug</code> são esperados — aquele painel
+                  consulta via service_role. Os dados existem e as views funcionam para usuários
+                  autenticados.
                 </p>
               </div>
             </div>
@@ -130,10 +143,7 @@ function ViewsAuditPage() {
       </SectionCard>
 
       {/* Proposta de correção */}
-      <SectionCard
-        title="Proposta de correção"
-        description="Sem alterar schema nem views."
-      >
+      <SectionCard title="Proposta de correção" description="Sem alterar schema nem views.">
         <ol className="list-decimal space-y-2 pl-5 text-sm text-foreground">
           <li>
             Em <code>/admin/debug</code>: trocar <code>supabaseAdmin.from('vw_*')</code> por{" "}
@@ -141,13 +151,16 @@ function ViewsAuditPage() {
             <code>current_user_clientes()</code>).
           </li>
           <li>
-            Em todas as telas que consomem views analíticas (dashboard, página do cliente): usar o cliente autenticado, nunca o service_role.
+            Em todas as telas que consomem views analíticas (dashboard, página do cliente): usar o
+            cliente autenticado, nunca o service_role.
           </li>
           <li>
-            Manter <code>supabaseAdmin</code> apenas para leituras administrativas que não passam pelas views (auth.users, user_roles, client_access, base_metricas crua).
+            Manter <code>supabaseAdmin</code> apenas para leituras administrativas que não passam
+            pelas views (auth.users, user_roles, client_access, base_metricas crua).
           </li>
           <li>
-            (Opcional, futuro) Migrar <code>current_user_clientes()</code> de débito técnico (SELECT DISTINCT em base_metricas) para um catálogo dedicado quando a base crescer.
+            (Opcional, futuro) Migrar <code>current_user_clientes()</code> de débito técnico (SELECT
+            DISTINCT em base_metricas) para um catálogo dedicado quando a base crescer.
           </li>
         </ol>
       </SectionCard>

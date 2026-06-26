@@ -8,14 +8,8 @@ import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
-import {
-  ChartFrame,
-  ChartLegendItem,
-} from "@/components/lotus/charts/ChartFrame";
-import {
-  AreaChartLotus,
-  getSeriesColor,
-} from "@/components/lotus/charts/AreaChartLotus";
+import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFrame";
+import { AreaChartLotus, getSeriesColor } from "@/components/lotus/charts/AreaChartLotus";
 import { BarChartLotus } from "@/components/lotus/charts/BarChartLotus";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
 import {
@@ -177,10 +171,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
 
   const ativosCount = clientes.filter((c: any) => c.ativo).length;
   const servicosCount = servicos.filter((s: any) => s.ativo).length;
-  const totalAcessos = clientes.reduce(
-    (sum: number, c: any) => sum + (c.qtd_acessos ?? 0),
-    0,
-  );
+  const totalAcessos = clientes.reduce((sum: number, c: any) => sum + (c.qtd_acessos ?? 0), 0);
   const ultimaSync = ativos
     .map((a) => a.ultima_ingestao)
     .filter(Boolean)
@@ -239,12 +230,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
           icon={Briefcase}
           emphasis="compact"
         />
-        <StatCard
-          label="Acessos vinculados"
-          value={totalAcessos}
-          icon={Users}
-          emphasis="compact"
-        />
+        <StatCard label="Acessos vinculados" value={totalAcessos} icon={Users} emphasis="compact" />
         <StatCard
           label="Última sync"
           value={relTime(ultimaSync ?? null)}
@@ -295,9 +281,9 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
               data={daily}
               yMetric="spend"
               series={[
-                { key: "meta_spend",   label: "Meta Ads",    metric: "spend",       tone: "primary"   },
-                { key: "google_spend", label: "Google Ads",  metric: "spend",       tone: "secondary" },
-                { key: "conversions",  label: "Conversões",  metric: "conversions", tone: "success"   },
+                { key: "meta_spend", label: "Meta Ads", metric: "spend", tone: "primary" },
+                { key: "google_spend", label: "Google Ads", metric: "spend", tone: "secondary" },
+                { key: "conversions", label: "Conversões", metric: "conversions", tone: "success" },
               ]}
               height={280}
             />
@@ -425,9 +411,7 @@ function EmptyChart() {
       <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">
         <Sparkles className="h-4 w-4" />
       </div>
-      <p className="font-display text-sm font-semibold">
-        Sem registros no período
-      </p>
+      <p className="font-display text-sm font-semibold">Sem registros no período</p>
       <p className="max-w-sm text-xs text-muted-foreground">
         Quando as campanhas começarem a rodar, a evolução aparece aqui.
       </p>
@@ -435,13 +419,7 @@ function EmptyChart() {
   );
 }
 
-function EmptyMini({
-  icon: Icon,
-  text,
-}: {
-  icon: typeof Sparkles;
-  text: string;
-}) {
+function EmptyMini({ icon: Icon, text }: { icon: typeof Sparkles; text: string }) {
   return (
     <div className="flex h-[220px] flex-col items-center justify-center gap-2 text-center">
       <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary-600 dark:text-primary-300">

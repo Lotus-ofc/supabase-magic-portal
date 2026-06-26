@@ -1,6 +1,6 @@
 ---
 title: CI/CD
-description: Pipeline de integração e deploy — estado atual e especificação alvo.
+description: Pipeline de integração e deploy — GitHub Actions, gates e deploy futuro.
 status: living
 owner: Engenharia / Ops Lotus
 last_review: 2026-06-26
@@ -12,94 +12,87 @@ last_review: 2026-06-26
 
 ## Estado atual
 
-| Item | Status |
-|------|--------|
-| GitHub Actions | ❌ Não existe (`.github/workflows/` ausente) |
-| Deploy automático | ❌ Manual via Lovable (transitório) |
-| Migrations automáticas | ❌ Manual no Supabase dashboard |
-| Lint no PR | ❌ Não enforced |
-| Testes no PR | ❌ Suite inexistente |
+| Item                   | Status                              |
+| ---------------------- | ----------------------------------- |
+| GitHub Actions         | ✅ `.github/workflows/ci.yml`       |
+| Lint no PR             | ✅ `npm run lint`                   |
+| Testes no PR           | ✅ `npm run test` (Vitest)          |
+| Build no PR            | ✅ `npm run build`                  |
+| Validação engenharia   | ✅ `npm run validate:engineering`   |
+| Gate local             | ✅ `npm run check`                  |
+| Deploy automático      | ❌ Manual via Lovable (transitório) |
+| Migrations automáticas | ❌ Manual no Supabase dashboard     |
 
 ---
 
-## Pipeline alvo (especificação)
+## Pipeline implementado
 
 ```mermaid
 flowchart LR
-    PR["Pull Request"] --> LINT["lint"]
-    LINT --> BUILD["build"]
-    BUILD --> TEST["test"]
-    TEST --> MERGE["merge main"]
-    MERGE --> DEPLOY["deploy production"]
-    DEPLOY --> MIG["migrations (manual gate)"]
+    PR["Pull Request"] --> VAL["validate:engineering"]
+    VAL --> LINT["lint"]
+    LINT --> TEST["test"]
+    TEST --> BUILD["build"]
+    BUILD --> MERGE["merge main"]
+    MERGE --> DEPLOY["deploy\n(Lovable hoje)"]
 ```
 
-### Job: `ci` (em todo PR)
+### Workflow: `CI` (`.github/workflows/ci.yml`)
+
+Dispara em `push` e `pull_request` para `main`.
+
+| Step        | Comando                                  |
+| ----------- | ---------------------------------------- |
+| Install     | `npm ci`                                 |
+| Engineering | `npm run validate:engineering`           |
+| Lint        | `npm run lint`                           |
+| Test        | `npm run test`                           |
+| Build       | `npm run build` (env placeholders no CI) |
+
+### Gate local
+
+```bash
+npm run check
+# = validate:engineering + lint + test + build
+```
+
+Requer `.env` local para o passo `build` (ver `.env.example`).
+
+---
+
+## PR template
+
+Checklist alinhado ao handbook: `.github/pull_request_template.md`
+
+---
+
+## Deploy (transitório)
+
+Deploy de produção ainda via Lovable/Nitro/Cloudflare. Ver [Deployment](./deployment.md).
+
+### Pipeline alvo (deploy proprietário)
 
 ```yaml
-# Especificação — não implementado ainda
+# Futuro — após desacoplar Lovable
 steps:
-  - checkout
-  - setup-node (LTS)
-  - npm ci
-  - npm run lint
-  - npm run build
-  # - npm test (quando existir)
+  - npm run check
+  - deploy Cloudflare (secrets reais)
+  - smoke test
 ```
 
-### Job: `deploy` (push em `main`)
-
-```yaml
-steps:
-  - build (Nitro/Cloudflare)
-  - deploy com secrets:
-      OFFICIAL_SUPABASE_URL
-      OFFICIAL_SUPABASE_ANON_KEY
-      OFFICIAL_SERVICE_ROLE_KEY
-      VITE_OFFICIAL_*
-```
-
-### Migrations
-
-Gate manual: aplicar `supabase/migrations-official/*.sql` no projeto Supabase **antes** ou
-**depois** do deploy conforme compatibilidade. Documentar ordem no PR.
+Ver [ADR-0009](../02-architecture/adr/0009-platform-proprietary-infrastructure.md).
 
 ---
 
-## Transição Lovable → CI proprietário
+## Migrations
 
-| Fase | Ação |
-|------|------|
-| 1 | GitHub Actions: lint + build em PR |
-| 2 | Deploy preview (branch) |
-| 3 | Deploy prod Cloudflare via Action |
-| 4 | Remover dependência deploy Lovable |
-| 5 | Remover `@lovable.dev/vite-tanstack-config` |
-
-Ver [ADR-0009](../02-architecture/adr/0009-platform-proprietary-infrastructure.md),
-[ADR-0010](../02-architecture/adr/0010-cursor-official-development-environment.md).
-
----
-
-## Checklist de PR (automação futura)
-
-- [ ] `docs/` atualizado se comportamento mudou
-- [ ] `npm run lint` passa
-- [ ] `npm run build` passa
-- [ ] Changelog se visível ao usuário
-- [ ] ADR se decisão estrutural
-
----
-
-## Dívida de lint (Windows)
-
-`npm run lint` pode falhar por CRLF vs LF (Prettier). Corrigir com `npm run format` +
-`.gitattributes` (`* text=auto eol=lf`) em PR dedicado.
+Gate **manual**: aplicar SQL no Supabase antes/depois do deploy conforme compatibilidade.
+Ver [Migrations](../04-database/migrations.md).
 
 ---
 
 ## Referências
 
-- [Deployment](./deployment.md)
-- [Ambientes](./environments.md)
+- [ADR-0011](../02-architecture/adr/0011-engineering-system-foundation.md)
 - [Testing](../09-standards/testing.md)
+- [Governança](../09-standards/governance.md)

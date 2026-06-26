@@ -60,10 +60,8 @@ export function BarChartLotus({ rows, max, className, empty }: Props) {
               <div
                 className={cn(
                   "h-full rounded-full transition-[width] duration-500",
-                  tone === "primary" &&
-                    "bg-gradient-to-r from-primary-400 to-primary-600",
-                  tone === "secondary" &&
-                    "bg-gradient-to-r from-secondary-400 to-secondary-600",
+                  tone === "primary" && "bg-gradient-to-r from-primary-400 to-primary-600",
+                  tone === "secondary" && "bg-gradient-to-r from-secondary-400 to-secondary-600",
                   tone === "neutral" && "bg-muted-foreground/50",
                 )}
                 style={{ width: `${pct}%` }}

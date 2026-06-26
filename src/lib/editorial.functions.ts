@@ -48,8 +48,7 @@ export const listPosts = createServerFn({ method: "GET" })
       .gte("data_publicacao", data.from)
       .lte("data_publicacao", data.to)
       .order("data_publicacao", { ascending: true });
-    if (data.cadastro_cliente_id)
-      q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
+    if (data.cadastro_cliente_id) q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
     if (data.cliente_nome) q = q.eq("cliente_nome", data.cliente_nome);
     if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
@@ -146,10 +145,7 @@ export const deletePost = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { error } = await context.supabase
-      .from("posts_editorial")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("posts_editorial").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -226,9 +222,7 @@ export const transitionPost = createServerFn({ method: "POST" })
 export const addPostComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z
-      .object({ id: z.string().uuid(), mensagem: z.string().trim().min(1).max(2000) })
-      .parse(d),
+    z.object({ id: z.string().uuid(), mensagem: z.string().trim().min(1).max(2000) }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const { data: user } = await context.supabase.auth.getUser();

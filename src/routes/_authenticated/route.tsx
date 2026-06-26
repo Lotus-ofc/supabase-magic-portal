@@ -1,4 +1,10 @@
-import { createFileRoute, Outlet, redirect, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
@@ -117,9 +123,7 @@ function AuthenticatedLayout() {
             {user.email?.slice(0, 1).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[12px] font-medium text-sidebar-foreground">
-              {user.email}
-            </p>
+            <p className="truncate text-[12px] font-medium text-sidebar-foreground">{user.email}</p>
             <p className="text-[10.5px] text-muted-foreground">
               {isAdmin ? "Admin · Lotus" : "Cliente · Lotus"}
             </p>

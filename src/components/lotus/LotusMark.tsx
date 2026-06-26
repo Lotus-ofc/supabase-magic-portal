@@ -40,7 +40,12 @@ export function LotusMark({ variant = "gradient", className, ...props }: LotusMa
         <path d="M16 28 C 26 22, 26 12, 16 4" opacity="0.55" />
         <path d="M16 28 C 16 22, 16 12, 16 4" />
       </g>
-      <circle cx="16" cy="28" r="1.6" fill={variant === "gradient" ? `url(#${id})` : "currentColor"} />
+      <circle
+        cx="16"
+        cy="28"
+        r="1.6"
+        fill={variant === "gradient" ? `url(#${id})` : "currentColor"}
+      />
     </svg>
   );
 }

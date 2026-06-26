@@ -74,8 +74,7 @@ export function AppShell({
                         className={cn(
                           "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-sidebar-foreground/80 transition-colors",
                           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                          active &&
-                            "bg-sidebar-accent text-sidebar-accent-foreground",
+                          active && "bg-sidebar-accent text-sidebar-accent-foreground",
                         )}
                       >
                         {active && (
@@ -107,9 +106,7 @@ export function AppShell({
           ))}
         </nav>
 
-        {bottomSlot && (
-          <div className="border-t border-sidebar-border p-3">{bottomSlot}</div>
-        )}
+        {bottomSlot && <div className="border-t border-sidebar-border p-3">{bottomSlot}</div>}
       </aside>
 
       {/* Topbar */}
@@ -131,11 +128,7 @@ export function AppShell({
       </header>
 
       {/* Main */}
-      <main
-        className={cn(
-          "lg:pl-[248px]",
-        )}
-      >
+      <main className={cn("lg:pl-[248px]")}>
         <div
           className={cn(
             "mx-auto w-full",

@@ -28,18 +28,18 @@ por canal, mais uma **visão consolidada** cross-channel.
 
 Plataformas na visão de produto (estratégica):
 
-| Plataforma | Estado no repositório |
-|------------|----------------------|
-| Google Ads | Implementada |
-| Meta Ads | Implementada |
-| Instagram | Implementada |
-| Google Analytics 4 | Implementada |
-| Google Business Profile | Parcial (catálogo) |
-| TikTok | Parcial (catálogo) |
-| LinkedIn Ads | Não implementada |
-| Pinterest | Não implementada |
-| YouTube | Não implementada |
-| Futuras integrações | Roadmap |
+| Plataforma              | Estado no repositório |
+| ----------------------- | --------------------- |
+| Google Ads              | Implementada          |
+| Meta Ads                | Implementada          |
+| Instagram               | Implementada          |
+| Google Analytics 4      | Implementada          |
+| Google Business Profile | Parcial (catálogo)    |
+| TikTok                  | Parcial (catálogo)    |
+| LinkedIn Ads            | Não implementada      |
+| Pinterest               | Não implementada      |
+| YouTube                 | Não implementada      |
+| Futuras integrações     | Roadmap               |
 
 ---
 
@@ -50,11 +50,11 @@ inteligência operacional e analítica deve residir dentro do ecossistema Lotus.
 
 ### Ferramentas a serem substituídas
 
-| Ferramenta | Papel hoje | Status no repo |
-|------------|-----------|----------------|
-| **Make** | Coleta e ingestão de métricas → Supabase | Usado operacionalmente; **não versionado** neste repositório |
-| **Lovable** | Build/deploy transitório | Confirmado via `@lovable.dev/vite-tanstack-config`; **não** é ambiente de dev (ADR-0010) |
-| **Horizons** | Citado na visão estratégica | **⚠️ INFORMAÇÃO NÃO ENCONTRADA** no repositório |
+| Ferramenta   | Papel hoje                               | Status no repo                                                                           |
+| ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Make**     | Coleta e ingestão de métricas → Supabase | Usado operacionalmente; **não versionado** neste repositório                             |
+| **Lovable**  | Build/deploy transitório                 | Confirmado via `@lovable.dev/vite-tanstack-config`; **não** é ambiente de dev (ADR-0010) |
+| **Horizons** | Citado na visão estratégica              | **⚠️ INFORMAÇÃO NÃO ENCONTRADA** no repositório                                          |
 
 ### Arquitetura alvo (resumo)
 
@@ -69,12 +69,12 @@ Detalhamento: [Arquitetura alvo](../02-architecture/target-architecture.md)
 
 ## Diferenciação
 
-| Aspecto | Lotus (alvo) | Planilhas / ferramentas isoladas |
-|---------|--------------|----------------------------------|
-| Fonte única de verdade | Sim — regras centralizadas | Não — fórmulas duplicadas |
-| Multi-plataforma | Dashboards por canal + overview | Silos por ferramenta |
-| Confiança nos números | Métricas oficiais + cálculo auditável | Dados inconsistentes |
-| Escala | Centenas de clientes, milhares de syncs/dia | Não escala |
+| Aspecto                | Lotus (alvo)                                | Planilhas / ferramentas isoladas |
+| ---------------------- | ------------------------------------------- | -------------------------------- |
+| Fonte única de verdade | Sim — regras centralizadas                  | Não — fórmulas duplicadas        |
+| Multi-plataforma       | Dashboards por canal + overview             | Silos por ferramenta             |
+| Confiança nos números  | Métricas oficiais + cálculo auditável       | Dados inconsistentes             |
+| Escala                 | Centenas de clientes, milhares de syncs/dia | Não escala                       |
 
 ---
 

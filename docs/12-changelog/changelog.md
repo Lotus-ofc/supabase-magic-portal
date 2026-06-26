@@ -20,9 +20,22 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 ## [Não lançado]
 
 ### Alterado
-- **Deployment & Padrões:** Lovable documentado como transitório (build/deploy); Cursor como dev oficial.
+
+- **Sistema de Engenharia fundado (ADR-0011):** CI, Vitest, CONTRIBUTING, governança, `npm run check`.
+- **Deployment & Padrões:** Lovable transitório (build/deploy); Cursor como dev oficial.
+
+### Adicionado (sistema de engenharia)
+
+- **CI:** `.github/workflows/ci.yml` — lint, test, build, validate
+- **Testes:** Vitest + `formulas.test.ts`, `period.test.ts`
+- **Governança:** `CONTRIBUTING.md`, PR template, `governance.md`, `engineering-system.md`
+- **Automação:** `scripts/validate-engineering.mjs`, `npm run check`
+- **`.gitattributes`** + Prettier LF
+- **ADR-0011** — Fundação do Sistema de Engenharia
+- **Regra Cursor:** `lotus-governance.mdc`
 
 ### Adicionado (auditoria CTO)
+
 - **Auditoria de completude** (`docs/AUDIT.md`) — matriz cobertura, lacunas L1–L9, roteiro sênior 4h.
 - **Auth & Segurança:** `03-backend/auth.md`, `security.md`.
 - **RLS:** catálogo completo de policies (`04-database/rls-policies.md`).
@@ -35,6 +48,7 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 - Procedimento manual de migrations documentado.
 
 ### Adicionado
+
 - **Fluxo oficial de desenvolvimento:** Cursor como ambiente de engenharia; Lovable rebaixado
   a build/deploy transitório.
 - **ADR-0010:** Cursor como ambiente oficial de engenharia.
@@ -58,6 +72,7 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 > migrations em `supabase/migrations-official/`.
 
 ### Dados / Segurança
+
 - **08 — Aliases e guarda de NULL.** Tabela `cliente_aliases` + `COALESCE` para nome canônico
   nas views; exclusão de `valor NULL`. Corrige dashboards vazios/duplicados por divergência de
   nome. Ver [ADR-0004](../02-architecture/adr/0004-chave-de-cliente-por-nome-e-aliases.md).

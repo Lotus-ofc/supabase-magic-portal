@@ -40,7 +40,10 @@ function ServicosAdmin() {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={create} className="flex flex-wrap items-end gap-2 rounded-md border border-border p-4">
+      <form
+        onSubmit={create}
+        className="flex flex-wrap items-end gap-2 rounded-md border border-border p-4"
+      >
         <div className="flex-1">
           <label className="text-xs font-medium">Nome</label>
           <input

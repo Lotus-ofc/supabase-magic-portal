@@ -17,7 +17,9 @@ Reserve ~1 dia adicional para ambiente e primeiro PR.
 ---
 
 ## Dia 0 — Contexto (leitura)
+
 Leia, nesta ordem:
+
 1. **[START HERE](../START_HERE.md)** (obrigatório)
 2. [Missão & Visão](../00-company/mission.md) + [Filosofia](../00-company/philosophy.md)
 3. [Estado atual](../02-architecture/current-state.md) e [Arquitetura alvo](../02-architecture/target-architecture.md)
@@ -31,6 +33,7 @@ Leia, nesta ordem:
 > no Lovable. Ver [Fluxo oficial](../09-standards/development-workflow.md).
 
 ### Pré-requisitos
+
 - Node.js (versão compatível com Vite 8 / `@types/node` ^22 — use a LTS atual).
 - npm.
 - Acesso ao projeto Supabase `ywvhoctcmibjitvwkkhb` e às chaves (peça ao time).
@@ -40,6 +43,7 @@ Leia, nesta ordem:
 > Lovable para implementar features. Ver [Fluxo oficial](../09-standards/development-workflow.md).
 
 ### Passos
+
 ```bash
 # 1. Clonar o repositório do app
 #    (o app fica em supabase-magic-portal)
@@ -57,13 +61,14 @@ npm run dev
 ```
 
 ### Variáveis mínimas (`.env`)
-| Variável | Necessária para |
-|----------|-----------------|
-| `VITE_OFFICIAL_SUPABASE_URL` | client anon |
-| `VITE_OFFICIAL_SUPABASE_ANON_KEY` | client anon |
-| `OFFICIAL_SUPABASE_URL` | server functions / middleware |
-| `OFFICIAL_SUPABASE_ANON_KEY` | middleware de auth |
-| `OFFICIAL_SERVICE_ROLE_KEY` | operações admin (só servidor) |
+
+| Variável                          | Necessária para               |
+| --------------------------------- | ----------------------------- |
+| `VITE_OFFICIAL_SUPABASE_URL`      | client anon                   |
+| `VITE_OFFICIAL_SUPABASE_ANON_KEY` | client anon                   |
+| `OFFICIAL_SUPABASE_URL`           | server functions / middleware |
+| `OFFICIAL_SUPABASE_ANON_KEY`      | middleware de auth            |
+| `OFFICIAL_SERVICE_ROLE_KEY`       | operações admin (só servidor) |
 
 > Detalhes em [Operações → Deployment](../08-operations/deployment.md).
 > Nunca commite `.env` nem exponha a service-role com prefixo `VITE_`.
@@ -92,6 +97,7 @@ flowchart TD
 ---
 
 ## Seu primeiro PR (sugestão de tarefa de aquecimento)
+
 1. Escolha uma melhoria pequena e segura (ex.: um _empty state_, um rótulo, um teste de
    `formulas.ts`).
 2. Siga o [Fluxo oficial de desenvolvimento](../09-standards/development-workflow.md) e os
@@ -103,6 +109,7 @@ flowchart TD
 ---
 
 ## Conceitos que você precisa entender cedo
+
 - **Multi-tenant via `current_user_clientes()`** — por que cada usuário só vê o que vê
   ([Schema](../04-database/schema.md)).
 - **Engine declarativo** — por que não criamos uma tela por plataforma
@@ -115,5 +122,6 @@ flowchart TD
 ---
 
 ## Onde pedir ajuda
+
 > ⚠️ **INFORMAÇÃO NÃO ENCONTRADA** — canais de comunicação do time (Slack/Discord), donos por
 > área e processo de code review não estão no repositório. Preencher com o time.

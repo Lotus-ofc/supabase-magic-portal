@@ -38,13 +38,13 @@ Detalhes: [Missão](./00-company/mission.md) · [Visão de produto](./01-product
 
 Toda a documentação da Lotus distingue **dois mundos**. Não confunda um com o outro.
 
-| | **Estado Atual** | **Visão Futura (Arquitetura Alvo)** |
-|---|------------------|-------------------------------------|
-| **O que é** | Como o sistema funciona **hoje**, no código | Como a Lotus **deverá** funcionar quando madura |
-| **Ingestão** | Make → Supabase (`base_metricas`) | Coletores proprietários → Fila → Workers → Supabase |
-| **App** | TanStack Start + Supabase + Lovable | Stack proprietária (TanStack ou evolução) **sem** Lovable |
-| **Métricas derivadas** | Parte calculada nas **views SQL** (dívida) | Calculadas **somente** na camada de aplicação |
-| **Onde ler** | [Estado atual](./02-architecture/current-state.md) | [Arquitetura alvo](./02-architecture/target-architecture.md) |
+|                        | **Estado Atual**                                   | **Visão Futura (Arquitetura Alvo)**                          |
+| ---------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| **O que é**            | Como o sistema funciona **hoje**, no código        | Como a Lotus **deverá** funcionar quando madura              |
+| **Ingestão**           | Make → Supabase (`base_metricas`)                  | Coletores proprietários → Fila → Workers → Supabase          |
+| **App**                | TanStack Start + Supabase + Lovable                | Stack proprietária (TanStack ou evolução) **sem** Lovable    |
+| **Métricas derivadas** | Parte calculada nas **views SQL** (dívida)         | Calculadas **somente** na camada de aplicação                |
+| **Onde ler**           | [Estado atual](./02-architecture/current-state.md) | [Arquitetura alvo](./02-architecture/target-architecture.md) |
 
 ```mermaid
 flowchart TB
@@ -72,6 +72,22 @@ Ferramentas **transitórias** (a serem removidas no longo prazo):
 - **Make** — ingestão de dados (não versionada neste repositório)
 - **Lovable** — build/deploy transitório (`@lovable.dev/vite-tanstack-config`); **não** é ambiente de dev
 - **Horizons** — citado na visão estratégica; **não encontrado no repositório**
+
+## Sistema de Engenharia (2 minutos)
+
+A Lotus trata **engenharia como sistema**, não como documentação solta.
+
+| Artefato                                                    | Função                         |
+| ----------------------------------------------------------- | ------------------------------ |
+| [Sistema de Engenharia](./00-company/engineering-system.md) | Charter CTO                    |
+| [Governança](./09-standards/governance.md)                  | Processos, PRs, ADRs           |
+| [CONTRIBUTING.md](../CONTRIBUTING.md)                       | Como contribuir                |
+| [CI](../.github/workflows/ci.yml)                           | Lint · test · build · validate |
+| `npm run check`                                             | Gate local = gate CI           |
+
+Mandato: **código ↔ docs sincronizados** · melhoria contínua · ADRs para decisões.
+
+---
 
 ## Fluxo de desenvolvimento oficial (2 minutos)
 
@@ -101,12 +117,12 @@ supabase-magic-portal/
 └── docs/                    # ← Você está aqui (Engineering Handbook)
 ```
 
-| Caminho | Responsabilidade |
-|---------|------------------|
-| `src/lib/platforms/` | Definições de plataforma, fórmulas, engine de KPIs |
-| `src/lib/*.functions.ts` | Server functions (admin, editorial) — service-role |
-| `supabase/migrations-official/` | Schema, views, RLS, editorial |
-| `docs/` | Centro de Conhecimento (docs-as-code) |
+| Caminho                         | Responsabilidade                                   |
+| ------------------------------- | -------------------------------------------------- |
+| `src/lib/platforms/`            | Definições de plataforma, fórmulas, engine de KPIs |
+| `src/lib/*.functions.ts`        | Server functions (admin, editorial) — service-role |
+| `supabase/migrations-official/` | Schema, views, RLS, editorial                      |
+| `docs/`                         | Centro de Conhecimento (docs-as-code)              |
 
 ---
 
@@ -128,15 +144,15 @@ Diagrama completo: [Fluxo de dados](./02-architecture/data-flow.md)
 
 ## Plataformas
 
-| Plataforma | Estado atual (código) | Métricas oficiais (alvo) |
-|------------|----------------------|--------------------------|
-| Google Ads | ✅ `PlatformDef` + views | impressions, clicks, spend, conversions |
-| Meta Ads | ✅ | impressions, reach, clicks, spend, conversions |
-| Instagram | ✅ | reach, accounts_engaged, likes, comments, saves, shares, total_interactions |
-| GA4 | ✅ | users, sessions, events, conversions |
-| Google Business | ⚠️ catálogo, sem dashboard completo | — |
-| TikTok | ⚠️ catálogo, sem dashboard completo | — |
-| LinkedIn, Pinterest, YouTube | ❌ não implementados | visão futura |
+| Plataforma                   | Estado atual (código)               | Métricas oficiais (alvo)                                                    |
+| ---------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| Google Ads                   | ✅ `PlatformDef` + views            | impressions, clicks, spend, conversions                                     |
+| Meta Ads                     | ✅                                  | impressions, reach, clicks, spend, conversions                              |
+| Instagram                    | ✅                                  | reach, accounts_engaged, likes, comments, saves, shares, total_interactions |
+| GA4                          | ✅                                  | users, sessions, events, conversions                                        |
+| Google Business              | ⚠️ catálogo, sem dashboard completo | —                                                                           |
+| TikTok                       | ⚠️ catálogo, sem dashboard completo | —                                                                           |
+| LinkedIn, Pinterest, YouTube | ❌ não implementados                | visão futura                                                                |
 
 Catálogo: `src/lib/integrations-catalog.ts` · Detalhes: [Integrações](./07-integrations/integrations.md)
 
@@ -170,15 +186,15 @@ Filosofia completa: [Princípios de engenharia](./00-company/philosophy.md)
 
 Siga esta ordem:
 
-| Tempo | Documento | Por quê |
-|-------|-----------|---------|
-| 10 min | [Estado atual](./02-architecture/current-state.md) | Stack, limites, dívidas reais |
-| 10 min | [Arquitetura alvo](./02-architecture/target-architecture.md) | Para onde estamos indo |
-| 10 min | [Engine de métricas](./06-engine/overview.md) + [PlatformDef](./06-engine/platform-catalog.md) | Como KPIs são calculados |
-| 10 min | [Auth](./03-backend/auth.md) + [Schema](./04-database/schema.md) | Dados e segurança |
-| 10 min | [Frontend](./05-frontend/overview.md) + [Dashboards](./06-dashboards/dashboards.md) | Como a UI consome dados |
-| 5 min | [ADRs](./02-architecture/adr/README.md) | Decisões já tomadas |
-| 5 min | [Roadmap](./11-roadmap/roadmap.md) + [Auditoria](./AUDIT.md) | Próximos passos e cobertura doc |
+| Tempo  | Documento                                                                                      | Por quê                         |
+| ------ | ---------------------------------------------------------------------------------------------- | ------------------------------- |
+| 10 min | [Estado atual](./02-architecture/current-state.md)                                             | Stack, limites, dívidas reais   |
+| 10 min | [Arquitetura alvo](./02-architecture/target-architecture.md)                                   | Para onde estamos indo          |
+| 10 min | [Engine de métricas](./06-engine/overview.md) + [PlatformDef](./06-engine/platform-catalog.md) | Como KPIs são calculados        |
+| 10 min | [Auth](./03-backend/auth.md) + [Schema](./04-database/schema.md)                               | Dados e segurança               |
+| 10 min | [Frontend](./05-frontend/overview.md) + [Dashboards](./06-dashboards/dashboards.md)            | Como a UI consome dados         |
+| 5 min  | [ADRs](./02-architecture/adr/README.md)                                                        | Decisões já tomadas             |
+| 5 min  | [Roadmap](./11-roadmap/roadmap.md) + [Auditoria](./AUDIT.md)                                   | Próximos passos e cobertura doc |
 
 **Setup local:** [Onboarding](./10-onboarding/onboarding.md) — use `.env.example` na raiz do projeto.
 
@@ -217,5 +233,5 @@ Ver [Modelo de métricas — Gap atual vs alvo](./04-database/metrics-model.md#g
 
 ---
 
-*Última revisão deste documento: 2026-06-26. Se algo aqui divergir do código, o código
-prevalece — abra um PR corrigindo a doc.*
+_Última revisão deste documento: 2026-06-26. Se algo aqui divergir do código, o código
+prevalece — abra um PR corrigindo a doc._

@@ -1,11 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -28,10 +24,12 @@ export function CollapsibleSection({
 }: CollapsibleSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className={cn("lotus-surface overflow-hidden", className)}>
-      <CollapsibleTrigger
-        className="lotus-focus flex w-full items-center gap-3 border-b border-border/70 px-5 py-4 text-left hover:bg-muted/30 data-[state=closed]:border-b-0"
-      >
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className={cn("lotus-surface overflow-hidden", className)}
+    >
+      <CollapsibleTrigger className="lotus-focus flex w-full items-center gap-3 border-b border-border/70 px-5 py-4 text-left hover:bg-muted/30 data-[state=closed]:border-b-0">
         <div className="min-w-0 flex-1">
           {eyebrow && (
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
@@ -41,9 +39,7 @@ export function CollapsibleSection({
           <h2 className="truncate font-display text-[15px] font-semibold tracking-tight text-foreground">
             {title}
           </h2>
-          {description && (
-            <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
         </div>
         {badge && <div className="shrink-0">{badge}</div>}
         <ChevronDown

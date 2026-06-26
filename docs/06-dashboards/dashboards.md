@@ -19,6 +19,7 @@ Telas operacionais (editorial, relatórios, admin CRUD): [Módulos admin](./admi
 ## Telas
 
 ### 1. Dashboard Executivo (admin) — `/admin`
+
 Arquivo: `src/routes/_authenticated/admin/index.tsx`.
 
 - **Hero KPIs:** investimento total (Meta + Google), clientes ativos, alcance Instagram,
@@ -29,6 +30,7 @@ Arquivo: `src/routes/_authenticated/admin/index.tsx`.
 - Fonte: `vw_overview_cliente` + `vw_clientes_ativos` + `listClientes`/`listServicos`.
 
 ### 2. Visão Geral do Cliente (cliente) — `/dashboard`
+
 Arquivo: `src/routes/_authenticated/dashboard.tsx`.
 
 - Hero de investimento (Google/Meta), conversões, sessões, cliques.
@@ -37,6 +39,7 @@ Arquivo: `src/routes/_authenticated/dashboard.tsx`.
 - Fonte: `vw_overview_cliente` + `vw_clientes_ativos`.
 
 ### 3. Conta do Cliente — `/cliente/{slug}`
+
 Arquivo: `src/routes/_authenticated/cliente.$cliente.index.tsx`.
 
 - KPIs (alcance, engajamento, impressões, cliques, conversões).
@@ -44,9 +47,11 @@ Arquivo: `src/routes/_authenticated/cliente.$cliente.index.tsx`.
 - Mix de investimento, resumo, insights e **detalhamento por plataforma** em abas.
 
 ### 4. Dashboards por Plataforma — `/cliente/{slug}/{plataforma}`
+
 Componente genérico `PlatformDashboard` (ver
 [Design System](../05-frontend/component-system.md)). Para cada plataforma com `PlatformDef`
 (Google Ads, Meta Ads, Instagram, GA4):
+
 - Header narrativo com as perguntas de negócio.
 - Cards hero + KPIs.
 - Gráficos declarados no `PlatformDef`.
@@ -65,24 +70,25 @@ Componente genérico `PlatformDashboard` (ver
 Definidas em `src/lib/platforms/formulas.ts`. Sempre sobre **totais agregados**, com divisão
 segura (denominador ≤ 0 → 0).
 
-| KPI | Fórmula | "Subir é bom?" |
-|-----|---------|----------------|
-| CTR | `clicks / impressions × 100` | Sim |
-| CPC | `spend / clicks` | Não |
-| CPM | `spend / impressions × 1000` | Não |
-| CPA | `spend / conversions` | Não |
-| Taxa de conversão | `conversions / sessions × 100` | Sim |
-| Frequência | `impressions / reach` | — |
-| Engagement rate | `interactions / reach × 100` | Sim |
-| Eventos por sessão | `events / sessions` | — |
-| Views por usuário | `pageviews / users` | — |
-| Média diária | `total / dias` | — |
+| KPI                | Fórmula                        | "Subir é bom?" |
+| ------------------ | ------------------------------ | -------------- |
+| CTR                | `clicks / impressions × 100`   | Sim            |
+| CPC                | `spend / clicks`               | Não            |
+| CPM                | `spend / impressions × 1000`   | Não            |
+| CPA                | `spend / conversions`          | Não            |
+| Taxa de conversão  | `conversions / sessions × 100` | Sim            |
+| Frequência         | `impressions / reach`          | —              |
+| Engagement rate    | `interactions / reach × 100`   | Sim            |
+| Eventos por sessão | `events / sessions`            | —              |
+| Views por usuário  | `pageviews / users`            | —              |
+| Média diária       | `total / dias`                 | —              |
 
 ---
 
 ## Regras de agregação que importam
 
 Em `src/lib/metrics.ts` (`sumOverview`):
+
 - **`google_spend`** → **MAX por cliente** no período (as integrações enviam cumulativo do
   período; somar entre dias inflaria).
 - **`instagram_reach`** → **MAX por cliente** (reach = contas únicas; somar contaria a mesma
@@ -95,7 +101,9 @@ Em `src/lib/metrics.ts` (`sumOverview`):
 ---
 
 ## Insights automáticos
+
 Gerados sem invenção, a partir de variações relevantes:
+
 - No overview (`buildInsights` em `metrics.ts`): conversões (±5%), investimento (±8%), CTR
   (limiar 1,5%), CPA (≥5 conversões), tráfego/sessões (±10%).
 - Nos dashboards de plataforma (`InsightsBlock`): KPIs com variação > 8% e métricas hero com
@@ -107,6 +115,7 @@ Gerados sem invenção, a partir de variações relevantes:
 ---
 
 ## Períodos e deltas
+
 Toda janela vem de `src/lib/period.ts` (fuso America/Sao_Paulo). Presets: hoje, ontem, 7/30/90
 dias, este mês, mês passado, custom. O delta sempre compara com uma **janela anterior de mesmo
 tamanho**. Ver [ADR-0006](../02-architecture/adr/0006-timezone-america-sao-paulo.md).

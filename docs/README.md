@@ -23,10 +23,10 @@ Depois: [Onboarding técnico](./10-onboarding/onboarding.md) para setup local.
 
 ## Dois estados da documentação
 
-| Estado | Documento principal |
-|--------|---------------------|
-| **Como funciona hoje** | [Estado atual](./02-architecture/current-state.md) |
-| **Para onde vamos** | [Arquitetura alvo](./02-architecture/target-architecture.md) |
+| Estado                 | Documento principal                                          |
+| ---------------------- | ------------------------------------------------------------ |
+| **Como funciona hoje** | [Estado atual](./02-architecture/current-state.md)           |
+| **Para onde vamos**    | [Arquitetura alvo](./02-architecture/target-architecture.md) |
 
 Ferramentas **transitórias**: Make (ingestão), Lovable (build/deploy). Ver
 [ADR-0009](./02-architecture/adr/0009-platform-proprietary-infrastructure.md).
@@ -35,24 +35,24 @@ Ferramentas **transitórias**: Make (ingestão), Lovable (build/deploy). Ver
 
 ## Como este handbook está organizado
 
-| # | Seção | O que você encontra | Para quem |
-|---|-------|---------------------|-----------|
-| — | **[START HERE](./START_HERE.md)** | Ponto de entrada, mapa mental, roteiro de 1h | Novos devs |
-| 00 | [Empresa](./00-company/mission.md) | Missão, filosofia, princípios, glossário | Todos |
-| 01 | [Produto](./01-product/product-overview.md) | O que a Lotus faz, personas, jornadas | PM, Eng, Vendas |
-| 02 | [Arquitetura](./02-architecture/overview.md) | Estado atual, arquitetura alvo, fluxo de dados, ADRs | Engenharia |
-| 03 | [Backend](./03-backend/overview.md) | Server functions, [auth](./03-backend/auth.md), [segurança](./03-backend/security.md), API | Engenharia |
-| 04 | [Banco de dados](./04-database/schema.md) | Schema, [RLS](./04-database/rls-policies.md), views, migrations, métricas | Eng, Dados |
-| 05 | [Frontend](./05-frontend/overview.md) | Stack, [estrutura](./05-frontend/repository-structure.md), roteamento, UI, [erros](./05-frontend/observability-errors.md) | Engenharia |
-| 06 | [Dashboards](./06-dashboards/dashboards.md) | KPIs, telas analíticas, [módulos admin](./06-dashboards/admin-modules.md) | Eng, PM |
-| 06b | [Engine de métricas](./06-engine/overview.md) | PlatformDef, [fórmulas](./06-engine/formulas.md), [período](./06-engine/period.md), [catálogo](./06-engine/platform-catalog.md) | Eng, Dados |
-| 07 | [Integrações](./07-integrations/integrations.md) | Catálogo, Make, coletores alvo | Eng, Ops |
-| 08 | [Operações](./08-operations/deployment.md) | Deploy, [ambientes](./08-operations/environments.md), [CI/CD](./08-operations/cicd.md), [observabilidade](./08-operations/observability.md), [troubleshooting](./08-operations/troubleshooting.md), runbook | Eng, Ops |
-| 09 | [Padrões](./09-standards/development.md) | Convenções, [código](./09-standards/code-organization.md), [testes](./09-standards/testing.md), fluxo, doc-as-code | Engenharia |
-| 10 | [Onboarding](./10-onboarding/onboarding.md) | Setup local, primeiros passos | Novos devs |
-| 11 | [Roadmap](./11-roadmap/roadmap.md) | Próximos passos e dívidas priorizadas | Todos |
-| 12 | [Changelog](./12-changelog/changelog.md) | Histórico de mudanças relevantes | Todos |
-| — | [Auditoria de completude](./AUDIT.md) | Cobertura CTO, lacunas, matriz código→doc | Liderança, Eng |
+| #   | Seção                                            | O que você encontra                                                                                                                                                                                         | Para quem       |
+| --- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| —   | **[START HERE](./START_HERE.md)**                | Ponto de entrada, mapa mental, roteiro de 1h                                                                                                                                                                | Novos devs      |
+| 00  | [Empresa](./00-company/mission.md)               | Missão, [Sistema de Engenharia](./00-company/engineering-system.md), filosofia, glossário                                                                                                                   | Todos           |
+| 01  | [Produto](./01-product/product-overview.md)      | O que a Lotus faz, personas, jornadas                                                                                                                                                                       | PM, Eng, Vendas |
+| 02  | [Arquitetura](./02-architecture/overview.md)     | Estado atual, arquitetura alvo, fluxo de dados, ADRs                                                                                                                                                        | Engenharia      |
+| 03  | [Backend](./03-backend/overview.md)              | Server functions, [auth](./03-backend/auth.md), [segurança](./03-backend/security.md), API                                                                                                                  | Engenharia      |
+| 04  | [Banco de dados](./04-database/schema.md)        | Schema, [RLS](./04-database/rls-policies.md), views, migrations, métricas                                                                                                                                   | Eng, Dados      |
+| 05  | [Frontend](./05-frontend/overview.md)            | Stack, [estrutura](./05-frontend/repository-structure.md), roteamento, UI, [erros](./05-frontend/observability-errors.md)                                                                                   | Engenharia      |
+| 06  | [Dashboards](./06-dashboards/dashboards.md)      | KPIs, telas analíticas, [módulos admin](./06-dashboards/admin-modules.md)                                                                                                                                   | Eng, PM         |
+| 06b | [Engine de métricas](./06-engine/overview.md)    | PlatformDef, [fórmulas](./06-engine/formulas.md), [período](./06-engine/period.md), [catálogo](./06-engine/platform-catalog.md)                                                                             | Eng, Dados      |
+| 07  | [Integrações](./07-integrations/integrations.md) | Catálogo, Make, coletores alvo                                                                                                                                                                              | Eng, Ops        |
+| 08  | [Operações](./08-operations/deployment.md)       | Deploy, [ambientes](./08-operations/environments.md), [CI/CD](./08-operations/cicd.md), [observabilidade](./08-operations/observability.md), [troubleshooting](./08-operations/troubleshooting.md), runbook | Eng, Ops        |
+| 09  | [Padrões](./09-standards/development.md)         | Convenções, [governança](./09-standards/governance.md), testes, fluxo, doc-as-code                                                                                                                          | Engenharia      |
+| 10  | [Onboarding](./10-onboarding/onboarding.md)      | Setup local, primeiros passos                                                                                                                                                                               | Novos devs      |
+| 11  | [Roadmap](./11-roadmap/roadmap.md)               | Próximos passos e dívidas priorizadas                                                                                                                                                                       | Todos           |
+| 12  | [Changelog](./12-changelog/changelog.md)         | Histórico de mudanças relevantes                                                                                                                                                                            | Todos           |
+| —   | [Auditoria de completude](./AUDIT.md)            | Cobertura CTO, lacunas, matriz código→doc                                                                                                                                                                   | Liderança, Eng  |
 
 ---
 

@@ -63,12 +63,16 @@ export const getCliente = createServerFn({ method: "GET" })
     return { cliente, servicos: servicos ?? [], acessos: acessos ?? [] };
   });
 
-const optText = (max = 200) =>
-  z.string().trim().max(max).optional().nullable().or(z.literal(""));
+const optText = (max = 200) => z.string().trim().max(max).optional().nullable().or(z.literal(""));
 
 const clienteFields = z.object({
   nome_cliente: z.string().trim().min(1).max(200),
-  slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/, "Use somente a-z, 0-9 e hífen"),
+  slug: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9-]+$/, "Use somente a-z, 0-9 e hífen"),
   ativo: z.boolean().default(true),
   empresa: z.string().trim().max(200).optional().nullable(),
   email_principal: z.string().trim().email().max(255).optional().nullable().or(z.literal("")),
@@ -471,7 +475,7 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const safe = async <T,>(p: PromiseLike<{ data: T; error: any }>) => {
+    const safe = async <T>(p: PromiseLike<{ data: T; error: any }>) => {
       try {
         const { data, error } = await p;
         return { data: (data ?? null) as T | null, error: error?.message ?? null };
@@ -512,17 +516,45 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
       // Views analíticas: SEMPRE via context.supabase (usuário autenticado).
       // O filtro interno depende de current_user_clientes() => auth.uid().
       // Com service_role, auth.uid() é NULL e as views retornam 0 linhas.
-      safe(context.supabase.from("vw_overview_cliente").select("*").order("data", { ascending: false }).limit(20)),
-      safe(context.supabase.from("vw_google_ads_diario").select("*").order("data", { ascending: false }).limit(20)),
-      safe(context.supabase.from("vw_meta_ads_diario").select("*").order("data", { ascending: false }).limit(20)),
-      safe(context.supabase.from("vw_ga4_diario").select("*").order("data", { ascending: false }).limit(20)),
-      safe(context.supabase.from("vw_instagram_diario").select("*").order("data", { ascending: false }).limit(20)),
+      safe(
+        context.supabase
+          .from("vw_overview_cliente")
+          .select("*")
+          .order("data", { ascending: false })
+          .limit(20),
+      ),
+      safe(
+        context.supabase
+          .from("vw_google_ads_diario")
+          .select("*")
+          .order("data", { ascending: false })
+          .limit(20),
+      ),
+      safe(
+        context.supabase
+          .from("vw_meta_ads_diario")
+          .select("*")
+          .order("data", { ascending: false })
+          .limit(20),
+      ),
+      safe(
+        context.supabase
+          .from("vw_ga4_diario")
+          .select("*")
+          .order("data", { ascending: false })
+          .limit(20),
+      ),
+      safe(
+        context.supabase
+          .from("vw_instagram_diario")
+          .select("*")
+          .order("data", { ascending: false })
+          .limit(20),
+      ),
     ]);
 
     const totalRegistros =
-      (totalRes as any)?.error == null
-        ? ((totalRes as any).count ?? null)
-        : null;
+      (totalRes as any)?.error == null ? ((totalRes as any).count ?? null) : null;
     // count comes via head:true — re-run to capture it properly
     const totalCount = await supabaseAdmin
       .from("base_metricas")
@@ -598,10 +630,14 @@ export const getViewsAudit = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const safe = async <T,>(p: PromiseLike<{ data: T; error: any; count?: number | null }>) => {
+    const safe = async <T>(p: PromiseLike<{ data: T; error: any; count?: number | null }>) => {
       try {
         const r = await p;
-        return { data: (r.data ?? null) as T | null, error: r.error?.message ?? null, count: r.count ?? null };
+        return {
+          data: (r.data ?? null) as T | null,
+          error: r.error?.message ?? null,
+          count: r.count ?? null,
+        };
       } catch (e: any) {
         return { data: null as T | null, error: e?.message ?? String(e), count: null };
       }
@@ -636,20 +672,33 @@ export const getViewsAudit = createServerFn({ method: "GET" })
     const cucService = await safe(supabaseAdmin.rpc("current_user_clientes"));
 
     // 3. Contagem de cada view: service_role (espera 0) vs admin autenticado (espera dados)
-    const viewResults: Record<string, {
-      service: { count: number | null; error: string | null; sample: any[] | null };
-      authed:  { count: number | null; error: string | null; sample: any[] | null };
-      sql: string;
-    }> = {};
+    const viewResults: Record<
+      string,
+      {
+        service: { count: number | null; error: string | null; sample: any[] | null };
+        authed: { count: number | null; error: string | null; sample: any[] | null };
+        sql: string;
+      }
+    > = {};
 
     for (const v of viewNames) {
       const [svc, aut] = await Promise.all([
-        safe(supabaseAdmin.from(v as any).select("*", { count: "exact" }).limit(3)),
-        safe(context.supabase.from(v as any).select("*", { count: "exact" }).limit(3)),
+        safe(
+          supabaseAdmin
+            .from(v as any)
+            .select("*", { count: "exact" })
+            .limit(3),
+        ),
+        safe(
+          context.supabase
+            .from(v as any)
+            .select("*", { count: "exact" })
+            .limit(3),
+        ),
       ]);
       viewResults[v] = {
-        service: { count: svc.count, error: svc.error, sample: (svc.data as any[] | null) },
-        authed:  { count: aut.count, error: aut.error, sample: (aut.data as any[] | null) },
+        service: { count: svc.count, error: svc.error, sample: svc.data as any[] | null },
+        authed: { count: aut.count, error: aut.error, sample: aut.data as any[] | null },
         sql: VIEW_SQL[v] ?? "(definição não capturada)",
       };
     }

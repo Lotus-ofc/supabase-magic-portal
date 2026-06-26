@@ -13,6 +13,7 @@ last_review: 2026-06-26
 ## Dashboard vazio / sem dados
 
 ### Sintomas
+
 Cards zerados, gráficos flat, "—" nos KPIs.
 
 ### Checklist
@@ -26,31 +27,31 @@ Cards zerados, gráficos flat, "—" nos KPIs.
 
 ### Causas frequentes
 
-| Causa | Solução |
-|-------|---------|
-| Make não rodou | Verificar ingestão externa |
-| Nome cliente divergente | Adicionar alias |
-| `valor IS NULL` | Corrigir pipeline Make |
-| RLS / views | Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md) |
+| Causa                   | Solução                                                               |
+| ----------------------- | --------------------------------------------------------------------- |
+| Make não rodou          | Verificar ingestão externa                                            |
+| Nome cliente divergente | Adicionar alias                                                       |
+| `valor IS NULL`         | Corrigir pipeline Make                                                |
+| RLS / views             | Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md) |
 
 ---
 
 ## 401 Unauthorized em server function
 
-| Causa | Solução |
-|-------|---------|
-| Sessão expirada | Re-login em `/auth` |
-| Bearer não anexado | Verificar `attachSupabaseAuth` em `start.ts` |
+| Causa              | Solução                                               |
+| ------------------ | ----------------------------------------------------- |
+| Sessão expirada    | Re-login em `/auth`                                   |
+| Bearer não anexado | Verificar `attachSupabaseAuth` em `start.ts`          |
 | Env server ausente | `OFFICIAL_SUPABASE_URL`, `OFFICIAL_SUPABASE_ANON_KEY` |
 
 ---
 
 ## 403 Forbidden (admin)
 
-| Causa | Solução |
-|-------|---------|
+| Causa                    | Solução                                     |
+| ------------------------ | ------------------------------------------- |
 | Usuário sem role `admin` | Inserir em `user_roles` via admin existente |
-| Guard de rota | Esperado — cliente não acessa `/admin` |
+| Guard de rota            | Esperado — cliente não acessa `/admin`      |
 
 ---
 
@@ -61,11 +62,11 @@ npm ci
 npm run build
 ```
 
-| Erro comum | Solução |
-|------------|---------|
-| Env ausente no build | Variáveis `VITE_OFFICIAL_*` no ambiente |
+| Erro comum            | Solução                                    |
+| --------------------- | ------------------------------------------ |
+| Env ausente no build  | Variáveis `VITE_OFFICIAL_*` no ambiente    |
 | Plugin duplicado Vite | Não adicionar plugins já no preset Lovable |
-| Tipos routeTree | Regenerar com `npm run dev` uma vez |
+| Tipos routeTree       | Regenerar com `npm run dev` uma vez        |
 
 ---
 

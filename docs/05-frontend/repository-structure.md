@@ -45,13 +45,13 @@ supabase-magic-portal/
 
 Convenção TanStack Start: arquivo = rota.
 
-| Padrão | Exemplo | Significado |
-|--------|---------|-------------|
-| `index.tsx` | `/` | Raiz |
-| `auth.tsx` | `/auth` | Rota plana |
-| `_authenticated/route.tsx` | Layout | Guard + shell |
-| `cliente.$cliente.tsx` | `/cliente/:cliente` | Parâmetro dinâmico |
-| `admin/clientes.$id.tsx` | `/admin/clientes/:id` | Aninhado |
+| Padrão                     | Exemplo               | Significado        |
+| -------------------------- | --------------------- | ------------------ |
+| `index.tsx`                | `/`                   | Raiz               |
+| `auth.tsx`                 | `/auth`               | Rota plana         |
+| `_authenticated/route.tsx` | Layout                | Guard + shell      |
+| `cliente.$cliente.tsx`     | `/cliente/:cliente`   | Parâmetro dinâmico |
+| `admin/clientes.$id.tsx`   | `/admin/clientes/:id` | Aninhado           |
 
 `routeTree.gen.ts` é **gerado** — nunca editar manualmente.
 
@@ -61,18 +61,18 @@ Detalhes: [Roteamento](./routing.md)
 
 ## `src/lib/` — lógica de negócio
 
-| Módulo | Responsabilidade |
-|--------|------------------|
-| `platforms/*` | Engine declarativo, fórmulas, PlatformDefs |
-| `metrics.ts` | Agregação overview cross-platform |
-| `period.ts` | Datas BRT, presets de período |
-| `admin.functions.ts` | Server functions administrativas |
-| `editorial.functions.ts` | Server functions editorial |
-| `integrations-catalog.ts` | Catálogo de integrações (formulário admin) |
-| `error-capture.ts` | Recuperação de erros SSR (h3) |
-| `error-page.ts` | HTML de erro 500 |
-| `lovable-error-reporting.ts` | Report client → Lovable (transitório) |
-| `utils.ts` | `cn()` — merge de classes Tailwind |
+| Módulo                       | Responsabilidade                           |
+| ---------------------------- | ------------------------------------------ |
+| `platforms/*`                | Engine declarativo, fórmulas, PlatformDefs |
+| `metrics.ts`                 | Agregação overview cross-platform          |
+| `period.ts`                  | Datas BRT, presets de período              |
+| `admin.functions.ts`         | Server functions administrativas           |
+| `editorial.functions.ts`     | Server functions editorial                 |
+| `integrations-catalog.ts`    | Catálogo de integrações (formulário admin) |
+| `error-capture.ts`           | Recuperação de erros SSR (h3)              |
+| `error-page.ts`              | HTML de erro 500                           |
+| `lovable-error-reporting.ts` | Report client → Lovable (transitório)      |
+| `utils.ts`                   | `cn()` — merge de classes Tailwind         |
 
 **Regra:** componentes React **não** contêm cálculos de KPI.
 
@@ -89,12 +89,12 @@ Catálogo: [Design System](./component-system.md)
 
 ## `src/integrations/supabase/`
 
-| Arquivo | Uso |
-|---------|-----|
-| `client.ts` | Browser — anon key + JWT |
-| `client.server.ts` | Servidor — service-role |
-| `auth-middleware.ts` | `requireSupabaseAuth` |
-| `auth-attacher.ts` | `attachSupabaseAuth` |
+| Arquivo              | Uso                      |
+| -------------------- | ------------------------ |
+| `client.ts`          | Browser — anon key + JWT |
+| `client.server.ts`   | Servidor — service-role  |
+| `auth-middleware.ts` | `requireSupabaseAuth`    |
+| `auth-attacher.ts`   | `attachSupabaseAuth`     |
 
 ---
 
@@ -102,15 +102,15 @@ Catálogo: [Design System](./component-system.md)
 
 Migrations numeradas, aditivas, idempotentes. Ordem:
 
-| # | Arquivo | Tema |
-|---|---------|------|
-| 01 | `auth_roles_access.sql` | Auth, roles, `current_user_clientes` |
-| 02 | `views_metricas.sql` | Views analíticas iniciais |
-| 03 | `cadastro_clientes_extensao.sql` | Clientes, serviços, RLS |
-| 05 | `cadastro_clientes_make_ids.sql` | IDs técnicos Make |
-| 06 | `editorial.sql` | Posts, revisões |
-| 07 | `views_fix_security_invoker.sql` | SECURITY DEFINER |
-| 08 | `aliases_e_null_guard.sql` | Aliases + NULL guard |
+| #   | Arquivo                          | Tema                                 |
+| --- | -------------------------------- | ------------------------------------ |
+| 01  | `auth_roles_access.sql`          | Auth, roles, `current_user_clientes` |
+| 02  | `views_metricas.sql`             | Views analíticas iniciais            |
+| 03  | `cadastro_clientes_extensao.sql` | Clientes, serviços, RLS              |
+| 05  | `cadastro_clientes_make_ids.sql` | IDs técnicos Make                    |
+| 06  | `editorial.sql`                  | Posts, revisões                      |
+| 07  | `views_fix_security_invoker.sql` | SECURITY DEFINER                     |
+| 08  | `aliases_e_null_guard.sql`       | Aliases + NULL guard                 |
 
 > Não existe migration `04` (deprecada).
 
@@ -124,13 +124,13 @@ Migrations numeradas, aditivas, idempotentes. Ordem:
 
 ## O que NÃO está no repositório
 
-| Item | Status |
-|------|--------|
-| Cenários Make | Externo |
+| Item                        | Status           |
+| --------------------------- | ---------------- |
+| Cenários Make               | Externo          |
 | CI/CD (`.github/workflows`) | Não implementado |
-| Testes (`*.test.ts`) | Não implementado |
-| `supabase/config.toml` | Não presente |
-| Schema DDL `base_metricas` | Não versionado |
+| Testes (`*.test.ts`)        | Não implementado |
+| `supabase/config.toml`      | Não presente     |
+| Schema DDL `base_metricas`  | Não versionado   |
 
 ---
 

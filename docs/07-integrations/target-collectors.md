@@ -52,27 +52,27 @@ flowchart TB
 
 ```typescript
 interface PlatformCollector {
-  platform: PlatformId
-  authenticate(clienteId: string): Promise<Credentials>
-  fetchMetrics(params: SyncParams): Promise<OfficialMetricRow[]>
-  upsert(rows: OfficialMetricRow[]): Promise<SyncResult>
+  platform: PlatformId;
+  authenticate(clienteId: string): Promise<Credentials>;
+  fetchMetrics(params: SyncParams): Promise<OfficialMetricRow[]>;
+  upsert(rows: OfficialMetricRow[]): Promise<SyncResult>;
 }
 
 interface SyncParams {
-  clienteId: string
-  dateFrom: string  // YYYY-MM-DD, America/Sao_Paulo
-  dateTo: string
-  runId: string
+  clienteId: string;
+  dateFrom: string; // YYYY-MM-DD, America/Sao_Paulo
+  dateTo: string;
+  runId: string;
 }
 
 interface OfficialMetricRow {
-  clienteId: string
-  platform: PlatformId
-  metric: string      // enum — métrica oficial apenas
-  value: number
-  date: string
-  ingestedAt: string
-  sourceRunId: string
+  clienteId: string;
+  platform: PlatformId;
+  metric: string; // enum — métrica oficial apenas
+  value: number;
+  date: string;
+  ingestedAt: string;
+  sourceRunId: string;
 }
 ```
 
@@ -80,16 +80,16 @@ interface OfficialMetricRow {
 
 ## Coletores planejados
 
-| Classe | Plataforma | Métricas oficiais | Prioridade sugerida |
-|--------|-----------|-------------------|---------------------|
-| `GoogleAdsCollector` | Google Ads | impressions, clicks, spend, conversions | Alta (piloto) |
-| `MetaCollector` | Meta Ads | impressions, reach, clicks, spend, conversions | Alta |
-| `InstagramCollector` | Instagram | reach, accounts_engaged, likes, … | Média |
-| `GA4Collector` | GA4 | users, sessions, events, conversions | Média |
-| `GoogleBusinessCollector` | GBP | TBD — definir com produto | Baixa |
-| `TikTokCollector` | TikTok | TBD | Baixa |
-| `LinkedInCollector` | LinkedIn Ads | TBD | Futuro |
-| `PinterestCollector` | Pinterest | TBD | Futuro |
+| Classe                    | Plataforma   | Métricas oficiais                              | Prioridade sugerida |
+| ------------------------- | ------------ | ---------------------------------------------- | ------------------- |
+| `GoogleAdsCollector`      | Google Ads   | impressions, clicks, spend, conversions        | Alta (piloto)       |
+| `MetaCollector`           | Meta Ads     | impressions, reach, clicks, spend, conversions | Alta                |
+| `InstagramCollector`      | Instagram    | reach, accounts_engaged, likes, …              | Média               |
+| `GA4Collector`            | GA4          | users, sessions, events, conversions           | Média               |
+| `GoogleBusinessCollector` | GBP          | TBD — definir com produto                      | Baixa               |
+| `TikTokCollector`         | TikTok       | TBD                                            | Baixa               |
+| `LinkedInCollector`       | LinkedIn Ads | TBD                                            | Futuro              |
+| `PinterestCollector`      | Pinterest    | TBD                                            | Futuro              |
 
 Métricas oficiais detalhadas: [Modelo de métricas](../04-database/metrics-model.md)
 
@@ -105,12 +105,12 @@ Métricas oficiais detalhadas: [Modelo de métricas](../04-database/metrics-mode
 
 ### Retries
 
-| Erro | Ação |
-|------|------|
-| Rate limit (429) | Backoff + requeue |
-| Timeout | Retry até N vezes |
-| 401/403 | Não retentar; alertar |
-| Dados inválidos | Log + skip row; não abortar batch |
+| Erro             | Ação                              |
+| ---------------- | --------------------------------- |
+| Rate limit (429) | Backoff + requeue                 |
+| Timeout          | Retry até N vezes                 |
+| 401/403          | Não retentar; alertar             |
+| Dados inválidos  | Log + skip row; não abortar batch |
 
 ### UPSERT idempotente
 

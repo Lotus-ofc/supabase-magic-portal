@@ -543,7 +543,6 @@ function ClienteEdit() {
         </div>
       </CollapsibleSection>
 
-
       {/* SERVIÇOS */}
       <CollapsibleSection
         eyebrow="06"
@@ -581,7 +580,9 @@ function ClienteEdit() {
                   onChange={(e) =>
                     setForm((f) => ({
                       ...f,
-                      servicos: f.servicos.map((p, j) => (j === i ? { ...p, valor: e.target.value } : p)),
+                      servicos: f.servicos.map((p, j) =>
+                        j === i ? { ...p, valor: e.target.value } : p,
+                      ),
                     }))
                   }
                   disabled={!s.selected}
@@ -626,9 +627,7 @@ function ClienteEdit() {
         <div
           className={
             "lotus-surface flex items-center justify-between gap-3 px-4 py-3 shadow-[var(--shadow-lg)] transition-all " +
-            (dirty
-              ? "border-amber-300/60 dark:border-amber-500/40"
-              : "border-border opacity-95")
+            (dirty ? "border-amber-300/60 dark:border-amber-500/40" : "border-border opacity-95")
           }
         >
           <div className="flex items-center gap-2 text-[12.5px]">
@@ -815,7 +814,11 @@ function AcessosBlock({
           onChange={(e) => setSearch(e.target.value)}
           className="min-w-0 flex-1"
         />
-        <Select value={userId} onChange={(e) => setUserId(e.target.value)} className="min-w-0 flex-1">
+        <Select
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          className="min-w-0 flex-1"
+        >
           <option value="">Selecione um usuário…</option>
           {available.map((u) => (
             <option key={u.id} value={u.id}>

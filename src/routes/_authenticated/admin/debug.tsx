@@ -43,11 +43,7 @@ function ViewBlock({
   return (
     <SectionCard
       title={title}
-      description={
-        result.error
-          ? `Erro: ${result.error}`
-          : `${rows.length} linha(s) (limite 20)`
-      }
+      description={result.error ? `Erro: ${result.error}` : `${rows.length} linha(s) (limite 20)`}
     >
       {result.error ? (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
@@ -82,11 +78,7 @@ function DebugPage() {
           icon={Database}
           emphasis="hero"
         />
-        <StatCard
-          label="Clientes distintos"
-          value={fmt(data.total_clientes)}
-          icon={Users}
-        />
+        <StatCard label="Clientes distintos" value={fmt(data.total_clientes)} icon={Users} />
         <StatCard
           label="Última data recebida"
           value={data.ultima_data ?? "—"}
@@ -120,9 +112,7 @@ function DebugPage() {
                 {data.por_plataforma.map((p) => (
                   <tr key={p.plataforma} className="border-t border-border">
                     <td className="px-3 py-2 font-medium">{p.plataforma}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {fmt(p.total)}
-                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums">{fmt(p.total)}</td>
                   </tr>
                 ))}
               </tbody>

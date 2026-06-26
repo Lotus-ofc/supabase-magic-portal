@@ -149,7 +149,7 @@ function ApprovalCard({
           src={post.capa_url}
           alt=""
           className="h-56 w-full border-b border-border/60 object-cover"
-          onError={(e) => ((e.currentTarget.style.display = "none"))}
+          onError={(e) => (e.currentTarget.style.display = "none")}
         />
       ) : (
         <div className="flex h-32 items-center justify-center border-b border-border/60 bg-muted/30 text-[11px] text-muted-foreground">
