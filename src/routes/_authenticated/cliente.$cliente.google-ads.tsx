@@ -1,13 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PlatformPlaceholder } from "@/components/lotus/PlatformPlaceholder";
-import { Megaphone } from "lucide-react";
+import { PlatformDashboardPage } from "@/components/lotus/PlatformDashboardPage";
+import { googleAdsDef } from "@/lib/platforms/google-ads";
 
 export const Route = createFileRoute("/_authenticated/cliente/$cliente/google-ads")({
-  component: () => (
-    <PlatformPlaceholder
-      icon={Megaphone}
-      title="Google Ads"
-      description="Campanhas, grupos e anúncios da conta Google Ads."
-    />
-  ),
+  component: () => <PlatformDashboardPage def={googleAdsDef} />,
 });
