@@ -253,19 +253,24 @@ export function pctDelta(current: number, previous: number): number | null {
   return ((current - previous) / previous) * 100;
 }
 
+// Helpers derivados — thin wrappers sobre src/lib/platforms/formulas.ts
+// para garantir UMA ÚNICA fonte de verdade entre Dashboard Executivo,
+// Visão Geral do Cliente e Dashboards de Plataforma.
+import { ctr as _ctr, cpa as _cpa, convRate as _convRate } from "./platforms/formulas";
+
 /** CTR derivado em pontos percentuais (0–100). */
 export function deriveCtr(impressions: number, clicks: number): number {
-  return impressions > 0 ? (clicks / impressions) * 100 : 0;
+  return _ctr(impressions, clicks);
 }
 
-/** Taxa de conversão sobre sessões (0–100). */
+/** Taxa de conversão (0–100). */
 export function deriveConvRate(sessions: number, conversions: number): number {
-  return sessions > 0 ? (conversions / sessions) * 100 : 0;
+  return _convRate(conversions, sessions);
 }
 
 /** CPA — custo por conversão. */
 export function deriveCpa(spend: number, conversions: number): number {
-  return conversions > 0 ? spend / conversions : 0;
+  return _cpa(spend, conversions);
 }
 
 // ----------------------------------------------------------------------------
