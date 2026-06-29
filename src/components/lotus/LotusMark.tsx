@@ -1,62 +1,58 @@
 import { cn } from "@/lib/utils";
+import { BRAND_ASSETS, BRAND_NAME } from "@/lib/brand";
 
-interface LotusMarkProps extends React.SVGProps<SVGSVGElement> {
-  /** Render with a static gradient (default) or a flat single-color tint. */
-  variant?: "gradient" | "flat";
-}
+type LogoSize = "sm" | "md" | "lg";
 
-/**
- * LotusMark — abstract three-curve petal. Conceptual reference to growth and
- * organic movement; intentionally NOT a literal flower icon. Used as the
- * single brand identity element across the app (logo lockup, splash, empty
- * states). Never duplicate as a generic decorative icon.
- */
-export function LotusMark({ variant = "gradient", className, ...props }: LotusMarkProps) {
-  const id = "lotus-mark-grad";
+const iconSize: Record<LogoSize, string> = {
+  sm: "h-6 w-6",
+  md: "h-8 w-8",
+  lg: "h-10 w-10",
+};
+
+const wordmarkHeight: Record<LogoSize, string> = {
+  sm: "h-6",
+  md: "h-8",
+  lg: "h-10",
+};
+
+/** Ícone Lots BI (pétala com gradiente roxo → azul). */
+export function LotsBIIcon({
+  className,
+  size = "md",
+  ...props
+}: React.ImgHTMLAttributes<HTMLImageElement> & { size?: LogoSize }) {
   return (
-    <svg
-      viewBox="0 0 32 32"
-      role="img"
-      aria-label="Lotus"
-      className={cn("h-7 w-7", className)}
+    <img
+      src={BRAND_ASSETS.icon}
+      alt=""
+      aria-hidden
+      className={cn("object-contain", iconSize[size], className)}
       {...props}
-    >
-      {variant === "gradient" && (
-        <defs>
-          <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="var(--primary-500)" />
-            <stop offset="100%" stopColor="var(--secondary-500)" />
-          </linearGradient>
-        </defs>
-      )}
-      {/* Three overlapping curves forming an upward opening — growth motif */}
-      <g
-        fill="none"
-        stroke={variant === "gradient" ? `url(#${id})` : "currentColor"}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      >
-        <path d="M16 28 C 6 22, 6 12, 16 4" opacity="0.55" />
-        <path d="M16 28 C 26 22, 26 12, 16 4" opacity="0.55" />
-        <path d="M16 28 C 16 22, 16 12, 16 4" />
-      </g>
-      <circle
-        cx="16"
-        cy="28"
-        r="1.6"
-        fill={variant === "gradient" ? `url(#${id})` : "currentColor"}
-      />
-    </svg>
+    />
   );
 }
 
-export function LotusWordmark({ className }: { className?: string }) {
+/** Lockup completo: ícone + “Lots BI”. */
+export function LotsBIWordmark({
+  className,
+  size = "md",
+}: {
+  className?: string;
+  size?: LogoSize;
+}) {
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <LotusMark className="h-7 w-7" />
-      <span className="font-display text-[15px] font-semibold tracking-[-0.02em] text-foreground">
-        Lotus
-      </span>
+    <div className={cn("flex items-center", className)}>
+      <img
+        src={BRAND_ASSETS.logoFull}
+        alt={BRAND_NAME}
+        className={cn("w-auto max-w-[148px] object-contain object-left", wordmarkHeight[size])}
+      />
     </div>
   );
 }
+
+/** @deprecated Use LotsBIIcon */
+export const LotusMark = LotsBIIcon;
+
+/** @deprecated Use LotsBIWordmark */
+export const LotusWordmark = LotsBIWordmark;

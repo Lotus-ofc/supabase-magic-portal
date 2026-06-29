@@ -27,11 +27,11 @@ export interface AreaSeries {
 }
 
 const TONE: Record<AreaSeriesTone, { stroke: string; fillFrom: string; legend: string }> = {
-  primary: { stroke: "var(--primary-500)", fillFrom: "var(--primary-500)", legend: "#9769b1" },
+  primary: { stroke: "var(--primary-500)", fillFrom: "var(--primary-500)", legend: "#A855F7" },
   secondary: {
     stroke: "var(--secondary-600)",
     fillFrom: "var(--secondary-500)",
-    legend: "#67bee7",
+    legend: "#60A5FA",
   },
   success: { stroke: "var(--success)", fillFrom: "var(--success)", legend: "#22c55e" },
   neutral: {

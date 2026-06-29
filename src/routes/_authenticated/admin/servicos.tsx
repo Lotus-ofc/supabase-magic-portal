@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { adminTitle } from "@/lib/brand";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { listServicos, upsertServico } from "@/lib/admin.functions";
@@ -6,6 +7,7 @@ import { listServicos, upsertServico } from "@/lib/admin.functions";
 const servicosQuery = { queryKey: ["admin", "servicos"], queryFn: () => listServicos() };
 
 export const Route = createFileRoute("/_authenticated/admin/servicos")({
+  head: () => ({ meta: [{ title: adminTitle("Serviços") }] }),
   loader: ({ context }) => (context as any).queryClient.ensureQueryData(servicosQuery),
   component: ServicosAdmin,
   errorComponent: ({ error }) => <p className="text-sm text-destructive">Erro: {error.message}</p>,

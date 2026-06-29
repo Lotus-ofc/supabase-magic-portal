@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { adminTitle } from "@/lib/brand";
 import { getDebugSnapshot } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
@@ -13,6 +14,7 @@ const debugQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/debug")({
+  head: () => ({ meta: [{ title: adminTitle("Debug de dados") }] }),
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(debugQuery);
   },

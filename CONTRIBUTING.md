@@ -1,6 +1,6 @@
-# Contribuindo com a Lotus
+# Contribuindo com o Lots BI
 
-Obrigado por contribuir. A Lotus trata **documentação como produto** e **engenharia como sistema**.
+Obrigado por contribuir. O **Lots BI** trata **documentação como produto** e **engenharia como sistema**.
 
 ## Antes de começar
 

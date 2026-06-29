@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportClientError } from "../lib/error-reporting";
+import { BRAND_ASSETS, BRAND_COLORS, BRAND_DESCRIPTION, BRAND_NAME } from "../lib/brand";
 import { ThemeProvider } from "@/components/lotus/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -79,39 +80,50 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lotus · Plataforma" },
+      { title: BRAND_NAME },
       {
         name: "description",
-        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+        content: BRAND_DESCRIPTION,
       },
-      { name: "theme-color", content: "#9769b1" },
-      { property: "og:title", content: "Lotus · Plataforma" },
+      { name: "theme-color", content: BRAND_COLORS.purple },
+      { property: "og:title", content: BRAND_NAME },
       {
         property: "og:description",
-        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+        content: BRAND_DESCRIPTION,
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Lotus · Plataforma" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: BRAND_NAME },
       {
         name: "twitter:description",
-        content: "Plataforma Lotus — gestão de clientes, performance e operações.",
+        content: BRAND_DESCRIPTION,
       },
       {
         property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp",
+        content: BRAND_ASSETS.ogImage,
       },
       {
         name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/Q40vDW253aTPWX9eW8Ev2CBiJjE3/social-images/social-1782163016375-722809986_17864684268690893_6430986593977098997_n.webp",
+        content: BRAND_ASSETS.ogImage,
       },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        href: BRAND_ASSETS.favicon,
+      },
+      {
+        rel: "apple-touch-icon",
+        href: BRAND_ASSETS.icon,
+      },
+      {
+        rel: "manifest",
+        href: "/site.webmanifest",
       },
     ],
   }),
@@ -123,7 +135,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   // Prevent FOUC by reading stored theme before hydration.
-  const themeScript = `(function(){try{var t=localStorage.getItem('lotus-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var v=t||(d?'dark':'light');if(v==='dark')document.documentElement.classList.add('dark');document.documentElement.style.colorScheme=v;}catch(e){}})();`;
+  const themeScript = `(function(){try{var k='lots-bi-theme';var t=localStorage.getItem(k)||localStorage.getItem('lotus-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var v=t||(d?'dark':'light');if(v==='dark')document.documentElement.classList.add('dark');document.documentElement.style.colorScheme=v;}catch(e){}})();`;
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>

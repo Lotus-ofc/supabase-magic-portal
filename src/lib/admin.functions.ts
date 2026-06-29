@@ -405,7 +405,7 @@ export const createUserAccount = createServerFn({ method: "POST" })
     let inviteSent = false;
     let tempPassword: string | null = null;
 
-    const genPwd = () => `Lotus#${Math.random().toString(36).slice(2, 10)}A1`;
+    const genPwd = () => `LotsBI#${Math.random().toString(36).slice(2, 10)}A1`;
 
     if (data.mode === "invite") {
       const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(

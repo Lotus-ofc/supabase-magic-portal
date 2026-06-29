@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { BRAND_NAME } from "@/lib/brand";
 import { BookOpen, Clock, Star } from "lucide-react";
 import { getDocsBySlugs } from "@/lib/knowledge-center";
 import { getFavorites, getRecent } from "@/lib/knowledge-center/storage";
@@ -15,7 +16,7 @@ export function KnowledgeHome() {
         </div>
         <h1 className="font-display text-2xl font-bold tracking-tight">Knowledge Center</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Centro de conhecimento integrado da Lotus — arquitetura, engenharia, produto, operações e
+          Centro de conhecimento integrado do {BRAND_NAME} — arquitetura, engenharia, produto, operações e
           dashboards. Markdown em{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/</code> é a fonte única de
           verdade; novos arquivos aparecem automaticamente aqui.

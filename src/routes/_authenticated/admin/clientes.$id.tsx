@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Plus,
 } from "lucide-react";
+import { adminTitle } from "@/lib/brand";
 import {
   getCliente,
   listServicos,
@@ -43,6 +44,7 @@ const servicosQuery = { queryKey: ["admin", "servicos"], queryFn: () => listServ
 const usersQuery = { queryKey: ["admin", "users"], queryFn: () => listUsers() };
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/$id")({
+  head: ({ params }) => ({ meta: [{ title: adminTitle(`Cliente ${params.id}`) }] }),
   loader: async ({ params, context }) => {
     const id = Number(params.id);
     const qc = (context as any).queryClient;

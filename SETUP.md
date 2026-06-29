@@ -1,6 +1,6 @@
-# Setup — Desenvolvimento Lotus (interno)
+# Setup — Desenvolvimento Lots BI (interno)
 
-Guia para rodar o portal **sem depender do editor Lovable**. O código vive neste repositório;
+Guia para rodar o portal **Lots BI** sem depender do editor Lovable. O código vive neste repositório;
 Lovable permanece apenas como pipeline transitório de build/deploy até a Fase 6 do roadmap.
 
 ## Pré-requisitos

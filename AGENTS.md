@@ -1,11 +1,11 @@
 <!-- LOTUS:BEGIN -->
 
 > [!IMPORTANT]
-> **Engenharia oficial Lotus:** desenvolvimento no **Cursor** + repositório Git.
+> **Engenharia oficial Lots BI:** desenvolvimento no **Cursor** + repositório Git.
 > **Setup local:** [SETUP.md](./SETUP.md) · `npm run setup`
 > **Sistema de Engenharia:** `docs/00-company/engineering-system.md` · `npm run check`
 >
-> Fluxo: Cursor → Commit → GitHub → CI → Deploy → Portal Lotus
+> Fluxo: Cursor → Commit → GitHub → CI → Deploy → Portal Lots BI
 >
 > **Transição interna:** Lovable e Horizons estão sendo desacoplados (ADR-0012).
 > Implemente **sempre** neste repo — não no editor Lovable.
@@ -25,7 +25,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 >
-> **Lotus policy:** Lovable is **build/deploy only** until Cloudflare deploy is validated.
+> **Lots BI policy:** Lovable is **build/deploy only** until Cloudflare deploy is validated.
 > Do not implement features in the Lovable editor.
 
 <!-- LOVABLE:END -->

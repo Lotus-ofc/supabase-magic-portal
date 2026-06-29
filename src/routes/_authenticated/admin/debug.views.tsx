@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { adminTitle } from "@/lib/brand";
 import { getViewsAudit } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
@@ -13,6 +14,7 @@ const auditQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/debug/views")({
+  head: () => ({ meta: [{ title: adminTitle("Auditoria de views") }] }),
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(auditQuery);
   },

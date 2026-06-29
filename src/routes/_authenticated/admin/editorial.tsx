@@ -1,4 +1,4 @@
-// Lotus · Calendário Editorial (admin)
+import { adminTitle } from "@/lib/brand";
 // MVP funcional: navegação mensal, filtro por cliente, grid 7-col, drawer
 // para criar / editar / aprovar / comentar. Sem dependências novas — usa
 // Sheet, Select, Button já presentes em src/components/ui/*.
@@ -102,7 +102,7 @@ type Post = {
 
 // ---------- Route ----------
 export const Route = createFileRoute("/_authenticated/admin/editorial")({
-  head: () => ({ meta: [{ title: "Calendário Editorial · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Calendário Editorial") }] }),
   component: EditorialPage,
   errorComponent: ({ error }) => (
     <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>

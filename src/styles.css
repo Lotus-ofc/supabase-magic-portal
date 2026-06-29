@@ -8,8 +8,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =========================================================================
- * LOTUS DESIGN SYSTEM
- * Brand: Lotus · primary #9769b1 · secondary #67bee7
+ * LOTS BI DESIGN SYSTEM
+ * Brand: Lots BI · primary #A855F7 · secondary #60A5FA
  * Neutrals: #e2eeeb (mint) · #dfcbe4 (lilac)
  * Identity: clarity, growth, control, technology, sophistication.
  * Petal/organic cues live as gradient meshes + curve utilities, not as icons.
@@ -113,7 +113,7 @@
   --primary-200: oklch(0.895 0.05 305);
   --primary-300: oklch(0.82 0.08 305);
   --primary-400: oklch(0.71 0.11 305);
-  --primary-500: oklch(0.605 0.135 305); /* #9769b1 anchor */
+  --primary-500: oklch(0.62 0.24 303); /* #A855F7 anchor */
   --primary-600: oklch(0.52 0.14 302);
   --primary-700: oklch(0.435 0.125 300);
   --primary-800: oklch(0.345 0.1 298);
@@ -124,8 +124,8 @@
   --secondary-100: oklch(0.955 0.03 225);
   --secondary-200: oklch(0.915 0.055 228);
   --secondary-300: oklch(0.86 0.08 228);
-  --secondary-400: oklch(0.81 0.095 230); /* #67bee7 anchor */
-  --secondary-500: oklch(0.745 0.108 232);
+  --secondary-400: oklch(0.78 0.14 238); /* #60A5FA anchor */
+  --secondary-500: oklch(0.72 0.16 240);
   --secondary-600: oklch(0.65 0.115 235);
   --secondary-700: oklch(0.54 0.11 238);
   --secondary-800: oklch(0.43 0.09 240);
@@ -345,7 +345,7 @@
 }
 
 /* =========================================================================
- * Lotus utilities — petal/organic cues, glass restricted to overlays
+ * Lots BI utilities — petal/organic cues, glass restricted to overlays
  * ========================================================================= */
 @utility lotus-aurora {
   background-image: var(--mesh-aurora);

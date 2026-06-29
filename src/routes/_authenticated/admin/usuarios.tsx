@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listUsersWithRoles } from "@/lib/admin.functions";
+import { adminTitle } from "@/lib/brand";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { TextInput } from "@/components/lotus/FormField";
@@ -21,7 +22,7 @@ const usersQuery = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios")({
-  head: () => ({ meta: [{ title: "Usuários · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Usuários") }] }),
   loader: ({ context }) => (context as any).queryClient.ensureQueryData(usersQuery),
   component: UsuariosPage,
   errorComponent: ({ error }) => (

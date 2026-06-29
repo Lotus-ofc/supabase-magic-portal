@@ -13,6 +13,7 @@ import {
   Megaphone,
   type LucideIcon,
 } from "lucide-react";
+import { brandTitle } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { detectClientPlatforms, type ClientPlatformRouteKey } from "@/lib/platform-availability";
 
@@ -104,7 +105,7 @@ const PLATFORM_META: Record<PlatformKey, { label: string; icon: LucideIcon; path
 // ---------------- Route ----------------
 
 export const Route = createFileRoute("/_authenticated/cliente/$cliente")({
-  head: ({ params }) => ({ meta: [{ title: `${params.cliente} · Lotus` }] }),
+  head: ({ params }) => ({ meta: [{ title: brandTitle(params.cliente) }] }),
   component: ClienteLayout,
   errorComponent: ({ error }) => (
     <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>

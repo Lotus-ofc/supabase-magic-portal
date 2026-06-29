@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 type Theme = "light" | "dark";
-const STORAGE_KEY = "lotus-theme";
+const STORAGE_KEY = "lots-bi-theme";
+const LEGACY_STORAGE_KEY = "lotus-theme";
 
 interface ThemeCtx {
   theme: Theme;
@@ -24,7 +25,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Hydrate from localStorage / system preference after mount (SSR-safe).
   useEffect(() => {
     const stored = (typeof window !== "undefined" &&
-      window.localStorage.getItem(STORAGE_KEY)) as Theme | null;
+      (window.localStorage.getItem(STORAGE_KEY) ??
+        window.localStorage.getItem(LEGACY_STORAGE_KEY))) as Theme | null;
     const prefersDark =
       typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches;
     const initial: Theme = stored ?? (prefersDark ? "dark" : "light");

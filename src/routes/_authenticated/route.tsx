@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
 import { ImpersonateClienteMenu } from "@/components/lotus/ImpersonateClienteMenu";
+import { BRAND_NAME } from "@/lib/brand";
 import {
   LayoutDashboard,
   Users,
@@ -130,7 +131,7 @@ function AuthenticatedLayout() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-[12px] font-medium text-sidebar-foreground">{user.email}</p>
             <p className="text-[10.5px] text-muted-foreground">
-              {isAdmin ? "Admin · Lotus" : "Cliente · Lotus"}
+              {isAdmin ? `Admin · ${BRAND_NAME}` : `Cliente · ${BRAND_NAME}`}
             </p>
           </div>
         </div>

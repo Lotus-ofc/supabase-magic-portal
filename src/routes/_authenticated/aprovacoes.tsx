@@ -1,4 +1,4 @@
-// Lotus · Aprovações (área do cliente)
+import { brandTitle } from "@/lib/brand";
 // Lista posts em status `aguardando_aprovacao` dos clientes que o usuário tem
 // acesso (RLS já filtra pelo client_access). Permite aprovar ou solicitar
 // alteração. Reutiliza transitionPost.
@@ -28,7 +28,7 @@ type Post = {
 };
 
 export const Route = createFileRoute("/_authenticated/aprovacoes")({
-  head: () => ({ meta: [{ title: "Aprovações · Lotus" }] }),
+  head: () => ({ meta: [{ title: brandTitle("Aprovações") }] }),
   component: AprovacoesPage,
   errorComponent: ({ error }) => (
     <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>

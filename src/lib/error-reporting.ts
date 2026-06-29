@@ -1,3 +1,5 @@
+import { BRAND_NAME } from "./brand";
+
 type ErrorReporterOptions = {
   mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
   handled?: boolean;
@@ -34,7 +36,7 @@ export function reportClientError(error: unknown, context: Record<string, unknow
   };
 
   if (import.meta.env.DEV) {
-    console.error("[Lotus]", error, payload);
+    console.error(`[${BRAND_NAME}]`, error, payload);
   }
 
   window.__lovableEvents?.captureException?.(error, payload, {

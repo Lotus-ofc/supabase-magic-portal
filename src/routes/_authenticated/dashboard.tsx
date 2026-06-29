@@ -16,6 +16,7 @@ import {
   type OverviewRow,
   type Totals,
 } from "@/lib/metrics";
+import { BRAND_NAME, brandTitle } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
@@ -72,7 +73,7 @@ const overviewQuery = (from: string, to: string, prevFrom: string) =>
   });
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Sua conta · Lotus" }] }),
+  head: () => ({ meta: [{ title: brandTitle("Sua conta") }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesQuery);
     const p = resolvePeriod({ preset: "last_30" });
@@ -98,7 +99,7 @@ function ClientHome() {
   return (
     <div className="space-y-9">
       <PageHeader
-        eyebrow="Sua conta na Lotus"
+        eyebrow={`Sua conta no ${BRAND_NAME}`}
         title="Resultados consolidados"
         description="Uma leitura clara do que está acontecendo nas suas plataformas — sem ruído, com contexto."
         actions={<PeriodPicker value={period} onChange={setPeriod} />}
@@ -648,7 +649,7 @@ function EmptyClientes() {
       </div>
       <p className="font-display text-sm font-semibold">Nenhuma conta vinculada</p>
       <p className="max-w-md text-xs text-muted-foreground">
-        Sua equipe Lotus ainda não vinculou nenhuma conta ao seu acesso. Assim que isso for feito,
+        A equipe {BRAND_NAME} ainda não vinculou nenhuma conta ao seu acesso. Assim que isso for feito,
         ela aparece aqui automaticamente.
       </p>
     </div>
@@ -665,7 +666,7 @@ function EmptyAccount() {
         Sua conta está sendo preparada
       </h2>
       <p className="max-w-md text-sm text-muted-foreground">
-        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe Lotus está configurando
+        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe {BRAND_NAME} está configurando
         integrações, fontes e relatórios da sua operação.
       </p>
     </div>

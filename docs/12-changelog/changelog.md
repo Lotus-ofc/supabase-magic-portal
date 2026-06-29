@@ -1,8 +1,8 @@
 ---
 title: Changelog
-description: Histórico de mudanças relevantes da Lotus (produto, dados e infraestrutura).
+description: Histórico de mudanças relevantes do Lots BI (produto, dados e infraestrutura).
 status: living
-owner: Engenharia Lotus
+owner: Engenharia Lots BI
 last_review: 2026-06-26
 ---
 
@@ -21,6 +21,8 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Rebranding Lots BI:** nova identidade visual (logo, favicon, og-image, cores `#A855F7` → `#60A5FA`),
+  metadados, títulos de aba, login e assets em `public/brand/`.
 - **Knowledge Center:** módulo admin `/admin/knowledge` — renderiza `docs/**/*.md` com busca,
   navegação colapsável, Mermaid, favoritos, recentes e metadados YAML. Documentação de
   plataformas em `06-dashboards/platforms/`.

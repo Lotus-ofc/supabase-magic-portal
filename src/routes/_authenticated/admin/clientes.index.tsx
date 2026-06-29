@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { listClientes, toggleClienteAtivo } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
+import { adminTitle } from "@/lib/brand";
 import { Search, Plus, MoreHorizontal, Filter, X } from "lucide-react";
 
 const clientesQuery = {
@@ -12,7 +13,7 @@ const clientesQuery = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/")({
-  head: () => ({ meta: [{ title: "Clientes · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Clientes") }] }),
   loader: ({ context }) => (context as any).queryClient?.ensureQueryData(clientesQuery),
   component: ClientesList,
   errorComponent: ({ error }) => (

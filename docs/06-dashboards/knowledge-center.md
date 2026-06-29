@@ -1,8 +1,8 @@
 ---
 title: Knowledge Center — Módulo nativo
-description: Arquitetura do Centro de Conhecimento integrado ao painel admin da Lotus.
+description: Arquitetura do Centro de Conhecimento integrado ao painel admin do Lots BI.
 status: living
-owner: Engenharia Lotus
+owner: Engenharia Lots BI
 tags: [knowledge-center, admin, documentation]
 difficulty: intermediate
 last_review: 2026-06-26

@@ -6,6 +6,7 @@ import { createUserAccount, listClientes } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { Field, FormRow, TextInput, Select } from "@/components/lotus/FormField";
 import { SectionCard } from "@/components/lotus/SectionCard";
+import { adminTitle, BRAND_NAME } from "@/lib/brand";
 import { Copy, Send, KeyRound } from "lucide-react";
 
 const clientesQuery = {
@@ -14,7 +15,7 @@ const clientesQuery = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios/novo")({
-  head: () => ({ meta: [{ title: "Novo usuário · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Novo usuário") }] }),
   loader: ({ context }) => (context as any).queryClient.ensureQueryData(clientesQuery),
   component: NovoUsuarioPage,
   errorComponent: ({ error }) => (
@@ -131,7 +132,7 @@ function NovoUsuarioPage() {
       <PageHeader
         eyebrow="Usuários"
         title="Novo usuário"
-        description="Crie acesso para administradores internos ou para clientes da Lotus."
+        description={`Crie acesso para administradores internos ou para clientes do ${BRAND_NAME}.`}
       />
       <form onSubmit={onSubmit} className="space-y-5">
         <SectionCard eyebrow="Identidade" title="Dados do usuário">

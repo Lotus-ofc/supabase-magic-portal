@@ -1,4 +1,4 @@
-// Lotus · Central de Relatórios
+// Lots BI · Central de Relatórios
 // Hub do módulo de relatórios. NÃO reimplementa dashboards — apenas organiza
 // o acesso ao executivo e aos relatórios individuais por cliente, reutilizando
 // vw_overview_cliente, vw_clientes_ativos e helpers de src/lib/metrics.
@@ -11,6 +11,7 @@ import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
+import { adminTitle, BRAND_NAME, brandTitle } from "@/lib/brand";
 import {
   PLATFORM_LABEL,
   aggregateByCliente,
@@ -76,7 +77,7 @@ const overviewQuery = (days: PeriodDays) =>
 // ---------------- Route ----------------
 
 export const Route = createFileRoute("/_authenticated/admin/relatorios")({
-  head: () => ({ meta: [{ title: "Relatórios · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Relatórios") }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesAtivosQuery);
     void context.queryClient.ensureQueryData(overviewQuery(30));
@@ -95,7 +96,7 @@ function RelatoriosHub() {
     <div className="space-y-7">
       <PageHeader
         eyebrow="Central de relatórios"
-        title="Relatórios Lotus"
+        title={`Relatórios ${BRAND_NAME}`}
         description="Acesso unificado ao relatório executivo da agência e aos relatórios individuais por cliente."
         actions={<PeriodToggle value={days} onChange={setDays} />}
       />
@@ -113,7 +114,7 @@ function RelatoriosHub() {
           to="/dashboard"
           icon={FileBarChart}
           eyebrow="Visão pessoal"
-          title="Sua conta na Lotus"
+          title={brandTitle("Sua conta")}
           description="Resultados consolidados que o cliente final enxerga ao entrar na plataforma."
         />
       </section>

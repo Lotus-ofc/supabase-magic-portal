@@ -12,6 +12,7 @@ import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFram
 import { AreaChartLotus, getSeriesColor } from "@/components/lotus/charts/AreaChartLotus";
 import { BarChartLotus } from "@/components/lotus/charts/BarChartLotus";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
+import { adminTitle, BRAND_NAME } from "@/lib/brand";
 import {
   PLATFORM_LABEL,
   aggregateByCliente,
@@ -90,7 +91,7 @@ const overviewAdminQuery = (days: PeriodDays) =>
 // ---------------- Route ----------------
 
 export const Route = createFileRoute("/_authenticated/admin/")({
-  head: () => ({ meta: [{ title: "Centro executivo · Admin Lotus" }] }),
+  head: () => ({ meta: [{ title: adminTitle("Centro executivo") }] }),
   loader: ({ context }) => {
     void context.queryClient.ensureQueryData(clientesAdminQuery);
     void context.queryClient.ensureQueryData(servicosQuery);
@@ -112,7 +113,7 @@ function AdminOverview() {
       <PageHeader
         eyebrow="Painel administrativo"
         title="Centro executivo"
-        description="Visão consolidada da operação Lotus — investimento, performance e portfólio."
+        description={`Visão consolidada da operação ${BRAND_NAME} — investimento, performance e portfólio.`}
         actions={
           <div className="flex items-center gap-2">
             <PeriodToggle value={days} onChange={setDays} />
@@ -250,7 +251,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
         <ChartFrame
           eyebrow="Evolução"
           title="Investimento diário consolidado"
-          description="Todas as contas Lotus, soma diária Meta + Google + Conversões."
+          description={`Todas as contas ${BRAND_NAME}, soma diária Meta + Google + Conversões.`}
           headline={formatMetric("spend", cT.spend)}
           meta={<DeltaPill delta={pctDelta(cT.spend, pT.spend)} showSuffix />}
           legend={

@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, ChevronDown, Loader2, Save } from "lucide-react";
+import { adminTitle } from "@/lib/brand";
 import { createCliente } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { Field, FormRow, TextArea, TextInput } from "@/components/lotus/FormField";
@@ -12,6 +13,7 @@ import { IntegrationCard } from "@/components/lotus/IntegrationCard";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes/novo")({
+  head: () => ({ meta: [{ title: adminTitle("Novo cliente") }] }),
   component: NovoCliente,
 });
 

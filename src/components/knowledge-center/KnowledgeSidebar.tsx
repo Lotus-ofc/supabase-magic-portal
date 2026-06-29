@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, ChevronRight, FileText, Folder } from "lucide-react";
 import type { NavNode } from "@/lib/knowledge-center";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -101,7 +102,7 @@ export function KnowledgeSidebar({ tree, currentSlug }: KnowledgeSidebarProps) {
         <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Documentação
         </p>
-        <p className="mt-0.5 text-sm font-medium text-foreground">Lotus Handbook</p>
+        <p className="mt-0.5 text-sm font-medium text-foreground">{BRAND_NAME} Handbook</p>
       </div>
       <nav className="flex-1 overflow-y-auto px-2 py-3">
         <div className="space-y-0.5">

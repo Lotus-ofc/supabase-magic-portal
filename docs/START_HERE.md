@@ -1,28 +1,28 @@
 ---
-title: START HERE — Lotus Engineering Handbook
-description: Ponto de entrada principal. Leia isto primeiro para entender a Lotus em menos de uma hora.
+title: START HERE — Lots BI Engineering Handbook
+description: Ponto de entrada principal. Leia isto primeiro para entender o Lots BI em menos de uma hora.
 status: living
-owner: Engenharia Lotus
+owner: Engenharia Lots BI
 last_review: 2026-06-26
 ---
 
 # START HERE
 
-> Bem-vindo ao **Centro de Conhecimento da Lotus**. Este documento foi escrito para que um
+> Bem-vindo ao **Centro de Conhecimento do Lots BI**. Este documento foi escrito para que um
 > novo desenvolvedor compreenda a plataforma, sua arquitetura e sua direção estratégica em
 > **menos de uma hora**.
 
 ---
 
-## O que é a Lotus? (5 minutos)
+## O que é o Lots BI? (5 minutos)
 
-A **Lotus** é um SaaS de **Business Intelligence** voltado para agências e empresas que
+O **Lots BI** é um SaaS de **Business Intelligence** voltado para agências e empresas que
 desejam acompanhar indicadores de marketing em um único ambiente.
 
 O objetivo não é apenas exibir métricas — é **transformar dados brutos em informações
 confiáveis** para tomada de decisão.
 
-**Hoje (observado no repositório):** a Lotus opera como portal de performance e operação
+**Hoje (observado no repositório):** o Lots BI opera como portal de performance e operação
 para uma agência de marketing, com dashboards multi-plataforma, painel administrativo e
 fluxo editorial/aprovações. O código vive em `supabase-magic-portal/`.
 

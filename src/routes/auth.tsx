@@ -1,10 +1,12 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { LotsBIWordmark } from "@/components/lotus/LotusMark";
+import { BRAND_NAME, BRAND_TAGLINE, brandTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Entrar · Majrá" }] }),
+  head: () => ({ meta: [{ title: brandTitle("Entrar") }] }),
   component: AuthPage,
 });
 
@@ -41,11 +43,16 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6 rounded-lg border border-border bg-card p-8 shadow-sm">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {mode === "signin" ? "Entrar" : "Criar conta"}
-          </h1>
-          <p className="text-sm text-muted-foreground">Portal de métricas Majrá</p>
+        <div className="flex flex-col items-center space-y-3 text-center">
+          <LotsBIWordmark size="lg" />
+          <div className="space-y-1">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {mode === "signin" ? "Entrar" : "Criar conta"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {BRAND_NAME} — {BRAND_TAGLINE.toLowerCase()}
+            </p>
+          </div>
         </div>
         <form onSubmit={submit} className="space-y-4">
           <div>
