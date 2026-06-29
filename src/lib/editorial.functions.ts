@@ -4,7 +4,7 @@
 // `solicitacao_alteracao` (volta para `em_producao`).
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { z } from "zod";
+import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 
 const POST_STATUS = [
   "rascunho",
@@ -15,7 +15,9 @@ const POST_STATUS = [
 ] as const;
 export type PostStatus = (typeof POST_STATUS)[number];
 
-async function isAdmin(ctx: { supabase: any; userId: string }) {
+async function isAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string; claims?: { email?: string | null } }) {
+  const email = ctx.claims?.email ?? undefined;
+  if (isPlatformOwnerEmail(email)) return true;
   const { data } = await ctx.supabase.rpc("has_role", {
     _user_id: ctx.userId,
     _role: "admin",
@@ -23,7 +25,11 @@ async function isAdmin(ctx: { supabase: any; userId: string }) {
   return !!data;
 }
 
-async function assertAdmin(ctx: { supabase: any; userId: string }) {
+async function assertAdmin(ctx: {
+  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> };
+  userId: string;
+  claims?: { email?: string | null };
+}) {
   if (!(await isAdmin(ctx))) throw new Error("Forbidden: admin role required");
 }
 

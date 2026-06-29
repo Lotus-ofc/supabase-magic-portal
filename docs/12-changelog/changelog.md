@@ -34,6 +34,11 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
   (`deploy.yml`, `npm run deploy:cloudflare`), `error-reporting.ts` genérico.
 - **Segurança:** `.env` adicionado ao `.gitignore`.
 
+### Corrigido
+
+- **Admin permanente do dono:** `has_role` reconhece `leandromajr@gmail.com`, auto-reparo no login
+  (`owner-admin.ts`) e migration `09_owner_admin_guard.sql` reforçada.
+
 ### Alterado
 
 - **Pronto para clientes:** rotas `/cliente/{slug}` corrigidas (slugify), login somente por convite,

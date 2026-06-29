@@ -3,26 +3,38 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
+import { repairOwnerAdminRole, resolveIsAdmin } from "@/lib/owner-admin";
 import { z } from "zod";
 
-async function assertAdmin(ctx: { supabase: any; userId: string }) {
-  const { data, error } = await ctx.supabase.rpc("has_role", {
-    _user_id: ctx.userId,
-    _role: "admin",
+type AuthCtx = {
+  supabase: Parameters<typeof resolveIsAdmin>[0]["supabase"];
+  userId: string;
+  claims?: { email?: string | null };
+};
+
+async function assertAdmin(ctx: AuthCtx) {
+  const email = ctx.claims?.email ?? undefined;
+  const ok = await resolveIsAdmin({
+    supabase: ctx.supabase,
+    userId: ctx.userId,
+    email,
+    repair: true,
   });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden: admin role required");
+  if (!ok) throw new Error("Forbidden: admin role required");
 }
 
 // ---------- CHECK ROLE ----------
 export const checkIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
+    const email = context.claims?.email ?? undefined;
+    const isAdmin = await resolveIsAdmin({
+      supabase: context.supabase,
+      userId: context.userId,
+      email,
+      repair: true,
     });
-    return { isAdmin: !!data };
+    return { isAdmin };
   });
 
 // ---------- CLIENTES ----------
