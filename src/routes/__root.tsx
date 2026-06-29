@@ -15,6 +15,7 @@ import { BRAND_ASSETS, BRAND_COLORS, BRAND_DESCRIPTION, BRAND_NAME } from "../li
 import { ThemeProvider } from "@/components/lotus/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SupabaseConfigGuard } from "@/components/lotus/SupabaseConfigGuard";
 
 function NotFoundComponent() {
   return (
@@ -170,10 +171,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <TooltipProvider delayDuration={300}>
-          <Outlet />
-          <Toaster position="top-right" richColors closeButton />
-        </TooltipProvider>
+        <SupabaseConfigGuard>
+          <TooltipProvider delayDuration={300}>
+            <Outlet />
+            <Toaster position="top-right" richColors closeButton />
+          </TooltipProvider>
+        </SupabaseConfigGuard>
       </ThemeProvider>
     </QueryClientProvider>
   );

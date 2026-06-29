@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   createFileRoute,
   Outlet,
@@ -14,6 +15,8 @@ import { GlobalSearch } from "@/components/lotus/GlobalSearch";
 import { NotificationCenter } from "@/components/lotus/NotificationCenter";
 import { recordAudit } from "@/lib/audit-log";
 import { BRAND_NAME } from "@/lib/brand";
+import { isPlatformOwnerEmail } from "@/lib/platform-owner";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import {
   LayoutDashboard,
   Users,
@@ -44,12 +47,28 @@ function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inAdmin = pathname.startsWith("/admin");
 
-  const { data: adminCheck } = useQuery({
+  const isOwner = isPlatformOwnerEmail(user.email);
+  const { data: adminCheck, isPending: adminPending } = useQuery({
     queryKey: ["me", "isAdmin"],
     queryFn: () => checkIsAdmin(),
     staleTime: 60_000,
+    retry: 1,
+    enabled: !isOwner,
   });
-  const isAdmin = !!adminCheck?.isAdmin;
+  const isAdmin = isOwner || !!adminCheck?.isAdmin;
+
+  useEffect(() => {
+    if (!inAdmin || adminPending || isAdmin) return;
+    void router.navigate({ to: "/dashboard" });
+  }, [inAdmin, adminPending, isAdmin, router]);
+
+  if (inAdmin && adminPending && !isOwner) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <DashboardSkeleton kpiCount={4} />
+      </div>
+    );
+  }
 
   const signOut = async () => {
     recordAudit({

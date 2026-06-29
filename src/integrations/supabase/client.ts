@@ -10,13 +10,19 @@ const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_OFFICIAL_SUPABASE_ANON_KEY ??
   (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_ANON_KEY : undefined);
 
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error("Missing VITE_OFFICIAL_SUPABASE_URL / VITE_OFFICIAL_SUPABASE_ANON_KEY env vars");
-}
+/** Quando preenchido, a app deve exibir aviso em vez de falhar em silêncio. */
+export const supabaseConfigError: string | null =
+  !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY
+    ? "Variáveis VITE_OFFICIAL_SUPABASE_URL e VITE_OFFICIAL_SUPABASE_ANON_KEY não estão configuradas no build."
+    : null;
 
 const PROJECT_ID = import.meta.env.VITE_OFFICIAL_SUPABASE_PROJECT_ID ?? "ywvhoctcmibjitvwkkhb";
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+// Fallbacks evitam throw no import (tela preta). Chamadas à API falham até o env estar correto.
+const resolvedUrl = SUPABASE_URL ?? "https://ywvhoctcmibjitvwkkhb.supabase.co";
+const resolvedKey = SUPABASE_PUBLISHABLE_KEY ?? "build-anon-key-not-configured";
+
+export const supabase = createClient(resolvedUrl, resolvedKey, {
   auth: {
     persistSession: typeof window !== "undefined",
     autoRefreshToken: true,
