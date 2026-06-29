@@ -5,6 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
+import { z } from "zod";
 
 const POST_STATUS = [
   "rascunho",
@@ -15,7 +16,7 @@ const POST_STATUS = [
 ] as const;
 export type PostStatus = (typeof POST_STATUS)[number];
 
-async function isAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string; claims?: { email?: string | null } }) {
+async function isAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }> }; userId: string; claims?: { email?: string | null } }) {
   const email = ctx.claims?.email ?? undefined;
   if (isPlatformOwnerEmail(email)) return true;
   const { data } = await ctx.supabase.rpc("has_role", {
@@ -26,7 +27,7 @@ async function isAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string,
 }
 
 async function assertAdmin(ctx: {
-  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> };
+  supabase: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }> };
   userId: string;
   claims?: { email?: string | null };
 }) {
