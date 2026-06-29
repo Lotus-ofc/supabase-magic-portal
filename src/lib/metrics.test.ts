@@ -5,6 +5,8 @@ import { metaAdsDef } from "@/lib/platforms/meta-ads";
 import type { Period } from "@/lib/period";
 
 const period: Period = {
+  preset: "custom",
+  label: "Teste",
   days: 7,
   from: "2026-06-20",
   to: "2026-06-26",

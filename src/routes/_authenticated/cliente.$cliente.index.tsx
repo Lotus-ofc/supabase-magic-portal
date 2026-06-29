@@ -3,6 +3,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
+import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
@@ -511,6 +512,8 @@ function PlatformTable({
   }
 
   const def = getPlatformDef(platform);
+  if (!def) return null;
+
   const labelFor = (key: string) => {
     if (key === "data") return "Data";
     if (key === "cliente") return "Cliente";
