@@ -2,115 +2,151 @@ import { createFileRoute } from "@tanstack/react-router";
 import { adminTitle } from "@/lib/brand";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { listServicos, upsertServico } from "@/lib/admin.functions";
+import { PageHeader } from "@/components/lotus/PageHeader";
+import { SectionCard } from "@/components/lotus/SectionCard";
+import { EmptyState } from "@/components/lotus/EmptyState";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Briefcase } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const servicosQuery = { queryKey: ["admin", "servicos"], queryFn: () => listServicos() };
 
 export const Route = createFileRoute("/_authenticated/admin/servicos")({
   head: () => ({ meta: [{ title: adminTitle("Serviços") }] }),
-  loader: ({ context }) => (context as any).queryClient.ensureQueryData(servicosQuery),
+  loader: ({ context }) => (context as { queryClient: { ensureQueryData: (q: typeof servicosQuery) => unknown } }).queryClient.ensureQueryData(servicosQuery),
   component: ServicosAdmin,
   errorComponent: ({ error }) => <p className="text-sm text-destructive">Erro: {error.message}</p>,
 });
+
+type Servico = {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  ativo: boolean;
+};
 
 function ServicosAdmin() {
   const { data } = useSuspenseQuery(servicosQuery);
   const qc = useQueryClient();
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
+
+  const servicos = (data ?? []) as Servico[];
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMsg(null);
-    try {
-      await upsertServico({ data: { nome, descricao, ativo: true } });
+    const promise = upsertServico({ data: { nome, descricao, ativo: true } }).then(async () => {
       setNome("");
       setDescricao("");
       await qc.invalidateQueries({ queryKey: ["admin", "servicos"] });
-    } catch (err) {
-      setMsg(err instanceof Error ? err.message : "Erro");
-    }
+    });
+    toast.promise(promise, {
+      loading: "Criando serviço…",
+      success: "Serviço adicionado.",
+      error: (err) => (err instanceof Error ? err.message : "Erro ao criar"),
+    });
   };
 
-  const toggle = async (s: any) => {
-    await upsertServico({
+  const toggle = (s: Servico) => {
+    const promise = upsertServico({
       data: { id: s.id, nome: s.nome, descricao: s.descricao, ativo: !s.ativo },
+    }).then(() => qc.invalidateQueries({ queryKey: ["admin", "servicos"] }));
+    toast.promise(promise, {
+      loading: s.ativo ? "Desativando…" : "Reativando…",
+      success: s.ativo ? "Serviço desativado." : "Serviço reativado.",
+      error: (err) => (err instanceof Error ? err.message : "Erro"),
     });
-    await qc.invalidateQueries({ queryKey: ["admin", "servicos"] });
   };
 
   return (
-    <div className="space-y-4">
-      <form
-        onSubmit={create}
-        className="flex flex-wrap items-end gap-2 rounded-md border border-border p-4"
-      >
-        <div className="flex-1">
-          <label className="text-xs font-medium">Nome</label>
-          <input
-            required
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm"
-          />
-        </div>
-        <div className="flex-[2]">
-          <label className="text-xs font-medium">Descrição</label>
-          <input
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          Adicionar
-        </button>
-      </form>
-      {msg && <p className="text-xs text-destructive">{msg}</p>}
+    <div className="space-y-7">
+      <PageHeader
+        eyebrow="Operações"
+        title="Serviços"
+        description="Catálogo de serviços oferecidos aos clientes — ative, desative ou cadastre novos."
+      />
 
-      <div className="overflow-hidden rounded-md border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2">Serviço</th>
-              <th className="px-3 py-2">Descrição</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {(data ?? []).map((s: any) => (
-              <tr key={s.id} className="border-t border-border">
-                <td className="px-3 py-2 font-medium">{s.nome}</td>
-                <td className="px-3 py-2 text-muted-foreground">{s.descricao ?? "—"}</td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      s.ativo
-                        ? "bg-emerald-500/15 text-emerald-600"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {s.ativo ? "Ativo" : "Inativo"}
-                  </span>
-                </td>
-                <td className="px-3 py-2 text-right">
-                  <button
-                    onClick={() => toggle(s)}
-                    className="rounded-md border border-input px-2 py-1 text-xs hover:bg-accent"
-                  >
-                    {s.ativo ? "Desativar" : "Reativar"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <SectionCard eyebrow="Novo" title="Adicionar serviço">
+        <form onSubmit={create} className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[180px] flex-1">
+            <Label htmlFor="svc-nome">Nome</Label>
+            <Input
+              id="svc-nome"
+              required
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="min-w-[240px] flex-[2]">
+            <Label htmlFor="svc-desc">Descrição</Label>
+            <Input
+              id="svc-desc"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <Button type="submit">Adicionar</Button>
+        </form>
+      </SectionCard>
+
+      <SectionCard
+        eyebrow="Catálogo"
+        title={`${servicos.length} ${servicos.length === 1 ? "serviço" : "serviços"}`}
+        bodyClassName="px-0 py-0"
+      >
+        {servicos.length === 0 ? (
+          <EmptyState
+            icon={Briefcase}
+            title="Nenhum serviço cadastrado"
+            description="Adicione o primeiro serviço no formulário acima."
+            compact
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-left text-[10.5px] uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-2.5 font-medium">Serviço</th>
+                  <th className="px-4 py-2.5 font-medium">Descrição</th>
+                  <th className="px-4 py-2.5 font-medium">Status</th>
+                  <th className="px-4 py-2.5 font-medium" />
+                </tr>
+              </thead>
+              <tbody>
+                {servicos.map((s) => (
+                  <tr key={s.id} className="border-t border-border/60 hover:bg-muted/20">
+                    <td className="px-4 py-3 font-medium text-foreground">{s.nome}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{s.descricao ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-xs font-medium",
+                          s.ativo
+                            ? "bg-success/12 text-[color:var(--success)]"
+                            : "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {s.ativo ? "Ativo" : "Inativo"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button variant="outline" size="sm" onClick={() => toggle(s)}>
+                        {s.ativo ? "Desativar" : "Reativar"}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </SectionCard>
     </div>
   );
 }

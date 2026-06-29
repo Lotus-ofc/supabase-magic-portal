@@ -57,6 +57,8 @@ export type CommonMetric =
 export interface MetricMeta {
   label: string;
   short: string;
+  /** Explicação curta para tooltip / ajuda contextual. */
+  description: string;
   /** Formato de display. */
   format: "currency" | "int" | "decimal" | "percent";
   /** true = subir é bom; false = subir é ruim (ex.: CPC). */
@@ -69,6 +71,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   spend: {
     label: "Investimento",
     short: "Invest.",
+    description: "Valor total investido em mídia paga no período.",
     format: "currency",
     positiveIsGood: true,
     tone: "primary",
@@ -76,6 +79,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   impressions: {
     label: "Impressões",
     short: "Impr.",
+    description: "Quantidade de vezes que o anúncio ou conteúdo foi exibido.",
     format: "int",
     positiveIsGood: true,
     tone: "secondary",
@@ -83,14 +87,23 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   clicks: {
     label: "Cliques",
     short: "Cliques",
+    description: "Total de cliques registrados nos anúncios ou links.",
     format: "int",
     positiveIsGood: true,
     tone: "secondary",
   },
-  ctr: { label: "CTR", short: "CTR", format: "percent", positiveIsGood: true, tone: "neutral" },
+  ctr: {
+    label: "CTR",
+    short: "CTR",
+    description: "Taxa de cliques sobre impressões.",
+    format: "percent",
+    positiveIsGood: true,
+    tone: "neutral",
+  },
   cpc: {
     label: "CPC médio",
     short: "CPC",
+    description: "Custo médio por clique no período.",
     format: "currency",
     positiveIsGood: false,
     tone: "warning",
@@ -98,6 +111,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   cpm: {
     label: "CPM médio",
     short: "CPM",
+    description: "Custo por mil impressões.",
     format: "currency",
     positiveIsGood: false,
     tone: "warning",
@@ -105,6 +119,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   reach: {
     label: "Alcance",
     short: "Alcance",
+    description: "Pessoas únicas alcançadas no período.",
     format: "int",
     positiveIsGood: true,
     tone: "secondary",
@@ -112,6 +127,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   engagement: {
     label: "Engajamento",
     short: "Engaj.",
+    description: "Interações totais (curtidas, comentários, compartilhamentos etc.).",
     format: "int",
     positiveIsGood: true,
     tone: "primary",
@@ -119,6 +135,7 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   sessions: {
     label: "Sessões",
     short: "Sessões",
+    description: "Sessões registradas no site ou app (GA4).",
     format: "int",
     positiveIsGood: true,
     tone: "secondary",
@@ -126,12 +143,49 @@ export const METRIC_META: Record<CommonMetric, MetricMeta> = {
   conversions: {
     label: "Conversões",
     short: "Conv.",
+    description: "Ações de conversão atribuídas no período.",
     format: "int",
     positiveIsGood: true,
     tone: "success",
   },
-  leads: { label: "Leads", short: "Leads", format: "int", positiveIsGood: true, tone: "success" },
+  leads: {
+    label: "Leads",
+    short: "Leads",
+    description: "Contatos ou leads gerados no período.",
+    format: "int",
+    positiveIsGood: true,
+    tone: "success",
+  },
 };
+
+/** Descrições para métricas específicas de plataforma (chave do PlatformDef). */
+export const PLATFORM_METRIC_DESCRIPTIONS: Record<string, string> = {
+  active_users: "Usuários ativos únicos no período (GA4).",
+  pageviews: "Total de visualizações de páginas.",
+  engaged_sessions: "Sessões com engajamento significativo.",
+  event_count: "Quantidade total de eventos registrados.",
+  engagement_rate: "Taxa de sessões engajadas sobre o total.",
+  events_per_session: "Média de eventos por sessão.",
+  pageviews_per_user: "Média de páginas vistas por usuário.",
+  conversions_per_session: "Taxa de conversões por sessão.",
+  conversions_per_user: "Taxa de conversões por usuário ativo.",
+  frequency: "Média de vezes que a mesma pessoa viu o anúncio.",
+  accounts_engaged: "Contas que interagiram com o conteúdo.",
+  interactions: "Total de interações no perfil ou conteúdo.",
+  profile_links_taps: "Toques em links do perfil do Instagram.",
+  profile_views: "Visualizações do perfil no Google Business.",
+  searches: "Buscas que exibiram o perfil da empresa.",
+  website_clicks: "Cliques para o site a partir do perfil.",
+  phone_calls: "Cliques para ligar a partir do perfil.",
+  total_actions: "Soma de ações de interesse no perfil.",
+  actions_per_view: "Ações divididas por visualizações do perfil.",
+  cpa: "Custo por conversão.",
+  conv_rate: "Taxa de conversões sobre sessões.",
+};
+
+export function resolveMetricDescription(key: string, fallback?: string): string | undefined {
+  return fallback ?? PLATFORM_METRIC_DESCRIPTIONS[key] ?? undefined;
+}
 
 // ----------------------------------------------------------------------------
 // Formatadores — sempre em pt-BR / BRL.

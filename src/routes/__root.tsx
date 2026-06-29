@@ -14,6 +14,7 @@ import { reportClientError } from "../lib/error-reporting";
 import { BRAND_ASSETS, BRAND_COLORS, BRAND_DESCRIPTION, BRAND_NAME } from "../lib/brand";
 import { ThemeProvider } from "@/components/lotus/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 function NotFoundComponent() {
   return (
@@ -169,9 +170,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-right" richColors closeButton />
+        <TooltipProvider delayDuration={300}>
+          <Outlet />
+          <Toaster position="top-right" richColors closeButton />
+        </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

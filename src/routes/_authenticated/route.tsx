@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
 import { ImpersonateClienteMenu } from "@/components/lotus/ImpersonateClienteMenu";
+import { GlobalSearch } from "@/components/lotus/GlobalSearch";
+import { NotificationCenter } from "@/components/lotus/NotificationCenter";
+import { recordAudit } from "@/lib/audit-log";
 import { BRAND_NAME } from "@/lib/brand";
 import {
   LayoutDashboard,
@@ -49,6 +52,11 @@ function AuthenticatedLayout() {
   const isAdmin = !!adminCheck?.isAdmin;
 
   const signOut = async () => {
+    recordAudit({
+      action: "logout",
+      detail: "Sessão encerrada pelo usuário",
+      userEmail: user.email ?? undefined,
+    });
     await supabase.auth.signOut();
     router.navigate({ to: "/auth" });
   };
@@ -105,6 +113,8 @@ function AuthenticatedLayout() {
       groups={groups}
       topRight={
         <div className="flex items-center gap-2">
+          <GlobalSearch />
+          <NotificationCenter />
           {inAdmin && isAdmin && <ImpersonateClienteMenu />}
           <div className="hidden text-right sm:block">
             <p className="text-[12px] font-medium leading-tight text-foreground">

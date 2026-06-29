@@ -14,7 +14,6 @@ function AuthPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,14 +22,7 @@ function AuthPage() {
     setError(null);
     setLoading(true);
     try {
-      const { error } =
-        mode === "signin"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({
-              email,
-              password,
-              options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-            });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       router.navigate({ to: "/dashboard" });
     } catch (err) {
@@ -46,9 +38,7 @@ function AuthPage() {
         <div className="flex flex-col items-center space-y-3 text-center">
           <LotsBIWordmark size="lg" />
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {mode === "signin" ? "Entrar" : "Criar conta"}
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
             <p className="text-sm text-muted-foreground">
               {BRAND_NAME} — {BRAND_TAGLINE.toLowerCase()}
             </p>
@@ -60,9 +50,10 @@ function AuthPage() {
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="lotus-focus mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -71,9 +62,10 @@ function AuthPage() {
               type="password"
               required
               minLength={6}
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="lotus-focus mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
@@ -82,15 +74,13 @@ function AuthPage() {
             disabled={loading}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Aguarde…" : mode === "signin" ? "Entrar" : "Criar conta"}
+            {loading ? "Aguarde…" : "Entrar"}
           </button>
         </form>
-        <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
-        >
-          {mode === "signin" ? "Não tem conta? Criar agora" : "Já tem conta? Entrar"}
-        </button>
+        <p className="text-center text-xs text-muted-foreground">
+          Acesso mediante convite da equipe {BRAND_NAME}. Em caso de dúvida, fale com seu gestor
+          de conta.
+        </p>
       </div>
     </div>
   );

@@ -24,8 +24,11 @@ import {
   periodRange,
   spendShareByPlatform,
   sumOverview,
+  METRIC_META,
   type OverviewRow,
 } from "@/lib/metrics";
+import { slugify } from "@/lib/slug";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import {
   Users,
   UserCheck,
@@ -128,27 +131,9 @@ function AdminOverview() {
         }
       />
 
-      <Suspense fallback={<ExecutiveSkeleton />}>
+      <Suspense fallback={<DashboardSkeleton kpiCount={6} />}>
         <ExecutiveBody days={days} />
       </Suspense>
-    </div>
-  );
-}
-
-function ExecutiveSkeleton() {
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="lotus-surface h-28">
-            <div className="lotus-skeleton m-4 h-3 w-1/2" />
-            <div className="lotus-skeleton mx-4 mt-3 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-      <div className="lotus-surface h-[320px]">
-        <div className="lotus-skeleton m-5 h-3 w-40" />
-      </div>
     </div>
   );
 }
@@ -193,6 +178,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
           icon={DollarSign}
           emphasis="hero"
           delta={pctDelta(cT.spend, pT.spend)}
+          description={METRIC_META.spend.description}
           hint={`Meta ${formatMetric("spend", cT.meta_spend)} · Google ${formatMetric("spend", cT.google_spend)}`}
           className="lg:col-span-2"
         />
@@ -201,24 +187,28 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
           value={ativosCount}
           icon={UserCheck}
           hint={`${clientes.length} no total`}
+          description="Contas com dados recebidos recentemente nas integrações."
         />
         <StatCard
           label="Alcance Instagram"
           value={formatMetric("reach", cT.reach)}
           icon={Eye}
           delta={pctDelta(cT.reach, pT.reach)}
+          description={METRIC_META.reach.description}
         />
         <StatCard
           label="Sessões GA4"
           value={formatMetric("sessions", cT.sessions)}
           icon={Activity}
           delta={pctDelta(cT.sessions, pT.sessions)}
+          description={METRIC_META.sessions.description}
         />
         <StatCard
           label="Conversões"
           value={formatMetric("conversions", cT.conversions)}
           icon={Target}
           delta={pctDelta(cT.conversions, pT.conversions)}
+          description={METRIC_META.conversions.description}
           hint={cpa > 0 ? `CPA ${formatMetric("spend", cpa)}` : undefined}
         />
       </section>
@@ -243,6 +233,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
           value={cT.impressions > 0 ? `${ctr.toFixed(2)}%` : "—"}
           icon={Sparkles}
           emphasis="compact"
+          description={METRIC_META.ctr.description}
         />
       </section>
 
@@ -328,7 +319,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
               label: (
                 <Link
                   to="/cliente/$cliente"
-                  params={{ cliente: c.cliente }}
+                  params={{ cliente: slugify(c.cliente) }}
                   className="hover:underline"
                 >
                   {c.cliente}
@@ -363,7 +354,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
                   <div className="flex items-center justify-between gap-2">
                     <Link
                       to="/cliente/$cliente"
-                      params={{ cliente: a.cliente }}
+                      params={{ cliente: slugify(a.cliente) }}
                       className="truncate text-[13px] font-medium text-foreground hover:underline"
                     >
                       {a.cliente}

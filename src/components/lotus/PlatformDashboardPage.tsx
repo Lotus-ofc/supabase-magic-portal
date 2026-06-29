@@ -9,6 +9,7 @@ import { Suspense, useMemo, useState } from "react";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { PlatformDashboard } from "@/components/lotus/PlatformDashboard";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { resolvePeriod, type PeriodInput } from "@/lib/period";
 import type { PlatformDef } from "@/lib/platforms/types";
 import { clienteRefQuery } from "@/routes/_authenticated/cliente.$cliente";
@@ -32,7 +33,7 @@ export function PlatformDashboardPage({ def }: Props) {
         description={def.description}
         actions={<PeriodPicker value={periodInput} onChange={setPeriodInput} />}
       />
-      <Suspense fallback={<div className="lotus-skeleton h-32 w-full" />}>
+      <Suspense fallback={<DashboardSkeleton kpiCount={4} />}>
         <PlatformResolved def={def} slug={slug} period={period} />
       </Suspense>
     </div>

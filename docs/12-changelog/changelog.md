@@ -21,6 +21,10 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Refinamento SaaS (camada app):** `MetricLabel`, tooltips em todos os KPIs (`METRIC_META`),
+  `EmptyState`, `DashboardSkeleton`, `SyncStatusBar`, `GlobalSearch` (Ctrl+K),
+  `NotificationCenter`, workflow de aprovações com preview ampliável e timeline,
+  fallbacks de logo/favicon via CDN Supabase.
 - **Rebranding Lots BI:** nova identidade visual (logo, favicon, og-image, cores `#A855F7` → `#60A5FA`),
   metadados, títulos de aba, login e assets em `public/brand/`.
 - **Knowledge Center:** módulo admin `/admin/knowledge` — renderiza `docs/**/*.md` com busca,
@@ -32,6 +36,8 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Alterado
 
+- **Pronto para clientes:** rotas `/cliente/{slug}` corrigidas (slugify), login somente por convite,
+  barra de sync, tooltips em KPIs, workflow de aprovações, pesquisa global e central de notificações.
 - **Sistema de Engenharia fundado (ADR-0011):** CI, Vitest, CONTRIBUTING, governança, `npm run check`.
 - **Deployment & Padrões:** Lovable transitório (build/deploy); Cursor como dev oficial.
 

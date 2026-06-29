@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
+import { EmptyState } from "@/components/lotus/EmptyState";
 import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { resolvePeriod, type PeriodInput } from "@/lib/period";
@@ -13,10 +15,13 @@ import {
   pctDelta,
   sumOverview,
   dailyFromOverview,
+  METRIC_META,
   type OverviewRow,
   type Totals,
 } from "@/lib/metrics";
-import { BRAND_NAME, brandTitle } from "@/lib/brand";
+import { MetricLabel } from "@/components/lotus/MetricLabel";
+import { slugify } from "@/lib/slug";
+import { PLATFORM_LABEL } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
@@ -105,31 +110,9 @@ function ClientHome() {
         actions={<PeriodPicker value={period} onChange={setPeriod} />}
       />
 
-      <Suspense fallback={<DashboardSkeleton />}>
+      <Suspense fallback={<DashboardSkeleton kpiCount={4} />}>
         <DashboardBody period={resolved} />
       </Suspense>
-    </div>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-6">
-        <div className="lotus-surface h-40 lg:col-span-3">
-          <div className="lotus-skeleton m-5 h-3 w-1/3" />
-          <div className="lotus-skeleton mx-5 mt-4 h-8 w-2/3" />
-        </div>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="lotus-surface h-40">
-            <div className="lotus-skeleton m-5 h-3 w-1/2" />
-            <div className="lotus-skeleton mx-5 mt-4 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-      <div className="lotus-surface h-[320px]">
-        <div className="lotus-skeleton m-5 h-3 w-40" />
-      </div>
     </div>
   );
 }
@@ -198,6 +181,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           value={fmtInt(totals.conversions)}
           icon={Target}
           delta={convDelta}
+          description={METRIC_META.conversions.description}
           hint={`${convRate.toFixed(2)}% taxa · CPA ${cpa > 0 ? fmtBRL(cpa) : "—"}`}
         />
         <StatCard
@@ -205,12 +189,14 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           value={fmtInt(totals.sessions)}
           icon={Activity}
           delta={sessionsDelta}
+          description={METRIC_META.sessions.description}
         />
         <StatCard
           label="Cliques"
           value={fmtInt(totals.clicks)}
           icon={MousePointerClick}
           delta={clicksDelta}
+          description={METRIC_META.clicks.description}
           hint={`${ctr.toFixed(2)}% CTR`}
         />
       </section>
@@ -366,7 +352,7 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                 <li key={c.cliente}>
                   <Link
                     to="/cliente/$cliente"
-                    params={{ cliente: c.cliente }}
+                    params={{ cliente: slugify(c.cliente) }}
                     className="lotus-row group flex items-center gap-4 px-5 py-3.5"
                   >
                     <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 text-[12px] font-semibold text-primary-700 dark:from-primary-700/40 dark:to-secondary-700/30 dark:text-primary-100">
@@ -383,9 +369,9 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
                           (c.plataformas_ativas ?? []).map((p) => (
                             <span
                               key={p}
-                              className="inline-flex items-center rounded-md border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                              className="inline-flex items-center rounded-md border border-border/60 bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
                             >
-                              {p}
+                              {PLATFORM_LABEL[p as keyof typeof PLATFORM_LABEL] ?? p}
                             </span>
                           ))
                         )}
@@ -494,21 +480,15 @@ function buildInsights(args: {
   return out.slice(0, 5);
 }
 
-const PLATFORM_LABEL: Record<string, string> = {
-  meta_ads: "Meta Ads",
-  google_ads: "Google Ads",
-  ga4: "Google Analytics 4",
-  instagram: "Instagram",
-  google_business: "Google Business",
-  tiktok: "TikTok",
-};
-
 function collectPlatforms(clientes: ClienteAtivo[]) {
   const set = new Set<string>();
   for (const c of clientes) (c.plataformas_ativas ?? []).forEach((p) => set.add(p));
   return Array.from(set)
     .sort()
-    .map((key) => ({ key, label: PLATFORM_LABEL[key] ?? key }));
+    .map((key) => ({
+      key,
+      label: PLATFORM_LABEL[key as keyof typeof PLATFORM_LABEL] ?? key,
+    }));
 }
 
 /* ----------------------- subcomponents ----------------------- */
@@ -538,9 +518,11 @@ function HeroSpend({
       )}
     >
       <div className="flex items-start justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
-          Investimento · últimos {days} dias
-        </p>
+        <MetricLabel
+          label={`Investimento · últimos ${days} dias`}
+          description={METRIC_META.spend.description}
+          className="text-[11px] font-semibold normal-case tracking-[0.14em] text-primary-600 dark:text-primary-300"
+        />
         <span className="grid h-9 w-9 place-items-center rounded-xl border border-border/70 bg-background/60 text-primary-600 dark:text-primary-300">
           <DollarSign className="h-4 w-4" />
         </span>

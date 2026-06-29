@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader } from "@/components/lotus/PageHeader";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
@@ -25,6 +25,7 @@ import {
   periodRange,
   spendShareByPlatform,
   sumOverview,
+  METRIC_META,
 } from "@/lib/metrics";
 import { getPlatformDef } from "@/lib/platforms/registry";
 import { clientePlatformsQuery, type PlatformKey } from "./cliente.$cliente";
@@ -103,7 +104,7 @@ function ClienteOverviewPage() {
   const period = useMemo(() => resolvePeriod(periodInput), [periodInput]);
 
   return (
-    <Suspense fallback={<ClienteSkeleton />}>
+    <Suspense fallback={<DashboardSkeleton kpiCount={6} />}>
       <ClienteResolved
         slug={slug}
         period={period}
@@ -142,24 +143,6 @@ function ClienteResolved({
         actions={<PeriodPicker value={periodInput} onChange={setPeriodInput} />}
       />
       <ClienteBody cliente={ref.queryName} period={period} />
-    </div>
-  );
-}
-
-function ClienteSkeleton() {
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="lotus-surface h-28">
-            <div className="lotus-skeleton m-4 h-3 w-1/2" />
-            <div className="lotus-skeleton mx-4 mt-3 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-      <div className="lotus-surface h-[320px]">
-        <div className="lotus-skeleton m-5 h-3 w-40" />
-      </div>
     </div>
   );
 }
@@ -204,7 +187,7 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
           icon={Eye}
           emphasis="hero"
           delta={pctDelta(cT.reach, pT.reach)}
-          hint="Pessoas únicas alcançadas no período"
+          description={METRIC_META.reach.description}
           className="lg:col-span-2"
         />
         <StatCard
@@ -212,18 +195,21 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
           value={formatMetric("engagement", cT.engagement)}
           icon={Heart}
           delta={pctDelta(cT.engagement, pT.engagement)}
+          description={METRIC_META.engagement.description}
         />
         <StatCard
           label="Impressões"
           value={formatMetric("impressions", cT.impressions)}
           icon={Activity}
           delta={pctDelta(cT.impressions, pT.impressions)}
+          description={METRIC_META.impressions.description}
         />
         <StatCard
           label="Cliques"
           value={formatMetric("clicks", cT.clicks)}
           icon={MousePointerClick}
           delta={pctDelta(cT.clicks, pT.clicks)}
+          description={METRIC_META.clicks.description}
           hint={cT.impressions > 0 ? `CTR ${ctr.toFixed(2)}%` : undefined}
         />
         <StatCard
@@ -231,6 +217,7 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
           value={formatMetric("conversions", cT.conversions)}
           icon={Target}
           delta={pctDelta(cT.conversions, pT.conversions)}
+          description={METRIC_META.conversions.description}
           hint={cT.sessions > 0 ? `${convRate.toFixed(2)}% taxa` : undefined}
         />
       </section>
@@ -523,6 +510,17 @@ function PlatformTable({
     );
   }
 
+  const def = getPlatformDef(platform);
+  const labelFor = (key: string) => {
+    if (key === "data") return "Data";
+    if (key === "cliente") return "Cliente";
+    const m = def.metrics.find((mm) => mm.key === key);
+    if (m) return m.label;
+    const k = def.kpis.find((kk) => kk.key === key);
+    if (k) return k.label;
+    return key.replace(/_/g, " ");
+  };
+
   const cols = Object.keys(data[0]);
   return (
     <div className="overflow-x-auto">
@@ -531,7 +529,7 @@ function PlatformTable({
           <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
             {cols.map((c) => (
               <th key={c} className="px-4 py-2.5 font-medium">
-                {c}
+                {labelFor(c)}
               </th>
             ))}
           </tr>

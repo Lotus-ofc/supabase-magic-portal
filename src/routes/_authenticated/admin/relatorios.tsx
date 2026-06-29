@@ -21,8 +21,11 @@ import {
   pctDelta,
   periodRange,
   sumOverview,
+  METRIC_META,
   type OverviewRow,
 } from "@/lib/metrics";
+import { slugify } from "@/lib/slug";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import {
   ArrowUpRight,
   DollarSign,
@@ -119,7 +122,7 @@ function RelatoriosHub() {
         />
       </section>
 
-      <Suspense fallback={<HubSkeleton />}>
+      <Suspense fallback={<DashboardSkeleton kpiCount={4} />}>
         <HubBody days={days} />
       </Suspense>
     </div>
@@ -156,24 +159,6 @@ function ShortcutCard({
       </div>
       <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
     </Link>
-  );
-}
-
-function HubSkeleton() {
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="lotus-surface h-28">
-            <div className="lotus-skeleton m-4 h-3 w-1/2" />
-            <div className="lotus-skeleton mx-4 mt-3 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-      <div className="lotus-surface h-[320px]">
-        <div className="lotus-skeleton m-5 h-3 w-40" />
-      </div>
-    </div>
   );
 }
 
@@ -230,6 +215,7 @@ function HubBody({ days }: { days: PeriodDays }) {
           value={formatMetric("spend", cT.spend)}
           icon={DollarSign}
           delta={pctDelta(cT.spend, pT.spend)}
+          description={METRIC_META.spend.description}
           hint={`Meta ${formatMetric("spend", cT.meta_spend)} · Google ${formatMetric("spend", cT.google_spend)}`}
         />
         <StatCard
@@ -237,6 +223,7 @@ function HubBody({ days }: { days: PeriodDays }) {
           value={formatMetric("conversions", cT.conversions)}
           icon={Target}
           delta={pctDelta(cT.conversions, pT.conversions)}
+          description={METRIC_META.conversions.description}
           hint={cpa > 0 ? `CPA ${formatMetric("spend", cpa)}` : undefined}
         />
         <StatCard
@@ -244,6 +231,7 @@ function HubBody({ days }: { days: PeriodDays }) {
           value={formatMetric("sessions", cT.sessions)}
           icon={Activity}
           delta={pctDelta(cT.sessions, pT.sessions)}
+          description={METRIC_META.sessions.description}
           hint={cT.impressions > 0 ? `CTR ${ctr.toFixed(2)}%` : undefined}
         />
         <StatCard
@@ -288,7 +276,7 @@ function HubBody({ days }: { days: PeriodDays }) {
                 <li key={c.cliente} className="group">
                   <Link
                     to="/cliente/$cliente"
-                    params={{ cliente: c.cliente }}
+                    params={{ cliente: slugify(c.cliente) }}
                     className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-muted/40"
                   >
                     <div className="min-w-0 flex-1">

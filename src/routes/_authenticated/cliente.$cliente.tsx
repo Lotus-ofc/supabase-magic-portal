@@ -16,19 +16,12 @@ import {
 import { brandTitle } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { detectClientPlatforms, type ClientPlatformRouteKey } from "@/lib/platform-availability";
+import { SyncStatusBar } from "@/components/lotus/SyncStatusBar";
+import { slugify } from "@/lib/slug";
 
 // ---------------- Shared helpers (used by child routes) ----------------
 
 export type ClienteRef = { slug: string; nome: string; queryName: string };
-
-export function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export const clienteRefQuery = (slug: string) =>
   queryOptions({
@@ -37,7 +30,7 @@ export const clienteRefQuery = (slug: string) =>
       const { data: cad } = await supabase
         .from("cadastro_clientes")
         .select("slug, nome_cliente")
-        .eq("slug", slug)
+        .eq("slug", slugify(slug))
         .maybeSingle();
 
       const { data: ativos, error: errAtivos } = await supabase
@@ -45,7 +38,9 @@ export const clienteRefQuery = (slug: string) =>
         .select("cliente");
       if (errAtivos) throw errAtivos;
 
-      const match = (ativos ?? []).find((r: { cliente: string }) => slugify(r.cliente) === slug);
+      const match = (ativos ?? []).find(
+        (r: { cliente: string }) => slugify(r.cliente) === slugify(slug),
+      );
       const queryName = match?.cliente ?? cad?.nome_cliente ?? null;
       if (!queryName) {
         console.warn("[cliente-ref] sem match para slug", slug);
@@ -163,7 +158,8 @@ function ClienteShell({ slug }: { slug: string }) {
           <PlatformSideNav slug={slug} queryName={ref.queryName} />
         </Suspense>
       </aside>
-      <div className="min-w-0">
+      <div className="min-w-0 space-y-5">
+        <SyncStatusBar queryName={ref.queryName} />
         <Outlet />
       </div>
     </div>

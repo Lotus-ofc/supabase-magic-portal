@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, ChevronDown, Search } from "lucide-react";
-import { listClientes } from "@/lib/admin.functions";
-import { cn } from "@/lib/utils";
+import { slugify } from "@/lib/slug";
 
 /**
  * Seletor para o admin "Ver como cliente". Não impersona — apenas
@@ -72,7 +71,7 @@ export function ImpersonateClienteMenu() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    const target = c.slug || c.nome_cliente;
+                    const target = c.slug ? slugify(c.slug) : slugify(c.nome_cliente);
                     navigate({ to: "/cliente/$cliente", params: { cliente: target } });
                   }}
                   className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-[12.5px] hover:bg-muted/60"

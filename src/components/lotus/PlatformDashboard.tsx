@@ -20,6 +20,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import type { PlatformDef, ValueFormat } from "@/lib/platforms/types";
 import type { CommonMetric } from "@/lib/metrics";
+import { METRIC_META, resolveMetricDescription } from "@/lib/metrics";
 import { aggregatePeriod, pctDelta } from "@/lib/platforms/engine";
 import type { Period } from "@/lib/period";
 import { formatBR } from "@/lib/period";
@@ -28,6 +29,8 @@ import { StatCard } from "./StatCard";
 import { ChartFrame, ChartLegendItem } from "./charts/ChartFrame";
 import { AreaChartLotus, getSeriesColor } from "./charts/AreaChartLotus";
 import { DeltaPill } from "./DeltaPill";
+import { EmptyState } from "./EmptyState";
+import { DashboardSkeleton } from "./DashboardSkeleton";
 import { cn } from "@/lib/utils";
 
 // ---------- Formatadores (locais para evitar coupling com metrics.ts) -------
@@ -101,7 +104,7 @@ interface Props {
 
 export function PlatformDashboard({ def, cliente, period }: Props) {
   return (
-    <Suspense fallback={<PlatformSkeleton />}>
+    <Suspense fallback={<DashboardSkeleton kpiCount={4} />}>
       <PlatformDashboardBody def={def} cliente={cliente} period={period} />
     </Suspense>
   );
@@ -120,7 +123,14 @@ function PlatformDashboardBody({ def, cliente, period }: Props) {
       <NarrativeHeader def={def} period={period} lastSync={agg.lastSync} />
 
       {!hasData ? (
-        <EmptyState />
+        <SectionCard eyebrow="Sem dados" title="Nada para mostrar no período selecionado">
+          <EmptyState
+            icon={Inbox}
+            title="Sem dados no período"
+            description="Ajuste o período ou aguarde a próxima sincronização. Quando a integração registrar novos dados, eles aparecem aqui automaticamente."
+            compact
+          />
+        </SectionCard>
       ) : (
         <>
           <HeroCards def={def} agg={agg} />
@@ -183,6 +193,13 @@ function NarrativeHeader({
 
 // ---------- Cards ----------------------------------------------------------
 
+function metricDescription(key: string, explicit?: string): string | undefined {
+  if (explicit) return explicit;
+  const common = key as CommonMetric;
+  if (common in METRIC_META) return METRIC_META[common as CommonMetric].description;
+  return resolveMetricDescription(key);
+}
+
 function HeroCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod> }) {
   const heroes = def.metrics.filter((m) => def.heroMetrics.includes(m.key));
   return (
@@ -199,7 +216,7 @@ function HeroCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggr
             delta={pctDelta(cur, prev)}
             positiveIsGood={m.positiveIsGood ?? true}
             emphasis={i === 0 ? "hero" : "default"}
-            hint={m.description}
+            description={metricDescription(m.key, m.description)}
             className={i === 0 ? "lg:col-span-2" : undefined}
           />
         );
@@ -224,7 +241,7 @@ function KpiCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggre
             delta={pctDelta(cur, prev)}
             positiveIsGood={k.positiveIsGood}
             emphasis="compact"
-            hint={k.description}
+            description={metricDescription(k.key, k.description)}
           />
         );
       })}
@@ -590,48 +607,5 @@ function InsightsBlock({
         ))}
       </ul>
     </SectionCard>
-  );
-}
-
-// ---------- Empty + Skeleton -----------------------------------------------
-
-function EmptyState() {
-  return (
-    <SectionCard
-      eyebrow="Sem dados"
-      title="Nada para mostrar no período selecionado"
-      description="Quando a integração registrar novos dados, eles aparecem aqui automaticamente."
-    >
-      <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
-          <Inbox className="h-5 w-5" />
-        </div>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          Ajuste o período ou aguarde a próxima sincronização.
-        </p>
-      </div>
-    </SectionCard>
-  );
-}
-
-function PlatformSkeleton() {
-  return (
-    <div className="space-y-5">
-      <div className="lotus-surface h-32">
-        <div className="lotus-skeleton m-5 h-3 w-1/4" />
-        <div className="lotus-skeleton mx-5 mt-4 h-3 w-2/3" />
-      </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="lotus-surface h-28">
-            <div className="lotus-skeleton m-4 h-3 w-1/2" />
-            <div className="lotus-skeleton mx-4 mt-3 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-      <div className="lotus-surface h-[320px]">
-        <div className="lotus-skeleton m-5 h-3 w-40" />
-      </div>
-    </div>
   );
 }

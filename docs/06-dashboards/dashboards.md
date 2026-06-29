@@ -65,6 +65,26 @@ Componente genérico `PlatformDashboard` (ver
 
 ---
 
+## Componentes de experiência (Lots BI)
+
+Camada compartilhada em `src/components/lotus/` — reutilizada em dashboards, cliente e admin:
+
+| Componente | Uso |
+| ---------- | --- |
+| `MetricLabel` | Rótulo de KPI com tooltip explicativo (ícone ℹ). |
+| `StatCard` | Card de métrica com `description` + `hint` opcional. |
+| `EmptyState` | Estados vazios padronizados (ícone, título, descrição). |
+| `DashboardSkeleton` | Loading unificado para dashboards. |
+| `SyncStatusBar` | Última sincronização, ingestão e plataformas ativas (`vw_clientes_ativos`). |
+| `GlobalSearch` | Paleta `Ctrl+K` — rotas, clientes e glossário. |
+| `NotificationCenter` | Central de notificações (persistência local). |
+| `ApprovalWorkflowCard` | Workflow de aprovação com preview ampliável e timeline (`post_revisions`). |
+
+Descrições canônicas das métricas: `METRIC_META` e `PLATFORM_METRIC_DESCRIPTIONS` em
+`src/lib/metrics.ts`. Tooltips exigem `TooltipProvider` no root (`__root.tsx`).
+
+---
+
 ## Fórmulas oficiais
 
 Definidas em `src/lib/platforms/formulas.ts`. Sempre sobre **totais agregados**, com divisão

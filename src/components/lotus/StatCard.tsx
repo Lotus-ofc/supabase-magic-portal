@@ -1,11 +1,15 @@
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { MetricLabel } from "./MetricLabel";
 
 export interface StatCardProps {
   label: string;
   value: string | number;
+  /** Texto auxiliar abaixo do valor (ex.: taxa derivada). */
   hint?: string;
+  /** Tooltip explicativo da métrica. */
+  description?: string;
   icon?: LucideIcon;
   /** Percent change vs previous period (e.g. 12.4 for +12.4%). */
   delta?: number | null;
@@ -26,6 +30,7 @@ export function StatCard({
   label,
   value,
   hint,
+  description,
   icon: Icon,
   delta,
   positiveIsGood = true,
@@ -49,14 +54,11 @@ export function StatCard({
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <p
-          className={cn(
-            "font-medium uppercase tracking-[0.08em] text-muted-foreground",
-            isHero ? "text-[11px]" : "text-[10.5px]",
-          )}
-        >
-          {label}
-        </p>
+        <MetricLabel
+          label={label}
+          description={description}
+          className={cn(isHero ? "text-[11px]" : "text-[10.5px]")}
+        />
         {Icon && (
           <span
             className={cn(

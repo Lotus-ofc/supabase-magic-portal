@@ -4,7 +4,7 @@ import { adminTitle } from "@/lib/brand";
 // Sheet, Select, Button já presentes em src/components/ui/*.
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -20,6 +20,7 @@ import {
 import { listClientes } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
+import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,6 +115,7 @@ function EditorialPage() {
   const today = new Date();
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [filterCli, setFilterCli] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<PostStatus | "all">("all");
   const [drawer, setDrawer] = useState<
     { mode: "create"; date: string } | { mode: "edit"; id: string } | null
   >(null);
@@ -143,6 +145,10 @@ function EditorialPage() {
   });
 
   const posts = (postsQ.data ?? []) as Post[];
+  const visiblePosts = useMemo(() => {
+    if (filterStatus === "all") return posts;
+    return posts.filter((p) => p.status === filterStatus);
+  }, [posts, filterStatus]);
   const clientes = (clientesQ.data ?? []) as Array<{
     id: number;
     nome_cliente: string;
@@ -152,13 +158,13 @@ function EditorialPage() {
 
   const byDay = useMemo(() => {
     const m = new Map<string, Post[]>();
-    for (const p of posts) {
+    for (const p of visiblePosts) {
       const arr = m.get(p.data_publicacao) ?? [];
       arr.push(p);
       m.set(p.data_publicacao, arr);
     }
     return m;
-  }, [posts]);
+  }, [visiblePosts]);
 
   const monthLabel = cursor.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
@@ -218,27 +224,55 @@ function EditorialPage() {
       <SectionCard
         eyebrow="Mês"
         title={cap(monthLabel)}
-        description={`${posts.length} ${posts.length === 1 ? "post planejado" : "posts planejados"} no período.`}
+        description={`${visiblePosts.length} de ${posts.length} ${
+          posts.length === 1 ? "post" : "posts"
+        } no período${filterStatus !== "all" ? ` · filtro: ${STATUS_META[filterStatus].label}` : ""}.`}
         bodyClassName="px-0 py-0"
       >
-        <MonthGrid
-          cursor={cursor}
-          byDay={byDay}
-          onPickDay={(date) => setDrawer({ mode: "create", date })}
-          onPickPost={(id) => setDrawer({ mode: "edit", id })}
-        />
+        {postsQ.isLoading ? (
+          <div className="p-6">
+            <DashboardSkeleton kpiCount={0} withChart={false} />
+          </div>
+        ) : (
+          <MonthGrid
+            cursor={cursor}
+            byDay={byDay}
+            showCliente={filterCli === "all"}
+            onPickDay={(date) => setDrawer({ mode: "create", date })}
+            onPickPost={(id) => setDrawer({ mode: "edit", id })}
+          />
+        )}
       </SectionCard>
 
-      {/* Legenda de status */}
-      <div className="flex flex-wrap gap-3">
+      {/* Legenda de status — clique para filtrar */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setFilterStatus("all")}
+          className={cn(
+            "rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors",
+            filterStatus === "all"
+              ? "border-primary bg-primary/10 text-primary-700 dark:text-primary-200"
+              : "border-border text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Todos
+        </button>
         {STATUS_ORDER.map((s) => (
-          <span
+          <button
             key={s}
-            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
+            type="button"
+            onClick={() => setFilterStatus((cur) => (cur === s ? "all" : s))}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors",
+              filterStatus === s
+                ? STATUS_META[s].chip
+                : "border-border text-muted-foreground hover:text-foreground",
+            )}
           >
             <span className={cn("h-2 w-2 rounded-full", STATUS_META[s].dot)} />
             {STATUS_META[s].label}
-          </span>
+          </button>
         ))}
       </div>
 
@@ -253,11 +287,13 @@ function EditorialPage() {
 function MonthGrid({
   cursor,
   byDay,
+  showCliente,
   onPickDay,
   onPickPost,
 }: {
   cursor: Date;
   byDay: Map<string, Post[]>;
+  showCliente?: boolean;
   onPickDay: (date: string) => void;
   onPickPost: (id: string) => void;
 }) {
@@ -321,6 +357,9 @@ function MonthGrid({
                   )}
                   title={`${p.cliente_nome} · ${STATUS_META[p.status].label}`}
                 >
+                  {showCliente && (
+                    <span className="font-normal opacity-80">{p.cliente_nome} · </span>
+                  )}
                   {p.titulo}
                 </button>
               ))}
@@ -369,20 +408,32 @@ function PostDrawer({
     capa_url: "",
     status: "rascunho" as PostStatus,
   }));
-  const [hydrated, setHydrated] = useState(false);
-  if (drawer.mode === "edit" && post && !hydrated) {
-    setForm({
-      cadastro_cliente_id: post.cadastro_cliente_id,
-      data_publicacao: post.data_publicacao,
-      titulo: post.titulo,
-      legenda: post.legenda ?? "",
-      plataforma: post.plataforma,
-      formato: post.formato ?? "",
-      capa_url: post.capa_url ?? "",
-      status: post.status,
-    });
-    setHydrated(true);
-  }
+
+  useEffect(() => {
+    if (drawer.mode === "edit" && post) {
+      setForm({
+        cadastro_cliente_id: post.cadastro_cliente_id,
+        data_publicacao: post.data_publicacao,
+        titulo: post.titulo,
+        legenda: post.legenda ?? "",
+        plataforma: post.plataforma,
+        formato: post.formato ?? "",
+        capa_url: post.capa_url ?? "",
+        status: post.status,
+      });
+    } else if (drawer.mode === "create") {
+      setForm({
+        cadastro_cliente_id: clientes[0]?.id ?? 0,
+        data_publicacao: drawer.date,
+        titulo: "",
+        legenda: "",
+        plataforma: "instagram",
+        formato: "",
+        capa_url: "",
+        status: "rascunho",
+      });
+    }
+  }, [drawer, post, clientes]);
 
   const [comment, setComment] = useState("");
   const [changeMsg, setChangeMsg] = useState("");
