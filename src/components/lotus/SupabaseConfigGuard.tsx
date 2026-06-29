@@ -55,15 +55,22 @@ export function SupabaseBootstrapGate({ children }: { children: ReactNode }) {
           </h1>
           <p className="text-sm leading-relaxed text-muted-foreground">{error}</p>
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-left text-xs leading-relaxed text-muted-foreground">
-            <p className="font-medium text-foreground">No Lovable (Cloud → Secrets):</p>
+            <p className="font-medium text-foreground">
+              Integração customizada (prefixo <code className="text-foreground">OFFICIAL_</code>, não
+              Supabase nativo do Lovable):
+            </p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               <li>
-                <code className="text-foreground">OFFICIAL_SUPABASE_ANON_KEY</code> ou{" "}
-                <code className="text-foreground">VITE_OFFICIAL_SUPABASE_ANON_KEY</code>
+                <code className="text-foreground">OFFICIAL_SUPABASE_ANON_KEY</code> — runtime secret
+                (obrigatório sem build env)
               </li>
               <li>
                 <code className="text-foreground">OFFICIAL_SUPABASE_URL</code> ={" "}
                 https://ywvhoctcmibjitvwkkhb.supabase.co
+              </li>
+              <li>
+                Opcional no build: <code className="text-foreground">VITE_OFFICIAL_SUPABASE_ANON_KEY</code>{" "}
+                e <code className="text-foreground">VITE_OFFICIAL_SUPABASE_URL</code>
               </li>
             </ul>
             <p className="mt-2">

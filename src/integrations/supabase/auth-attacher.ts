@@ -2,11 +2,15 @@
 // session bearer token to every server-function HTTP call so that
 // `requireSupabaseAuth` can validate it server-side.
 import { createMiddleware } from "@tanstack/react-start";
-import { supabase } from "./client";
+import { isSupabaseReady, supabase } from "./client";
 
 export const attachSupabaseAuth = createMiddleware({ type: "function" }).client(
   async ({ next }) => {
     if (typeof window === "undefined") {
+      return next();
+    }
+    // Bootstrap chama getPublicSupabaseConfig antes do client existir — não anexar Bearer.
+    if (!isSupabaseReady()) {
       return next();
     }
     const { data } = await supabase.auth.getSession();
