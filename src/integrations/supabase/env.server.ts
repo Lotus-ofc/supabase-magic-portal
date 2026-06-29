@@ -1,4 +1,12 @@
-/** Resolve variáveis Supabase no servidor (middleware, server functions, SSR). */
+/**
+ * Resolve variáveis Supabase no SERVIDOR (middleware, server functions, SSR).
+ * NUNCA importar este arquivo em código client-side.
+ *
+ * Segurança:
+ * - `OFFICIAL_SERVICE_ROLE_KEY` só via process.env (runtime secret).
+ * - Nunca prefixar service-role com VITE_.
+ * - Anon key pode usar VITE_* (pública, protegida por RLS).
+ */
 
 function pick(...values: (string | undefined)[]): string | undefined {
   for (const v of values) {
@@ -33,7 +41,7 @@ export function getServerSupabaseAnonKey(): string | undefined {
   );
 }
 
-/** Service role — somente servidor; opcional em dev. */
+/** Service role — SOMENTE process.env em runtime server. Nunca VITE_. */
 export function getServerSupabaseServiceRoleKey(): string | undefined {
   return pick(process.env.OFFICIAL_SERVICE_ROLE_KEY);
 }
@@ -43,7 +51,7 @@ export function requireServerSupabaseAnonConfig(): { url: string; anonKey: strin
   const anonKey = getServerSupabaseAnonKey();
   if (!url || !anonKey) {
     throw new Error(
-      "Missing Supabase config: set OFFICIAL_SUPABASE_URL and OFFICIAL_SUPABASE_ANON_KEY (or VITE_OFFICIAL_* equivalents)",
+      "Missing Supabase config: set OFFICIAL_SUPABASE_URL and OFFICIAL_SUPABASE_ANON_KEY (runtime secrets no Lovable; VITE_OFFICIAL_* no build)",
     );
   }
   return { url, anonKey };

@@ -32,3 +32,4 @@ alwaysApply: true
 
 - Sem force-push no `main` enquanto Lovable estiver conectado
 - `npm run check` antes de merge
+- **Nunca** commitar `.env` — ver regra `lotus-secrets.mdc`

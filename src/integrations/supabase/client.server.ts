@@ -1,7 +1,7 @@
 // SERVER-ONLY admin client para o projeto OFICIAL (ywvhoctcmibjitvwkkhb).
 // Lazy init — não quebra dev quando service-role não está no .env.
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { getServerSupabaseServiceRoleKey, getServerSupabaseUrl } from "./env";
+import { getServerSupabaseServiceRoleKey, getServerSupabaseUrl } from "./env.server";
 
 let _client: SupabaseClient | null = null;
 

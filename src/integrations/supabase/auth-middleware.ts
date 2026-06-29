@@ -3,7 +3,7 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
-import { requireServerSupabaseAnonConfig } from "./env";
+import { requireServerSupabaseAnonConfig } from "./env.server";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
