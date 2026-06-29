@@ -3,19 +3,16 @@ import { BRAND_ASSETS, BRAND_NAME } from "@/lib/brand";
 
 type LogoSize = "sm" | "md" | "lg";
 
-const iconSize: Record<LogoSize, string> = {
-  sm: "h-6 w-6",
-  md: "h-8 w-8",
-  lg: "h-10 w-10",
+const lockup: Record<
+  LogoSize,
+  { icon: string; lots: string; bi: string; gap: string }
+> = {
+  sm: { icon: "h-6 w-6", lots: "text-[13px]", bi: "h-[13px]", gap: "gap-1.5" },
+  md: { icon: "h-7 w-7", lots: "text-[15px]", bi: "h-[15px]", gap: "gap-2" },
+  lg: { icon: "h-9 w-9", lots: "text-[17px]", bi: "h-[17px]", gap: "gap-2.5" },
 };
 
-const wordmarkHeight: Record<LogoSize, string> = {
-  sm: "h-6",
-  md: "h-8",
-  lg: "h-10",
-};
-
-/** Ícone Lots BI (pétala com gradiente roxo → azul). */
+/** Símbolo Lots BI (pétala com gradiente roxo → azul). */
 export function LotsBIIcon({
   className,
   size = "md",
@@ -26,26 +23,62 @@ export function LotsBIIcon({
       src={BRAND_ASSETS.icon}
       alt=""
       aria-hidden
-      className={cn("object-contain", iconSize[size], className)}
+      className={cn("shrink-0 object-contain", lockup[size].icon, className)}
       {...props}
     />
   );
 }
 
-/** Lockup completo: ícone + “Lots BI”. */
+/**
+ * Lockup horizontal — mesmo layout do logo Lotus antigo:
+ * símbolo + texto "Lots" + imagem "BI".
+ */
 export function LotsBIWordmark({
   className,
   size = "md",
+  variant = "composed",
 }: {
   className?: string;
   size?: LogoSize;
+  /** `composed` = símbolo + Lots (texto) + BI (img). `full` = PNG completo. */
+  variant?: "composed" | "full";
 }) {
+  const s = lockup[size];
+
+  if (variant === "full") {
+    const fullHeight = { sm: "h-6", md: "h-7", lg: "h-9" }[size];
+    return (
+      <div className={cn("flex items-center", className)}>
+        <img
+          src={BRAND_ASSETS.logoFull}
+          alt={BRAND_NAME}
+          className={cn("w-auto max-w-[168px] object-contain object-left", fullHeight)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("flex items-center", className)}>
+    <div
+      className={cn("flex items-center", s.gap, className)}
+      aria-label={BRAND_NAME}
+      role="img"
+    >
+      <LotsBIIcon size={size} />
+      <span
+        className={cn(
+          "font-display font-semibold leading-none tracking-[-0.02em]",
+          "text-[color:var(--lots-wordmark-text)]",
+          s.lots,
+        )}
+      >
+        Lots
+      </span>
       <img
-        src={BRAND_ASSETS.logoFull}
-        alt={BRAND_NAME}
-        className={cn("w-auto max-w-[148px] object-contain object-left", wordmarkHeight[size])}
+        src={BRAND_ASSETS.logoBi}
+        alt=""
+        aria-hidden
+        className={cn("w-auto shrink-0 object-contain", s.bi)}
       />
     </div>
   );

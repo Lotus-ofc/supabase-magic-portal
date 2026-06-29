@@ -213,6 +213,9 @@
   --motion-base: 220ms;
   --motion-slow: 360ms;
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Lockup "Lots" — cor do asset oficial; legível no sidebar claro */
+  --lots-wordmark-text: #2c2e3b;
 }
 
 /* =========================================================================
@@ -247,6 +250,8 @@
   --danger-foreground: oklch(0.15 0.04 25);
   --info: var(--secondary-400);
   --info-foreground: oklch(0.15 0.04 230);
+
+  --lots-wordmark-text: oklch(0.88 0.015 280);
 
   --sidebar: oklch(0.195 0.024 285);
   --sidebar-foreground: oklch(0.87 0.015 285);

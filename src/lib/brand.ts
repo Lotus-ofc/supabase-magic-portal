@@ -5,20 +5,30 @@ export const BRAND_TAGLINE = "Business Intelligence para marketing digital";
 export const BRAND_DESCRIPTION =
   "Lots BI — plataforma de inteligência de negócios para consolidar métricas, clientes e operações de marketing.";
 
+const SUPABASE_MEDIA_BASE =
+  "https://ywvhoctcmibjitvwkkhb.supabase.co/storage/v1/object/public/Midias";
+
 export const BRAND_COLORS = {
   purple: "#A855F7",
   blue: "#60A5FA",
+  /** Cor do texto "Lots" no lockup (extraída do asset oficial). */
+  lotsText: "#2C2E3B",
   slate: "#334155",
   background: "#000000",
 } as const;
 
+/** Mídias oficiais hospedadas no Supabase Storage (bucket `Midias`). */
 export const BRAND_ASSETS = {
-  icon: "/brand/logo-icon.png",
-  logoFull: "/brand/logo-full.png",
-  logoBi: "/brand/logo-bi.png",
-  logoLots: "/brand/logo-lots.png",
-  favicon: "/favicon.png",
-  ogImage: "/og-image.png",
+  /** Lockup horizontal completo (símbolo + Lots + BI). */
+  logoFull: `${SUPABASE_MEDIA_BASE}/1.png`,
+  /** Símbolo / pétala (favicon, ícone compacto). */
+  icon: `${SUPABASE_MEDIA_BASE}/2.png`,
+  /** Letras BI com gradiente. */
+  logoBi: `${SUPABASE_MEDIA_BASE}/3.png`,
+  /** Palavra Lots (referência; no UI usamos texto tipográfico). */
+  logoLots: `${SUPABASE_MEDIA_BASE}/4.png`,
+  favicon: `${SUPABASE_MEDIA_BASE}/2.png`,
+  ogImage: `${SUPABASE_MEDIA_BASE}/1.png`,
 } as const;
 
 /** Título de aba: `section` · Lots BI */

@@ -8,12 +8,7 @@
   "theme_color": "#A855F7",
   "icons": [
     {
-      "src": "/favicon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/brand/logo-icon.png",
+      "src": "https://ywvhoctcmibjitvwkkhb.supabase.co/storage/v1/object/public/Midias/2.png",
       "sizes": "512x512",
       "type": "image/png"
     }
