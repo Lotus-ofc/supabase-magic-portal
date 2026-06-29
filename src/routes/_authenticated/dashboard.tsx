@@ -16,12 +16,13 @@ import {
   sumOverview,
   dailyFromOverview,
   METRIC_META,
+  PLATFORM_LABEL,
   type OverviewRow,
   type Totals,
 } from "@/lib/metrics";
+import { BRAND_NAME, brandTitle } from "@/lib/brand";
 import { MetricLabel } from "@/components/lotus/MetricLabel";
 import { slugify } from "@/lib/slug";
-import { PLATFORM_LABEL } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import {
   DollarSign,
