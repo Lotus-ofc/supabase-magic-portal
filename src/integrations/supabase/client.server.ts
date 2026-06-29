@@ -1,18 +1,31 @@
 // SERVER-ONLY admin client para o projeto OFICIAL (ywvhoctcmibjitvwkkhb).
-// Usa OFFICIAL_SERVICE_ROLE_KEY (a service_role padrão do Supabase, renomeada
-// porque o prefixo SUPABASE_ é reservado pela plataforma Lovable).
-// NUNCA importe deste arquivo no client; o sufixo .server.ts bloqueia.
-import { createClient } from "@supabase/supabase-js";
+// Lazy init — não quebra dev quando service-role não está no .env.
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { getServerSupabaseServiceRoleKey, getServerSupabaseUrl } from "./env";
 
-const SUPABASE_URL = process.env.OFFICIAL_SUPABASE_URL;
-const SERVICE_ROLE = process.env.OFFICIAL_SERVICE_ROLE_KEY;
+let _client: SupabaseClient | null = null;
 
-if (!SUPABASE_URL || !SERVICE_ROLE) {
-  throw new Error(
-    "Missing OFFICIAL_SUPABASE_URL / OFFICIAL_SERVICE_ROLE_KEY env vars for admin client",
-  );
+export function getSupabaseAdmin(): SupabaseClient {
+  if (_client) return _client;
+
+  const url = getServerSupabaseUrl();
+  const serviceRole = getServerSupabaseServiceRoleKey();
+
+  if (!url || !serviceRole) {
+    throw new Error(
+      "Missing OFFICIAL_SUPABASE_URL / OFFICIAL_SERVICE_ROLE_KEY for admin client",
+    );
+  }
+
+  _client = createClient(url, serviceRole, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return _client;
 }
 
-export const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE, {
-  auth: { persistSession: false, autoRefreshToken: false },
+/** @deprecated Prefer getSupabaseAdmin() — lazy and safe when service-role is absent. */
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    return (getSupabaseAdmin() as unknown as Record<string | symbol, unknown>)[prop];
+  },
 });

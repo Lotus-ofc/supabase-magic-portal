@@ -3,6 +3,7 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireServerSupabaseAnonConfig } from "./env";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
@@ -14,10 +15,16 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     }
     const token = authHeader.slice("Bearer ".length).trim();
 
-    const SUPABASE_URL = process.env.OFFICIAL_SUPABASE_URL!;
-    const SUPABASE_ANON_KEY = process.env.OFFICIAL_SUPABASE_ANON_KEY!;
+    let url: string;
+    let anonKey: string;
+    try {
+      ({ url, anonKey } = requireServerSupabaseAnonConfig());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Supabase not configured";
+      throw new Response(message, { status: 500 });
+    }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const supabase = createClient(url, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
       global: { headers: { Authorization: `Bearer ${token}` } },
     });

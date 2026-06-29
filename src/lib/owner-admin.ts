@@ -18,7 +18,8 @@ export async function repairOwnerAdminRole(userId: string, email: string | null 
   if (!ownerHasAdminAccess(email)) return;
 
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getSupabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabaseAdmin = getSupabaseAdmin();
 
     const { error: rpcError } = await supabaseAdmin.rpc("ensure_owner_admin_for_user", {
       _user_id: userId,
