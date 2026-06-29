@@ -22,7 +22,7 @@ export const BRAND_ASSETS = {
   /** Lockup horizontal completo (símbolo + Lots + BI). */
   logoFull: `${SUPABASE_MEDIA_BASE}/1.png`,
   /** Símbolo / pétala (favicon, ícone compacto). */
-  icon: `${SUPABASE_MEDIA_BASE}/2.png`,
+  icon: `${SUPABASE_MEDIA_BASE}/Logo%20SVG/2.svg`,
   /** Letras BI com gradiente. */
   logoBi: `${SUPABASE_MEDIA_BASE}/3.png`,
   /** Palavra Lots (referência; no UI usamos texto tipográfico). */
