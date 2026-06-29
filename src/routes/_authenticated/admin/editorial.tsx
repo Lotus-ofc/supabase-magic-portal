@@ -48,6 +48,9 @@ import {
   CheckCircle2,
   RotateCcw,
 } from "lucide-react";
+import { EditorialMediaUpload } from "@/components/lotus/EditorialMediaUpload";
+import { MediaPreview } from "@/components/lotus/MediaPreview";
+import { buildPreviewContext, capaUrlToAsset } from "@/lib/media-preview";
 import { cn } from "@/lib/utils";
 
 // ---------- Status meta ----------
@@ -96,6 +99,10 @@ type Post = {
   plataforma: string;
   formato: string | null;
   capa_url: string | null;
+  localizacao: string | null;
+  tags: string[] | null;
+  observacoes: string | null;
+  responsavel_email: string | null;
   status: PostStatus;
   created_at: string;
   updated_at: string;
@@ -396,6 +403,10 @@ function PostDrawer({
 
   const post = drawer.mode === "edit" ? (detailQ.data?.post as Post | undefined) : undefined;
   const revisions = drawer.mode === "edit" ? (detailQ.data?.revisions ?? []) : [];
+  const postMedia =
+    drawer.mode === "edit" && detailQ.data?.media
+      ? detailQ.data.media
+      : capaUrlToAsset(post?.capa_url ?? null);
 
   // Form state
   const [form, setForm] = useState(() => ({
@@ -406,6 +417,10 @@ function PostDrawer({
     plataforma: "instagram",
     formato: "",
     capa_url: "",
+    localizacao: "",
+    tags: "",
+    observacoes: "",
+    responsavel_email: "",
     status: "rascunho" as PostStatus,
   }));
 
@@ -419,6 +434,10 @@ function PostDrawer({
         plataforma: post.plataforma,
         formato: post.formato ?? "",
         capa_url: post.capa_url ?? "",
+        localizacao: post.localizacao ?? "",
+        tags: (post.tags ?? []).join(", "),
+        observacoes: post.observacoes ?? "",
+        responsavel_email: post.responsavel_email ?? "",
         status: post.status,
       });
     } else if (drawer.mode === "create") {
@@ -430,6 +449,10 @@ function PostDrawer({
         plataforma: "instagram",
         formato: "",
         capa_url: "",
+        localizacao: "",
+        tags: "",
+        observacoes: "",
+        responsavel_email: "",
         status: "rascunho",
       });
     }
@@ -454,7 +477,15 @@ function PostDrawer({
           legenda: form.legenda || null,
           plataforma: form.plataforma,
           formato: form.formato || null,
-          capa_url: form.capa_url || null,
+          localizacao: form.localizacao || null,
+          tags: form.tags
+            ? form.tags
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean)
+            : [],
+          observacoes: form.observacoes || null,
+          responsavel_email: form.responsavel_email || null,
           status: form.status,
         },
       }),
@@ -476,7 +507,15 @@ function PostDrawer({
           legenda: form.legenda || null,
           plataforma: form.plataforma,
           formato: form.formato || null,
-          capa_url: form.capa_url || null,
+          localizacao: form.localizacao || null,
+          tags: form.tags
+            ? form.tags
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean)
+            : [],
+          observacoes: form.observacoes || null,
+          responsavel_email: form.responsavel_email || null,
         },
       }),
     onSuccess: () => {
@@ -655,21 +694,77 @@ function PostDrawer({
               />
             </div>
             <div className="grid gap-1.5">
-              <Label>URL da capa (preview)</Label>
+              <Label>Localização</Label>
               <Input
-                value={form.capa_url}
-                onChange={(e) => setForm({ ...form, capa_url: e.target.value })}
-                placeholder="https://…"
+                value={form.localizacao}
+                onChange={(e) => setForm({ ...form, localizacao: e.target.value })}
+                placeholder="Ex.: São Paulo, Brasil"
               />
-              {form.capa_url && (
-                <img
-                  src={form.capa_url}
-                  alt=""
-                  className="mt-1 max-h-48 w-full rounded-md border border-border/60 object-cover"
-                  onError={(e) => (e.currentTarget.style.display = "none")}
-                />
-              )}
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-1.5">
+                <Label>Tags (separadas por vírgula)</Label>
+                <Input
+                  value={form.tags}
+                  onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                  placeholder="campanha, verão"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Responsável (e-mail)</Label>
+                <Input
+                  type="email"
+                  value={form.responsavel_email}
+                  onChange={(e) => setForm({ ...form, responsavel_email: e.target.value })}
+                  placeholder="equipe@…"
+                />
+              </div>
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Observações internas</Label>
+              <Textarea
+                rows={2}
+                value={form.observacoes}
+                onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+                placeholder="Notas para o cliente ou equipe…"
+              />
+            </div>
+            {drawer.mode === "edit" && post && (
+              <>
+                <div className="grid gap-1.5">
+                  <Label>Mídia da publicação</Label>
+                  <EditorialMediaUpload
+                    postId={post.id}
+                    onUploaded={() => {
+                      qc.invalidateQueries({ queryKey: ["editorial", "post", post.id] });
+                    }}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Preview (como o cliente verá)</Label>
+                  <MediaPreview
+                    context={buildPreviewContext(
+                      {
+                        formato: form.formato || post.formato,
+                        plataforma: form.plataforma,
+                        legenda: form.legenda || post.legenda,
+                        cliente_nome: post.cliente_nome,
+                        data_publicacao: form.data_publicacao || post.data_publicacao,
+                        localizacao: form.localizacao || post.localizacao,
+                      },
+                      postMedia as any,
+                    )}
+                    loading={detailQ.isLoading}
+                  />
+                </div>
+              </>
+            )}
+            {drawer.mode === "create" && (
+              <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 p-3 text-[11px] text-muted-foreground">
+                Após criar o post, envie as mídias oficiais no modo edição. O preview usa os
+                arquivos enviados — não URLs.
+              </p>
+            )}
           </div>
 
           {/* Ações principais */}
@@ -830,6 +925,7 @@ function RevisionLabel({ r }: { r: any }) {
   if (r.tipo === "comentario") return <>Comentário</>;
   if (r.tipo === "aprovacao") return <>Aprovou o post</>;
   if (r.tipo === "solicitacao_alteracao") return <>Solicitou alteração</>;
+  if (r.tipo === "reprovacao") return <>Reprovou o post</>;
   if (r.tipo === "mudanca_status")
     return (
       <>

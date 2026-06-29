@@ -8,10 +8,7 @@ import { transitionPost, addPostComment } from "@/lib/editorial.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EmptyState } from "@/components/lotus/EmptyState";
-import {
-  ApprovalWorkflowCard,
-  type ApprovalPost,
-} from "@/components/lotus/ApprovalWorkflowCard";
+import { ApprovalWorkflowCard, type ApprovalPost } from "@/components/lotus/ApprovalWorkflowCard";
 import { pushNotification } from "@/lib/notifications";
 import { recordAudit } from "@/lib/audit-log";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
@@ -62,7 +59,7 @@ function AprovacoesPage() {
       <PageHeader
         eyebrow="Conteúdo"
         title="Aprovações pendentes"
-        description="Revise, amplie o preview e acompanhe o histórico antes de publicar."
+        description="Visualize o conteúdo exatamente como será publicado antes de aprovar."
       />
 
       {isLoading ? (
@@ -72,7 +69,7 @@ function AprovacoesPage() {
           <EmptyState
             icon={CheckCircle2}
             title="Nenhum post aguardando aprovação"
-            description="Quando houver conteúdo para aprovar, ele aparece aqui com preview, timeline e ações."
+            description="Quando houver conteúdo para aprovar, ele aparece aqui com preview fiel, timeline e ações."
           />
         </SectionCard>
       ) : (
@@ -82,9 +79,15 @@ function AprovacoesPage() {
               key={p.id}
               post={p}
               isPending={actingId === p.id}
-              onApprove={(id) =>
+              onApprove={(id, mensagem) =>
                 runAction(id, () =>
-                  transitionFn({ data: { id, action: "aprovar" } }).then(() => {
+                  transitionFn({
+                    data: {
+                      id,
+                      action: "aprovar",
+                      mensagem: mensagem ?? null,
+                    },
+                  }).then(() => {
                     toast.success("Post aprovado.");
                     pushNotification({
                       kind: "aprovacao",
@@ -122,10 +125,30 @@ function AprovacoesPage() {
                   }),
                 ).catch((e: Error) => toast.error(e.message))
               }
+              onReject={(id, mensagem) =>
+                runAction(id, () =>
+                  transitionFn({
+                    data: { id, action: "reprovar", mensagem },
+                  }).then(() => {
+                    toast.success("Publicação reprovada.");
+                    pushNotification({
+                      kind: "reprovacao",
+                      title: `“${p.titulo}” reprovado`,
+                      body: mensagem.slice(0, 120),
+                      href: "/admin/editorial",
+                    });
+                    recordAudit({
+                      action: "reprovacao",
+                      detail: `Post reprovado: ${p.titulo}`,
+                    });
+                    qc.invalidateQueries({ queryKey: ["aprovacoes"] });
+                    qc.invalidateQueries({ queryKey: ["approval-post", id] });
+                  }),
+                ).catch((e: Error) => toast.error(e.message))
+              }
               onComment={(id, mensagem) =>
                 runAction(id, () =>
                   commentFn({ data: { id, mensagem } }).then(() => {
-                    toast.success("Comentário enviado.");
                     qc.invalidateQueries({ queryKey: ["approval-post", id] });
                   }),
                 ).catch((e: Error) => toast.error(e.message))

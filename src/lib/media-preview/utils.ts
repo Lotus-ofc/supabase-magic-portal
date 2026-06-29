@@ -1,0 +1,105 @@
+import type { MediaAsset, MediaPreviewContext, ParsedCaption } from "./types";
+import type { EditorialPostMediaRow } from "./types";
+
+const HASHTAG_RE = /#[\w\u00C0-\u024F\u1E00-\u1EFF]+/g;
+
+export function parseCaption(raw: string | null | undefined): ParsedCaption {
+  if (!raw?.trim()) return { text: "", hashtags: [] };
+  const hashtags = [...raw.matchAll(HASHTAG_RE)].map((m) => m[0]);
+  return { text: raw.trim(), hashtags };
+}
+
+export function initialsFromName(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+export function formatDuration(seconds: number | null | undefined): string {
+  if (seconds == null || !Number.isFinite(seconds)) return "0:00";
+  const s = Math.floor(seconds);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${String(r).padStart(2, "0")}`;
+}
+
+export function formatScheduledDate(isoDate: string | null | undefined): string {
+  if (!isoDate) return "";
+  return new Date(isoDate + "T00:00:00").toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function fakeLikeCount(seed: string): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return 120 + (h % 8800);
+}
+
+/** Converte linhas DB + URLs assinadas em assets ordenados. */
+export function mapMediaRows(
+  rows: EditorialPostMediaRow[],
+  urlForPath: (path: string) => string,
+): MediaAsset[] {
+  return [...rows]
+    .sort((a, b) => a.ordem - b.ordem)
+    .map((r) => ({
+      id: r.id,
+      kind: r.kind,
+      url: urlForPath(r.storage_path),
+      posterUrl: r.poster_path ? urlForPath(r.poster_path) : null,
+      mimeType: r.mime_type,
+      width: r.width,
+      height: r.height,
+      durationSeconds: r.duration_seconds,
+      ordem: r.ordem,
+    }));
+}
+
+/** Fallback legacy: capa_url vira asset único (sem exibir URL). */
+export function capaUrlToAsset(capaUrl: string | null): MediaAsset[] {
+  if (!capaUrl?.trim()) return [];
+  const lower = capaUrl.toLowerCase();
+  const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(lower);
+  return [
+    {
+      id: "legacy-capa",
+      kind: isVideo ? "video" : "image",
+      url: capaUrl,
+    },
+  ];
+}
+
+export function buildPreviewContext(
+  post: {
+    formato: string | null;
+    plataforma: string;
+    legenda: string | null;
+    cliente_nome: string;
+    data_publicacao: string;
+    localizacao?: string | null;
+  },
+  assets: MediaAsset[],
+  opts?: { showEngagement?: boolean; accountAvatarUrl?: string | null },
+): MediaPreviewContext {
+  return {
+    formato: post.formato,
+    plataforma: post.plataforma,
+    assets,
+    caption: post.legenda,
+    accountName: post.cliente_nome,
+    accountAvatarUrl: opts?.accountAvatarUrl ?? null,
+    location: post.localizacao ?? null,
+    scheduledAt: post.data_publicacao,
+    showEngagement: opts?.showEngagement ?? true,
+  };
+}
+
+export function hasMedia(ctx: MediaPreviewContext): boolean {
+  return ctx.assets.length > 0;
+}
