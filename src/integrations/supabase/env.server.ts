@@ -28,7 +28,10 @@ export function getServerSupabaseUrl(): string | undefined {
   return pick(
     process.env.OFFICIAL_SUPABASE_URL,
     process.env.VITE_OFFICIAL_SUPABASE_URL,
+    process.env.VITE_SUPABASE_URL,
+    process.env.SUPABASE_URL,
     viteEnv("VITE_OFFICIAL_SUPABASE_URL"),
+    viteEnv("VITE_SUPABASE_URL"),
   );
 }
 
@@ -37,7 +40,12 @@ export function getServerSupabaseAnonKey(): string | undefined {
   return pick(
     process.env.OFFICIAL_SUPABASE_ANON_KEY,
     process.env.VITE_OFFICIAL_SUPABASE_ANON_KEY,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_ANON_KEY,
+    process.env.SUPABASE_ANON_KEY,
     viteEnv("VITE_OFFICIAL_SUPABASE_ANON_KEY"),
+    viteEnv("VITE_SUPABASE_PUBLISHABLE_KEY"),
+    viteEnv("VITE_SUPABASE_ANON_KEY"),
   );
 }
 

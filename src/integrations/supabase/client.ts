@@ -1,33 +1,77 @@
-// Browser-safe Supabase client conectado ao projeto OFICIAL (ywvhoctcmibjitvwkkhb).
-// As chaves OFICIAIS usam prefixo OFFICIAL_ porque SUPABASE_ é reservado pelo Lovable.
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  resolveBuildTimeSupabaseConfig,
+  SUPABASE_PROJECT_ID,
+  type SupabasePublicConfig,
+} from "./public-config";
 
-const SUPABASE_URL =
-  import.meta.env.VITE_OFFICIAL_SUPABASE_URL ??
-  (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_URL : undefined);
+let _client: SupabaseClient | null = null;
+let _config: SupabasePublicConfig | null = null;
 
-const SUPABASE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_OFFICIAL_SUPABASE_ANON_KEY ??
-  (typeof process !== "undefined" ? process.env.OFFICIAL_SUPABASE_ANON_KEY : undefined);
+function createSupabaseClient(cfg: SupabasePublicConfig): SupabaseClient {
+  return createClient(cfg.url, cfg.anonKey, {
+    auth: {
+      persistSession: typeof window !== "undefined",
+      autoRefreshToken: true,
+      detectSessionInUrl: typeof window !== "undefined",
+      storage: typeof window !== "undefined" ? window.localStorage : undefined,
+      storageKey: `sb-${cfg.projectId}-auth-token`,
+    },
+  });
+}
 
-/** Quando preenchido, a app deve exibir aviso em vez de falhar em silêncio. */
-export const supabaseConfigError: string | null =
-  !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY
-    ? "Variáveis VITE_OFFICIAL_SUPABASE_URL e VITE_OFFICIAL_SUPABASE_ANON_KEY não estão configuradas no build."
-    : null;
+/** Inicializa o client (build-time ou bootstrap runtime). Idempotente. */
+export function initSupabaseClient(cfg: SupabasePublicConfig): SupabaseClient {
+  if (_client && _config?.anonKey === cfg.anonKey && _config.url === cfg.url) {
+    return _client;
+  }
+  _config = cfg;
+  _client = createSupabaseClient(cfg);
+  return _client;
+}
 
-const PROJECT_ID = import.meta.env.VITE_OFFICIAL_SUPABASE_PROJECT_ID ?? "ywvhoctcmibjitvwkkhb";
+export function isSupabaseReady(): boolean {
+  return _client != null;
+}
 
-// Fallbacks evitam throw no import (tela preta). Chamadas à API falham até o env estar correto.
-const resolvedUrl = SUPABASE_URL ?? "https://ywvhoctcmibjitvwkkhb.supabase.co";
-const resolvedKey = SUPABASE_PUBLISHABLE_KEY ?? "build-anon-key-not-configured";
+export function getSupabaseConfig(): SupabasePublicConfig | null {
+  return _config;
+}
 
-export const supabase = createClient(resolvedUrl, resolvedKey, {
-  auth: {
-    persistSession: typeof window !== "undefined",
-    autoRefreshToken: true,
-    detectSessionInUrl: typeof window !== "undefined",
-    storage: typeof window !== "undefined" ? window.localStorage : undefined,
-    storageKey: `sb-${PROJECT_ID}-auth-token`,
+/** Client Supabase — só use após `bootstrapSupabase()` ou init manual. */
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    if (!_client) {
+      throw new Error(
+        "Supabase ainda não inicializado. Aguarde bootstrapSupabase() ou configure VITE_OFFICIAL_* no build.",
+      );
+    }
+    const value = (_client as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof value === "function" ? value.bind(_client) : value;
   },
 });
+
+/** Tenta build env; senão busca anon/url no servidor (runtime secrets Lovable). */
+export async function bootstrapSupabase(): Promise<SupabasePublicConfig> {
+  const build = resolveBuildTimeSupabaseConfig();
+  if (build) {
+    initSupabaseClient(build);
+    return build;
+  }
+
+  const { getPublicSupabaseConfig } = await import("@/lib/supabase.functions");
+  const remote = await getPublicSupabaseConfig();
+  const cfg: SupabasePublicConfig = {
+    url: remote.url,
+    anonKey: remote.anonKey,
+    projectId: remote.projectId ?? SUPABASE_PROJECT_ID,
+    source: "runtime",
+  };
+  initSupabaseClient(cfg);
+  return cfg;
+}
+
+/** @deprecated Use resolveBuildTimeSupabaseConfig — null quando anon não está no build. */
+export const supabaseConfigError: string | null = resolveBuildTimeSupabaseConfig()
+  ? null
+  : "Anon key não embutida no build; tentando carregar via servidor…";

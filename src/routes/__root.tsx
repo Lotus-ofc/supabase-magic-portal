@@ -15,7 +15,7 @@ import { BRAND_ASSETS, BRAND_COLORS, BRAND_DESCRIPTION, BRAND_NAME } from "../li
 import { ThemeProvider } from "@/components/lotus/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SupabaseConfigGuard } from "@/components/lotus/SupabaseConfigGuard";
+import { SupabaseBootstrapGate } from "@/components/lotus/SupabaseConfigGuard";
 
 function NotFoundComponent() {
   return (
@@ -157,8 +157,9 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    // Lazy import to keep SSR safe
-    import("../integrations/supabase/client").then(({ supabase }) => {
+    // Lazy import to keep SSR safe — após SupabaseBootstrapGate
+    import("../integrations/supabase/client").then(({ supabase, isSupabaseReady }) => {
+      if (!isSupabaseReady()) return;
       const { data: sub } = supabase.auth.onAuthStateChange((event) => {
         if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
         router.invalidate();
@@ -171,12 +172,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <SupabaseConfigGuard>
+        <SupabaseBootstrapGate>
           <TooltipProvider delayDuration={300}>
             <Outlet />
             <Toaster position="top-right" richColors closeButton />
           </TooltipProvider>
-        </SupabaseConfigGuard>
+        </SupabaseBootstrapGate>
       </ThemeProvider>
     </QueryClientProvider>
   );
