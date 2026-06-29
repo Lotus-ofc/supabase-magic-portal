@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, ChevronDown, Search } from "lucide-react";
+import { listClientes } from "@/lib/admin.functions";
 import { slugify } from "@/lib/slug";
+import { cn } from "@/lib/utils";
 
 /**
  * Seletor para o admin "Ver como cliente". Não impersona — apenas
