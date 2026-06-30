@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 interface KnowledgeSidebarProps {
   tree: NavNode[];
   currentSlug?: string;
+  onNavigate?: () => void;
 }
 
 function nodeContainsSlug(node: NavNode, slug: string): boolean {
@@ -20,10 +21,12 @@ function NavBranch({
   node,
   currentSlug,
   depth = 0,
+  onNavigate,
 }: {
   node: NavNode;
   currentSlug?: string;
   depth?: number;
+  onNavigate?: () => void;
 }) {
   const isDoc = node.type === "doc" && node.slug && (!node.children || node.children.length === 0);
   const hasChildren = (node.children?.length ?? 0) > 0;
@@ -36,6 +39,7 @@ function NavBranch({
       <Link
         to="/admin/knowledge/$"
         params={{ _splat: node.slug }}
+        onClick={onNavigate}
         className={cn(
           "flex items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] transition-colors",
           isActive
@@ -55,6 +59,7 @@ function NavBranch({
       <Link
         to="/admin/knowledge/$"
         params={{ _splat: node.slug }}
+        onClick={onNavigate}
         className={cn(
           "flex items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] transition-colors",
           isActive
@@ -88,14 +93,20 @@ function NavBranch({
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-0.5 pb-1 pt-0.5">
         {node.children?.map((child) => (
-          <NavBranch key={child.id} node={child} currentSlug={currentSlug} depth={depth + 1} />
+          <NavBranch
+            key={child.id}
+            node={child}
+            currentSlug={currentSlug}
+            depth={depth + 1}
+            onNavigate={onNavigate}
+          />
         ))}
       </CollapsibleContent>
     </Collapsible>
   );
 }
 
-export function KnowledgeSidebar({ tree, currentSlug }: KnowledgeSidebarProps) {
+export function KnowledgeSidebar({ tree, currentSlug, onNavigate }: KnowledgeSidebarProps) {
   return (
     <aside className="flex h-full flex-col border-r border-border bg-sidebar/40">
       <div className="border-b border-border px-4 py-3">
@@ -104,10 +115,15 @@ export function KnowledgeSidebar({ tree, currentSlug }: KnowledgeSidebarProps) {
         </p>
         <p className="mt-0.5 text-sm font-medium text-foreground">{BRAND_NAME} Handbook</p>
       </div>
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      <nav className="flex-1 overflow-y-auto px-2 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="space-y-0.5">
           {tree.map((node) => (
-            <NavBranch key={node.id} node={node} currentSlug={currentSlug} />
+            <NavBranch
+              key={node.id}
+              node={node}
+              currentSlug={currentSlug}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
       </nav>

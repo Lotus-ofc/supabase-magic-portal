@@ -314,7 +314,7 @@ async function buildDashboard(supabase: any, planoId: string): Promise<Strategic
   if (estrategiaIds.length > 0) {
     const { data: statsRows } = await supabase
       .from("vw_estrategia_editorial_stats")
-      .select(ESTRATEGIA_EDITORIAL_STATS_SELECT)
+      .select(ESTRATEGIA_EDITORIAL_STATS_SELECT);
     editorialStatsMap = parseEditorialStats(statsRows ?? []);
   }
 

@@ -122,13 +122,18 @@ export function ApprovalWorkflowCard({
             </p>
           </header>
 
-          <div className="flex flex-wrap gap-2">
-            <Button disabled={isPending} onClick={() => setModalAction("aprovar")}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button
+              className="min-h-[44px] w-full sm:w-auto"
+              disabled={isPending}
+              onClick={() => setModalAction("aprovar")}
+            >
               <CheckCircle2 className="h-4 w-4" />
               Aprovar
             </Button>
             <Button
               variant="outline"
+              className="min-h-[44px] w-full sm:w-auto"
               disabled={isPending}
               onClick={() => setModalAction("solicitar_alteracao")}
             >
@@ -137,6 +142,7 @@ export function ApprovalWorkflowCard({
             </Button>
             <Button
               variant="destructive"
+              className="min-h-[44px] w-full sm:w-auto"
               disabled={isPending}
               onClick={() => setModalAction("reprovar")}
             >
@@ -145,7 +151,7 @@ export function ApprovalWorkflowCard({
             </Button>
           </div>
 
-          <p className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
+          <p className="hidden items-center gap-1.5 text-[10.5px] text-muted-foreground sm:flex">
             <MessageSquareWarning className="h-3 w-3" />
             Atalhos: F tela cheia · +/- zoom · ← → carrossel
           </p>

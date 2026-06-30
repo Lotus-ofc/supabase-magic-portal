@@ -692,7 +692,7 @@ function PostDrawer({
 
   return (
     <Sheet open onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full max-w-full overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-w-xl">
+      <SheetContent className="flex h-[100dvh] max-h-[100dvh] w-full max-w-full flex-col overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-w-xl">
         <SheetHeader>
           <SheetTitle>{drawer.mode === "create" ? "Novo post" : "Editar post"}</SheetTitle>
           <SheetDescription>
@@ -902,9 +902,10 @@ function PostDrawer({
           </div>
 
           {/* Ações principais */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
             {drawer.mode === "create" ? (
               <Button
+                className="w-full sm:w-auto"
                 onClick={() => createMut.mutate()}
                 disabled={createMut.isPending || !form.titulo || !form.data_publicacao}
               >
@@ -912,14 +913,18 @@ function PostDrawer({
               </Button>
             ) : (
               <>
-                <Button onClick={() => updateMut.mutate()} disabled={updateMut.isPending}>
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => updateMut.mutate()}
+                  disabled={updateMut.isPending}
+                >
                   Salvar alterações
                 </Button>
                 <Select
                   value={post?.status}
                   onValueChange={(v) => setStatusMut.mutate(v as PostStatus)}
                 >
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="h-10 w-full sm:h-9 sm:w-[200px]">
                     <SelectValue placeholder="Mudar status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -932,6 +937,7 @@ function PostDrawer({
                 </Select>
                 <Button
                   variant="outline"
+                  className="w-full sm:w-auto"
                   onClick={() => {
                     if (confirm("Excluir este post?")) deleteMut.mutate();
                   }}
@@ -940,7 +946,7 @@ function PostDrawer({
                 </Button>
               </>
             )}
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="ghost" className="w-full sm:w-auto" onClick={onClose}>
               Fechar
             </Button>
           </div>

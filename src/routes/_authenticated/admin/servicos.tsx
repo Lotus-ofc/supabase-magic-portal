@@ -75,7 +75,7 @@ function ServicosAdmin() {
 
       <SectionCard eyebrow="Novo" title="Adicionar serviço">
         <form onSubmit={create} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[180px] flex-1">
+          <div className="min-w-0 flex-1">
             <Label htmlFor="svc-nome">Nome</Label>
             <Input
               id="svc-nome"
@@ -85,7 +85,7 @@ function ServicosAdmin() {
               className="mt-1"
             />
           </div>
-          <div className="min-w-[240px] flex-[2]">
+          <div className="min-w-0 flex-[2]">
             <Label htmlFor="svc-desc">Descrição</Label>
             <Input
               id="svc-desc"

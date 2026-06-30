@@ -210,7 +210,7 @@ function HubBody({ days }: { days: PeriodDays }) {
   return (
     <div className="space-y-7">
       {/* KPIs do portfólio no período */}
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Investimento total"
           value={formatMetric("spend", cT.spend)}

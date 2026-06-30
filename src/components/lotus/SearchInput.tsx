@@ -18,7 +18,7 @@ export function SearchInput({
   inputClassName,
 }: SearchInputProps) {
   return (
-    <div className={cn("relative min-w-[200px] flex-1", className)}>
+    <div className={cn("relative min-w-0 w-full flex-1", className)}>
       <Search
         className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
         aria-hidden
@@ -29,7 +29,7 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "lotus-focus h-9 w-full rounded-lg border border-border bg-background py-2 pl-9 pr-8 text-[13px] text-foreground placeholder:text-muted-foreground",
+          "lotus-focus h-10 w-full rounded-lg border border-border bg-background py-2 pl-9 pr-8 text-[13px] text-foreground placeholder:text-muted-foreground sm:h-9",
           inputClassName,
         )}
       />

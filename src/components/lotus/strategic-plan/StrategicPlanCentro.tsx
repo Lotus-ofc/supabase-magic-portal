@@ -60,7 +60,7 @@ export function StrategicPlanCentro({
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
+            className="h-10 w-full gap-1.5 sm:h-9 sm:w-auto"
             onClick={() => setManageOpen(true)}
           >
             <Settings2 className="h-3.5 w-3.5" />

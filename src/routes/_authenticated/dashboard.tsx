@@ -549,14 +549,14 @@ function HeroSpend({
         </span>
       </div>
 
-      <div className="mt-5 flex items-end gap-3">
-        <span className="font-display text-[44px] leading-none font-semibold tracking-[-0.03em] tabular-nums text-foreground">
+      <div className="mt-5 flex flex-wrap items-end gap-3">
+        <span className="font-display text-[clamp(1.75rem,10vw,2.75rem)] leading-none font-semibold tracking-[-0.03em] tabular-nums text-foreground">
           {fmtBRL(value)}
         </span>
         {hasDelta && (
           <span
             className={cn(
-              "mb-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
+              "mb-1 inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
               up
                 ? "bg-success/12 text-[color:var(--success)]"
                 : "bg-danger/12 text-[color:var(--danger)]",
@@ -568,7 +568,7 @@ function HeroSpend({
         )}
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border/60 pt-4">
+      <div className="mt-5 grid grid-cols-1 gap-3 border-t border-border/60 pt-4 min-[375px]:grid-cols-2">
         <SplitMetric label="Google Ads" value={fmtBRL(google)} tone="secondary" />
         <SplitMetric label="Meta Ads" value={fmtBRL(meta)} tone="primary" />
       </div>

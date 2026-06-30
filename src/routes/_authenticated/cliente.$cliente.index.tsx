@@ -190,7 +190,7 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
 
   return (
     <div className="space-y-7">
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-6">
         <StatCard
           label="Alcance"
           value={formatMetric("reach", cT.reach)}

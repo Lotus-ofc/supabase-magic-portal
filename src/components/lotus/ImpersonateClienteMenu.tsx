@@ -41,16 +41,16 @@ export function ImpersonateClienteMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground",
+          "lotus-focus inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground sm:h-9 sm:px-3",
           open && "border-primary-300 text-foreground",
         )}
       >
-        <Eye className="h-3.5 w-3.5" />
-        Ver como cliente
-        <ChevronDown className="h-3 w-3 opacity-70" />
+        <Eye className="h-3.5 w-3.5 shrink-0" />
+        <span className="hidden min-[360px]:inline">Ver como cliente</span>
+        <ChevronDown className="h-3 w-3 shrink-0 opacity-70" />
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[280px] overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-lg)]">
+        <div className="absolute right-0 z-50 mt-2 w-[min(calc(100vw-1.5rem),280px)] overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-lg)]">
           <div className="relative border-b border-border/70 p-2">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input

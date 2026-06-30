@@ -46,7 +46,7 @@ export function Field({ label, hint, error, required, children, className }: Fie
 }
 
 const baseInput =
-  "lotus-focus h-9 w-full rounded-lg border border-border bg-background px-3 text-[13px] text-foreground placeholder:text-muted-foreground/60 transition-colors hover:border-primary-300 disabled:opacity-60";
+  "lotus-focus h-10 w-full rounded-lg border border-border bg-background px-3 text-[13px] text-foreground placeholder:text-muted-foreground/60 transition-colors hover:border-primary-300 disabled:opacity-60 sm:h-9";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean }) {
   const { className, invalid, ...rest } = props;

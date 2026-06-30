@@ -119,11 +119,11 @@ function AdminOverview() {
         title="Centro executivo"
         description={`Visão consolidada da operação ${BRAND_NAME} — investimento, performance e portfólio.`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
             <PeriodToggle value={days} onChange={setDays} />
             <Link
               to="/admin/clientes/novo"
-              className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px"
+              className="lotus-focus inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px sm:h-9 sm:w-auto"
             >
               Novo cliente
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -172,7 +172,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
   return (
     <div className="space-y-7">
       {/* HERO KPIs */}
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-6">
         <StatCard
           label="Investimento total"
           value={formatMetric("spend", cT.spend)}
@@ -215,7 +215,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
       </section>
 
       {/* SECUNDÁRIOS — operacional */}
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Serviços ativos"
           value={servicosCount}

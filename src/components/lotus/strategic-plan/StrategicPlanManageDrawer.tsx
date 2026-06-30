@@ -63,7 +63,7 @@ export function StrategicPlanManageDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+      <SheetContent className="flex h-[100dvh] max-h-[100dvh] w-full max-w-full flex-col overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Gerenciar plano</SheetTitle>
           <SheetDescription>

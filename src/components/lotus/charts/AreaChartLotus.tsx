@@ -60,7 +60,7 @@ export function AreaChartLotus({ data, series, height = 260, className, yMetric 
 
   return (
     <div
-      className={cn("w-full min-w-[240px]", className)}
+      className={cn("w-full min-w-0", className)}
       style={{ height: `clamp(200px, 45vw, ${height}px)` }}
     >
       <ResponsiveContainer width="100%" height="100%">

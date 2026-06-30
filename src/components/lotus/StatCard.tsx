@@ -76,7 +76,11 @@ export const StatCard = memo(function StatCard({
         <span
           className={cn(
             "font-display font-semibold tracking-[-0.02em] tabular-nums text-foreground",
-            isHero ? "text-3xl sm:text-4xl" : isCompact ? "text-xl" : "text-2xl",
+            isHero
+              ? "text-2xl min-[375px]:text-3xl sm:text-4xl"
+              : isCompact
+                ? "text-lg min-[375px]:text-xl"
+                : "text-xl min-[375px]:text-2xl",
           )}
         >
           {numberFmt(value)}

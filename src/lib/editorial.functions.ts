@@ -19,7 +19,9 @@ import {
   POST_REVISION_SELECT,
   POST_SNAPSHOT_SELECT,
 } from "@/lib/db-selects";
-import { z } from "zod"; = "editorial-media";
+import { z } from "zod";
+
+const EDITORIAL_BUCKET = "editorial-media";
 const SIGNED_URL_TTL = 3600;
 
 const POST_STATUS = [

@@ -51,7 +51,7 @@ export const listClientes = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data, error } = await context.supabase
       .from("vw_clientes_admin")
-      .select(VW_CLIENTES_ADMIN_SELECT)
+      .select(VW_CLIENTES_ADMIN_SELECT);
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -218,7 +218,7 @@ export const listServicos = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("servicos")
-      .select(SERVICOS_SELECT)
+      .select(SERVICOS_SELECT);
     if (error) throw new Error(error.message);
     return data ?? [];
   });

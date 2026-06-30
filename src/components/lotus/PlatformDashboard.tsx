@@ -204,7 +204,7 @@ function metricDescription(key: string, explicit?: string): string | undefined {
 function HeroCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod> }) {
   const heroes = def.metrics.filter((m) => def.heroMetrics.includes(m.key));
   return (
-    <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-4">
       {heroes.map((m, i) => {
         const cur = agg.current[m.key] ?? 0;
         const prev = agg.previous[m.key] ?? 0;
@@ -229,7 +229,7 @@ function HeroCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggr
 function KpiCards({ def, agg }: { def: PlatformDef; agg: ReturnType<typeof aggregatePeriod> }) {
   if (def.kpis.length === 0) return null;
   return (
-    <section className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-5">
+    <section className="grid grid-cols-1 gap-3 min-[375px]:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
       {def.kpis.map((k) => {
         const cur = agg.currentKpis[k.key] ?? 0;
         const prev = agg.previousKpis[k.key] ?? 0;
