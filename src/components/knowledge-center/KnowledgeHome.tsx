@@ -2,9 +2,36 @@ import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { BRAND_NAME } from "@/lib/brand";
-import { BookOpen, Clock, Star } from "lucide-react";
+import { BookOpen, Clock, Star, Sparkles, Database, Wrench, Smartphone } from "lucide-react";
 import { kcDocsBySlugsQuery } from "@/lib/knowledge-center/registry";
 import { getFavorites, getRecent } from "@/lib/knowledge-center/storage";
+
+const HIGHLIGHTS = [
+  {
+    slug: "12-changelog/changelog",
+    title: "Changelog",
+    description: "Performance, responsividade mobile e correções de jun/2026.",
+    icon: Sparkles,
+  },
+  {
+    slug: "04-database/migrations",
+    title: "Migrations",
+    description: "Ordem 01→12, migration 05 com DROP VIEW e validação.",
+    icon: Database,
+  },
+  {
+    slug: "08-operations/troubleshooting",
+    title: "Troubleshooting",
+    description: "Diagnóstico: views, admin, build e erros comuns.",
+    icon: Wrench,
+  },
+  {
+    slug: "06-dashboards/knowledge-center",
+    title: "Este módulo",
+    description: "Arquitetura do KC, mobile e manutenção de docs.",
+    icon: Smartphone,
+  },
+] as const;
 
 export function KnowledgeHome() {
   return (
@@ -28,10 +55,12 @@ function KnowledgeHomeBody() {
         </div>
         <h1 className="font-display text-2xl font-bold tracking-tight">Knowledge Center</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Centro de conhecimento integrado do {BRAND_NAME} — arquitetura, engenharia, produto,
-          operações e dashboards. Markdown em{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/</code> é a fonte única de
-          verdade; novos arquivos aparecem automaticamente aqui.
+          Handbook de engenharia e produto do {BRAND_NAME} — arquitetura, dados, dashboards e
+          operações. A pasta <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/</code>{" "}
+          é a fonte única; novos arquivos aparecem aqui após o build.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          No celular, use o botão de menu no topo para abrir o índice lateral.
         </p>
         <Link
           to="/admin/knowledge/$"
@@ -41,6 +70,34 @@ function KnowledgeHomeBody() {
           Começar por START HERE
         </Link>
       </div>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold">Destaques recentes</h2>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {HIGHLIGHTS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.slug}>
+                <Link
+                  to="/admin/knowledge/$"
+                  params={{ _splat: item.slug }}
+                  className="flex h-full gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-primary/30"
+                >
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted text-primary-600 dark:text-primary-300">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       {favorites.length > 0 && (
         <section>
@@ -81,10 +138,12 @@ function KnowledgeHomeBody() {
                 <Link
                   to="/admin/knowledge/$"
                   params={{ _splat: doc.slug }}
-                  className="flex items-center justify-between rounded-md px-2 py-2 text-sm transition-colors hover:bg-muted"
+                  className="flex items-center justify-between gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-muted"
                 >
-                  <span>{doc.title}</span>
-                  <span className="text-xs text-muted-foreground">{doc.path}</span>
+                  <span className="min-w-0 truncate">{doc.title}</span>
+                  <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                    {doc.path}
+                  </span>
                 </Link>
               </li>
             ))}

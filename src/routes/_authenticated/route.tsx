@@ -121,7 +121,7 @@ function AuthenticatedLayout() {
     },
     {
       label: "Conhecimento",
-      items: [{ to: "/admin/knowledge", label: "📚 Knowledge Center", icon: BookOpen }],
+      items: [{ to: "/admin/knowledge", label: "Knowledge Center", icon: BookOpen }],
     },
   ];
 

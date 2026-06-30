@@ -89,7 +89,11 @@ Por cliente: `ultima_data_recebida`, `ultima_ingestao` (max `created_at`),
 ## `vw_clientes_admin` (cadastro enriquecido)
 
 Junta `cadastro_clientes` com: array de `servicos` ativos, `qtd_acessos` (de `client_access`),
-todas as flags e IDs técnicos. É o que `listClientes` retorna para o painel admin.
+flags de plataforma e IDs técnicos do Make (`instagram_username`, `facebook_ad_account_id`,
+`google_ads_customer_id`, `ga4_property_id`, `tiktok_ativo`, `tiktok_ad_account_id`, …).
+
+Disponível após migration **`05_cadastro_clientes_make_ids.sql`**. É o que `listClientes` lê
+para o painel admin (`select("*")` no app).
 
 ---
 

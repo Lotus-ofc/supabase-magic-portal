@@ -3,7 +3,7 @@ title: Changelog
 description: Histórico de mudanças relevantes do Lots BI (produto, dados e infraestrutura).
 status: living
 owner: Engenharia Lots BI
-last_review: 2026-06-26
+last_review: 2026-06-29
 ---
 
 # Changelog
@@ -19,15 +19,36 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ## [Não lançado]
 
+### Adicionado
+
+- **Sprint de performance:** `manualChunks` no Vite (react, supabase, recharts, mermaid, fuse…),
+  `QueryClient` com `staleTime`/`gcTime`, lazy load de Recharts (`AreaChartLotusLazy`), registry
+  do KC assíncrono, `db-selects.ts` para payloads menores, `React.memo` em `StatCard`.
+- **Sprint de responsividade:** plataforma utilizável em 320–768px — drawer mobile no `AppShell`
+  e no KC, touch targets (44px), sheets/dialogs com safe-area iOS, KPI grids adaptativos,
+  formulários e drawers do editorial/plano/aprovações revisados.
+
 ### Alterado
 
 - **Plano Estratégico — conceito contínuo:** um plano ativo por cliente; evolução por
   objetivos sucessivos (não múltiplos planos). Dashboard centrado no objetivo atual, histórico
   (ativos/concluídos/cancelados), onboarding do primeiro objetivo, estratégias/hipóteses/roadmap
   vinculados ao objetivo. Migration aditiva `12_plano_objetivo_scope.sql`.
+- **Migration 05 (`vw_clientes_admin`):** recriação da view com `DROP VIEW` + `CREATE VIEW`
+  (não `CREATE OR REPLACE` ao inserir colunas no meio — Postgres erro `42P16`).
+- **Knowledge Center:** drawer de índice no mobile; documentação atualizada (este changelog,
+  migrations, troubleshooting, módulo KC).
 
 ### Corrigido
 
+- **`column vw_clientes_admin.tiktok_ativo does not exist`:** select explícito pedia colunas da
+  migration 05 antes dela estar em produção; `listClientes`/`getCliente` voltaram a `select("*")`
+  até o banco estar alinhado (após aplicar `05_cadastro_clientes_make_ids.sql`).
+- **Dashboard admin (`/admin`):** `AreaChartLotusLazy` usado sem import — `ReferenceError` ao
+  renderizar gráfico de evolução quando havia dados no período.
+- **`getCliente`:** restaurado `.eq("id", data.id)` removido acidentalmente na sprint de performance.
+- **Sintaxe em server functions:** `EDITORIAL_BUCKET`, `;` faltando em selects Supabase
+  (`admin.functions.ts`, `strategic-plan.functions.ts`).
 - **Plano Estratégico — navegação cliente:** rota pai `plano-estrategico` convertida em layout
   (`<Outlet />`); listagem em `index.tsx`; Centro Estratégico em `$planoId.tsx`. Corrige página
   vazia ao abrir `/cliente/:cliente/plano-estrategico/:planoId`.

@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Guia de diagnóstico para problemas comuns — dados, auth, build e deploy.
 status: living
 owner: Engenharia / Ops Lotus
-last_review: 2026-06-26
+last_review: 2026-06-29
 ---
 
 # Troubleshooting
@@ -118,11 +118,48 @@ Considerar `.gitattributes` com `eol=lf`.
 
 ## Migrations
 
-1. Aplicar em ordem numérica (`01` → `08`)
+1. Aplicar em ordem numérica (`01` → `12`)
 2. Cada migration tem bloco de validação no final
 3. Idempotente — safe re-run
+4. **View com colunas novas no meio:** use `DROP VIEW IF EXISTS` + `CREATE VIEW` (ver migration `05`)
 
 Ver [Migrations](../04-database/migrations.md).
+
+---
+
+## `column vw_clientes_admin.<coluna> does not exist`
+
+### Sintomas
+
+Portal admin não carrega clientes; erro em `listClientes` ou páginas que dependem de `vw_clientes_admin`.
+
+### Causa
+
+O app pediu colunas (ex.: `tiktok_ativo`) que ainda não existem na view em produção — migration `05` não aplicada, ou view não recriada após `ALTER TABLE`.
+
+### Solução
+
+1. Aplicar `05_cadastro_clientes_make_ids.sql` completo no SQL Editor.
+2. Se `CREATE OR REPLACE VIEW` falhar com `42P16`, use o script da migration corrigida (`DROP VIEW` + `CREATE VIEW`).
+3. Validar colunas:
+   ```sql
+   SELECT column_name FROM information_schema.columns
+   WHERE table_schema = 'public' AND table_name = 'vw_clientes_admin'
+   ORDER BY ordinal_position;
+   ```
+4. O app usa `select("*")` em `listClientes` como compatibilidade; após migration 05, TikTok e IDs Make funcionam no cadastro.
+
+---
+
+## Erro `42P16` ao recriar view (`cannot change name of view column`)
+
+Postgres interpreta colunas inseridas **no meio** da lista como rename. **Solução:** `DROP VIEW IF EXISTS public.vw_...` e em seguida `CREATE VIEW ...` (padrão adotado na migration `05`).
+
+---
+
+## Dashboard admin quebra com `AreaChartLotusLazy is not defined`
+
+Gráfico de evolução em `/admin` sem import do componente lazy. Corrigido em `admin/index.tsx` — garantir deploy com import de `@/components/lotus/charts/AreaChartLotusLazy`.
 
 ---
 
