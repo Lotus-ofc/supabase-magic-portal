@@ -17,6 +17,11 @@ export function isLocalhostUrl(url: string): boolean {
   }
 }
 
+export function buildAuthCallbackUrl(appUrl: string): string {
+  return `${normalizeAppUrl(appUrl)}/auth/callback`;
+}
+
+/** @deprecated Prefer buildAuthCallbackUrl — mantido para compat temporária. */
 export function buildAuthInviteRedirectUrl(appUrl: string): string {
-  return `${normalizeAppUrl(appUrl)}/auth`;
+  return buildAuthCallbackUrl(appUrl);
 }

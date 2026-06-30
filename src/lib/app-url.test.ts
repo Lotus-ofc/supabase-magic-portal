@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildAuthInviteRedirectUrl, isLocalhostUrl, normalizeAppUrl } from "./app-url";
+import {
+  buildAuthCallbackUrl,
+  buildAuthInviteRedirectUrl,
+  isLocalhostUrl,
+  normalizeAppUrl,
+} from "./app-url";
 
 describe("app-url", () => {
   it("normaliza barra final", () => {
@@ -15,9 +20,12 @@ describe("app-url", () => {
     expect(isLocalhostUrl("https://portal.exemplo.com")).toBe(false);
   });
 
-  it("monta redirect de convite", () => {
+  it("monta redirect de callback auth", () => {
+    expect(buildAuthCallbackUrl("https://portal.exemplo.com")).toBe(
+      "https://portal.exemplo.com/auth/callback",
+    );
     expect(buildAuthInviteRedirectUrl("https://portal.exemplo.com")).toBe(
-      "https://portal.exemplo.com/auth",
+      "https://portal.exemplo.com/auth/callback",
     );
   });
 });
