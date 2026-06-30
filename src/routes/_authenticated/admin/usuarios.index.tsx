@@ -21,7 +21,7 @@ const usersQuery = {
   queryFn: () => listUsersWithRoles(),
 };
 
-export const Route = createFileRoute("/_authenticated/admin/usuarios")({
+export const Route = createFileRoute("/_authenticated/admin/usuarios/")({
   head: () => ({ meta: [{ title: adminTitle("Usuários") }] }),
   loader: ({ context }) => (context as any).queryClient.ensureQueryData(usersQuery),
   component: UsuariosPage,

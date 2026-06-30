@@ -872,8 +872,8 @@ function AcessosBlock({
       <p className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
         <ExternalLink className="h-3 w-3" />
         Para cadastrar um novo usuário cliente, vá em{" "}
-        <Link to="/admin/usuarios" className="text-primary hover:underline">
-          Usuários
+        <Link to="/admin/usuarios/novo" className="text-primary hover:underline">
+          Usuários → Novo usuário
         </Link>
         .
       </p>
