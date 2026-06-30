@@ -7,3 +7,4 @@ export {
   resolveAccessBlockedRedirect,
 } from "./services/resolve-blocked-redirect";
 export { resolveUserIsAdmin } from "./services/resolve-user-context";
+export type { AccessRecoveryAction } from "./recovery-actions";

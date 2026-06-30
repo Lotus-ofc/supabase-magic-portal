@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { AccessRecoveryAction } from "@/lib/access.functions.server";
+import type { AccessRecoveryAction } from "@/modules/access/recovery-actions";
 
 const RECOVERY_ACTIONS: {
   action: AccessRecoveryAction;

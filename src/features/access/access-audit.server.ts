@@ -3,7 +3,7 @@
  * Substitui o buffer in-memory como fonte primária.
  */
 import { getSupabaseAdmin } from "@/integrations/supabase/client.server";
-import { recordAccessAuditEntry } from "@/lib/access.functions.server";
+import { recordAccessAuditEntry } from "@/modules/access/internal/access-db.server";
 import type { InviteAuditAction, InviteAuditEntry } from "@/lib/infra/invite-audit";
 
 export async function recordInviteAccessAudit(params: {

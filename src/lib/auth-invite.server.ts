@@ -8,7 +8,7 @@ import { buildAuthInviteRedirectUrl, buildAuthCallbackUrl, normalizeAppUrl } fro
 import { resolveAuthInviteRedirectUrl, resolveServerAppUrl } from "@/lib/app-url.server";
 import { recordInviteAudit } from "@/lib/infra/invite-audit";
 import { recordInviteAccessAudit } from "@/features/access/access-audit.server";
-import { ensureAccessAccountRow } from "@/lib/access.functions.server";
+import { ensureAccessAccountRow } from "@/modules/access/internal/access-db.server";
 import { evaluateAuthDiagnostics } from "@/lib/infra/system-diagnostics.server";
 
 export class AuthInviteError extends Error {

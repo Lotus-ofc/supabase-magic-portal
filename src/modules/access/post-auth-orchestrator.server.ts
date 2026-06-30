@@ -5,4 +5,4 @@ export {
   postAuthOnRecoveryCompleted,
   postAuthOnPasswordChangedByUser,
   postAuthOnLoginSuccess,
-} from "@/lib/access.functions.server";
+} from "@/modules/access/post-auth.server";
