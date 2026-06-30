@@ -111,14 +111,14 @@ function ServicosAdmin() {
             compact
           />
         ) : (
-          <div className="lotus-scroll-x">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-left text-[10.5px] uppercase tracking-wider text-muted-foreground">
+          <div className="lotus-table-scroll">
+            <table className="w-full min-w-max text-sm">
+              <thead className="text-left text-[10.5px] uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2.5 font-medium">Serviço</th>
-                  <th className="px-4 py-2.5 font-medium">Descrição</th>
-                  <th className="px-4 py-2.5 font-medium">Status</th>
-                  <th className="px-4 py-2.5 font-medium" />
+                  <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Serviço</th>
+                  <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Descrição</th>
+                  <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Status</th>
+                  <th className="lotus-table-head-sticky px-4 py-2.5 font-medium" />
                 </tr>
               </thead>
               <tbody>

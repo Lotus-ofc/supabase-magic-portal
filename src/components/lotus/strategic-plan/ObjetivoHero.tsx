@@ -36,7 +36,9 @@ export function ObjetivoHero({
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
           Plano Estratégico
         </p>
-        <h2 className="mt-1 font-display text-lg font-semibold text-foreground">{planoTitulo}</h2>
+        <h2 className="mt-1 break-words font-display text-lg font-semibold text-foreground">
+          {planoTitulo}
+        </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Documento vivo de longo prazo — a evolução acontece pelos objetivos.
         </p>

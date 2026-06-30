@@ -308,6 +308,10 @@ export interface OverviewRow {
   instagram_interactions: number | null;
 }
 
+/** Colunas mínimas de vw_overview_cliente — evita select("*"). */
+export const OVERVIEW_CLIENTE_SELECT =
+  "data,cliente,meta_spend,google_spend,total_impressions,total_clicks,ga4_sessions,ga4_conversions,instagram_reach,instagram_interactions";
+
 export interface Totals {
   spend: number;
   meta_spend: number;

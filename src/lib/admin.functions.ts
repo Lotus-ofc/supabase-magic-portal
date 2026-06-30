@@ -5,6 +5,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import { repairOwnerAdminRole, resolveIsAdmin } from "@/lib/owner-admin";
 import { z } from "zod";
+import {
+  CADASTRO_CLIENTES_SELECT,
+  DEBUG_DAILY_VIEW_SAMPLE_SELECT,
+  SERVICOS_SELECT,
+  VW_CLIENTES_ADMIN_SELECT,
+} from "@/lib/db-selects";
+import { OVERVIEW_CLIENTE_SELECT } from "@/lib/metrics";
 
 type AuthCtx = {
   supabase: Parameters<typeof resolveIsAdmin>[0]["supabase"];
@@ -44,8 +51,7 @@ export const listClientes = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data, error } = await context.supabase
       .from("vw_clientes_admin")
-      .select("*")
-      .order("nome_cliente", { ascending: true });
+      .select(VW_CLIENTES_ADMIN_SELECT)
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -57,8 +63,7 @@ export const getCliente = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data: cliente, error } = await context.supabase
       .from("cadastro_clientes")
-      .select("*")
-      .eq("id", data.id)
+      .select(CADASTRO_CLIENTES_SELECT)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!cliente) throw new Error("Cliente não encontrado");
@@ -153,7 +158,7 @@ export const createCliente = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .insert(payload)
-      .select("*")
+      .select(CADASTRO_CLIENTES_SELECT)
       .single();
     if (error) throw new Error(translatePgError(error.message));
     return row;
@@ -172,7 +177,7 @@ export const updateCliente = createServerFn({ method: "POST" })
       .from("cadastro_clientes")
       .update(patch)
       .eq("id", id)
-      .select("*")
+      .select(CADASTRO_CLIENTES_SELECT)
       .single();
     if (error) throw new Error(translatePgError(error.message));
     return row;
@@ -213,8 +218,7 @@ export const listServicos = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("servicos")
-      .select("*")
-      .order("nome", { ascending: true });
+      .select(SERVICOS_SELECT)
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -532,35 +536,28 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
       safe(
         context.supabase
           .from("vw_overview_cliente")
-          .select("*")
-          .order("data", { ascending: false })
-          .limit(20),
-      ),
-      safe(
-        context.supabase
-          .from("vw_google_ads_diario")
-          .select("*")
+          .select(OVERVIEW_CLIENTE_SELECT)
           .order("data", { ascending: false })
           .limit(20),
       ),
       safe(
         context.supabase
           .from("vw_meta_ads_diario")
-          .select("*")
+          .select(DEBUG_DAILY_VIEW_SAMPLE_SELECT)
           .order("data", { ascending: false })
           .limit(20),
       ),
       safe(
         context.supabase
           .from("vw_ga4_diario")
-          .select("*")
+          .select(DEBUG_DAILY_VIEW_SAMPLE_SELECT)
           .order("data", { ascending: false })
           .limit(20),
       ),
       safe(
         context.supabase
           .from("vw_instagram_diario")
-          .select("*")
+          .select(DEBUG_DAILY_VIEW_SAMPLE_SELECT)
           .order("data", { ascending: false })
           .limit(20),
       ),

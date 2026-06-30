@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getStrategicDashboard } from "@/lib/strategic-plan.functions";
-import { checkIsAdmin } from "@/lib/admin.functions";
 import { StrategicPlanCentro } from "@/components/lotus/strategic-plan/StrategicPlanCentro";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { brandTitle } from "@/lib/brand";
+import { getRouteApi } from "@tanstack/react-router";
 import { clienteRefQuery } from "./cliente.$cliente";
+
+const authenticatedRoute = getRouteApi("/_authenticated");
 
 export const Route = createFileRoute("/_authenticated/cliente/$cliente/plano-estrategico/$planoId")(
   {
@@ -25,15 +27,11 @@ export const Route = createFileRoute("/_authenticated/cliente/$cliente/plano-est
 
 function PlanoCentroPage() {
   const { cliente, planoId } = Route.useParams();
-  const { data: adminCheck } = useQuery({
-    queryKey: ["me", "isAdmin"],
-    queryFn: () => checkIsAdmin(),
-    staleTime: 60_000,
-  });
+  const { isAdmin } = authenticatedRoute.useRouteContext();
 
   return (
     <Suspense fallback={<DashboardSkeleton kpiCount={4} />}>
-      <PlanoCentroInner planoId={planoId} clienteSlug={cliente} isAdmin={!!adminCheck?.isAdmin} />
+      <PlanoCentroInner planoId={planoId} clienteSlug={cliente} isAdmin={isAdmin} />
     </Suspense>
   );
 }

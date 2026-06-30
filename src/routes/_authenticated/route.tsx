@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   createFileRoute,
   Outlet,
@@ -6,17 +6,13 @@ import {
   useRouter,
   useRouterState,
 } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
-import { ImpersonateClienteMenu } from "@/components/lotus/ImpersonateClienteMenu";
-import { GlobalSearch } from "@/components/lotus/GlobalSearch";
 import { NotificationCenter } from "@/components/lotus/NotificationCenter";
 import { recordAudit } from "@/lib/audit-log";
 import { BRAND_NAME } from "@/lib/brand";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
-import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import {
   LayoutDashboard,
   Users,
@@ -31,45 +27,67 @@ import {
   BookOpen,
   Compass,
 } from "lucide-react";
+import { lazy, Suspense } from "react";
+
+const GlobalSearch = lazy(() =>
+  import("@/components/lotus/GlobalSearch").then((m) => ({ default: m.GlobalSearch })),
+);
+const ImpersonateClienteMenu = lazy(() =>
+  import("@/components/lotus/ImpersonateClienteMenu").then((m) => ({
+    default: m.ImpersonateClienteMenu,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ context, location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
-    return { user: data.user };
+
+    const isOwner = isPlatformOwnerEmail(data.user.email);
+    let isAdmin = isOwner;
+    if (!isOwner) {
+      const result = await context.queryClient.fetchQuery({
+        queryKey: ["me", "isAdmin"],
+        queryFn: () => checkIsAdmin(),
+      });
+      isAdmin = !!result?.isAdmin;
+    }
+
+    if (location.pathname.startsWith("/admin") && !isAdmin) {
+      throw redirect({ to: "/dashboard" });
+    }
+
+    return { user: data.user, isAdmin };
   },
   component: AuthenticatedLayout,
 });
 
+function ShellSearchSlot({ isAdmin }: { isAdmin: boolean }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-10 w-10 shrink-0 rounded-lg border border-border bg-card sm:w-24" />
+      }
+    >
+      <GlobalSearch isAdmin={isAdmin} />
+    </Suspense>
+  );
+}
+
+function ShellImpersonateSlot() {
+  return (
+    <Suspense fallback={null}>
+      <ImpersonateClienteMenu />
+    </Suspense>
+  );
+}
+
 function AuthenticatedLayout() {
-  const { user } = Route.useRouteContext();
+  const { user, isAdmin } = Route.useRouteContext();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inAdmin = pathname.startsWith("/admin");
-
-  const isOwner = isPlatformOwnerEmail(user.email);
-  const { data: adminCheck, isPending: adminPending } = useQuery({
-    queryKey: ["me", "isAdmin"],
-    queryFn: () => checkIsAdmin(),
-    staleTime: 60_000,
-    retry: 1,
-    enabled: !isOwner,
-  });
-  const isAdmin = isOwner || !!adminCheck?.isAdmin;
-
-  useEffect(() => {
-    if (!inAdmin || adminPending || isAdmin) return;
-    void router.navigate({ to: "/dashboard" });
-  }, [inAdmin, adminPending, isAdmin, router]);
-
-  if (inAdmin && adminPending && !isOwner) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <DashboardSkeleton kpiCount={4} />
-      </div>
-    );
-  }
 
   const signOut = async () => {
     recordAudit({
@@ -135,9 +153,9 @@ function AuthenticatedLayout() {
       groups={groups}
       topRight={
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
-          <GlobalSearch />
+          <ShellSearchSlot isAdmin={isAdmin} />
           <NotificationCenter />
-          {inAdmin && isAdmin && <ImpersonateClienteMenu />}
+          {inAdmin && isAdmin && <ShellImpersonateSlot />}
           <div className="hidden text-right md:block">
             <p className="text-[12px] font-medium leading-tight text-foreground">
               {user.email?.split("@")[0]}

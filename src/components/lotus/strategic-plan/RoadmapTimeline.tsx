@@ -14,7 +14,7 @@ export function RoadmapTimeline({ marcos }: { marcos: PlanoRoadmapMarco[] }) {
           <ol className="flex min-w-max gap-0">
             {sorted.map((m, i) => (
               <li key={m.id} className="flex items-start">
-                <div className="w-40 shrink-0 px-2">
+                <div className="w-[min(10rem,42vw)] shrink-0 px-2 sm:w-40">
                   <div
                     className={cn(
                       "rounded-lg border p-3",

@@ -22,8 +22,10 @@ import {
   periodRange,
   sumOverview,
   METRIC_META,
+  OVERVIEW_CLIENTE_SELECT,
   type OverviewRow,
 } from "@/lib/metrics";
+import { VW_CLIENTES_ATIVOS_SELECT } from "@/lib/db-selects";
 import { slugify } from "@/lib/slug";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import {
@@ -54,8 +56,7 @@ const clientesAtivosQuery = queryOptions({
   queryFn: async (): Promise<ClienteAtivo[]> => {
     const { data, error } = await supabase
       .from("vw_clientes_ativos")
-      .select("*")
-      .order("ultima_data_recebida", { ascending: false });
+      .select(VW_CLIENTES_ATIVOS_SELECT)
     if (error) throw error;
     return (data ?? []) as ClienteAtivo[];
   },
@@ -65,12 +66,12 @@ const overviewQuery = (days: PeriodDays) =>
   queryOptions({
     queryKey: ["relatorios", "overview", days],
     queryFn: async (): Promise<OverviewRow[]> => {
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
+      const { prevFrom, to } = periodRange(days);
       const { data, error } = await supabase
         .from("vw_overview_cliente")
-        .select("*")
-        .gte("data", since.toISOString().slice(0, 10))
+        .select(OVERVIEW_CLIENTE_SELECT)
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
@@ -277,10 +278,10 @@ function HubBody({ days }: { days: PeriodDays }) {
                   <Link
                     to="/cliente/$cliente"
                     params={{ cliente: slugify(c.cliente) }}
-                    className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-muted/40"
+                    className="flex flex-col gap-3 px-4 py-3.5 transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
                         <p className="truncate text-[13.5px] font-semibold text-foreground">
                           {c.cliente}
                         </p>
@@ -305,6 +306,19 @@ function HubBody({ days }: { days: PeriodDays }) {
                           </span>
                         )}
                       </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3 sm:contents">
+                      <div className="text-left sm:hidden">
+                        <p className="font-display text-[13px] font-semibold tabular-nums text-foreground">
+                          {formatMetric("spend", c.totals.spend)}
+                        </p>
+                        <p className="text-[10.5px] text-muted-foreground">
+                          {formatMetric("conversions", c.totals.conversions)} conv.
+                        </p>
+                      </div>
+
+                      <DeltaPill delta={spendDelta} size="sm" className="sm:hidden" />
                     </div>
 
                     <div className="hidden text-right sm:block">

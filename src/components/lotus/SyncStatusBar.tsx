@@ -19,7 +19,7 @@ const clienteSyncQuery = (queryName: string) =>
     queryFn: async (): Promise<ClienteAtivo | null> => {
       const { data, error } = await supabase
         .from("vw_clientes_ativos")
-        .select("*")
+        .select("cliente,ultima_data_recebida,ultima_ingestao,plataformas_ativas,total_registros")
         .eq("cliente", queryName)
         .maybeSingle();
       if (error) throw error;

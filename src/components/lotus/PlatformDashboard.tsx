@@ -21,13 +21,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { PlatformDef, ValueFormat } from "@/lib/platforms/types";
 import type { CommonMetric } from "@/lib/metrics";
 import { METRIC_META, resolveMetricDescription } from "@/lib/metrics";
-import { aggregatePeriod, pctDelta } from "@/lib/platforms/engine";
+import { aggregatePeriod, pctDelta, platformViewSelect } from "@/lib/platforms/engine";
 import type { Period } from "@/lib/period";
 import { formatBR } from "@/lib/period";
 import { SectionCard } from "./SectionCard";
 import { StatCard } from "./StatCard";
 import { ChartFrame, ChartLegendItem } from "./charts/ChartFrame";
-import { AreaChartLotus, getSeriesColor } from "./charts/AreaChartLotus";
+import { AreaChartLotusLazy } from "./charts/AreaChartLotusLazy";
+import { getSeriesColor } from "./charts/chart-colors";
 import { DeltaPill } from "./DeltaPill";
 import { EmptyState } from "./EmptyState";
 import { DashboardSkeleton } from "./DashboardSkeleton";
@@ -84,7 +85,7 @@ const platformRowsQuery = (def: PlatformDef, cliente: string, prevFrom: string, 
     queryFn: async () => {
       const { data, error } = await supabase
         .from(def.view)
-        .select("*")
+        .select(platformViewSelect(def))
         .eq("cliente", cliente)
         .gte("data", prevFrom)
         .lte("data", to)
@@ -289,7 +290,7 @@ function ChartsSection({
               </>
             }
           >
-            <AreaChartLotus
+            <AreaChartLotusLazy
               data={agg.daily}
               yMetric={yChartMetric}
               height={chart.height ?? 260}
@@ -338,14 +339,18 @@ function ComparisonBlock({
       description={`${formatBR(period.from)}–${formatBR(period.to)} comparado a ${formatBR(period.prevFrom)}–${formatBR(period.prevTo)}.`}
       bodyClassName="px-0 py-0"
     >
-      <div className="lotus-scroll-x">
-        <table className="w-full text-[13px]">
-          <thead className="bg-muted/30 text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
+      <div className="lotus-table-scroll">
+        <table className="w-full min-w-max text-[13px]">
+          <thead className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
             <tr>
-              <th className="px-4 py-2.5 font-medium">Métrica</th>
-              <th className="px-4 py-2.5 text-right font-medium">Atual</th>
-              <th className="px-4 py-2.5 text-right font-medium">Anterior</th>
-              <th className="px-4 py-2.5 text-right font-medium">Variação</th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Métrica</th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 text-right font-medium">Atual</th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 text-right font-medium">
+                Anterior
+              </th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 text-right font-medium">
+                Variação
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -399,14 +404,17 @@ function CampaignRanking({
       description={`${ranked.length} ${ranked.length === 1 ? "campanha ativa" : "campanhas ativas"} no período, ordenadas por ${def.metrics.find((m) => m.key === sortKey)?.label ?? sortKey}.`}
       bodyClassName="px-0 py-0"
     >
-      <div className="lotus-scroll-x">
-        <table className="w-full text-[13px]">
-          <thead className="bg-muted/30 text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
+      <div className="lotus-table-scroll">
+        <table className="w-full min-w-max text-[13px]">
+          <thead className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
             <tr>
-              <th className="px-4 py-2.5 font-medium">#</th>
-              <th className="px-4 py-2.5 font-medium">Campanha</th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">#</th>
+              <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Campanha</th>
               {cols.map((c) => (
-                <th key={c.key} className="px-4 py-2.5 text-right font-medium">
+                <th
+                  key={c.key}
+                  className="lotus-table-head-sticky px-4 py-2.5 text-right font-medium"
+                >
                   {c.label}
                 </th>
               ))}

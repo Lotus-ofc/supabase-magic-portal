@@ -17,6 +17,7 @@ import {
   dailyFromOverview,
   METRIC_META,
   PLATFORM_LABEL,
+  OVERVIEW_CLIENTE_SELECT,
   type OverviewRow,
   type Totals,
 } from "@/lib/metrics";
@@ -68,7 +69,7 @@ const clientesQuery = queryOptions({
   queryFn: async (): Promise<ClienteAtivo[]> => {
     const { data, error } = await supabase
       .from("vw_clientes_ativos")
-      .select("*")
+      .select("cliente,ultima_data_recebida,ultima_ingestao,plataformas_ativas,total_registros")
       .order("ultima_data_recebida", { ascending: false });
     if (error) throw error;
     return (data ?? []) as ClienteAtivo[];
@@ -82,7 +83,7 @@ const overviewQuery = (from: string, to: string, prevFrom: string) =>
       // Busca a janela atual + a anterior (mesmo comprimento) para o delta.
       const { data, error } = await supabase
         .from("vw_overview_cliente")
-        .select("*")
+        .select(OVERVIEW_CLIENTE_SELECT)
         .gte("data", prevFrom)
         .lte("data", to)
         .order("data", { ascending: true });

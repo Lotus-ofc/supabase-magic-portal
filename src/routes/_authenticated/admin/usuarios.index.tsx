@@ -119,15 +119,17 @@ function UsuariosPage() {
           </div>
         </div>
 
-        <div className="lotus-scroll-x">
-          <table className="w-full text-sm">
+        <div className="lotus-table-scroll">
+          <table className="w-full min-w-max text-sm">
             <thead>
               <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
-                <th className="px-4 py-2.5 font-medium">Usuário</th>
-                <th className="px-4 py-2.5 font-medium">Tipo</th>
-                <th className="px-4 py-2.5 font-medium">Clientes vinculados</th>
-                <th className="px-4 py-2.5 font-medium">Cadastrado em</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Usuário</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Tipo</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">
+                  Clientes vinculados
+                </th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Cadastrado em</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>

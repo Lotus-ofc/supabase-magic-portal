@@ -1,12 +1,24 @@
 import { Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
 import { BRAND_NAME } from "@/lib/brand";
 import { BookOpen, Clock, Star } from "lucide-react";
-import { getDocsBySlugs } from "@/lib/knowledge-center";
+import { kcDocsBySlugsQuery } from "@/lib/knowledge-center/registry";
 import { getFavorites, getRecent } from "@/lib/knowledge-center/storage";
 
 export function KnowledgeHome() {
-  const favorites = getDocsBySlugs(getFavorites());
-  const recent = getDocsBySlugs(getRecent()).filter((d) => d.slug !== "start-here");
+  return (
+    <Suspense fallback={<div className="lotus-skeleton mx-auto h-64 max-w-3xl rounded-2xl" />}>
+      <KnowledgeHomeBody />
+    </Suspense>
+  );
+}
+
+function KnowledgeHomeBody() {
+  const favoriteSlugs = getFavorites();
+  const recentSlugs = getRecent().filter((s) => s !== "start-here");
+  const { data: favorites } = useSuspenseQuery(kcDocsBySlugsQuery(favoriteSlugs));
+  const { data: recent } = useSuspenseQuery(kcDocsBySlugsQuery(recentSlugs));
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-2">

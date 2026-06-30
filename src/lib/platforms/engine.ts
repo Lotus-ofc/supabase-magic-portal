@@ -9,6 +9,13 @@ import type { Period } from "@/lib/period";
 import { addDaysISO } from "@/lib/period";
 import { applyAggregation } from "./aggregations";
 
+/** Colunas mínimas para queries à view da plataforma. */
+export function platformViewSelect(def: PlatformDef): string {
+  const cols = new Set(["data", "cliente"]);
+  for (const m of def.metrics) cols.add(m.column);
+  return [...cols].join(",");
+}
+
 /** Filtra rows pelo período (inclusivo). */
 export function rowsInPeriod(rows: Row[], from: string, to: string): Row[] {
   return rows.filter((r) => r.data >= from && r.data <= to);

@@ -379,6 +379,24 @@
   scrollbar-width: thin;
 }
 
+/* Tabela com scroll vertical e cabeçalho fixo */
+@utility lotus-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  max-height: min(70dvh, 640px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+@utility lotus-table-head-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--card);
+  box-shadow: 0 1px 0 var(--border);
+}
+
 /* Área segura iOS — padding inferior em barras fixas */
 @utility lotus-safe-bottom {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));

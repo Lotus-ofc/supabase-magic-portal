@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import { Outlet } from "@tanstack/react-router";
-import { getNavigationTree } from "@/lib/knowledge-center";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { kcNavQuery } from "@/lib/knowledge-center/registry";
 import { KnowledgeSearchDialog } from "./KnowledgeSearchDialog";
 import { KnowledgeSidebar } from "./KnowledgeSidebar";
 import { useKnowledgeCurrentSlug } from "./useKnowledgeCurrentSlug";
 
 export function KnowledgeLayout({ children }: { children?: ReactNode }) {
-  const tree = getNavigationTree();
+  const { data: tree } = useSuspenseQuery(kcNavQuery);
   const currentSlug = useKnowledgeCurrentSlug();
 
   return (

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { resolvePeriod, type Period, type PeriodInput } from "@/lib/period";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
@@ -9,7 +9,8 @@ import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
 import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFrame";
-import { AreaChartLotus, getSeriesColor } from "@/components/lotus/charts/AreaChartLotus";
+import { AreaChartLotusLazy } from "@/components/lotus/charts/AreaChartLotusLazy";
+import { getSeriesColor } from "@/components/lotus/charts/chart-colors";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
 import {
   PLATFORM_LABEL,
@@ -27,10 +28,11 @@ import {
   spendShareByPlatform,
   sumOverview,
   METRIC_META,
+  OVERVIEW_CLIENTE_SELECT,
 } from "@/lib/metrics";
 import { getPlatformDef } from "@/lib/platforms/registry";
-import { clientePlatformsQuery, type PlatformKey } from "./cliente.$cliente";
-import { resolvePeriod, type Period, type PeriodInput } from "@/lib/period";
+import { platformViewSelect } from "@/lib/platforms/engine";
+import { clientePlatformsQuery, clienteRefQuery, type PlatformKey } from "./cliente.$cliente";
 import {
   Sparkles,
   Target,
@@ -44,7 +46,7 @@ import {
   Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { clienteRefQuery } from "./cliente.$cliente";
+import { supabase } from "@/integrations/supabase/client";
 
 const ROUTE_TO_PLATFORM: Partial<Record<PlatformKey, Platform>> = {
   instagram: "instagram",
@@ -60,7 +62,7 @@ const overviewQuery = (nomeCliente: string, prevFrom: string, to: string) =>
     queryFn: async (): Promise<OverviewRow[]> => {
       const { data, error } = await supabase
         .from("vw_overview_cliente")
-        .select("*")
+        .select(OVERVIEW_CLIENTE_SELECT)
         .eq("cliente", nomeCliente)
         .gte("data", prevFrom)
         .lte("data", to)
@@ -83,7 +85,7 @@ const platformDailyQuery = (nomeCliente: string, platform: Platform, from: strin
       if (!def) return [];
       const { data, error } = await supabase
         .from(def.view)
-        .select("*")
+        .select(platformViewSelect(def))
         .eq("cliente", nomeCliente)
         .gte("data", from)
         .lte("data", to)
@@ -96,6 +98,13 @@ const platformDailyQuery = (nomeCliente: string, platform: Platform, from: strin
 // ---------------- Route ----------------
 
 export const Route = createFileRoute("/_authenticated/cliente/$cliente/")({
+  loader: async ({ context, params }) => {
+    const ref = await context.queryClient.ensureQueryData(clienteRefQuery(params.cliente));
+    if (ref?.queryName) {
+      const p = resolvePeriod({ preset: "last_30" });
+      await context.queryClient.ensureQueryData(overviewQuery(ref.queryName, p.prevFrom, p.to));
+    }
+  },
   component: ClienteOverviewPage,
 });
 
@@ -256,7 +265,7 @@ function ClienteBody({ cliente, period }: { cliente: string; period: Period }) {
           {cT.spend === 0 && cT.conversions === 0 ? (
             <EmptyChart />
           ) : (
-            <AreaChartLotus
+            <AreaChartLotusLazy
               data={daily}
               yMetric="spend"
               series={[
@@ -385,7 +394,7 @@ function ComparisonStrip({ cliente }: { cliente: string }) {
     queryFn: async (): Promise<OverviewRow[]> => {
       const { data, error } = await supabase
         .from("vw_overview_cliente")
-        .select("*")
+        .select(OVERVIEW_CLIENTE_SELECT)
         .eq("cliente", cliente)
         .gte("data", since);
       if (error) throw error;

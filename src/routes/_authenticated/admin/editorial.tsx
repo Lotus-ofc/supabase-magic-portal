@@ -186,8 +186,8 @@ function EditorialPage() {
         title="Calendário Editorial"
         description="Planejamento, aprovação e publicação de conteúdos por cliente."
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="flex items-center justify-center gap-1">
               <Button
                 size="icon"
                 variant="outline"
@@ -213,7 +213,7 @@ function EditorialPage() {
               </Button>
             </div>
             <Select value={filterCli} onValueChange={setFilterCli}>
-              <SelectTrigger className="h-9 w-[200px]">
+              <SelectTrigger className="h-10 w-full sm:h-9 sm:w-[200px]">
                 <SelectValue placeholder="Todos os clientes" />
               </SelectTrigger>
               <SelectContent>
@@ -225,7 +225,10 @@ function EditorialPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={() => setDrawer({ mode: "create", date: isoDay(today) })}>
+            <Button
+              className="h-10 w-full sm:h-9 sm:w-auto"
+              onClick={() => setDrawer({ mode: "create", date: isoDay(today) })}
+            >
               <Plus /> Novo post
             </Button>
           </div>
@@ -296,6 +299,133 @@ function EditorialPage() {
 
 // ---------- Month grid ----------
 function MonthGrid({
+  cursor,
+  byDay,
+  showCliente,
+  onPickDay,
+  onPickPost,
+}: {
+  cursor: Date;
+  byDay: Map<string, Post[]>;
+  showCliente?: boolean;
+  onPickDay: (date: string) => void;
+  onPickPost: (id: string) => void;
+}) {
+  return (
+    <>
+      <div className="hidden lg:block">
+        <MonthGridCalendar
+          cursor={cursor}
+          byDay={byDay}
+          showCliente={showCliente}
+          onPickDay={onPickDay}
+          onPickPost={onPickPost}
+        />
+      </div>
+      <div className="lg:hidden">
+        <MonthAgendaList
+          cursor={cursor}
+          byDay={byDay}
+          showCliente={showCliente}
+          onPickDay={onPickDay}
+          onPickPost={onPickPost}
+        />
+      </div>
+    </>
+  );
+}
+
+function MonthAgendaList({
+  cursor,
+  byDay,
+  showCliente,
+  onPickDay,
+  onPickPost,
+}: {
+  cursor: Date;
+  byDay: Map<string, Post[]>;
+  showCliente?: boolean;
+  onPickDay: (date: string) => void;
+  onPickPost: (id: string) => void;
+}) {
+  const days = useMemo(
+    () => buildMonthDays(cursor).filter((d) => d.getMonth() === cursor.getMonth()),
+    [cursor],
+  );
+  const todayIso = isoDay(new Date());
+
+  return (
+    <ul className="divide-y divide-border/60">
+      {days.map((d) => {
+        const iso = isoDay(d);
+        const posts = byDay.get(iso) ?? [];
+        const isToday = iso === todayIso;
+        const dayLabel = d.toLocaleDateString("pt-BR", {
+          weekday: "long",
+          day: "numeric",
+          month: "short",
+        });
+
+        return (
+          <li key={iso} className="p-3 sm:p-4">
+            <div className="flex items-center justify-between gap-2">
+              <h3
+                className={cn(
+                  "min-w-0 flex-1 text-sm font-semibold capitalize",
+                  isToday ? "text-primary" : "text-foreground",
+                )}
+              >
+                {dayLabel}
+                {isToday && (
+                  <span className="ml-2 text-[10px] font-normal normal-case text-muted-foreground">
+                    Hoje
+                  </span>
+                )}
+              </h3>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-9 shrink-0 gap-1"
+                onClick={() => onPickDay(iso)}
+              >
+                <Plus className="h-3.5 w-3.5" aria-hidden />
+                <span className="sr-only sm:not-sr-only">Adicionar</span>
+              </Button>
+            </div>
+            {posts.length === 0 ? (
+              <p className="mt-2 text-xs text-muted-foreground">Nenhum post neste dia.</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {posts.map((p) => (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      onClick={() => onPickPost(p.id)}
+                      className={cn(
+                        "lotus-focus w-full rounded-lg border px-3 py-2.5 text-left transition-transform active:scale-[0.99]",
+                        STATUS_META[p.status].chip,
+                      )}
+                    >
+                      <p className="text-[13px] font-medium leading-snug">{p.titulo}</p>
+                      <p className="mt-1 text-[11px] opacity-80">
+                        {showCliente && <span>{p.cliente_nome} · </span>}
+                        {STATUS_META[p.status].label}
+                        {p.plataforma && ` · ${p.plataforma}`}
+                      </p>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function MonthGridCalendar({
   cursor,
   byDay,
   showCliente,
@@ -562,7 +692,7 @@ function PostDrawer({
 
   return (
     <Sheet open onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent className="w-full max-w-full overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-w-xl">
         <SheetHeader>
           <SheetTitle>{drawer.mode === "create" ? "Novo post" : "Editar post"}</SheetTitle>
           <SheetDescription>
@@ -611,7 +741,7 @@ function PostDrawer({
                 </Select>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
                 <Label>Data</Label>
                 <Input
@@ -640,7 +770,7 @@ function PostDrawer({
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
                 <Label>Formato</Label>
                 <Select
@@ -705,7 +835,7 @@ function PostDrawer({
                 placeholder="Ex.: São Paulo, Brasil"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
                 <Label>Tags (separadas por vírgula)</Label>
                 <Input

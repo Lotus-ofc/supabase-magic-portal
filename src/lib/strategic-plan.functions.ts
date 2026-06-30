@@ -5,7 +5,7 @@ import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import { resolvePeriod } from "@/lib/period";
 import { getPlatformDef, PLATFORM_REGISTRY } from "@/lib/platforms/registry";
 import type { Row } from "@/lib/platforms/types";
-import { aggregatePeriod } from "@/lib/platforms/engine";
+import { aggregatePeriod, platformViewSelect } from "@/lib/platforms/engine";
 import { z } from "zod";
 import {
   PLANO_STATUS,
@@ -39,6 +39,20 @@ import {
   OBJETIVO_WORKFLOW_FASE,
 } from "@/lib/strategic-plan/objetivo-workflow";
 import { brtToday } from "@/lib/period";
+import {
+  PLANO_ACAO_SELECT,
+  PLANO_APRENDIZADO_SELECT,
+  PLANO_DECISAO_SELECT,
+  PLANO_ESTRATEGIA_SELECT,
+  PLANO_ESTRATEGICO_SELECT,
+  PLANO_EVENTO_SELECT,
+  PLANO_HIPOTESE_SELECT,
+  PLANO_METRIC_REF_SELECT,
+  PLANO_OBJETIVO_SELECT,
+  PLANO_OPORTUNIDADE_SELECT,
+  PLANO_ROADMAP_MARCO_SELECT,
+} from "@/lib/strategic-plan/selects";
+import { ESTRATEGIA_EDITORIAL_STATS_SELECT } from "@/lib/db-selects";
 
 async function isAdmin(ctx: {
   supabase: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }> };
@@ -94,7 +108,7 @@ async function recordEvent(
 async function loadPlanoDetail(supabase: any, planoId: string): Promise<PlanoDetail> {
   const { data: plano, error: e0 } = await supabase
     .from("planos_estrategicos")
-    .select("*")
+    .select(PLANO_ESTRATEGICO_SELECT)
     .eq("id", planoId)
     .maybeSingle();
   if (e0) throw new Error(e0.message);
@@ -113,26 +127,46 @@ async function loadPlanoDetail(supabase: any, planoId: string): Promise<PlanoDet
     { data: eventos },
     { data: junctions },
   ] = await Promise.all([
-    supabase.from("plano_objetivos").select("*").eq("plano_id", planoId).order("ordem"),
-    supabase.from("plano_estrategias").select("*").eq("plano_id", planoId).order("ordem"),
-    supabase.from("plano_metric_refs").select("*").eq("plano_id", planoId),
-    supabase.from("plano_hipoteses").select("*").eq("plano_id", planoId).order("ordem"),
-    supabase.from("plano_oportunidades").select("*").eq("plano_id", planoId).order("ordem"),
+    supabase
+      .from("plano_objetivos")
+      .select(PLANO_OBJETIVO_SELECT)
+      .eq("plano_id", planoId)
+      .order("ordem"),
+    supabase
+      .from("plano_estrategias")
+      .select(PLANO_ESTRATEGIA_SELECT)
+      .eq("plano_id", planoId)
+      .order("ordem"),
+    supabase.from("plano_metric_refs").select(PLANO_METRIC_REF_SELECT).eq("plano_id", planoId),
+    supabase
+      .from("plano_hipoteses")
+      .select(PLANO_HIPOTESE_SELECT)
+      .eq("plano_id", planoId)
+      .order("ordem"),
+    supabase
+      .from("plano_oportunidades")
+      .select(PLANO_OPORTUNIDADE_SELECT)
+      .eq("plano_id", planoId)
+      .order("ordem"),
     supabase
       .from("plano_decisoes")
-      .select("*")
+      .select(PLANO_DECISAO_SELECT)
       .eq("plano_id", planoId)
       .order("data_decisao", { ascending: false }),
     supabase
       .from("plano_aprendizados")
-      .select("*")
+      .select(PLANO_APRENDIZADO_SELECT)
       .eq("plano_id", planoId)
       .order("mes_referencia", { ascending: false }),
-    supabase.from("plano_roadmap_marcos").select("*").eq("plano_id", planoId).order("ordem"),
-    supabase.from("plano_acoes").select("*").eq("plano_id", planoId).order("ordem"),
+    supabase
+      .from("plano_roadmap_marcos")
+      .select(PLANO_ROADMAP_MARCO_SELECT)
+      .eq("plano_id", planoId)
+      .order("ordem"),
+    supabase.from("plano_acoes").select(PLANO_ACAO_SELECT).eq("plano_id", planoId).order("ordem"),
     supabase
       .from("plano_eventos")
-      .select("*")
+      .select(PLANO_EVENTO_SELECT)
       .eq("plano_id", planoId)
       .order("created_at", { ascending: false })
       .limit(50),
@@ -206,7 +240,7 @@ async function fetchPlatformRows(
       if (!def) return;
       const { data, error } = await supabase
         .from(def.view)
-        .select("*")
+        .select(platformViewSelect(def))
         .eq("cliente", clienteNome)
         .gte("data", prevFrom)
         .lte("data", to);
@@ -280,8 +314,7 @@ async function buildDashboard(supabase: any, planoId: string): Promise<Strategic
   if (estrategiaIds.length > 0) {
     const { data: statsRows } = await supabase
       .from("vw_estrategia_editorial_stats")
-      .select("*")
-      .in("estrategia_id", estrategiaIds);
+      .select(ESTRATEGIA_EDITORIAL_STATS_SELECT)
     editorialStatsMap = parseEditorialStats(statsRows ?? []);
   }
 
@@ -417,7 +450,7 @@ export const listPlanos = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("planos_estrategicos")
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .order("updated_at", { ascending: false });
     if (data.cadastro_cliente_id) q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
     if (data.status) q = q.eq("status", data.status);
@@ -443,7 +476,7 @@ export const getPlanoForCliente = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("planos_estrategicos")
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .eq("status", "ativo")
       .order("updated_at", { ascending: false })
       .limit(1);
@@ -468,7 +501,7 @@ export const ensurePlanoCliente = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: existing } = await context.supabase
       .from("planos_estrategicos")
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .eq("cadastro_cliente_id", data.cadastro_cliente_id)
       .eq("status", "ativo")
       .maybeSingle();
@@ -498,7 +531,7 @@ export const ensurePlanoCliente = createServerFn({ method: "POST" })
         status: "ativo",
         created_by: context.userId,
       })
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await recordEvent(context, {
@@ -581,7 +614,7 @@ export const createPlano = createServerFn({ method: "POST" })
         observacoes: data.observacoes ?? null,
         created_by: context.userId,
       })
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await recordEvent(context, { plano_id: row.id, tipo: "criacao", mensagem: "Plano criado" });
@@ -609,7 +642,7 @@ export const updatePlano = createServerFn({ method: "POST" })
       .from("planos_estrategicos")
       .update(patch)
       .eq("id", id)
-      .select("*")
+      .select(PLANO_ESTRATEGICO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await recordEvent(context, {
@@ -678,7 +711,7 @@ export const upsertObjetivo = createServerFn({ method: "POST" })
         .from("plano_objetivos")
         .update(payload)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_OBJETIVO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       row = updated;
@@ -697,7 +730,7 @@ export const upsertObjetivo = createServerFn({ method: "POST" })
           workflow_fase: payload.workflow_fase ?? "planejamento",
           status: payload.status ?? "pendente",
         })
-        .select("*")
+        .select(PLANO_OBJETIVO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       row = inserted;
@@ -756,7 +789,7 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
         .from("plano_estrategias")
         .update(payload)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_ESTRATEGIA_SELECT)
         .single();
       if (error) throw new Error(error.message);
       if (objetivo_id) {
@@ -776,7 +809,7 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_estrategias")
       .insert({ ...payload, plano_id })
-      .select("*")
+      .select(PLANO_ESTRATEGIA_SELECT)
       .single();
     if (error) throw new Error(error.message);
     if (objetivo_id) {
@@ -823,7 +856,7 @@ export const upsertMetricRef = createServerFn({ method: "POST" })
         .from("plano_metric_refs")
         .update(fields)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_METRIC_REF_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -831,7 +864,7 @@ export const upsertMetricRef = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_metric_refs")
       .insert(fields)
-      .select("*")
+      .select(PLANO_METRIC_REF_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -869,7 +902,7 @@ export const upsertAcao = createServerFn({ method: "POST" })
         .from("plano_acoes")
         .update(payload)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_ACAO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -877,7 +910,7 @@ export const upsertAcao = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_acoes")
       .insert({ ...payload, plano_id })
-      .select("*")
+      .select(PLANO_ACAO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -909,7 +942,7 @@ export const upsertHipotese = createServerFn({ method: "POST" })
         .from("plano_hipoteses")
         .update(fields)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_HIPOTESE_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -917,7 +950,7 @@ export const upsertHipotese = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_hipoteses")
       .insert({ ...fields, plano_id })
-      .select("*")
+      .select(PLANO_HIPOTESE_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -947,7 +980,7 @@ export const upsertOportunidade = createServerFn({ method: "POST" })
         .from("plano_oportunidades")
         .update(fields)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_OPORTUNIDADE_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -955,7 +988,7 @@ export const upsertOportunidade = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_oportunidades")
       .insert({ ...fields, plano_id, origem: fields.origem ?? "manual" })
-      .select("*")
+      .select(PLANO_OPORTUNIDADE_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -990,7 +1023,7 @@ export const upsertDecisao = createServerFn({ method: "POST" })
         .from("plano_decisoes")
         .update(payload)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_DECISAO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -998,7 +1031,7 @@ export const upsertDecisao = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_decisoes")
       .insert({ ...payload, plano_id })
-      .select("*")
+      .select(PLANO_DECISAO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await recordEvent(context, {
@@ -1034,7 +1067,7 @@ export const upsertAprendizado = createServerFn({ method: "POST" })
         .from("plano_aprendizados")
         .update(payload)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_APRENDIZADO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -1042,7 +1075,7 @@ export const upsertAprendizado = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_aprendizados")
       .insert({ ...payload, plano_id })
-      .select("*")
+      .select(PLANO_APRENDIZADO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await recordEvent(context, {
@@ -1085,7 +1118,7 @@ export const upsertRoadmapMarco = createServerFn({ method: "POST" })
         .from("plano_roadmap_marcos")
         .update(fields)
         .eq("id", id)
-        .select("*")
+        .select(PLANO_ROADMAP_MARCO_SELECT)
         .single();
       if (error) throw new Error(error.message);
       return row;
@@ -1093,7 +1126,7 @@ export const upsertRoadmapMarco = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("plano_roadmap_marcos")
       .insert({ ...fields, plano_id })
-      .select("*")
+      .select(PLANO_ROADMAP_MARCO_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;

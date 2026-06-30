@@ -49,7 +49,7 @@ export function StrategicPlanCentro({
   const estrategiasDoObjetivo = objetivoAtual?.estrategias ?? data.estrategias;
 
   return (
-    <div className="space-y-6 pb-10" id="objetivos">
+    <div className="min-w-0 space-y-6 pb-10" id="objetivos">
       {backLink}
 
       <PageHeader

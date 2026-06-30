@@ -41,10 +41,6 @@ const TONE: Record<AreaSeriesTone, { stroke: string; fillFrom: string; legend: s
   },
 };
 
-export function getSeriesColor(tone: AreaSeriesTone) {
-  return TONE[tone].legend;
-}
-
 interface Props {
   // Aceita qualquer shape de ponto desde que tenha `date`. Os charts usam
   // apenas `series[].key` para extrair valores, então tipar como any[] aqui

@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState } from "react";
-import mermaid from "mermaid";
 
 let mermaidInitialized = false;
 
@@ -8,15 +7,18 @@ function getMermaidTheme(): "default" | "dark" {
   return document.documentElement.classList.contains("dark") ? "dark" : "default";
 }
 
-function ensureMermaidInit() {
-  if (mermaidInitialized) return;
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: getMermaidTheme(),
-    securityLevel: "strict",
-    fontFamily: "inherit",
-  });
-  mermaidInitialized = true;
+async function ensureMermaidInit() {
+  const { default: mermaid } = await import("mermaid");
+  if (!mermaidInitialized) {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: getMermaidTheme(),
+      securityLevel: "strict",
+      fontFamily: "inherit",
+    });
+    mermaidInitialized = true;
+  }
+  return mermaid;
 }
 
 export function MermaidDiagram({ chart }: { chart: string }) {
@@ -30,7 +32,7 @@ export function MermaidDiagram({ chart }: { chart: string }) {
 
     async function render() {
       if (!containerRef.current || !code) return;
-      ensureMermaidInit();
+      const mermaid = await ensureMermaidInit();
       mermaid.initialize({ theme: getMermaidTheme() });
 
       try {

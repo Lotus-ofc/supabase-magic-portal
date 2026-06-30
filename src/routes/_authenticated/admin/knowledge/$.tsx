@@ -15,9 +15,9 @@ export const Route = createFileRoute("/_authenticated/admin/knowledge/$")({
       },
     ],
   }),
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const slug = params._splat?.replace(/^\/+|\/+$/g, "") ?? "";
-    const doc = getDocBySlug(slug);
+    const doc = await getDocBySlug(slug);
     if (!doc) throw notFound();
     return { doc };
   },

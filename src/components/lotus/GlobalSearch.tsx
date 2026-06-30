@@ -13,7 +13,6 @@ import {
   Compass,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { checkIsAdmin } from "@/lib/admin.functions";
 import {
   CommandDialog,
   CommandEmpty,
@@ -121,17 +120,10 @@ const STATIC_ROUTES: SearchRoute[] = [
   },
 ];
 
-export function GlobalSearch() {
+export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
-
-  const { data: isAdmin } = useQuery({
-    queryKey: ["me", "isAdmin"],
-    queryFn: () => checkIsAdmin(),
-    staleTime: 60_000,
-    select: (d) => !!d?.isAdmin,
-  });
 
   const { data: clientes = [] } = useQuery({
     queryKey: ["search-clientes"],

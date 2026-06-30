@@ -11,9 +11,15 @@ import {
   type EditorialPostMediaRow,
   type MediaAsset,
 } from "@/lib/media-preview";
-import { z } from "zod";
-
-const EDITORIAL_BUCKET = "editorial-media";
+import {
+  ESTRATEGIA_EDITORIAL_STATS_SELECT,
+  POST_EDITORIAL_APPROVAL_SELECT,
+  POST_EDITORIAL_SELECT,
+  POST_MEDIA_SELECT,
+  POST_REVISION_SELECT,
+  POST_SNAPSHOT_SELECT,
+} from "@/lib/db-selects";
+import { z } from "zod"; = "editorial-media";
 const SIGNED_URL_TTL = 3600;
 
 const POST_STATUS = [
@@ -81,8 +87,7 @@ async function resolvePostMedia(
 ): Promise<MediaAsset[]> {
   const { data: rows } = await (ctx.supabase as any)
     .from("post_media")
-    .select("*")
-    .eq("post_id", postId)
+    .select(POST_MEDIA_SELECT)
     .order("ordem", { ascending: true });
 
   const mediaRows = (rows ?? []) as EditorialPostMediaRow[];
@@ -105,14 +110,12 @@ async function resolvePostMedia(
 async function snapshotPost(ctx: { supabase: any; userId: string }, postId: string) {
   const { data: post } = await ctx.supabase
     .from("posts_editorial")
-    .select("*")
-    .eq("id", postId)
+    .select(POST_EDITORIAL_SELECT)
     .maybeSingle();
   if (!post) return;
   const { data: media } = await ctx.supabase
     .from("post_media")
-    .select("*")
-    .eq("post_id", postId)
+    .select(POST_MEDIA_SELECT)
     .order("ordem", { ascending: true });
   await ctx.supabase.from("post_snapshots").insert({
     post_id: postId,
@@ -143,8 +146,7 @@ export const listPosts = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("posts_editorial")
-      .select("*")
-      .gte("data_publicacao", data.from)
+      .select(POST_EDITORIAL_SELECT)
       .lte("data_publicacao", data.to)
       .order("data_publicacao", { ascending: true });
     if (data.cadastro_cliente_id) q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
@@ -163,19 +165,19 @@ export const getPost = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { data: post, error } = await context.supabase
       .from("posts_editorial")
-      .select("*")
+      .select(POST_EDITORIAL_SELECT)
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!post) throw new Error("Post não encontrado");
     const { data: revisions } = await context.supabase
       .from("post_revisions")
-      .select("*")
+      .select(POST_REVISION_SELECT)
       .eq("post_id", data.id)
       .order("created_at", { ascending: false });
     const { data: snapshots } = await (context.supabase as any)
       .from("post_snapshots")
-      .select("*")
+      .select(POST_SNAPSHOT_SELECT)
       .eq("post_id", data.id)
       .order("created_at", { ascending: false })
       .limit(5);
@@ -224,7 +226,7 @@ export const createPost = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("posts_editorial")
       .insert(payload)
-      .select("*")
+      .select(POST_EDITORIAL_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -250,7 +252,7 @@ export const updatePost = createServerFn({ method: "POST" })
       .from("posts_editorial")
       .update(patch)
       .eq("id", id)
-      .select("*")
+      .select(POST_EDITORIAL_SELECT)
       .single();
     if (error) throw new Error(error.message);
     return row;
@@ -400,7 +402,7 @@ export const uploadPostMedia = createServerFn({ method: "POST" })
         kind: inferMediaKind(data.mimeType),
         ordem,
       })
-      .select("*")
+      .select(POST_MEDIA_SELECT)
       .single();
     if (error) throw new Error(error.message);
     await snapshotPost(context, data.postId);
@@ -417,7 +419,7 @@ export const deletePostMedia = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { data: media, error: e0 } = await (context.supabase as any)
       .from("post_media")
-      .select("*")
+      .select(POST_MEDIA_SELECT)
       .eq("id", data.mediaId)
       .eq("post_id", data.postId)
       .maybeSingle();

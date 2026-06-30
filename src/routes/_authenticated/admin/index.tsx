@@ -9,7 +9,7 @@ import { SectionCard } from "@/components/lotus/SectionCard";
 import { PeriodToggle, type PeriodDays } from "@/components/lotus/PeriodToggle";
 import { DeltaPill } from "@/components/lotus/DeltaPill";
 import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFrame";
-import { AreaChartLotus, getSeriesColor } from "@/components/lotus/charts/AreaChartLotus";
+import { getSeriesColor } from "@/components/lotus/charts/chart-colors";
 import { BarChartLotus } from "@/components/lotus/charts/BarChartLotus";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
 import { adminTitle, BRAND_NAME } from "@/lib/brand";
@@ -25,6 +25,7 @@ import {
   spendShareByPlatform,
   sumOverview,
   METRIC_META,
+  OVERVIEW_CLIENTE_SELECT,
   type OverviewRow,
 } from "@/lib/metrics";
 import { slugify } from "@/lib/slug";
@@ -68,7 +69,7 @@ const clientesAtivosQuery = queryOptions({
   queryFn: async (): Promise<ClienteAtivo[]> => {
     const { data, error } = await supabase
       .from("vw_clientes_ativos")
-      .select("*")
+      .select("cliente,ultima_data_recebida,ultima_ingestao,plataformas_ativas,total_registros")
       .order("ultima_data_recebida", { ascending: false });
     if (error) throw error;
     return (data ?? []) as ClienteAtivo[];
@@ -79,12 +80,12 @@ const overviewAdminQuery = (days: PeriodDays) =>
   queryOptions({
     queryKey: ["admin", "overview", days],
     queryFn: async (): Promise<OverviewRow[]> => {
-      const since = new Date();
-      since.setDate(since.getDate() - days * 2);
+      const { prevFrom, to } = periodRange(days);
       const { data, error } = await supabase
         .from("vw_overview_cliente")
-        .select("*")
-        .gte("data", since.toISOString().slice(0, 10))
+        .select(OVERVIEW_CLIENTE_SELECT)
+        .gte("data", prevFrom)
+        .lte("data", to)
         .order("data", { ascending: true });
       if (error) throw error;
       return (data ?? []) as OverviewRow[];
@@ -269,7 +270,7 @@ function ExecutiveBody({ days }: { days: PeriodDays }) {
           {cT.spend === 0 && cT.conversions === 0 ? (
             <EmptyChart />
           ) : (
-            <AreaChartLotus
+            <AreaChartLotusLazy
               data={daily}
               yMetric="spend"
               series={[

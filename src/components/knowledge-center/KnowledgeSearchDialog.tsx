@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { FileText, Search } from "lucide-react";
 import {
@@ -10,14 +10,27 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { getSearchIndex, searchDocs } from "@/lib/knowledge-center";
+import type Fuse from "fuse.js";
+import type { SearchableDoc } from "@/lib/knowledge-center/search";
 
 export function KnowledgeSearchDialog() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [fuse, setFuse] = useState<Fuse<SearchableDoc> | null>(null);
   const navigate = useNavigate();
-  const fuse = useMemo(() => getSearchIndex(), []);
 
-  const results = useMemo(() => searchDocs(fuse, query, 24), [fuse, query]);
+  useEffect(() => {
+    if (!open || fuse) return;
+    let cancelled = false;
+    void getSearchIndex().then((index) => {
+      if (!cancelled) setFuse(index);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, fuse]);
+
+  const results = fuse ? searchDocs(fuse, query, 24) : [];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -60,7 +73,9 @@ export function KnowledgeSearchDialog() {
           onValueChange={setQuery}
         />
         <CommandList>
-          <CommandEmpty>Nenhum documento encontrado.</CommandEmpty>
+          <CommandEmpty>
+            {fuse ? "Nenhum documento encontrado." : "Carregando índice de busca…"}
+          </CommandEmpty>
           {results.length > 0 && (
             <CommandGroup heading="Documentos">
               {results.map((hit) => (

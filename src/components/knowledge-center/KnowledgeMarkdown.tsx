@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import { Link } from "@tanstack/react-router";
 import { MermaidDiagram } from "./MermaidDiagram";
-import { getKnownSlugs, resolveMarkdownHref } from "@/lib/knowledge-center";
+import { kcKnownSlugsQuery } from "@/lib/knowledge-center/registry";
+import { resolveMarkdownHref } from "@/lib/knowledge-center/link-resolver";
 
 interface KnowledgeMarkdownProps {
   content: string;
@@ -12,7 +13,7 @@ interface KnowledgeMarkdownProps {
 }
 
 export function KnowledgeMarkdown({ content, currentDocPath }: KnowledgeMarkdownProps) {
-  const knownSlugs = useMemo(() => getKnownSlugs(), []);
+  const { data: knownSlugs } = useSuspenseQuery(kcKnownSlugsQuery);
 
   return (
     <div className="knowledge-prose">

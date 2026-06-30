@@ -1,15 +1,26 @@
 import { Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronRight, Home } from "lucide-react";
 import { breadcrumbForSlug } from "@/lib/knowledge-center/navigation";
-import { getAllDocs, getDocBySlug } from "@/lib/knowledge-center/registry";
+import { ensureRegistry } from "@/lib/knowledge-center/registry";
+
+function kcBreadcrumbQuery(slug: string) {
+  return queryOptions({
+    queryKey: ["kc", "breadcrumb", slug],
+    queryFn: async () => {
+      const reg = await ensureRegistry();
+      return breadcrumbForSlug(slug, reg.bySlug);
+    },
+    staleTime: Infinity,
+  });
+}
 
 interface KnowledgeBreadcrumbProps {
   slug: string;
 }
 
 export function KnowledgeBreadcrumb({ slug }: KnowledgeBreadcrumbProps) {
-  const docsBySlug = new Map(getAllDocs().map((d) => [d.slug, d]));
-  const crumbs = breadcrumbForSlug(slug, docsBySlug);
+  const { data: crumbs } = useSuspenseQuery(kcBreadcrumbQuery(slug));
 
   return (
     <nav

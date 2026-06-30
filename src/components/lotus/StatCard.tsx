@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
@@ -26,7 +27,7 @@ const numberFmt = (v: string | number) => (typeof v === "number" ? v.toLocaleStr
  * StatCard — KPI card with optional delta + context. Solid surface (no glass),
  * subtle petal accent on `hero` variant, branded hover lift.
  */
-export function StatCard({
+export const StatCard = memo(function StatCard({
   label,
   value,
   hint,
@@ -104,4 +105,4 @@ export function StatCard({
       {hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
-}
+});

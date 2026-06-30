@@ -139,16 +139,16 @@ function ClientesList() {
         )}
 
         {/* Table */}
-        <div className="lotus-scroll-x">
-          <table className="w-full text-sm">
+        <div className="lotus-table-scroll">
+          <table className="w-full min-w-max text-sm">
             <thead>
               <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
-                <th className="px-4 py-2.5 font-medium">Cliente</th>
-                <th className="px-4 py-2.5 font-medium">Empresa</th>
-                <th className="px-4 py-2.5 font-medium">Serviços</th>
-                <th className="px-4 py-2.5 font-medium">Acessos</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-                <th className="px-4 py-2.5"></th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Cliente</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Empresa</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Serviços</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Acessos</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Status</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5" />
               </tr>
             </thead>
             <tbody>

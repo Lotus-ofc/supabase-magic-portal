@@ -39,15 +39,27 @@ export const clienteRefQuery = (slug: string) =>
         .eq("slug", slugify(slug))
         .maybeSingle();
 
-      const { data: ativos, error: errAtivos } = await supabase
-        .from("vw_clientes_ativos")
-        .select("cliente");
-      if (errAtivos) throw errAtivos;
+      let queryName: string | null = null;
 
-      const match = (ativos ?? []).find(
-        (r: { cliente: string }) => slugify(r.cliente) === slugify(slug),
-      );
-      const queryName = match?.cliente ?? cad?.nome_cliente ?? null;
+      if (cad?.nome_cliente) {
+        const { data: ativo, error } = await supabase
+          .from("vw_clientes_ativos")
+          .select("cliente")
+          .eq("cliente", cad.nome_cliente)
+          .maybeSingle();
+        if (error) throw error;
+        queryName = ativo?.cliente ?? cad.nome_cliente;
+      } else {
+        const { data: ativos, error: errAtivos } = await supabase
+          .from("vw_clientes_ativos")
+          .select("cliente");
+        if (errAtivos) throw errAtivos;
+        const match = (ativos ?? []).find(
+          (r: { cliente: string }) => slugify(r.cliente) === slugify(slug),
+        );
+        queryName = match?.cliente ?? null;
+      }
+
       if (!queryName) {
         console.warn("[cliente-ref] sem match para slug", slug);
         return null;

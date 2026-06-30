@@ -12,7 +12,7 @@ import { ApprovalWorkflowCard, type ApprovalPost } from "@/components/lotus/Appr
 import { pushNotification } from "@/lib/notifications";
 import { recordAudit } from "@/lib/audit-log";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
-import { brandTitle } from "@/lib/brand";
+import { POST_EDITORIAL_APPROVAL_SELECT } from "@/lib/db-selects";
 import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/aprovacoes")({
@@ -35,7 +35,7 @@ function AprovacoesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts_editorial")
-        .select("*")
+        .select(POST_EDITORIAL_APPROVAL_SELECT)
         .eq("status", "aguardando_aprovacao")
         .order("data_publicacao", { ascending: true });
       if (error) throw error;
