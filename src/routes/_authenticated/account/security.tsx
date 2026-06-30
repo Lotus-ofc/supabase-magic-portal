@@ -1,8 +1,9 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { buildLotsBiMetadataPatch } from "@/features/access/lots-bi-metadata";
-import { markPasswordChangedByUser } from "@/lib/access.functions.server";
+import { validatePasswordPair } from "@/modules/auth";
+import { postAuthOnPasswordChangedByUser } from "@/modules/access/post-auth-orchestrator.server";
 import { brandTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/_authenticated/account/security")({
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/account/security")({
 function AccountSecurityPage() {
   const router = useRouter();
   const { user } = Route.useRouteContext({ from: "/_authenticated" });
+  const passwordChangedFn = useServerFn(postAuthOnPasswordChangedByUser);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,12 +28,9 @@ function AccountSecurityPage() {
     setError(null);
     setSuccess(false);
 
-    if (newPassword.length < 8) {
-      setError("A nova senha deve ter pelo menos 8 caracteres.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("As senhas não coincidem.");
+    const validationError = validatePasswordPair(newPassword, confirmPassword);
+    if (validationError) {
+      setError(validationError);
       return;
     }
     if (!user.email) {
@@ -47,16 +46,10 @@ function AccountSecurityPage() {
       });
       if (reauthError) throw new Error("Senha atual incorreta.");
 
-      const now = new Date().toISOString();
-      const metadataPatch = buildLotsBiMetadataPatch({ password_set_at: now }, user.user_metadata);
-
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
-        data: metadataPatch,
-      });
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
       if (updateError) throw updateError;
 
-      await markPasswordChangedByUser();
+      await passwordChangedFn();
 
       setSuccess(true);
       setCurrentPassword("");

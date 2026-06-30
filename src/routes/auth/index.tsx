@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { buildLotsBiMetadataPatch } from "@/features/access/lots-bi-metadata";
 import {
   AuthBootstrapping,
   AuthShell,
@@ -9,18 +9,17 @@ import {
   hasLegacyAuthTokensOnAuthRoute,
   isSetPasswordView,
   resolveAuthView,
-  resolvePostAuthPath,
+  validatePasswordPair,
   waitForPasswordRecoveryEvent,
   type SetPasswordContext,
-} from "@/features/auth";
+} from "@/modules/auth";
 import {
-  markFirstAccessCompleted,
-  markPasswordRecoveryCompleted,
-} from "@/lib/access.functions.server";
-import { checkIsAdmin } from "@/lib/admin.functions";
+  postAuthOnInvitePasswordSet,
+  postAuthOnLoginSuccess,
+  postAuthOnRecoveryCompleted,
+} from "@/modules/access/post-auth-orchestrator.server";
 import { buildAuthCallbackUrl } from "@/lib/app-url";
 import { BRAND_NAME, BRAND_TAGLINE, brandTitle } from "@/lib/brand";
-import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 
 export const Route = createFileRoute("/auth/")({
   ssr: false,
@@ -48,21 +47,14 @@ export const Route = createFileRoute("/auth/")({
 
 type AuthPhase = "bootstrapping" | "ready";
 
-async function resolveIsAdmin(email: string | undefined): Promise<boolean> {
-  if (isPlatformOwnerEmail(email)) return true;
-  try {
-    const result = await checkIsAdmin();
-    return !!result?.isAdmin;
-  } catch {
-    return false;
-  }
-}
-
 function AuthPage() {
   const router = useRouter();
   const search = Route.useSearch();
   const view = resolveAuthView(search);
   const signingInRef = useRef(false);
+  const loginSuccessFn = useServerFn(postAuthOnLoginSuccess);
+  const invitePasswordSetFn = useServerFn(postAuthOnInvitePasswordSet);
+  const recoveryCompletedFn = useServerFn(postAuthOnRecoveryCompleted);
   const [phase, setPhase] = useState<AuthPhase>("bootstrapping");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,6 +62,18 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(search.error ?? null);
   const [forgotSent, setForgotSent] = useState(false);
+
+  const navigateAfterLogin = async (redirectTo?: string | null) => {
+    const result = await loginSuccessFn({ data: { redirect: redirectTo ?? undefined } });
+    if (!result.ok) {
+      if (result.blocked.signOut) {
+        await supabase.auth.signOut();
+      }
+      router.navigate({ to: result.blocked.to, search: result.blocked.search, replace: true });
+      return;
+    }
+    router.navigate({ to: result.path, replace: true });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -119,8 +123,7 @@ function AuthPage() {
           });
           return;
         }
-        const isAdmin = await resolveIsAdmin(session.user.email);
-        router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
+        await navigateAfterLogin(search.redirect);
         return;
       }
 
@@ -133,6 +136,7 @@ function AuthPage() {
       cancelled = true;
       sub.subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, search.redirect, view]);
 
   const submitSignIn = async (e: React.FormEvent) => {
@@ -143,8 +147,7 @@ function AuthPage() {
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
-      const isAdmin = await resolveIsAdmin(email);
-      router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
+      await navigateAfterLogin(search.redirect);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado");
     } finally {
@@ -175,12 +178,9 @@ function AuthPage() {
   const submitSetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password.length < 8) {
-      setError("A senha deve ter pelo menos 8 caracteres.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
+    const validationError = validatePasswordPair(password, confirmPassword);
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setLoading(true);
@@ -192,29 +192,17 @@ function AuthPage() {
 
       const context: SetPasswordContext = search.context ?? "invite";
 
-      if (context === "recovery") {
-        const { error: updateError } = await supabase.auth.updateUser({ password });
-        if (updateError) throw updateError;
-        await markPasswordRecoveryCompleted();
-        await supabase.auth.signOut();
-        router.navigate({ to: "/auth", search: { view: "login" }, replace: true });
-        return;
-      }
-
-      const now = new Date().toISOString();
-      const metadataPatch = buildLotsBiMetadataPatch(
-        { password_set_at: now, onboarding_completed_at: now },
-        session.user.user_metadata,
-      );
-      const { error: updateError } = await supabase.auth.updateUser({
-        password,
-        data: metadataPatch,
-      });
+      const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
 
-      await markFirstAccessCompleted();
-      const isAdmin = await resolveIsAdmin(session.user.email);
-      router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
+      if (context === "recovery") {
+        await recoveryCompletedFn();
+      } else {
+        await invitePasswordSetFn();
+      }
+
+      await supabase.auth.signOut();
+      router.navigate({ to: "/auth", search: { view: "login" }, replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado");
     } finally {
@@ -329,7 +317,7 @@ function AuthPage() {
             disabled={loading}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Aguarde…" : context === "invite" ? "Salvar e entrar" : "Salvar nova senha"}
+            {loading ? "Aguarde…" : context === "invite" ? "Salvar senha" : "Salvar nova senha"}
           </button>
         </form>
       </AuthShell>

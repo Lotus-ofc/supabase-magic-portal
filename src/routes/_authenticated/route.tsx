@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { resolveAccessBlockedRedirect } from "@/features/auth";
-import { useSignOut } from "@/features/auth/use-sign-out";
+import { resolveBlockedRedirect } from "@/modules/access";
+import { useSignOut } from "@/modules/auth";
 import { assertAccessActive } from "@/lib/access.functions.server";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
@@ -65,7 +65,7 @@ export const Route = createFileRoute("/_authenticated")({
     } = await supabase.auth.getSession();
 
     if (!access.ok) {
-      const blocked = resolveAccessBlockedRedirect(access.effective_status, Boolean(session));
+      const blocked = resolveBlockedRedirect(access.effective_status, Boolean(session));
       if (blocked.signOut) {
         await supabase.auth.signOut();
       }

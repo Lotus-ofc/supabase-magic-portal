@@ -39,4 +39,36 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    files: ["src/routes/auth/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/modules/access",
+              message:
+                "Regra de Ouro: rotas Auth importam apenas o orchestrator (@/modules/access/post-auth-orchestrator.server), nunca o barrel access.",
+            },
+            {
+              name: "@/features/access",
+              message: "Auth não importa features/access — use o orchestrator.",
+            },
+            {
+              name: "@/lib/admin.functions",
+              message: "Auth não decide admin — use postAuthOnLoginSuccess.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@/lib/access.functions.server"],
+              message:
+                "Rotas Auth usam @/modules/access/post-auth-orchestrator.server, não access.functions.server diretamente.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

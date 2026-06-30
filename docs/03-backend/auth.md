@@ -38,16 +38,26 @@ sequenceDiagram
 
 ---
 
-## Login e sessão (módulo v2.1)
+## Login e sessão (módulo Auth + Access)
 
 | Item               | Detalhe                                                                 |
 | ------------------ | ----------------------------------------------------------------------- |
 | Rotas públicas     | `/auth` (multi-view) + `/auth/callback`                                 |
 | Views em `/auth`   | `login`, `set-password`, `forgot-password`, `link-error`                |
-| Callback           | `verifyOtp` / `exchangeCodeForSession` → lifecycle + redirect           |
+| Callback           | `verifyOtp` / `exchangeCodeForSession` → orchestrator → redirect        |
 | Segurança conta    | `/account/security` (alterar senha com reautenticação)                  |
 | Storage            | `localStorage` key `sb-{projectId}-auth-token`                          |
-| Redirect pós-login | `resolvePostAuthPath()` → `/admin` ou `/dashboard`                      |
+| Redirect pós-login | `resolvePostAuthDestination()` → `/admin` ou `/dashboard` (Access)        |
+
+### Princípios arquiteturais
+
+1. **Auth** estabelece/encerra sessão — nunca decide admin, lifecycle ou metadata.
+2. **Access** autoriza, lifecycle, bloqueios e destinos pós-login.
+3. **Regra de Ouro:** rotas Auth importam `@/modules/auth` + orchestrator (`post-auth-orchestrator.server`) — nunca `@/modules/access` barrel.
+4. **Convite e recovery** nunca fazem login automático: `updateUser(password)` → `signOut()` → login normal.
+5. **Orchestrator** (`postAuthOnLoginSuccess`, `postAuthOnInvitePasswordSet`, etc.) é a única ponte Auth → Access.
+
+Código: `src/modules/auth/`, `src/modules/access/`, `src/modules/admin/`, `src/lib/access.functions.server.ts`.
 
 ### Fronteira Supabase × Lots BI
 
@@ -81,9 +91,9 @@ Links de convite/recovery usam `redirectTo` = `{APP_URL}/auth/callback`.
 | Detalhe + Recovery Mode | `/admin/usuarios/$userId` → `performAccessRecovery` |
 | Auditoria | `access_audit_log` (append-only) |
 
-Recovery Mode (APIs oficiais Supabase): recalcular lifecycle, revalidar metadata, reenviar convite, reiniciar onboarding, invalidar sessões, forçar reset, reativar/revogar/desativar, auto-fix.
+Recovery Mode (7 ações fechadas): reenviar convite, forçar reset, invalidar sessões, reativar, revogar, desativar, excluir.
 
-Código: `src/features/access/`, `src/lib/access.functions.server.ts`.
+Código: `src/modules/admin/`, `src/features/access/`, `src/lib/access.functions.server.ts`.
 
 ---
 

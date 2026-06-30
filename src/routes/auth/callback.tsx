@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -8,8 +9,8 @@ import {
   completeAuthCallback,
   parseAuthCallbackParams,
   resolvePostCallbackRedirect,
-} from "@/features/auth";
-import { markInviteAccepted } from "@/lib/access.functions.server";
+} from "@/modules/auth";
+import { postAuthOnCallbackCompleted } from "@/modules/access/post-auth-orchestrator.server";
 import { brandTitle } from "@/lib/brand";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallbackPage() {
   const router = useRouter();
+  const callbackCompletedFn = useServerFn(postAuthOnCallbackCompleted);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ function AuthCallbackPage() {
 
       if (result.flow === "invite") {
         try {
-          await markInviteAccepted();
+          await callbackCompletedFn({ data: { flow: "invite" } });
         } catch {
           /* idempotente */
         }
@@ -63,7 +65,7 @@ function AuthCallbackPage() {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [router, callbackCompletedFn]);
 
   if (message) {
     return (
