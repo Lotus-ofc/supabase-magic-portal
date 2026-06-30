@@ -3,7 +3,7 @@ title: Banco — Migrations
 description: Histórico, convenções e princípios das migrations da Lotus.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-29
+last_review: 2026-06-30
 ---
 
 # Migrations
@@ -33,6 +33,7 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 | `10_editorial_media.sql`            | `post_media`, bucket `editorial-media`, snapshots.                                                                                                                                                            |
 | `11_plano_estrategico.sql`          | Plano Estratégico — tabelas, RLS colaborativa, FK `posts_editorial.estrategia_id`, view `vw_estrategia_editorial_stats`. Ver [ADR-0013](../02-architecture/adr/0013-plano-estrategico-centro-estrategico.md). |
 | `12_plano_objetivo_scope.sql`       | Escopo por objetivo no plano (estratégias/hipóteses/roadmap vinculados ao objetivo atual).                                                                                                                    |
+| `13_access_management.sql`          | Módulo Auth + Gestão de Acessos v2.1: `access_accounts` (lifecycle), `access_audit_log`, `system_metadata` (`AUTH_MODULE_VERSION=2.1`), trigger em `auth.users`, backfill idempotente.                       |
 
 > **Não existe `04`.** A tentativa `04_integracoes_make.sql` foi **deprecada e substituída**
 > pela `05` (que usa nomes de coluna diferentes); a 04 nunca foi aplicada ao banco.
@@ -85,6 +86,7 @@ Projeto Supabase: `ywvhoctcmibjitvwkkhb`.
 10_editorial_media.sql
 11_plano_estrategico.sql
 12_plano_objetivo_scope.sql
+13_access_management.sql
 ```
 
 ### Rollback

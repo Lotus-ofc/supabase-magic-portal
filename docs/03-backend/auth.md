@@ -3,7 +3,7 @@ title: Autenticação & Autorização
 description: Fluxo de auth Supabase, papéis, guards de rota e server functions.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-26
+last_review: 2026-06-30
 ---
 
 # Autenticação & Autorização
@@ -38,27 +38,61 @@ sequenceDiagram
 
 ---
 
-## Login e sessão
+## Login e sessão (módulo v2.1)
 
-| Item               | Detalhe                                        |
-| ------------------ | ---------------------------------------------- |
-| Rota               | `/auth` (`src/routes/auth.tsx`)                |
-| Métodos            | `signInWithPassword`, `signUp` (público hoje)  |
-| SSR                | Desabilitado na rota (`ssr: false`)            |
-| Storage            | `localStorage` key `sb-{projectId}-auth-token` |
-| Redirect pós-login | `/dashboard`                                   |
+| Item               | Detalhe                                                                 |
+| ------------------ | ----------------------------------------------------------------------- |
+| Rotas públicas     | `/auth` (multi-view) + `/auth/callback`                                 |
+| Views em `/auth`   | `login`, `set-password`, `forgot-password`, `link-error`                |
+| Callback           | `verifyOtp` / `exchangeCodeForSession` → lifecycle + redirect           |
+| Segurança conta    | `/account/security` (alterar senha com reautenticação)                  |
+| Storage            | `localStorage` key `sb-{projectId}-auth-token`                          |
+| Redirect pós-login | `resolvePostAuthPath()` → `/admin` ou `/dashboard`                      |
+
+### Fronteira Supabase × Lots BI
+
+- **Supabase Auth:** identidade, e-mail, senha, ban, sessões, `user_metadata.lots_bi`
+- **Lots BI Postgres:** `access_accounts.lifecycle_status`, `blocked_reason`, `access_audit_log`
+- **Runtime:** `assembleUserAccessProfile()` compõe a view model admin/diagnóstico
+- **Regra:** sessão JWT válida ≠ usuário ativo — guards usam lifecycle + metadata
+
+Namespace `user_metadata.lots_bi`:
+
+```json
+{
+  "password_set_at": "ISO-8601",
+  "onboarding_completed_at": "ISO-8601"
+}
+```
 
 ### Política de cadastro
 
-**Estado atual:** `/auth` permite **signup público** (`signUp`).
+Usuários são criados **somente via admin** (`createUserAccount`). Signup público desabilitado na UI.
 
-**Recomendação (roadmap):** desabilitar signup público; criar usuários apenas via
-`createUserAccount` (admin). Ver [API Reference](./api-reference.md).
+Links de convite/recovery usam `redirectTo` = `{APP_URL}/auth/callback`.
 
-### Branding na tela de login
+---
 
-A UI exibe **"Majrá"** (`auth.tsx`). O handbook e código interno usam **Lotus**.
-Relação oficial não documentada no negócio — ver [Glossário](../00-company/glossary.md).
+## Gestão de acessos (admin)
+
+| Recurso | Rota / API |
+| ------- | ---------- |
+| Lista paginada | `/admin/usuarios` → `listUserAccessProfiles` |
+| Detalhe + Recovery Mode | `/admin/usuarios/$userId` → `performAccessRecovery` |
+| Auditoria | `access_audit_log` (append-only) |
+
+Recovery Mode (APIs oficiais Supabase): recalcular lifecycle, revalidar metadata, reenviar convite, reiniciar onboarding, invalidar sessões, forçar reset, reativar/revogar/desativar, auto-fix.
+
+Código: `src/features/access/`, `src/lib/access.functions.server.ts`.
+
+---
+
+## Login e sessão (legado — substituído)
+
+| Item               | Detalhe                                        |
+| ------------------ | ---------------------------------------------- |
+| Rota (antiga)      | `src/routes/auth.tsx` (monolito — removido)    |
+| Redirect convites  | Agora `/auth/callback` (`buildAuthCallbackUrl`) |
 
 ---
 
@@ -75,10 +109,10 @@ Verificação: RPC `has_role(user_id, role)` (migration `01_auth_roles_access.sq
 
 ## Guards de rota (frontend)
 
-| Guard       | Arquivo                    | Comportamento                         |
-| ----------- | -------------------------- | ------------------------------------- |
-| Autenticado | `_authenticated/route.tsx` | Sem user → `/auth`                    |
-| Admin       | `admin/route.tsx`          | `checkIsAdmin()` false → `/dashboard` |
+| Guard       | Arquivo                    | Comportamento                                              |
+| ----------- | -------------------------- | ---------------------------------------------------------- |
+| Autenticado | `_authenticated/route.tsx` | Sem user → `/auth`; `assertAccessActive()` bloqueia lifecycle |
+| Admin       | `admin/route.tsx`          | `checkIsAdmin()` false → `/dashboard`                      |
 
 > Guards de rota são **UX**, não segurança. A barreira real é RLS + `assertAdmin` nas server functions.
 
