@@ -12,6 +12,7 @@ import { ChartFrame, ChartLegendItem } from "@/components/lotus/charts/ChartFram
 import { getSeriesColor } from "@/components/lotus/charts/chart-colors";
 import { BarChartLotus } from "@/components/lotus/charts/BarChartLotus";
 import { DonutChartLotus } from "@/components/lotus/charts/DonutChartLotus";
+import { AreaChartLotusLazy } from "@/components/lotus/charts/AreaChartLotusLazy";
 import { adminTitle, BRAND_NAME } from "@/lib/brand";
 import {
   PLATFORM_LABEL,

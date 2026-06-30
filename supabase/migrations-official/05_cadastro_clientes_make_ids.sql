@@ -7,10 +7,10 @@
 -- do Google Sheets como fonte de IDs.
 --
 -- Regras:
---   * Apenas ADD COLUMN IF NOT EXISTS e CREATE OR REPLACE VIEW.
+--   * ADD COLUMN IF NOT EXISTS na tabela.
+--   * DROP + CREATE na view (CREATE OR REPLACE falha ao inserir colunas
+--     no meio da lista — Postgres interpreta como rename de coluna).
 --   * Nenhuma coluna existente é removida ou renomeada.
---   * Todas as colunas novas são opcionais (text NULL), exceto tiktok_ativo
---     (boolean NOT NULL DEFAULT false).
 --
 -- IMPORTANTE: substitui e deprecia a tentativa anterior (04_integracoes_make.sql)
 -- que usava nomes diferentes e nunca foi aplicada ao banco.
@@ -30,8 +30,10 @@ ALTER TABLE public.cadastro_clientes
   ADD COLUMN IF NOT EXISTS tiktok_ad_account_id   text,
   ADD COLUMN IF NOT EXISTS tiktok_ativo           boolean NOT NULL DEFAULT false;
 
--- Refresh da view administrativa para expor as novas colunas.
-CREATE OR REPLACE VIEW public.vw_clientes_admin
+-- Recria a view (não usar CREATE OR REPLACE ao expandir colunas no meio).
+DROP VIEW IF EXISTS public.vw_clientes_admin;
+
+CREATE VIEW public.vw_clientes_admin
 WITH (security_invoker = on) AS
 SELECT
   cc.id,
@@ -50,13 +52,13 @@ SELECT
   cc.ga4_ativo,
   cc.instagram_ativo,
   cc.google_business_ativo,
+  cc.google_business_location_id,
   cc.tiktok_ativo,
   cc.instagram_username,
   cc.instagram_page_id,
   cc.facebook_ad_account_id,
   cc.google_ads_customer_id,
   cc.ga4_property_id,
-  cc.google_business_location_id,
   cc.tiktok_ad_account_id,
   cc.created_at,
   cc.updated_at,
