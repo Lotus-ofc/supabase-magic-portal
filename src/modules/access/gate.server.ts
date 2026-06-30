@@ -21,6 +21,10 @@ export const assertAccessActive = createServerFn({ method: "GET" })
         effective_status: profile.effective_status,
       };
     } catch {
-      return { ok: true, lifecycle_status: "active", effective_status: "active", legacy: true };
+      return {
+        ok: false,
+        lifecycle_status: "invite_pending",
+        effective_status: "invite_pending",
+      };
     }
   });

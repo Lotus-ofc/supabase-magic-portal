@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate:engineering": "node scripts/validate-engineering.mjs",
-    "check": "npm run validate:engineering && npm run lint && npm run test && npm run build"
+    "validate:auth-boundaries": "node scripts/validate-auth-boundaries.mjs",
+    "check": "npm run validate:engineering && npm run validate:auth-boundaries && npm run lint && npm run test && npm run build"
   },
   "engines": {
     "node": ">=22"

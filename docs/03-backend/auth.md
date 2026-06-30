@@ -109,7 +109,17 @@ Links de convite/recovery usam `redirectTo` = `{APP_URL}/auth/callback`.
 
 Recovery Mode (7 ações fechadas): reenviar convite, forçar reset, invalidar sessões, reativar, revogar, desativar, excluir.
 
-Código: `src/modules/admin/`, `src/features/access/`, `src/lib/access.functions.server.ts`.
+Código: `src/modules/admin/`, `src/modules/access/`, `src/lib/access.functions.server.ts`.
+
+### Migrations obrigatórias (produção)
+
+| Migration | Propósito |
+|-----------|-----------|
+| `13_access_management.sql` | Tabelas `access_accounts`, audit |
+| `15_auth_invalidate_sessions.sql` | RPC `access_invalidate_auth_sessions` (Recovery Mode) |
+| `16_lifecycle_invite_expired_removal.sql` | Dados legados `invite_expired` → `invite_pending` |
+
+Aplicar via Supabase CLI ou SQL Editor antes de usar Recovery Mode e gate de lifecycle.
 
 ---
 

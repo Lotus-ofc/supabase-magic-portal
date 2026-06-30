@@ -25,3 +25,4 @@ export { authCallbackSearchSchema, type AuthCallbackSearch } from "./callback/au
 export { useSignOut } from "./hooks/use-sign-out";
 export { validatePasswordPair } from "./validation/password";
 export { ChangePasswordForm } from "./pages/change-password-form";
+export { AuthPage, type AuthPageOrchestrator } from "./pages/auth-page";

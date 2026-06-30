@@ -12,7 +12,7 @@ import {
   AuthInviteError,
   resendAuthInviteEmail,
   sendAuthInviteEmail,
-} from "@/lib/auth-invite.server";
+} from "@/modules/admin/invites.server";
 import { getInviteStatsForEmail } from "@/lib/infra/invite-audit";
 import {
   fetchInviteAuditLogFromDb,
