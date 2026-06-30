@@ -62,7 +62,7 @@ export function NotificationCenter() {
         <Button
           variant="outline"
           size="icon"
-          className="relative h-9 w-9 shrink-0"
+          className="relative h-10 w-10 shrink-0 sm:h-9 sm:w-9"
           aria-label="Central de notificações"
         >
           <Bell className="h-4 w-4" />

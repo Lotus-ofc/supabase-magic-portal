@@ -5,16 +5,15 @@ import { Settings2 } from "lucide-react";
 import type { StrategicDashboardPayload } from "@/lib/strategic-plan/types";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { Button } from "@/components/ui/button";
-import { DiagnosticoAtualBlock } from "./DiagnosticoAtualBlock";
-import { StrategicRadarChart } from "./StrategicRadarChart";
-import { ObjetivosSection } from "./ObjetivosSection";
-import { HipotesesFlow } from "./HipotesesFlow";
-import { EstrategiasSection } from "./EstrategiasSection";
-import { OportunidadesSection } from "./OportunidadesSection";
-import { RoadmapTimeline } from "./RoadmapTimeline";
+import { ObjetivoHero } from "./ObjetivoHero";
+import { ObjetivosHistoricoSection } from "./ObjetivosHistoricoSection";
+import { PrimeiroObjetivoOnboarding, ProximoObjetivoPrompt } from "./PrimeiroObjetivoOnboarding";
 import { DecisoesPanel } from "./DecisoesPanel";
 import { AprendizadosTimeline } from "./AprendizadosTimeline";
-import { KpisAlertsSection, PlanoTimelineSection } from "./KpisAlertsSection";
+import { HipotesesFlow } from "./HipotesesFlow";
+import { EstrategiasSection } from "./EstrategiasSection";
+import { RoadmapTimeline } from "./RoadmapTimeline";
+import { OportunidadesSection } from "./OportunidadesSection";
 import { ProximosPassosBlock } from "./ProximosPassosBlock";
 import { StrategicPlanManageDrawer } from "./StrategicPlanManageDrawer";
 import { addPlanoComment } from "@/lib/strategic-plan.functions";
@@ -23,6 +22,7 @@ import type { ReactNode } from "react";
 interface StrategicPlanCentroProps {
   data: StrategicDashboardPayload;
   planoId: string;
+  clienteNome: string;
   isAdmin?: boolean;
   backLink?: ReactNode;
 }
@@ -30,10 +30,12 @@ interface StrategicPlanCentroProps {
 export function StrategicPlanCentro({
   data,
   planoId,
+  clienteNome,
   isAdmin,
   backLink,
 }: StrategicPlanCentroProps) {
   const [manageOpen, setManageOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const qc = useQueryClient();
   const addCommentFn = useServerFn(addPlanoComment);
   const commentMut = useMutation({
@@ -43,19 +45,17 @@ export function StrategicPlanCentro({
     },
   });
 
-  const periodoLabel = `${new Date(data.plano.periodo_inicio + "T12:00:00").toLocaleDateString("pt-BR")} — ${new Date(data.plano.periodo_fim + "T12:00:00").toLocaleDateString("pt-BR")}`;
+  const objetivoAtual = data.objetivoAtual;
+  const estrategiasDoObjetivo = objetivoAtual?.estrategias ?? data.estrategias;
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-10" id="objetivos">
       {backLink}
+
       <PageHeader
-        eyebrow="Centro Estratégico"
+        eyebrow="Plano Estratégico"
         title={data.plano.titulo}
-        description={
-          data.plano.objetivo_principal
-            ? `${data.plano.objetivo_principal} · ${periodoLabel}`
-            : periodoLabel
-        }
+        description="Planejamento contínuo — evolua por objetivos, preserve o histórico."
         actions={
           <Button
             variant="outline"
@@ -69,25 +69,64 @@ export function StrategicPlanCentro({
         }
       />
 
-      <DiagnosticoAtualBlock insights={data.diagnostico} />
-      <StrategicRadarChart axes={data.radar} />
-      <ObjetivosSection objetivos={data.objetivos} />
-      <HipotesesFlow hipoteses={data.hipoteses} />
-      <EstrategiasSection estrategias={data.estrategias} isAdmin={isAdmin} />
-      <OportunidadesSection oportunidades={data.oportunidades} />
-      <RoadmapTimeline marcos={data.roadmap} />
-      <DecisoesPanel decisoes={data.decisoes} />
-      <AprendizadosTimeline aprendizados={data.aprendizados} />
-      <KpisAlertsSection alerts={data.alerts} metricCount={data.metricProgress.length} />
-      <PlanoTimelineSection eventos={data.eventos} />
+      <ObjetivoHero planoTitulo={data.plano.titulo} objetivo={objetivoAtual} />
+
+      {data.needsPrimeiroObjetivo && (
+        <PrimeiroObjetivoOnboarding
+          planoId={planoId}
+          clienteNome={clienteNome}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+
+      {data.suggestProximoObjetivo && !showOnboarding && (
+        <ProximoObjetivoPrompt planoId={planoId} onStart={() => setShowOnboarding(true)} />
+      )}
+
+      {showOnboarding && !data.needsPrimeiroObjetivo && (
+        <PrimeiroObjetivoOnboarding
+          planoId={planoId}
+          clienteNome={clienteNome}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+
+      {objetivoAtual && (
+        <>
+          <EstrategiasSection
+            estrategias={estrategiasDoObjetivo.map((e) => ({
+              ...e,
+              editorialStats: data.estrategias.find((s) => s.id === e.id)?.editorialStats ?? {
+                estrategia_id: e.id,
+                total: 0,
+                publicados: 0,
+                aprovados: 0,
+                aguardando: 0,
+                em_producao: 0,
+                rascunho: 0,
+              },
+            }))}
+            isAdmin={isAdmin}
+            objetivoTitulo={objetivoAtual.titulo}
+          />
+          <HipotesesFlow hipoteses={data.hipoteses} />
+          <RoadmapTimeline marcos={data.roadmap} />
+          <OportunidadesSection oportunidades={data.oportunidades} />
+        </>
+      )}
+
+      <DecisoesPanel decisoes={data.decisoes} title="Últimas decisões" />
       <ProximosPassosBlock passos={data.proximosPassos} />
+      <AprendizadosTimeline aprendizados={data.aprendizados} />
+      <ObjetivosHistoricoSection objetivos={data.objetivos} />
 
       <StrategicPlanManageDrawer
         open={manageOpen}
         onOpenChange={setManageOpen}
         planoId={planoId}
         plano={data.plano}
-        estrategias={data.estrategias}
+        objetivoAtualId={objetivoAtual?.id ?? null}
+        estrategias={estrategiasDoObjetivo}
         onComment={(msg) => commentMut.mutate(msg)}
       />
     </div>

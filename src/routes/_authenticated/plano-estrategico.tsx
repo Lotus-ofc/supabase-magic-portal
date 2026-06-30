@@ -30,7 +30,7 @@ function PlanoHubPage() {
       <PageHeader
         eyebrow="Centro Estratégico"
         title="Planos Estratégicos"
-        description="Acompanhe diagnóstico, objetivos, estratégias e execução integrados às métricas."
+        description="Um plano contínuo por cliente — abra para ver o objetivo atual e o histórico."
       />
 
       {isLoading ? (
@@ -40,7 +40,7 @@ function PlanoHubPage() {
           <EmptyState
             icon={Compass}
             title="Sem planos estratégicos ativos"
-            description="A agência criará planos estratégicos para seus clientes no painel admin."
+            description="A agência cria um plano por cliente no painel admin. Depois, a evolução é por objetivos."
           />
         </SectionCard>
       ) : (
@@ -56,11 +56,11 @@ function PlanoHubPage() {
                 {p.cliente_nome}
               </p>
               <h2 className="font-display text-lg font-semibold text-foreground">{p.titulo}</h2>
-              {p.objetivo_principal && (
-                <p className="line-clamp-2 text-sm text-muted-foreground">{p.objetivo_principal}</p>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Plano contínuo · evolução por objetivos
+              </p>
               <span className="mt-auto inline-flex items-center gap-1 text-xs font-medium text-primary">
-                Abrir centro estratégico <ArrowRight className="h-3.5 w-3.5" />
+                Abrir plano <ArrowRight className="h-3.5 w-3.5" />
               </span>
             </Link>
           ))}

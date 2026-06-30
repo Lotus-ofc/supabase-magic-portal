@@ -199,7 +199,7 @@ export function GlobalSearch() {
       <Button
         variant="outline"
         size="icon"
-        className="h-9 w-9 sm:hidden"
+        className="h-10 w-10 sm:hidden"
         onClick={() => setOpen(true)}
         aria-label="Pesquisa global"
       >

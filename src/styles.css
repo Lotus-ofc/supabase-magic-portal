@@ -306,6 +306,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "kern", "liga", "calt";
+    overflow-x: hidden;
   }
 
   h1,
@@ -361,10 +362,26 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  min-width: 0;
+  max-width: 100%;
   transition:
     box-shadow var(--motion-base) var(--ease-out-soft),
     border-color var(--motion-base) var(--ease-out-soft),
     transform var(--motion-base) var(--ease-out-soft);
+}
+
+/* Scroll horizontal elegante para tabelas e dados largos */
+@utility lotus-scroll-x {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Área segura iOS — padding inferior em barras fixas */
+@utility lotus-safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 @utility lotus-surface-raised {

@@ -47,7 +47,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "lotus-surface lotus-hoverable relative flex flex-col justify-between overflow-hidden",
+        "lotus-surface lotus-hoverable relative flex min-w-0 flex-col justify-between overflow-hidden",
         isHero && "lotus-petal-accent bg-gradient-to-br from-card to-card/60",
         isCompact ? "p-4" : "p-5",
         className,
@@ -75,7 +75,7 @@ export function StatCard({
         <span
           className={cn(
             "font-display font-semibold tracking-[-0.02em] tabular-nums text-foreground",
-            isHero ? "text-4xl" : isCompact ? "text-xl" : "text-2xl",
+            isHero ? "text-3xl sm:text-4xl" : isCompact ? "text-xl" : "text-2xl",
           )}
         >
           {numberFmt(value)}

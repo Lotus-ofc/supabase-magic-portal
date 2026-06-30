@@ -111,7 +111,7 @@ function ServicosAdmin() {
             compact
           />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="lotus-scroll-x">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-left text-[10.5px] uppercase tracking-wider text-muted-foreground">
                 <tr>

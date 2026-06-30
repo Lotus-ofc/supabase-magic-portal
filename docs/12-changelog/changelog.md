@@ -19,6 +19,22 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ## [Não lançado]
 
+### Alterado
+
+- **Plano Estratégico — conceito contínuo:** um plano ativo por cliente; evolução por
+  objetivos sucessivos (não múltiplos planos). Dashboard centrado no objetivo atual, histórico
+  (ativos/concluídos/cancelados), onboarding do primeiro objetivo, estratégias/hipóteses/roadmap
+  vinculados ao objetivo. Migration aditiva `12_plano_objetivo_scope.sql`.
+
+### Corrigido
+
+- **Plano Estratégico — navegação cliente:** rota pai `plano-estrategico` convertida em layout
+  (`<Outlet />`); listagem em `index.tsx`; Centro Estratégico em `$planoId.tsx`. Corrige página
+  vazia ao abrir `/cliente/:cliente/plano-estrategico/:planoId`.
+- **Admin debug:** mesmo padrão layout + index; `/admin/debug/views` volta a renderizar como filho.
+- **Admin permanente do dono:** `has_role` reconhece `leandromajr@gmail.com`, auto-reparo no login
+  (`owner-admin.ts`) e migration `09_owner_admin_guard.sql` reforçada.
+
 ### Adicionado
 
 - **Plano Estratégico (Centro de Inteligência):** módulo completo com diagnóstico automático,
@@ -37,11 +53,6 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 - **Setup interno:** `SETUP.md`, `npm run setup`, ADR-0012, deploy Cloudflare manual
   (`deploy.yml`, `npm run deploy:cloudflare`), `error-reporting.ts` genérico.
 - **Segurança:** `.env` adicionado ao `.gitignore`.
-
-### Corrigido
-
-- **Admin permanente do dono:** `has_role` reconhece `leandromajr@gmail.com`, auto-reparo no login
-  (`owner-admin.ts`) e migration `09_owner_admin_guard.sql` reforçada.
 
 ### Alterado
 

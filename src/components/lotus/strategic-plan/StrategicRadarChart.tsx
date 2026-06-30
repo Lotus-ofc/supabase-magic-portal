@@ -21,13 +21,13 @@ export function StrategicRadarChart({ axes }: { axes: RadarAxis[] }) {
         <p className="text-sm text-muted-foreground">Adicione estratégias e KPIs para o radar.</p>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="h-[280px] w-full min-w-0">
+          <div className="w-full min-w-0" style={{ height: "clamp(220px, 55vw, 280px)" }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={data} cx="50%" cy="50%" outerRadius="75%">
                 <PolarGrid stroke="var(--border)" />
                 <PolarAngleAxis
                   dataKey="subject"
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+                  tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
                 />
                 <Radar
                   name="Progresso"

@@ -134,11 +134,11 @@ function AuthenticatedLayout() {
       variant={variant}
       groups={groups}
       topRight={
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1 sm:gap-2">
           <GlobalSearch />
           <NotificationCenter />
           {inAdmin && isAdmin && <ImpersonateClienteMenu />}
-          <div className="hidden text-right sm:block">
+          <div className="hidden text-right md:block">
             <p className="text-[12px] font-medium leading-tight text-foreground">
               {user.email?.split("@")[0]}
             </p>
@@ -147,11 +147,13 @@ function AuthenticatedLayout() {
             </p>
           </div>
           <button
+            type="button"
             onClick={signOut}
-            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground"
+            aria-label="Sair da conta"
+            className="lotus-focus inline-flex h-10 min-w-10 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-0 text-xs font-medium text-muted-foreground transition-colors hover:border-primary-300 hover:text-foreground active:scale-[0.98] sm:h-9 sm:min-w-0 sm:px-3"
           >
-            <LogOut className="h-3.5 w-3.5" />
-            Sair
+            <LogOut className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="hidden sm:inline">Sair</span>
           </button>
         </div>
       }

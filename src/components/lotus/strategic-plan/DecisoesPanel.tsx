@@ -1,12 +1,18 @@
 import type { PlanoDecisao } from "@/lib/strategic-plan/types";
 import { SectionCard } from "@/components/lotus/SectionCard";
 
-export function DecisoesPanel({ decisoes }: { decisoes: PlanoDecisao[] }) {
+export function DecisoesPanel({
+  decisoes,
+  title = "Decisões",
+}: {
+  decisoes: PlanoDecisao[];
+  title?: string;
+}) {
   return (
     <SectionCard
       eyebrow="Memória estratégica"
-      title="Decisões"
-      description="Registro de decisões de marketing com motivo e resultado."
+      title={title}
+      description="Registro histórico de decisões — permanecem no plano contínuo."
     >
       {decisoes.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhuma decisão registrada.</p>

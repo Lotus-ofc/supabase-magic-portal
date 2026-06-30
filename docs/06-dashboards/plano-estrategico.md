@@ -15,9 +15,21 @@ de tarefas — é o planejamento estratégico vivo, conectado às métricas da p
 
 | Rota | Público | Função |
 |------|---------|--------|
-| `/plano-estrategico` | Cliente + admin | Hub de planos ativos |
-| `/cliente/$cliente/plano-estrategico` | Cliente + admin | Planos do cliente |
-| `/cliente/$cliente/plano-estrategico/$planoId` | Colaborativo | **Centro Estratégico** |
+| `/plano-estrategico` | Cliente + admin | Hub — um plano ativo por cliente |
+| `/cliente/$cliente/plano-estrategico` | Cliente + admin | Bootstrap: cria ou redireciona ao plano único |
+| `/cliente/$cliente/plano-estrategico/$planoId` | Colaborativo | **Centro Estratégico** (objetivo atual + histórico) |
+| `/admin/plano-estrategico` | Admin | Criar plano (apenas clientes sem plano ativo) |
+
+## Conceito
+
+- **Um plano contínuo por cliente** — documento vivo de longo prazo.
+- **Objetivos sucessivos** — cada objetivo tem título, descrição, período, meta, progresso e fase
+  (Planejamento → Em andamento → Em validação → Concluído/Cancelado).
+- **Estratégias, hipóteses e roadmap** pertencem ao objetivo atual.
+- **Decisões e aprendizados** permanecem no histórico do plano.
+
+A rota pai `plano-estrategico` é um **layout route** (`<Outlet />`); a listagem fica em
+`plano-estrategico.index.tsx` e o centro em `plano-estrategico.$planoId.tsx`.
 | `/admin/plano-estrategico` | Admin | Criar e listar planos |
 
 ## Layout do Centro Estratégico
@@ -57,6 +69,7 @@ KPIs **nunca duplicados** — apenas referência (`platform_key` + `metric_key`/
 | Tipos + motores | `src/lib/strategic-plan/` |
 | Server functions | `src/lib/strategic-plan.functions.ts` |
 | UI | `src/components/lotus/strategic-plan/` |
+| Rotas cliente | `cliente.$cliente.plano-estrategico.tsx` (layout), `.index.tsx` (lista), `.$planoId.tsx` (centro) |
 | Testes | `src/lib/strategic-plan/*.test.ts` |
 
 ## Integrações

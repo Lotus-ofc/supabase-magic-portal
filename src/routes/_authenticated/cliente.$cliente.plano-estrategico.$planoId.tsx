@@ -1,34 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
 import { getStrategicDashboard } from "@/lib/strategic-plan.functions";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { StrategicPlanCentro } from "@/components/lotus/strategic-plan/StrategicPlanCentro";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { brandTitle } from "@/lib/brand";
-import type { StrategicDashboardPayload } from "@/lib/strategic-plan/types";
-
-const dashboardQuery = (planoId: string) =>
-  queryOptions({
-    queryKey: ["strategic-dashboard", planoId],
-    queryFn: async (): Promise<StrategicDashboardPayload> => {
-      return getStrategicDashboard({ data: { id: planoId } });
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+import { clienteRefQuery } from "./cliente.$cliente";
 
 export const Route = createFileRoute("/_authenticated/cliente/$cliente/plano-estrategico/$planoId")(
   {
     head: ({ params }) => ({
       meta: [{ title: brandTitle(`Centro Estratégico · ${params.cliente}`) }],
     }),
-    loader: ({ params, context }) => {
-      void context.queryClient.ensureQueryData(dashboardQuery(params.planoId));
-    },
     component: PlanoCentroPage,
+    errorComponent: ({ error }) => (
+      <div className="lotus-surface p-4 text-sm text-danger">
+        Não foi possível carregar o plano: {error.message}
+      </div>
+    ),
   },
 );
 
@@ -56,22 +47,20 @@ function PlanoCentroInner({
   clienteSlug: string;
   isAdmin: boolean;
 }) {
-  const { data } = useSuspenseQuery(dashboardQuery(planoId));
+  const dashboardFn = useServerFn(getStrategicDashboard);
+  const { data: ref } = useSuspenseQuery(clienteRefQuery(clienteSlug));
+  const { data } = useSuspenseQuery({
+    queryKey: ["strategic-dashboard", planoId],
+    queryFn: () => dashboardFn({ data: { id: planoId } }),
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <StrategicPlanCentro
       data={data}
       planoId={planoId}
+      clienteNome={ref?.nome ?? data.plano.cliente_nome}
       isAdmin={isAdmin}
-      backLink={
-        <Link
-          to="/cliente/$cliente/plano-estrategico"
-          params={{ cliente: clienteSlug }}
-          className="inline-flex items-center gap-1 text-[11.5px] text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-3 w-3" /> Todos os planos
-        </Link>
-      }
     />
   );
 }

@@ -526,7 +526,7 @@ function PlatformTable({
 
   const cols = Object.keys(data[0]);
   return (
-    <div className="overflow-x-auto">
+    <div className="lotus-scroll-x">
       <table className="w-full text-[13px]">
         <thead>
           <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">

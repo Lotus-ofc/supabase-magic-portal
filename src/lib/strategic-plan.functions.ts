@@ -28,6 +28,17 @@ import { deriveProximosPassos } from "@/lib/strategic-plan/proximos-passos";
 import { buildRadarAxes } from "@/lib/strategic-plan/radar-data";
 import { buildAlerts } from "@/lib/strategic-plan/alerts";
 import { serializePlanoSnapshot } from "@/lib/strategic-plan/snapshots";
+import {
+  pickObjetivoAtual,
+  resolveObjetivoFase,
+  shouldAutoConcluirObjetivo,
+  faseToDbStatus,
+  defaultPlanoTitulo,
+  planoPeriodoLongo,
+  isObjetivoAtivo,
+  OBJETIVO_WORKFLOW_FASE,
+} from "@/lib/strategic-plan/objetivo-workflow";
+import { brtToday } from "@/lib/period";
 
 async function isAdmin(ctx: {
   supabase: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }> };
@@ -206,6 +217,24 @@ async function fetchPlatformRows(
   return out;
 }
 
+async function syncObjectiveAutoComplete(
+  supabase: any,
+  objetivos: Array<{ id: string; progressPct: number | null; fase: string }>,
+) {
+  for (const o of objetivos) {
+    if (o.fase === "concluido" || o.fase === "cancelado") continue;
+    if (!shouldAutoConcluirObjetivo(o.progressPct)) continue;
+    await supabase
+      .from("plano_objetivos")
+      .update({
+        status: "concluido",
+        workflow_fase: "concluido",
+        progresso_manual: 100,
+      })
+      .eq("id", o.id);
+  }
+}
+
 async function buildDashboard(supabase: any, planoId: string): Promise<StrategicDashboardPayload> {
   const detail = await loadPlanoDetail(supabase, planoId);
   const { plano } = detail;
@@ -256,22 +285,36 @@ async function buildDashboard(supabase: any, planoId: string): Promise<Strategic
     editorialStatsMap = parseEditorialStats(statsRows ?? []);
   }
 
-  const estrategiaById = new Map(detail.estrategias.map((e) => [e.id, e]));
-
-  const objetivos = detail.objetivos.map((o) => {
+  let objetivos = detail.objetivos.map((o) => {
     const objRefs = metricProgress.filter((m) => m.ref.objetivo_id === o.id);
-    const linked = (o.estrategia_ids ?? [])
-      .map((id) => estrategiaById.get(id))
-      .filter(Boolean) as typeof detail.estrategias;
+    const linked = detail.estrategias.filter(
+      (e) => e.objetivo_id === o.id || (o.estrategia_ids ?? []).includes(e.id),
+    );
+    const progressPct = objectiveProgressPct(objRefs, o.progresso_manual);
+    const fase = resolveObjetivoFase({ ...o, progressPct });
     return {
       ...o,
       estrategias: linked,
       metricProgress: objRefs,
-      progressPct: objectiveProgressPct(objRefs, o.progresso_manual),
+      progressPct,
+      fase,
     };
   });
 
-  const estrategias = detail.estrategias.map((e) => ({
+  await syncObjectiveAutoComplete(supabase, objetivos);
+  objetivos = objetivos.map((o) =>
+    shouldAutoConcluirObjetivo(o.progressPct) && o.fase !== "concluido"
+      ? { ...o, fase: "concluido", progressPct: 100, status: "concluido" as const }
+      : o,
+  );
+
+  const objetivoAtualBuilt = pickObjetivoAtual(objetivos);
+  const scopeObjetivoId = objetivoAtualBuilt?.id ?? null;
+  const estrategiasScoped = scopeObjetivoId
+    ? detail.estrategias.filter((e) => e.objetivo_id === scopeObjetivoId)
+    : detail.estrategias;
+
+  const estrategias = estrategiasScoped.map((e) => ({
     ...e,
     editorialStats: editorialStatsMap[e.id] ?? {
       estrategia_id: e.id,
@@ -292,33 +335,71 @@ async function buildDashboard(supabase: any, planoId: string): Promise<Strategic
   });
 
   const proximosPassos = deriveProximosPassos({
-    acoes: detail.acoes,
+    acoes: scopeObjetivoId
+      ? detail.acoes.filter(
+          (a) => !a.estrategia_id || estrategiasScoped.some((e) => e.id === a.estrategia_id),
+        )
+      : detail.acoes,
     oportunidades: oportunidadesMerged,
-    hipoteses: detail.hipoteses,
-    estrategias: detail.estrategias,
+    hipoteses: scopeObjetivoId
+      ? detail.hipoteses.filter((h) => h.objetivo_id === scopeObjetivoId || !h.objetivo_id)
+      : detail.hipoteses,
+    estrategias: estrategiasScoped,
     editorialStats: editorialStatsMap,
     metricProgress,
   });
 
-  const radar = buildRadarAxes({ metricProgress, estrategias: detail.estrategias });
+  const radar = buildRadarAxes({ metricProgress, estrategias: estrategiasScoped });
+
+  const ultimasDecisoes = detail.decisoes.slice(0, 5);
+  const hipotesesScoped = scopeObjetivoId
+    ? detail.hipoteses.filter((h) => h.objetivo_id === scopeObjetivoId)
+    : detail.hipoteses;
+  const roadmapScoped = scopeObjetivoId
+    ? detail.roadmap.filter((r) => r.objetivo_id === scopeObjetivoId)
+    : detail.roadmap;
+
+  const proximaMeta =
+    objetivoAtualBuilt?.metricProgress.find((m) => m.meta != null && !m.onTrack) ??
+    objetivoAtualBuilt?.metricProgress.find((m) => m.meta != null) ??
+    null;
+
+  const hasAtivos = objetivos.some((o) =>
+    isObjetivoAtivo(o.fase as (typeof OBJETIVO_WORKFLOW_FASE)[number]),
+  );
+  const allConcluidos =
+    objetivos.length > 0 &&
+    objetivos.every((o) => o.fase === "concluido" || o.fase === "cancelado");
 
   return {
     plano,
+    objetivoAtual: objetivoAtualBuilt
+      ? {
+          ...objetivoAtualBuilt,
+          proximaMeta,
+        }
+      : null,
     objetivos,
     estrategias,
-    hipoteses: detail.hipoteses,
+    hipoteses: hipotesesScoped,
     oportunidades: oportunidadesMerged,
     oportunidadesRegra: regraOnly,
-    decisoes: detail.decisoes,
+    decisoes: ultimasDecisoes,
     aprendizados: detail.aprendizados,
-    roadmap: detail.roadmap,
-    acoes: detail.acoes,
+    roadmap: roadmapScoped,
+    acoes: scopeObjetivoId
+      ? detail.acoes.filter(
+          (a) => !a.estrategia_id || estrategiasScoped.some((e) => e.id === a.estrategia_id),
+        )
+      : detail.acoes,
     eventos: detail.eventos,
     diagnostico,
     radar,
     metricProgress,
     alerts,
     proximosPassos,
+    needsPrimeiroObjetivo: objetivos.length === 0,
+    suggestProximoObjetivo: !hasAtivos && allConcluidos,
   };
 }
 
@@ -345,6 +426,89 @@ export const listPlanos = createServerFn({ method: "GET" })
     return rows ?? [];
   });
 
+// ---------- GET PLANO FOR CLIENTE (único ativo) ----------
+export const getPlanoForCliente = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        cadastro_cliente_id: z.number().int().optional(),
+        cliente_nome: z.string().trim().min(1).optional(),
+      })
+      .refine((v) => v.cadastro_cliente_id != null || v.cliente_nome != null, {
+        message: "Informe cadastro_cliente_id ou cliente_nome",
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    let q = context.supabase
+      .from("planos_estrategicos")
+      .select("*")
+      .eq("status", "ativo")
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if (data.cadastro_cliente_id) q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
+    if (data.cliente_nome) q = q.eq("cliente_nome", data.cliente_nome);
+    const { data: row, error } = await q.maybeSingle();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+// ---------- ENSURE PLANO (cria se não existir) ----------
+export const ensurePlanoCliente = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        cadastro_cliente_id: z.number().int(),
+        titulo: z.string().trim().max(200).optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: existing } = await context.supabase
+      .from("planos_estrategicos")
+      .select("*")
+      .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+      .eq("status", "ativo")
+      .maybeSingle();
+
+    if (existing) return { plano: existing, created: false };
+
+    const { data: cli, error: e0 } = await context.supabase
+      .from("cadastro_clientes")
+      .select("nome_cliente")
+      .eq("id", data.cadastro_cliente_id)
+      .maybeSingle();
+    if (e0) throw new Error(e0.message);
+    if (!cli) throw new Error("Cliente não encontrado");
+
+    const today = brtToday();
+    const periodo = planoPeriodoLongo(today);
+    const titulo = data.titulo?.trim() || defaultPlanoTitulo(cli.nome_cliente);
+
+    const { data: row, error } = await context.supabase
+      .from("planos_estrategicos")
+      .insert({
+        cadastro_cliente_id: data.cadastro_cliente_id,
+        cliente_nome: cli.nome_cliente,
+        titulo,
+        periodo_inicio: periodo.inicio,
+        periodo_fim: periodo.fim,
+        status: "ativo",
+        created_by: context.userId,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    await recordEvent(context, {
+      plano_id: row.id,
+      tipo: "criacao",
+      mensagem: "Plano estratégico iniciado",
+    });
+    return { plano: row, created: true };
+  });
+
 // ---------- GET PLANO ----------
 export const getPlano = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -357,14 +521,20 @@ export const getStrategicDashboard = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => buildDashboard(context.supabase, data.id));
 
-// ---------- CREATE PLANO (admin) ----------
+// ---------- CREATE PLANO (admin — um ativo por cliente) ----------
 const planoCreate = z.object({
   cadastro_cliente_id: z.number().int(),
-  titulo: z.string().trim().min(1).max(200),
+  titulo: z.string().trim().max(200).optional().nullable(),
   descricao: z.string().trim().max(5000).optional().nullable(),
-  periodo_inicio: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  periodo_fim: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  status: z.enum(PLANO_STATUS).default("rascunho"),
+  periodo_inicio: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  periodo_fim: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  status: z.enum(PLANO_STATUS).default("ativo"),
   objetivo_principal: z.string().trim().max(2000).optional().nullable(),
   observacoes: z.string().trim().max(5000).optional().nullable(),
 });
@@ -374,6 +544,17 @@ export const createPlano = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => planoCreate.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
+
+    const { data: existing } = await context.supabase
+      .from("planos_estrategicos")
+      .select("id")
+      .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (existing) {
+      throw new Error("Este cliente já possui um Plano Estratégico ativo.");
+    }
+
     const { data: cli, error: e0 } = await context.supabase
       .from("cadastro_clientes")
       .select("nome_cliente")
@@ -381,11 +562,23 @@ export const createPlano = createServerFn({ method: "POST" })
       .maybeSingle();
     if (e0) throw new Error(e0.message);
     if (!cli) throw new Error("Cliente não encontrado");
+
+    const today = brtToday();
+    const periodo = planoPeriodoLongo(today);
+    const titulo = data.titulo?.trim() || defaultPlanoTitulo(cli.nome_cliente);
+
     const { data: row, error } = await context.supabase
       .from("planos_estrategicos")
       .insert({
-        ...data,
+        cadastro_cliente_id: data.cadastro_cliente_id,
         cliente_nome: cli.nome_cliente,
+        titulo,
+        descricao: data.descricao ?? null,
+        periodo_inicio: data.periodo_inicio ?? periodo.inicio,
+        periodo_fim: data.periodo_fim ?? periodo.fim,
+        status: data.status ?? "ativo",
+        objetivo_principal: data.objetivo_principal ?? null,
+        observacoes: data.observacoes ?? null,
         created_by: context.userId,
       })
       .select("*")
@@ -444,7 +637,13 @@ export const upsertObjetivo = createServerFn({ method: "POST" })
           .regex(/^\d{4}-\d{2}-\d{2}$/)
           .optional()
           .nullable(),
-        progresso_manual: z.number().optional().nullable(),
+        periodo_inicio: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional()
+          .nullable(),
+        workflow_fase: z.enum(OBJETIVO_WORKFLOW_FASE).optional(),
+        progresso_manual: z.number().min(0).max(100).optional().nullable(),
         status: z.enum(PLANO_ITEM_STATUS).optional(),
         ordem: z.number().int().optional(),
         estrategia_ids: z.array(z.string().uuid()).optional(),
@@ -452,12 +651,32 @@ export const upsertObjetivo = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { estrategia_ids, id, plano_id, ...fields } = data;
+    const { estrategia_ids, id, plano_id, workflow_fase, ...fields } = data;
+    const payload = {
+      ...fields,
+      ...(workflow_fase
+        ? {
+            workflow_fase,
+            status: faseToDbStatus(workflow_fase),
+          }
+        : {}),
+    };
+    if (
+      workflow_fase === "concluido" ||
+      (payload.progresso_manual != null && payload.progresso_manual >= 100)
+    ) {
+      payload.status = "concluido";
+      payload.workflow_fase = "concluido";
+      payload.progresso_manual = 100;
+    }
+    if (!payload.periodo_inicio && !id) {
+      payload.periodo_inicio = brtToday();
+    }
     let row;
     if (id) {
       const { data: updated, error } = await context.supabase
         .from("plano_objetivos")
-        .update(fields)
+        .update(payload)
         .eq("id", id)
         .select("*")
         .single();
@@ -472,7 +691,12 @@ export const upsertObjetivo = createServerFn({ method: "POST" })
     } else {
       const { data: inserted, error } = await context.supabase
         .from("plano_objetivos")
-        .insert({ ...fields, plano_id })
+        .insert({
+          ...payload,
+          plano_id,
+          workflow_fase: payload.workflow_fase ?? "planejamento",
+          status: payload.status ?? "pendente",
+        })
         .select("*")
         .single();
       if (error) throw new Error(error.message);
@@ -503,6 +727,7 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         plano_id: z.string().uuid(),
+        objetivo_id: z.string().uuid().optional().nullable(),
         titulo: z.string().trim().min(1).max(200),
         descricao: z.string().trim().max(2000).optional().nullable(),
         prioridade: z.enum(PLANO_PRIORIDADE).optional(),
@@ -520,9 +745,10 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { id, plano_id, responsavel_email, ...fields } = data;
+    const { id, plano_id, objetivo_id, responsavel_email, ...fields } = data;
     const payload = {
       ...fields,
+      objetivo_id: objetivo_id ?? null,
       responsavel_email: responsavel_email || null,
     };
     if (id) {
@@ -533,6 +759,11 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
         .select("*")
         .single();
       if (error) throw new Error(error.message);
+      if (objetivo_id) {
+        await context.supabase
+          .from("plano_objetivo_estrategias")
+          .upsert({ objetivo_id, estrategia_id: id }, { onConflict: "objetivo_id,estrategia_id" });
+      }
       await recordEvent(context, {
         plano_id,
         tipo: "edicao",
@@ -548,6 +779,14 @@ export const upsertEstrategia = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+    if (objetivo_id) {
+      await context.supabase
+        .from("plano_objetivo_estrategias")
+        .upsert(
+          { objetivo_id, estrategia_id: row.id },
+          { onConflict: "objetivo_id,estrategia_id" },
+        );
+    }
     await recordEvent(context, {
       plano_id,
       tipo: "criacao",
@@ -652,6 +891,7 @@ export const upsertHipotese = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         plano_id: z.string().uuid(),
+        objetivo_id: z.string().uuid().optional().nullable(),
         estrategia_id: z.string().uuid().optional().nullable(),
         hipotese: z.string().trim().min(1).max(2000),
         status: z.enum(HIPOTESE_STATUS).optional(),
@@ -823,6 +1063,7 @@ export const upsertRoadmapMarco = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         plano_id: z.string().uuid(),
+        objetivo_id: z.string().uuid().optional().nullable(),
         titulo: z.string().trim().min(1).max(200),
         descricao: z.string().trim().max(2000).optional().nullable(),
         tipo: z.enum(ROADMAP_MARCO_TIPO).optional(),

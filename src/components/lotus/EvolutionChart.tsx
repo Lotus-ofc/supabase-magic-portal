@@ -27,7 +27,7 @@ export function EvolutionChart({ data }: { data: EvolutionPoint[] }) {
   const points = useMemo(() => data, [data]);
 
   return (
-    <div className="h-[260px] w-full">
+    <div className="h-full w-full min-w-[240px]" style={{ minHeight: "clamp(200px, 45vw, 260px)" }}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>

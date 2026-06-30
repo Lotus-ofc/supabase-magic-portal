@@ -23,6 +23,7 @@ Implementar o **Plano Estratégico** como Centro de Inteligência com:
 4. **Integração editorial** — `posts_editorial.estrategia_id` + `vw_estrategia_editorial_stats`.
 5. **RLS colaborativa** — admin CRUD total; cliente edita no escopo `current_user_clientes()`.
 6. **UX narrativa** — diagnóstico automático no topo, próximos passos no rodapé; CRUD em drawer.
+7. **Rotas aninhadas** — layout route com `<Outlet />` + index + `$planoId` (padrão TanStack Router).
 
 ## Alternativas consideradas
 

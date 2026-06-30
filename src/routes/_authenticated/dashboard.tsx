@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { EmptyState } from "@/components/lotus/EmptyState";
-import { EvolutionChart, type EvolutionPoint } from "@/components/lotus/EvolutionChart";
+import type { EvolutionPoint } from "@/components/lotus/EvolutionChart";
 import { PeriodPicker } from "@/components/lotus/PeriodPicker";
 import { resolvePeriod, type PeriodInput } from "@/lib/period";
 import {
@@ -39,6 +39,19 @@ import {
   CheckCircle2,
   Clock3,
 } from "lucide-react";
+
+const LazyEvolutionChart = lazy(() =>
+  import("@/components/lotus/EvolutionChart").then((m) => ({ default: m.EvolutionChart })),
+);
+
+function ChartSkeleton() {
+  return (
+    <div
+      className="lotus-skeleton w-full rounded-lg"
+      style={{ minHeight: "clamp(200px, 45vw, 260px)" }}
+    />
+  );
+}
 
 type ClienteAtivo = {
   cliente: string;
@@ -210,7 +223,13 @@ function DashboardBody({ period }: { period: ReturnType<typeof resolvePeriod> })
           description="Meta Ads e Google Ads consolidados no período selecionado."
           className="xl:col-span-2"
         >
-          {evolution.length > 0 ? <EvolutionChart data={evolution} /> : <EmptyChart />}
+          {evolution.length > 0 ? (
+            <Suspense fallback={<ChartSkeleton />}>
+              <LazyEvolutionChart data={evolution} />
+            </Suspense>
+          ) : (
+            <EmptyChart />
+          )}
         </SectionCard>
 
         <SectionCard

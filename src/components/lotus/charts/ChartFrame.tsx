@@ -62,7 +62,9 @@ export function ChartFrame({
           {legend}
         </div>
       )}
-      <div className={cn("px-3 py-3", bodyClassName)}>{children}</div>
+      <div className={cn("lotus-scroll-x min-w-0 px-2 py-3 sm:px-3", bodyClassName)}>
+        {children}
+      </div>
     </section>
   );
 }

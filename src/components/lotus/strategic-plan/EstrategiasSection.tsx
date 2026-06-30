@@ -6,15 +6,21 @@ import { StrategyEditorialStats } from "./StrategyEditorialStats";
 export function EstrategiasSection({
   estrategias,
   isAdmin,
+  objetivoTitulo,
 }: {
   estrategias: StrategicDashboardPayload["estrategias"];
   isAdmin?: boolean;
+  objetivoTitulo?: string;
 }) {
   return (
     <SectionCard
       eyebrow="Execução"
-      title="Estratégias"
-      description="Prioridade, peso relativo e conteúdos vinculados."
+      title="Estratégias do objetivo"
+      description={
+        objetivoTitulo
+          ? `Linhas de atuação vinculadas a «${objetivoTitulo}».`
+          : "Prioridade, peso relativo e conteúdos vinculados."
+      }
     >
       {estrategias.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhuma estratégia definida.</p>

@@ -42,14 +42,28 @@ export function DonutChartLotus({
   className,
 }: Props) {
   const total = slices.reduce((s, x) => s + x.value, 0);
+  const responsiveSize = `min(${size}px, 42vw)`;
   const r = (size - thickness) / 2;
   const c = 2 * Math.PI * r;
   let acc = 0;
 
   return (
-    <div className={cn("flex flex-col items-center gap-4 sm:flex-row sm:gap-6", className)}>
-      <div className="relative shrink-0" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div
+      className={cn(
+        "flex w-full min-w-0 flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6",
+        className,
+      )}
+    >
+      <div
+        className="relative mx-auto shrink-0 sm:mx-0"
+        style={{ width: responsiveSize, height: responsiveSize, maxWidth: size, maxHeight: size }}
+      >
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${size} ${size}`}
+          className="max-h-full max-w-full"
+        >
           {/* Trilho */}
           <circle
             cx={size / 2}
@@ -99,7 +113,7 @@ export function DonutChartLotus({
         )}
       </div>
 
-      <ul className="flex-1 space-y-2">
+      <ul className="w-full min-w-0 flex-1 space-y-2">
         {slices.length === 0 && (
           <li className="text-sm text-muted-foreground">Sem distribuição no período.</li>
         )}

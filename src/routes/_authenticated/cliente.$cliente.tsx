@@ -22,7 +22,12 @@ import { slugify } from "@/lib/slug";
 
 // ---------------- Shared helpers (used by child routes) ----------------
 
-export type ClienteRef = { slug: string; nome: string; queryName: string };
+export type ClienteRef = {
+  slug: string;
+  nome: string;
+  queryName: string;
+  cadastroId: number | null;
+};
 
 export const clienteRefQuery = (slug: string) =>
   queryOptions({
@@ -30,7 +35,7 @@ export const clienteRefQuery = (slug: string) =>
     queryFn: async (): Promise<ClienteRef | null> => {
       const { data: cad } = await supabase
         .from("cadastro_clientes")
-        .select("slug, nome_cliente")
+        .select("id, slug, nome_cliente")
         .eq("slug", slugify(slug))
         .maybeSingle();
 
@@ -51,6 +56,7 @@ export const clienteRefQuery = (slug: string) =>
         slug,
         nome: cad?.nome_cliente ?? queryName,
         queryName,
+        cadastroId: cad?.id ?? null,
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -119,9 +125,9 @@ function ClienteLayout() {
       <div>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1 text-[11.5px] text-muted-foreground hover:text-foreground"
+          className="inline-flex min-h-[44px] items-center gap-1 text-[11.5px] text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-3 w-3" /> Voltar ao painel
+          <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden /> Voltar ao painel
         </Link>
       </div>
 
@@ -153,9 +159,9 @@ function ClienteShell({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
-      <aside className="lg:sticky lg:top-20 lg:self-start">
-        <Suspense fallback={<div className="lotus-skeleton h-48 w-full rounded-xl" />}>
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-6">
+      <aside className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-3 sm:-mx-6 lg:static lg:top-20 lg:z-auto lg:mx-0 lg:self-start">
+        <Suspense fallback={<div className="lotus-skeleton h-14 w-full rounded-xl lg:h-48" />}>
           <PlatformSideNav slug={slug} queryName={ref.queryName} />
         </Suspense>
       </aside>
@@ -172,53 +178,58 @@ function PlatformSideNav({ slug, queryName }: { slug: string; queryName: string 
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav className="lotus-surface flex flex-col gap-0.5 p-2">
-      <p className="px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        Conta
-      </p>
-      <SubNavLink
-        to="/cliente/$cliente"
-        params={{ cliente: slug }}
-        pathname={pathname}
-        href={`/cliente/${slug}`}
-        icon={LayoutDashboard}
-        label="Visão geral"
-        exact
-      />
-      <SubNavLink
-        to="/cliente/$cliente/plano-estrategico"
-        params={{ cliente: slug }}
-        pathname={pathname}
-        href={`/cliente/${slug}/plano-estrategico`}
-        icon={Compass}
-        label="Plano Estratégico"
-      />
-
-      <p className="mt-3 px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        Plataformas
-      </p>
-
-      {platforms.length === 0 && (
-        <p className="px-3 py-2 text-[11.5px] text-muted-foreground">
-          Nenhuma plataforma com dados ainda.
+    <nav
+      className="lotus-surface min-w-0 overflow-hidden lg:flex lg:flex-col lg:gap-0.5 lg:p-2"
+      aria-label="Navegação do cliente"
+    >
+      <div className="lotus-scroll-x flex gap-1 p-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:p-0">
+        <p className="hidden px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:block">
+          Conta
         </p>
-      )}
+        <SubNavLink
+          to="/cliente/$cliente"
+          params={{ cliente: slug }}
+          pathname={pathname}
+          href={`/cliente/${slug}`}
+          icon={LayoutDashboard}
+          label="Visão geral"
+          exact
+        />
+        <SubNavLink
+          to="/cliente/$cliente/plano-estrategico"
+          params={{ cliente: slug }}
+          pathname={pathname}
+          href={`/cliente/${slug}/plano-estrategico`}
+          icon={Compass}
+          label="Plano Estratégico"
+        />
 
-      {platforms.map((p) => {
-        const meta = PLATFORM_META[p];
-        const href = meta.path.replace("$cliente", slug);
-        return (
-          <SubNavLink
-            key={p}
-            to={meta.path}
-            params={{ cliente: slug }}
-            pathname={pathname}
-            href={href}
-            icon={meta.icon}
-            label={meta.label}
-          />
-        );
-      })}
+        <p className="hidden px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:mt-3 lg:block">
+          Plataformas
+        </p>
+
+        {platforms.length === 0 && (
+          <p className="hidden px-3 py-2 text-[11.5px] text-muted-foreground lg:block">
+            Nenhuma plataforma com dados ainda.
+          </p>
+        )}
+
+        {platforms.map((p) => {
+          const meta = PLATFORM_META[p];
+          const href = meta.path.replace("$cliente", slug);
+          return (
+            <SubNavLink
+              key={p}
+              to={meta.path}
+              params={{ cliente: slug }}
+              pathname={pathname}
+              href={href}
+              icon={meta.icon}
+              label={meta.label}
+            />
+          );
+        })}
+      </div>
     </nav>
   );
 }
@@ -246,14 +257,15 @@ function SubNavLink({
       to={to as never}
       params={params as never}
       className={cn(
-        "flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
+        "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors",
+        "min-h-[44px] lg:w-full lg:shrink",
         active
           ? "bg-primary/12 text-primary-700 dark:text-primary-200"
-          : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
+          : "text-muted-foreground hover:bg-muted/40 hover:text-foreground active:scale-[0.98]",
       )}
     >
-      <Icon className="h-4 w-4" />
-      <span className="truncate">{label}</span>
+      <Icon className="h-4 w-4 shrink-0" aria-hidden />
+      <span className="whitespace-nowrap lg:truncate">{label}</span>
     </Link>
   );
 }

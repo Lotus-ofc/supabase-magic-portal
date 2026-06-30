@@ -59,6 +59,8 @@ export interface PlanoObjetivo {
   descricao: string | null;
   meta_numerica: number | null;
   data_alvo: string | null;
+  periodo_inicio: string | null;
+  workflow_fase: string | null;
   progresso_manual: number | null;
   status: PlanoItemStatus;
   ordem: number;
@@ -70,6 +72,7 @@ export interface PlanoObjetivo {
 export interface PlanoEstrategia {
   id: string;
   plano_id: string;
+  objetivo_id: string | null;
   titulo: string;
   descricao: string | null;
   prioridade: PlanoPrioridade;
@@ -98,6 +101,7 @@ export interface PlanoMetricRef {
 export interface PlanoHipotese {
   id: string;
   plano_id: string;
+  objetivo_id: string | null;
   estrategia_id: string | null;
   hipotese: string;
   status: HipoteseStatus;
@@ -150,6 +154,7 @@ export interface PlanoAprendizado {
 export interface PlanoRoadmapMarco {
   id: string;
   plano_id: string;
+  objetivo_id: string | null;
   titulo: string;
   descricao: string | null;
   tipo: RoadmapMarcoTipo;
@@ -262,10 +267,20 @@ export interface PlanoDetail {
 
 export interface StrategicDashboardPayload {
   plano: PlanoEstrategico;
+  objetivoAtual:
+    | (PlanoObjetivo & {
+        estrategias: PlanoEstrategia[];
+        metricProgress: MetricRefProgress[];
+        progressPct: number | null;
+        fase: string;
+        proximaMeta: MetricRefProgress | null;
+      })
+    | null;
   objetivos: (PlanoObjetivo & {
     estrategias: PlanoEstrategia[];
     metricProgress: MetricRefProgress[];
     progressPct: number | null;
+    fase: string;
   })[];
   estrategias: (PlanoEstrategia & { editorialStats: EstrategiaEditorialStats })[];
   hipoteses: PlanoHipotese[];
@@ -281,4 +296,6 @@ export interface StrategicDashboardPayload {
   metricProgress: MetricRefProgress[];
   alerts: StrategicAlert[];
   proximosPassos: ProximoPasso[];
+  needsPrimeiroObjetivo: boolean;
+  suggestProximoObjetivo: boolean;
 }

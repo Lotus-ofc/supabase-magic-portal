@@ -22,22 +22,28 @@ export function SectionCard({
   bodyClassName,
 }: SectionCardProps) {
   return (
-    <section className={cn("lotus-surface overflow-hidden", className)}>
-      <header className="flex items-start justify-between gap-3 border-b border-border/70 px-5 py-4">
-        <div className="min-w-0">
+    <section className={cn("lotus-surface min-w-0 max-w-full overflow-hidden", className)}>
+      <header className="flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+        <div className="min-w-0 flex-1">
           {eyebrow && (
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300">
               {eyebrow}
             </p>
           )}
-          <h2 className="truncate font-display text-[15px] font-semibold tracking-tight text-foreground">
+          <h2 className="break-words font-display text-sm font-semibold tracking-tight text-foreground sm:text-[15px]">
             {title}
           </h2>
-          {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{description}</p>
+          )}
         </div>
-        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">
+            {actions}
+          </div>
+        )}
       </header>
-      <div className={cn("px-5 py-5", bodyClassName)}>{children}</div>
+      <div className={cn("px-4 py-4 sm:px-5 sm:py-5", bodyClassName)}>{children}</div>
     </section>
   );
 }

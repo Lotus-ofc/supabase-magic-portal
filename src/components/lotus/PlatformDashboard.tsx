@@ -338,7 +338,7 @@ function ComparisonBlock({
       description={`${formatBR(period.from)}–${formatBR(period.to)} comparado a ${formatBR(period.prevFrom)}–${formatBR(period.prevTo)}.`}
       bodyClassName="px-0 py-0"
     >
-      <div className="overflow-x-auto">
+      <div className="lotus-scroll-x">
         <table className="w-full text-[13px]">
           <thead className="bg-muted/30 text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
             <tr>
@@ -399,7 +399,7 @@ function CampaignRanking({
       description={`${ranked.length} ${ranked.length === 1 ? "campanha ativa" : "campanhas ativas"} no período, ordenadas por ${def.metrics.find((m) => m.key === sortKey)?.label ?? sortKey}.`}
       bodyClassName="px-0 py-0"
     >
-      <div className="overflow-x-auto">
+      <div className="lotus-scroll-x">
         <table className="w-full text-[13px]">
           <thead className="bg-muted/30 text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">
             <tr>

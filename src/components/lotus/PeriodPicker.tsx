@@ -1,8 +1,9 @@
 // Lotus · PeriodPicker
 // Substitui o antigo PeriodToggle. Suporta presets BRT + intervalo personalizado.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Calendar as CalendarIcon, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   PERIOD_PRESETS,
   resolvePeriod,
@@ -23,25 +24,11 @@ export function PeriodPicker({ value, onChange, className }: Props) {
   const [open, setOpen] = useState(false);
   const [customFrom, setCustomFrom] = useState(value.customFrom ?? brtToday());
   const [customTo, setCustomTo] = useState(value.customTo ?? brtToday());
-  const rootRef = useRef<HTMLDivElement>(null);
 
-  // Atualiza estado interno quando o controlado muda externamente
   useEffect(() => {
     if (value.customFrom) setCustomFrom(value.customFrom);
     if (value.customTo) setCustomTo(value.customTo);
   }, [value.customFrom, value.customTo]);
-
-  // Fecha ao clicar fora
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
 
   const resolved: Period = resolvePeriod(value);
 
@@ -60,89 +47,96 @@ export function PeriodPicker({ value, onChange, className }: Props) {
   };
 
   return (
-    <div ref={rootRef} className={cn("relative inline-block", className)}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="lotus-surface lotus-focus inline-flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-medium text-foreground hover:bg-muted/40"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-      >
-        <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="tabular-nums">{resolved.label}</span>
-        {value.preset !== "today" && value.preset !== "yesterday" && (
-          <span className="hidden text-[11px] text-muted-foreground sm:inline">
-            · {formatBR(resolved.from)} → {formatBR(resolved.to)}
-          </span>
-        )}
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-      </button>
-
-      {open && (
-        <div
-          role="dialog"
-          className="absolute right-0 z-50 mt-2 w-[320px] rounded-xl border border-border bg-popover p-2 shadow-[var(--shadow-lg)]"
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "lotus-surface lotus-focus inline-flex w-full max-w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-[12.5px] font-medium text-foreground hover:bg-muted/40 sm:w-auto sm:justify-start sm:py-2",
+            className,
+          )}
+          aria-haspopup="dialog"
+          aria-expanded={open}
         >
-          <ul className="max-h-[320px] overflow-y-auto">
-            {PERIOD_PRESETS.map((opt) => {
-              const active = value.preset === opt.value;
-              return (
-                <li key={opt.value}>
-                  <button
-                    type="button"
-                    onClick={() => pick(opt.value)}
-                    className={cn(
-                      "lotus-focus flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-[13px] hover:bg-muted/50",
-                      active && "bg-primary/10 text-primary-700 dark:text-primary-200",
-                    )}
-                  >
-                    <span>{opt.label}</span>
-                    {active && <Check className="h-3.5 w-3.5" />}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <span className="flex min-w-0 items-center gap-2">
+            <CalendarIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            <span className="truncate tabular-nums">{resolved.label}</span>
+            {value.preset !== "today" && value.preset !== "yesterday" && (
+              <span className="hidden truncate text-[11px] text-muted-foreground sm:inline">
+                · {formatBR(resolved.from)} → {formatBR(resolved.to)}
+              </span>
+            )}
+          </span>
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+        </button>
+      </PopoverTrigger>
 
-          {value.preset === "custom" && (
-            <div className="mt-2 border-t border-border/70 pt-3">
-              <div className="grid grid-cols-2 gap-2 px-1">
-                <label className="block">
-                  <span className="text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                    De
-                  </span>
-                  <input
-                    type="date"
-                    value={customFrom}
-                    onChange={(e) => setCustomFrom(e.target.value)}
-                    className="lotus-focus mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-[12.5px] text-foreground"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                    Até
-                  </span>
-                  <input
-                    type="date"
-                    value={customTo}
-                    onChange={(e) => setCustomTo(e.target.value)}
-                    className="lotus-focus mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-[12.5px] text-foreground"
-                  />
-                </label>
-              </div>
-              <div className="mt-3 flex justify-end px-1">
+      <PopoverContent
+        align="center"
+        side="bottom"
+        sideOffset={8}
+        collisionPadding={16}
+        className="w-[min(320px,calc(100vw-2rem))] rounded-xl border-border p-2 shadow-[var(--shadow-lg)]"
+      >
+        <ul className="max-h-[min(320px,50dvh)] overflow-y-auto overscroll-contain">
+          {PERIOD_PRESETS.map((opt) => {
+            const active = value.preset === opt.value;
+            return (
+              <li key={opt.value}>
                 <button
                   type="button"
-                  onClick={applyCustom}
-                  className="lotus-focus rounded-md bg-primary px-3 py-1.5 text-[12px] font-semibold text-primary-foreground hover:opacity-90"
+                  onClick={() => pick(opt.value)}
+                  className={cn(
+                    "lotus-focus flex min-h-[44px] w-full items-center justify-between rounded-md px-3 py-2 text-left text-[13px] hover:bg-muted/50",
+                    active && "bg-primary/10 text-primary-700 dark:text-primary-200",
+                  )}
                 >
-                  Aplicar
+                  <span>{opt.label}</span>
+                  {active && <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                 </button>
-              </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        {value.preset === "custom" && (
+          <div className="mt-2 border-t border-border/70 pt-3">
+            <div className="grid grid-cols-1 gap-3 px-1 sm:grid-cols-2 sm:gap-2">
+              <label className="block min-w-0">
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  De
+                </span>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="lotus-focus mt-1 w-full min-w-0 rounded-md border border-border bg-background px-2 py-2.5 text-[12.5px] text-foreground sm:py-1.5"
+                />
+              </label>
+              <label className="block min-w-0">
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  Até
+                </span>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="lotus-focus mt-1 w-full min-w-0 rounded-md border border-border bg-background px-2 py-2.5 text-[12.5px] text-foreground sm:py-1.5"
+                />
+              </label>
             </div>
-          )}
-        </div>
-      )}
-    </div>
+            <div className="mt-3 flex justify-end px-1">
+              <button
+                type="button"
+                onClick={applyCustom}
+                className="lotus-focus min-h-[44px] rounded-md bg-primary px-4 py-2 text-[12px] font-semibold text-primary-foreground hover:opacity-90 sm:min-h-0 sm:py-1.5"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }

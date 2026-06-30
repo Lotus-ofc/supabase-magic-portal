@@ -139,7 +139,7 @@ function ClientesList() {
         )}
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="lotus-scroll-x">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground">

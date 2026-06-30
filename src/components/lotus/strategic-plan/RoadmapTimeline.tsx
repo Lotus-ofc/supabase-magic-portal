@@ -10,7 +10,7 @@ export function RoadmapTimeline({ marcos }: { marcos: PlanoRoadmapMarco[] }) {
       {sorted.length === 0 ? (
         <p className="text-sm text-muted-foreground">Roadmap ainda não definido.</p>
       ) : (
-        <div className="overflow-x-auto pb-2">
+        <div className="lotus-scroll-x pb-2">
           <ol className="flex min-w-max gap-0">
             {sorted.map((m, i) => (
               <li key={m.id} className="flex items-start">
