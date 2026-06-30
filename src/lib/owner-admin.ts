@@ -1,7 +1,10 @@
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 
 type SupabaseRpc = {
-  rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
 };
 
 /**
@@ -14,7 +17,10 @@ export function ownerHasAdminAccess(email: string | null | undefined): boolean {
 }
 
 /** Garante linha admin em user_roles (service-role). Idempotente. */
-export async function repairOwnerAdminRole(userId: string, email: string | null | undefined): Promise<void> {
+export async function repairOwnerAdminRole(
+  userId: string,
+  email: string | null | undefined,
+): Promise<void> {
   if (!ownerHasAdminAccess(email)) return;
 
   try {

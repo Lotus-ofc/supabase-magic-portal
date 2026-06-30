@@ -56,10 +56,7 @@ related:
 # Related Doc
 `;
     const doc = parseMarkdownFile("06-dashboards/platforms/google-ads.md", raw);
-    expect(doc.frontmatter.related).toEqual([
-      "06-engine/platform-catalog",
-      "06-engine/formulas",
-    ]);
+    expect(doc.frontmatter.related).toEqual(["06-engine/platform-catalog", "06-engine/formulas"]);
   });
 });
 

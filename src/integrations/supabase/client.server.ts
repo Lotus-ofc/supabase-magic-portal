@@ -12,9 +12,7 @@ export function getSupabaseAdmin(): SupabaseClient {
   const serviceRole = getServerSupabaseServiceRoleKey();
 
   if (!url || !serviceRole) {
-    throw new Error(
-      "Missing OFFICIAL_SUPABASE_URL / OFFICIAL_SERVICE_ROLE_KEY for admin client",
-    );
+    throw new Error("Missing OFFICIAL_SUPABASE_URL / OFFICIAL_SERVICE_ROLE_KEY for admin client");
   }
 
   _client = createClient(url, serviceRole, {

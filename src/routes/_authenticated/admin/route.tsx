@@ -5,7 +5,7 @@ import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
     const user = context.user;
-  // Dono: não depende de server function no beforeLoad (evita tela preta se env server falhar).
+    // Dono: não depende de server function no beforeLoad (evita tela preta se env server falhar).
     if (isPlatformOwnerEmail(user?.email)) return;
 
     try {

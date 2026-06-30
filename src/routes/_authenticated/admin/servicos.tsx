@@ -17,7 +17,10 @@ const servicosQuery = { queryKey: ["admin", "servicos"], queryFn: () => listServ
 
 export const Route = createFileRoute("/_authenticated/admin/servicos")({
   head: () => ({ meta: [{ title: adminTitle("Serviços") }] }),
-  loader: ({ context }) => (context as { queryClient: { ensureQueryData: (q: typeof servicosQuery) => unknown } }).queryClient.ensureQueryData(servicosQuery),
+  loader: ({ context }) =>
+    (
+      context as { queryClient: { ensureQueryData: (q: typeof servicosQuery) => unknown } }
+    ).queryClient.ensureQueryData(servicosQuery),
   component: ServicosAdmin,
   errorComponent: ({ error }) => <p className="text-sm text-destructive">Erro: {error.message}</p>,
 });

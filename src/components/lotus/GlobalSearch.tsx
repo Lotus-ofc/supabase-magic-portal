@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Search,
   Users,
+  Compass,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
@@ -52,6 +53,13 @@ const STATIC_ROUTES: SearchRoute[] = [
     keywords: ["posts", "conteúdo", "aprovar"],
   },
   {
+    id: "plano-estrategico",
+    label: "Plano Estratégico",
+    href: "/plano-estrategico",
+    icon: Compass,
+    keywords: ["estratégia", "objetivos", "centro estratégico"],
+  },
+  {
     id: "admin",
     label: "Admin — Visão geral",
     href: "/admin",
@@ -73,6 +81,14 @@ const STATIC_ROUTES: SearchRoute[] = [
     icon: CalendarDays,
     adminOnly: true,
     keywords: ["posts", "publicação"],
+  },
+  {
+    id: "plano-admin",
+    label: "Plano Estratégico (admin)",
+    href: "/admin/plano-estrategico",
+    icon: Compass,
+    adminOnly: true,
+    keywords: ["estratégia", "objetivos"],
   },
   {
     id: "clientes",
@@ -142,10 +158,7 @@ export function GlobalSearch() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const routes = useMemo(
-    () => STATIC_ROUTES.filter((r) => !r.adminOnly || isAdmin),
-    [isAdmin],
-  );
+  const routes = useMemo(() => STATIC_ROUTES.filter((r) => !r.adminOnly || isAdmin), [isAdmin]);
 
   const needle = q.trim().toLowerCase();
 
@@ -159,9 +172,7 @@ export function GlobalSearch() {
 
   const filteredClientes = useMemo(() => {
     if (!needle) return clientes.slice(0, 8);
-    return clientes
-      .filter((c) => c.toLowerCase().includes(needle))
-      .slice(0, 8);
+    return clientes.filter((c) => c.toLowerCase().includes(needle)).slice(0, 8);
   }, [clientes, needle]);
 
   const go = (href: string) => {
@@ -225,11 +236,7 @@ export function GlobalSearch() {
                 {filteredClientes.map((nome) => {
                   const slug = slugify(nome);
                   return (
-                    <CommandItem
-                      key={nome}
-                      value={nome}
-                      onSelect={() => go(`/cliente/${slug}`)}
-                    >
+                    <CommandItem key={nome} value={nome} onSelect={() => go(`/cliente/${slug}`)}>
                       <Users className="mr-2 h-4 w-4 text-muted-foreground" />
                       <span>{nome}</span>
                     </CommandItem>

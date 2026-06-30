@@ -78,8 +78,8 @@ function AuthPage() {
           </button>
         </form>
         <p className="text-center text-xs text-muted-foreground">
-          Acesso mediante convite da equipe {BRAND_NAME}. Em caso de dúvida, fale com seu gestor
-          de conta.
+          Acesso mediante convite da equipe {BRAND_NAME}. Em caso de dúvida, fale com seu gestor de
+          conta.
         </p>
       </div>
     </div>

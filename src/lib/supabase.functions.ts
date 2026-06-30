@@ -1,9 +1,6 @@
 /** Expõe URL + anon key do runtime server (Lovable secrets). Sem auth — dados são públicos (RLS). */
 import { createServerFn } from "@tanstack/react-start";
-import {
-  getServerSupabaseAnonKey,
-  getServerSupabaseUrl,
-} from "@/integrations/supabase/env.server";
+import { getServerSupabaseAnonKey, getServerSupabaseUrl } from "@/integrations/supabase/env.server";
 import { SUPABASE_DEFAULT_URL, SUPABASE_PROJECT_ID } from "@/integrations/supabase/public-config";
 
 export const getPublicSupabaseConfig = createServerFn({ method: "GET" }).handler(async () => {

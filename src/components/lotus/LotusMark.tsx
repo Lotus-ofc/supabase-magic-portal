@@ -4,10 +4,7 @@ import { useState } from "react";
 
 type LogoSize = "sm" | "md" | "lg";
 
-const lockup: Record<
-  LogoSize,
-  { icon: string; lots: string; bi: string; gap: string }
-> = {
+const lockup: Record<LogoSize, { icon: string; lots: string; bi: string; gap: string }> = {
   sm: { icon: "h-6 w-6", lots: "text-[13px]", bi: "h-[13px]", gap: "gap-1.5" },
   md: { icon: "h-7 w-7", lots: "text-[15px]", bi: "h-[15px]", gap: "gap-2" },
   lg: { icon: "h-9 w-9", lots: "text-[17px]", bi: "h-[17px]", gap: "gap-2.5" },
@@ -91,11 +88,7 @@ export function LotsBIWordmark({
   }
 
   return (
-    <div
-      className={cn("flex items-center", s.gap, className)}
-      aria-label={BRAND_NAME}
-      role="img"
-    >
+    <div className={cn("flex items-center", s.gap, className)} aria-label={BRAND_NAME} role="img">
       <LotsBIIcon size={size} />
       <span
         className={cn(

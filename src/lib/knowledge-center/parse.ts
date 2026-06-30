@@ -10,10 +10,7 @@ function parseScalarValue(raw: string): unknown {
     if (!inner) return [];
     return inner.split(",").map((s) => s.trim().replace(/^["']|["']$/g, ""));
   }
-  if (
-    (v.startsWith('"') && v.endsWith('"')) ||
-    (v.startsWith("'") && v.endsWith("'"))
-  ) {
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
     return v.slice(1, -1);
   }
   return v;

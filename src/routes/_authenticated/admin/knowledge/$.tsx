@@ -7,7 +7,13 @@ import { trackRecent } from "@/lib/knowledge-center/storage";
 
 export const Route = createFileRoute("/_authenticated/admin/knowledge/$")({
   head: ({ loaderData }) => ({
-    meta: [{ title: adminTitle((loaderData as { doc?: { title?: string } } | undefined)?.doc?.title ?? "Documento") }],
+    meta: [
+      {
+        title: adminTitle(
+          (loaderData as { doc?: { title?: string } } | undefined)?.doc?.title ?? "Documento",
+        ),
+      },
+    ],
   }),
   loader: ({ params }) => {
     const slug = params._splat?.replace(/^\/+|\/+$/g, "") ?? "";

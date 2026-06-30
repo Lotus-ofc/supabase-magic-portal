@@ -632,8 +632,8 @@ function EmptyClientes() {
       </div>
       <p className="font-display text-sm font-semibold">Nenhuma conta vinculada</p>
       <p className="max-w-md text-xs text-muted-foreground">
-        A equipe {BRAND_NAME} ainda não vinculou nenhuma conta ao seu acesso. Assim que isso for feito,
-        ela aparece aqui automaticamente.
+        A equipe {BRAND_NAME} ainda não vinculou nenhuma conta ao seu acesso. Assim que isso for
+        feito, ela aparece aqui automaticamente.
       </p>
     </div>
   );
@@ -649,8 +649,8 @@ function EmptyAccount() {
         Sua conta está sendo preparada
       </h2>
       <p className="max-w-md text-sm text-muted-foreground">
-        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe {BRAND_NAME} está configurando
-        integrações, fontes e relatórios da sua operação.
+        Em breve seus dados começam a aparecer aqui. Enquanto isso, a equipe {BRAND_NAME} está
+        configurando integrações, fontes e relatórios da sua operação.
       </p>
     </div>
   );

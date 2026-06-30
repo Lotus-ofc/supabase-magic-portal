@@ -22,10 +22,7 @@ export function SupabaseBootstrapGate({ children }: { children: ReactNode }) {
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        const msg =
-          err instanceof Error
-            ? err.message
-            : "Não foi possível conectar ao Supabase.";
+        const msg = err instanceof Error ? err.message : "Não foi possível conectar ao Supabase.";
         setError(msg);
         setState("error");
       });
@@ -56,8 +53,8 @@ export function SupabaseBootstrapGate({ children }: { children: ReactNode }) {
           <p className="text-sm leading-relaxed text-muted-foreground">{error}</p>
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-left text-xs leading-relaxed text-muted-foreground">
             <p className="font-medium text-foreground">
-              Integração customizada (prefixo <code className="text-foreground">OFFICIAL_</code>, não
-              Supabase nativo do Lovable):
+              Integração customizada (prefixo <code className="text-foreground">OFFICIAL_</code>,
+              não Supabase nativo do Lovable):
             </p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               <li>
@@ -69,8 +66,9 @@ export function SupabaseBootstrapGate({ children }: { children: ReactNode }) {
                 https://ywvhoctcmibjitvwkkhb.supabase.co
               </li>
               <li>
-                Opcional no build: <code className="text-foreground">VITE_OFFICIAL_SUPABASE_ANON_KEY</code>{" "}
-                e <code className="text-foreground">VITE_OFFICIAL_SUPABASE_URL</code>
+                Opcional no build:{" "}
+                <code className="text-foreground">VITE_OFFICIAL_SUPABASE_ANON_KEY</code> e{" "}
+                <code className="text-foreground">VITE_OFFICIAL_SUPABASE_URL</code>
               </li>
             </ul>
             <p className="mt-2">

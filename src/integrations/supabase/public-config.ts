@@ -39,11 +39,8 @@ export interface SupabasePublicConfig {
 /** Lê config embutida no build (Vite) — inclui nomes Lovable padrão e OFFICIAL_. */
 export function resolveBuildTimeSupabaseConfig(): SupabasePublicConfig | null {
   const url =
-    pickEnv(
-      "VITE_OFFICIAL_SUPABASE_URL",
-      "VITE_SUPABASE_URL",
-      "OFFICIAL_SUPABASE_URL",
-    ) ?? SUPABASE_DEFAULT_URL;
+    pickEnv("VITE_OFFICIAL_SUPABASE_URL", "VITE_SUPABASE_URL", "OFFICIAL_SUPABASE_URL") ??
+    SUPABASE_DEFAULT_URL;
 
   const anonKey = pickEnv(
     "VITE_OFFICIAL_SUPABASE_ANON_KEY",
@@ -55,8 +52,7 @@ export function resolveBuildTimeSupabaseConfig(): SupabasePublicConfig | null {
   if (!anonKey) return null;
 
   const projectId =
-    pickEnv("VITE_OFFICIAL_SUPABASE_PROJECT_ID", "VITE_SUPABASE_PROJECT_ID") ??
-    SUPABASE_PROJECT_ID;
+    pickEnv("VITE_OFFICIAL_SUPABASE_PROJECT_ID", "VITE_SUPABASE_PROJECT_ID") ?? SUPABASE_PROJECT_ID;
 
   return { url, anonKey, projectId, source: "build" };
 }

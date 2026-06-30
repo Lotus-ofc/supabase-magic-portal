@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   Megaphone,
   type LucideIcon,
+  Compass,
 } from "lucide-react";
 import { brandTitle } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -183,6 +184,14 @@ function PlatformSideNav({ slug, queryName }: { slug: string; queryName: string 
         icon={LayoutDashboard}
         label="Visão geral"
         exact
+      />
+      <SubNavLink
+        to="/cliente/$cliente/plano-estrategico"
+        params={{ cliente: slug }}
+        pathname={pathname}
+        href={`/cliente/${slug}/plano-estrategico`}
+        icon={Compass}
+        label="Plano Estratégico"
       />
 
       <p className="mt-3 px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">

@@ -36,7 +36,12 @@ export function EmptyState({
         <Icon className={compact ? "h-4 w-4" : "h-5 w-5"} />
       </div>
       <div className="max-w-md space-y-1">
-        <p className={cn("font-display font-semibold text-foreground", compact ? "text-sm" : "text-base")}>
+        <p
+          className={cn(
+            "font-display font-semibold text-foreground",
+            compact ? "text-sm" : "text-base",
+          )}
+        >
           {title}
         </p>
         {description && (

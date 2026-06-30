@@ -92,12 +92,7 @@ function SyncStatusBody({ queryName }: { queryName: string }) {
     .filter(Boolean) as Platform[];
 
   return (
-    <div
-      className={cn(
-        "lotus-surface p-4",
-        isStale && "border-warning/40 bg-warning/[0.04]",
-      )}
-    >
+    <div className={cn("lotus-surface p-4", isStale && "border-warning/40 bg-warning/[0.04]")}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
           {isStale ? (
@@ -146,8 +141,8 @@ function SyncStatusBody({ queryName }: { queryName: string }) {
 
       {isStale && (
         <p className="mt-3 text-[11.5px] leading-relaxed text-warning">
-          Os dados têm mais de 3 dias sem atualização. Verifique as integrações ou aguarde a
-          próxima coleta automática.
+          Os dados têm mais de 3 dias sem atualização. Verifique as integrações ou aguarde a próxima
+          coleta automática.
         </p>
       )}
     </div>
