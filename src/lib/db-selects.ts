@@ -1,4 +1,6 @@
-/** Colunas explícitas para reduzir payload — espelham views/tabelas usadas no app. */
+/** Colunas explícitas para reduzir payload — espelham views/tabelas usadas no app.
+ *  VW_CLIENTES_ADMIN_SELECT e CADASTRO_CLIENTES_SELECT exigem migration 05 aplicada.
+ *  Queries de clientes usam select("*") até a migration estar em todos os ambientes. */
 
 export const VW_CLIENTES_ADMIN_SELECT =
   "id,nome_cliente,slug,ativo,empresa,email_principal,telefone,data_inicio,valor_mensal,mlabs_url,observacoes,google_ads_ativo,meta_ativo,ga4_ativo,instagram_ativo,google_business_ativo,tiktok_ativo,instagram_username,instagram_page_id,facebook_ad_account_id,google_ads_customer_id,ga4_property_id,google_business_location_id,tiktok_ad_account_id,created_at,updated_at,servicos,qtd_acessos";

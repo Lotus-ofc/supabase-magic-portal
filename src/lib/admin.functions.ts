@@ -6,10 +6,8 @@ import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import { repairOwnerAdminRole, resolveIsAdmin } from "@/lib/owner-admin";
 import { z } from "zod";
 import {
-  CADASTRO_CLIENTES_SELECT,
   DEBUG_DAILY_VIEW_SAMPLE_SELECT,
   SERVICOS_SELECT,
-  VW_CLIENTES_ADMIN_SELECT,
 } from "@/lib/db-selects";
 import { OVERVIEW_CLIENTE_SELECT } from "@/lib/metrics";
 
@@ -51,7 +49,8 @@ export const listClientes = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data, error } = await context.supabase
       .from("vw_clientes_admin")
-      .select(VW_CLIENTES_ADMIN_SELECT);
+      .select("*")
+      .order("nome_cliente", { ascending: true });
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -63,7 +62,8 @@ export const getCliente = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const { data: cliente, error } = await context.supabase
       .from("cadastro_clientes")
-      .select(CADASTRO_CLIENTES_SELECT)
+      .select("*")
+      .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!cliente) throw new Error("Cliente não encontrado");
@@ -158,7 +158,7 @@ export const createCliente = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase
       .from("cadastro_clientes")
       .insert(payload)
-      .select(CADASTRO_CLIENTES_SELECT)
+      .select("*")
       .single();
     if (error) throw new Error(translatePgError(error.message));
     return row;
@@ -177,7 +177,7 @@ export const updateCliente = createServerFn({ method: "POST" })
       .from("cadastro_clientes")
       .update(patch)
       .eq("id", id)
-      .select(CADASTRO_CLIENTES_SELECT)
+      .select("*")
       .single();
     if (error) throw new Error(translatePgError(error.message));
     return row;
