@@ -21,6 +21,10 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Plano Estratégico (Centro de Inteligência):** módulo completo com diagnóstico automático,
+  radar executivo, objetivos, hipóteses, estratégias com peso %, oportunidades, roadmap, decisões,
+  aprendizados, próximos passos, timeline colaborativa e integração editorial (`estrategia_id`).
+  Migration `11_plano_estrategico.sql`, ADR-0013, docs em `06-dashboards/plano-estrategico.md`.
 - **Refinamento SaaS (camada app):** `MetricLabel`, tooltips em todos os KPIs (`METRIC_META`),
   `EmptyState`, `DashboardSkeleton`, `SyncStatusBar`, `GlobalSearch` (Ctrl+K),
   `NotificationCenter`, workflow de aprovações com preview ampliável e timeline,

@@ -19,6 +19,7 @@ flowchart TB
     A["/admin"] --> B["Dashboard executivo"]
     A --> R["/admin/relatorios"]
     A --> E["/admin/editorial"]
+    A --> PE["/admin/plano-estrategico"]
     A --> C["/admin/clientes"]
     A --> U["/admin/usuarios"]
     A --> S["/admin/servicos"]
@@ -71,6 +72,23 @@ Funcionalidades:
 Calendário de conteúdo: criar, editar, transicionar status, comentários.
 
 Status do fluxo (enum): rascunho → aguardando_aprovacao → aprovado / rejeitado / publicado.
+
+Posts podem ser vinculados a uma **estratégia** do Plano Estratégico (`estrategia_id`).
+Filtro por estratégia: `/admin/editorial?estrategia={uuid}`.
+
+---
+
+## Plano Estratégico (`/admin/plano-estrategico`)
+
+| Item    | Detalhe                                              |
+| ------- | ---------------------------------------------------- |
+| Arquivo | `admin/plano-estrategico.tsx`                        |
+| Backend | `strategic-plan.functions.ts`                        |
+| Tabelas | `planos_estrategicos` + entidades relacionadas       |
+| Docs    | [plano-estrategico.md](./plano-estrategico.md)        |
+
+Centro de inteligência estratégica: diagnóstico automático, objetivos, estratégias com peso,
+hipóteses, oportunidades, decisões, aprendizados, radar e integração editorial.
 
 ---
 
