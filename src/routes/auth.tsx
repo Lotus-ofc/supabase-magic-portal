@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LotsBIWordmark } from "@/components/lotus/LotusMark";
 import { BRAND_NAME, BRAND_TAGLINE, brandTitle } from "@/lib/brand";
@@ -11,6 +11,10 @@ export const Route = createFileRoute("/auth")({
 });
 
 type AuthMode = "signin" | "invite" | "recovery";
+type AuthPhase = "bootstrapping" | "ready";
+
+/** Marca fluxo de convite iniciado via detectSessionInUrl (SIGNED_IN). */
+const INVITE_FLOW_SESSION_KEY = "lots-auth-invite-flow";
 
 function readAuthTypeFromUrl(): AuthMode {
   if (typeof window === "undefined") return "signin";
@@ -22,8 +26,34 @@ function readAuthTypeFromUrl(): AuthMode {
   return "signin";
 }
 
+function markInviteFlowActive(): void {
+  try {
+    sessionStorage.setItem(INVITE_FLOW_SESSION_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+function clearInviteFlowMarker(): void {
+  try {
+    sessionStorage.removeItem(INVITE_FLOW_SESSION_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function isInviteFlowActive(): boolean {
+  try {
+    return sessionStorage.getItem(INVITE_FLOW_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function AuthPage() {
   const router = useRouter();
+  const signingInRef = useRef(false);
+  const [phase, setPhase] = useState<AuthPhase>("bootstrapping");
   const [mode, setMode] = useState<AuthMode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,15 +62,63 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const detected = readAuthTypeFromUrl();
-    if (detected !== "signin") setMode(detected);
+    let cancelled = false;
 
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setMode("recovery");
+      if (event === "PASSWORD_RECOVERY") {
+        setMode("recovery");
+        return;
+      }
+      if (event === "SIGNED_IN" && !signingInRef.current) {
+        markInviteFlowActive();
+        setMode("invite");
+      }
     });
 
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    async function bootstrapAuthUi() {
+      const urlMode = readAuthTypeFromUrl();
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (cancelled) return;
+
+      if (urlMode === "recovery") {
+        setMode("recovery");
+        setPhase("ready");
+        return;
+      }
+
+      if (urlMode === "invite") {
+        markInviteFlowActive();
+        setMode("invite");
+        setPhase("ready");
+        return;
+      }
+
+      if (session?.user) {
+        if (isInviteFlowActive() || session.user.invited_at) {
+          setMode("invite");
+          setPhase("ready");
+          return;
+        }
+
+        router.navigate({ to: "/dashboard" });
+        return;
+      }
+
+      setMode("signin");
+      setPhase("ready");
+    }
+
+    void bootstrapAuthUi();
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [router]);
 
   const clearAuthFragment = () => {
     if (typeof window === "undefined") return;
@@ -51,6 +129,7 @@ function AuthPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    signingInRef.current = true;
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -58,6 +137,7 @@ function AuthPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado");
     } finally {
+      signingInRef.current = false;
       setLoading(false);
     }
   };
@@ -77,6 +157,7 @@ function AuthPage() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+      clearInviteFlowMarker();
       clearAuthFragment();
       router.navigate({ to: "/dashboard" });
     } catch (err) {
@@ -87,6 +168,17 @@ function AuthPage() {
   };
 
   const isSetPassword = mode === "invite" || mode === "recovery";
+
+  if (phase === "bootstrapping") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="space-y-3 text-center">
+          <LotsBIWordmark size="lg" className="mx-auto" />
+          <p className="text-sm text-muted-foreground">Preparando acesso…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
