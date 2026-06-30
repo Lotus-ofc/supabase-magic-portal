@@ -40,6 +40,7 @@ import { Route as AuthenticatedClienteClienteGoogleBusinessRouteImport } from '.
 import { Route as AuthenticatedClienteClienteGoogleAdsRouteImport } from './routes/_authenticated/cliente.$cliente.google-ads'
 import { Route as AuthenticatedClienteClienteGa4RouteImport } from './routes/_authenticated/cliente.$cliente.ga4'
 import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin/usuarios.novo'
+import { Route as AuthenticatedAdminUsuariosUserIdRouteImport } from './routes/_authenticated/admin/usuarios.$userId'
 import { Route as AuthenticatedAdminKnowledgeSplatRouteImport } from './routes/_authenticated/admin/knowledge/$'
 import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
@@ -222,6 +223,12 @@ const AuthenticatedAdminUsuariosNovoRoute =
     path: '/usuarios/novo',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminUsuariosUserIdRoute =
+  AuthenticatedAdminUsuariosUserIdRouteImport.update({
+    id: '/usuarios/$userId',
+    path: '/usuarios/$userId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminKnowledgeSplatRoute =
   AuthenticatedAdminKnowledgeSplatRouteImport.update({
     id: '/$',
@@ -281,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
+  '/admin/usuarios/$userId': typeof AuthenticatedAdminUsuariosUserIdRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -314,6 +322,7 @@ export interface FileRoutesByTo {
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
+  '/admin/usuarios/$userId': typeof AuthenticatedAdminUsuariosUserIdRoute
   '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -353,6 +362,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/_authenticated/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
+  '/_authenticated/admin/usuarios/$userId': typeof AuthenticatedAdminUsuariosUserIdRoute
   '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/_authenticated/cliente/$cliente/ga4': typeof AuthenticatedClienteClienteGa4Route
   '/_authenticated/cliente/$cliente/google-ads': typeof AuthenticatedClienteClienteGoogleAdsRoute
@@ -393,6 +403,7 @@ export interface FileRouteTypes {
     | '/admin/clientes/novo'
     | '/admin/debug/views'
     | '/admin/knowledge/$'
+    | '/admin/usuarios/$userId'
     | '/admin/usuarios/novo'
     | '/cliente/$cliente/ga4'
     | '/cliente/$cliente/google-ads'
@@ -426,6 +437,7 @@ export interface FileRouteTypes {
     | '/admin/clientes/novo'
     | '/admin/debug/views'
     | '/admin/knowledge/$'
+    | '/admin/usuarios/$userId'
     | '/admin/usuarios/novo'
     | '/cliente/$cliente/ga4'
     | '/cliente/$cliente/google-ads'
@@ -464,6 +476,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes/novo'
     | '/_authenticated/admin/debug/views'
     | '/_authenticated/admin/knowledge/$'
+    | '/_authenticated/admin/usuarios/$userId'
     | '/_authenticated/admin/usuarios/novo'
     | '/_authenticated/cliente/$cliente/ga4'
     | '/_authenticated/cliente/$cliente/google-ads'
@@ -706,6 +719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosNovoRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/usuarios/$userId': {
+      id: '/_authenticated/admin/usuarios/$userId'
+      path: '/usuarios/$userId'
+      fullPath: '/admin/usuarios/$userId'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosUserIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/knowledge/$': {
       id: '/_authenticated/admin/knowledge/$'
       path: '/$'
@@ -795,6 +815,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminClientesIdRoute: typeof AuthenticatedAdminClientesIdRoute
   AuthenticatedAdminClientesNovoRoute: typeof AuthenticatedAdminClientesNovoRoute
+  AuthenticatedAdminUsuariosUserIdRoute: typeof AuthenticatedAdminUsuariosUserIdRoute
   AuthenticatedAdminUsuariosNovoRoute: typeof AuthenticatedAdminUsuariosNovoRoute
   AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
   AuthenticatedAdminUsuariosIndexRoute: typeof AuthenticatedAdminUsuariosIndexRoute
@@ -813,6 +834,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminClientesIdRoute: AuthenticatedAdminClientesIdRoute,
     AuthenticatedAdminClientesNovoRoute: AuthenticatedAdminClientesNovoRoute,
+    AuthenticatedAdminUsuariosUserIdRoute:
+      AuthenticatedAdminUsuariosUserIdRoute,
     AuthenticatedAdminUsuariosNovoRoute: AuthenticatedAdminUsuariosNovoRoute,
     AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
     AuthenticatedAdminUsuariosIndexRoute: AuthenticatedAdminUsuariosIndexRoute,

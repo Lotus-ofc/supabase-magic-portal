@@ -405,3 +405,232 @@ export async function ensureAccessAccountRow(
   );
   if (error) throw new Error(error.message);
 }
+
+export type AccessRecoveryAction =
+  | "recalculate_lifecycle"
+  | "revalidate_metadata"
+  | "resend_invite"
+  | "restart_onboarding"
+  | "invalidate_sessions"
+  | "force_password_reset"
+  | "reactivate"
+  | "revoke"
+  | "disable"
+  | "auto_fix";
+
+async function invalidateAllSessions(userId: string) {
+  const admin = getSupabaseAdmin();
+  const { error } = await admin.auth.admin.signOut(userId, "global");
+  if (error) throw new Error(error.message);
+}
+
+async function patchLegacyMetadataIfNeeded(userId: string) {
+  const admin = getSupabaseAdmin();
+  const { data, error } = await admin.auth.admin.getUserById(userId);
+  if (error) throw new Error(error.message);
+  const user = data.user;
+  if (!user) throw new Error("Usuário não encontrado.");
+
+  const { parseLotsBiMetadata, buildLotsBiMetadataPatch, isOnboardingComplete } =
+    await import("@/features/access/lots-bi-metadata");
+  const lotsBi = parseLotsBiMetadata(user.user_metadata);
+  if (isOnboardingComplete(lotsBi) || !user.last_sign_in_at) return false;
+
+  const stamp = user.last_sign_in_at ?? new Date().toISOString();
+  const patch = buildLotsBiMetadataPatch(
+    { password_set_at: lotsBi.password_set_at ?? stamp, onboarding_completed_at: stamp },
+    user.user_metadata,
+  );
+  const { error: updateError } = await admin.auth.admin.updateUserById(userId, {
+    user_metadata: patch,
+  });
+  if (updateError) throw new Error(updateError.message);
+  return true;
+}
+
+// ---------- Admin: Recovery Mode ----------
+export const performAccessRecovery = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        action: z.enum([
+          "recalculate_lifecycle",
+          "revalidate_metadata",
+          "resend_invite",
+          "restart_onboarding",
+          "invalidate_sessions",
+          "force_password_reset",
+          "reactivate",
+          "revoke",
+          "disable",
+          "auto_fix",
+        ]),
+        client_origin: z.string().url().optional().nullable(),
+        blocked_reason: z.string().max(500).optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdminAccess(context);
+    const admin = getSupabaseAdmin();
+    const { data: userData, error: userError } = await admin.auth.admin.getUserById(data.user_id);
+    if (userError) throw new Error(userError.message);
+    const authUser = userData.user;
+    if (!authUser?.email) throw new Error("Usuário sem e-mail.");
+
+    const action = data.action as AccessRecoveryAction;
+
+    switch (action) {
+      case "recalculate_lifecycle":
+      case "auto_fix": {
+        const account = await fetchAccessAccount(data.user_id);
+        const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+        if (action === "auto_fix") {
+          await patchLegacyMetadataIfNeeded(data.user_id);
+        }
+        const { data: refreshed } = await admin.auth.admin.getUserById(data.user_id);
+        const result = reconcileLifecycle(
+          data.user_id,
+          current,
+          authUserFromSupabase(refreshed.user ?? authUser),
+        );
+        if (result.changed) {
+          await upsertLifecycle(data.user_id, result.suggested_status);
+        }
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "lifecycle_reconciled",
+          detail: result.reasons.join(" ") || "Recálculo concluído.",
+          metadata: { action, ...result },
+        });
+        return { ok: true as const, result };
+      }
+      case "revalidate_metadata": {
+        const patched = await patchLegacyMetadataIfNeeded(data.user_id);
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "metadata_revalidated",
+          detail: patched ? "Metadata lots_bi atualizada." : "Metadata já consistente.",
+        });
+        return { ok: true as const, patched };
+      }
+      case "resend_invite": {
+        const { resendAuthInviteEmail } = await import("@/lib/auth-invite.server");
+        await resendAuthInviteEmail(
+          admin,
+          authUser.email,
+          data.user_id,
+          { full_name: (authUser.user_metadata?.full_name as string | undefined) ?? null },
+          data.client_origin,
+        );
+        await upsertLifecycle(data.user_id, "invite_pending");
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "invite_resent",
+        });
+        return { ok: true as const };
+      }
+      case "restart_onboarding": {
+        await invalidateAllSessions(data.user_id);
+        const cleared = {
+          ...(authUser.user_metadata ?? {}),
+          lots_bi: {},
+        };
+        await admin.auth.admin.updateUserById(data.user_id, { user_metadata: cleared });
+        await upsertLifecycle(data.user_id, "invite_pending");
+        const { resendAuthInviteEmail } = await import("@/lib/auth-invite.server");
+        await resendAuthInviteEmail(
+          admin,
+          authUser.email,
+          data.user_id,
+          { full_name: (authUser.user_metadata?.full_name as string | undefined) ?? null },
+          data.client_origin,
+        );
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "onboarding_restarted",
+        });
+        return { ok: true as const };
+      }
+      case "invalidate_sessions": {
+        await invalidateAllSessions(data.user_id);
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "sessions_revoked",
+        });
+        return { ok: true as const };
+      }
+      case "force_password_reset": {
+        await invalidateAllSessions(data.user_id);
+        const { resolveAuthInviteRedirectUrl } = await import("@/lib/app-url.server");
+        const redirectTo = resolveAuthInviteRedirectUrl();
+        const { error: linkError } = await admin.auth.admin.generateLink({
+          type: "recovery",
+          email: authUser.email,
+          options: { redirectTo },
+        });
+        if (linkError) throw new Error(linkError.message);
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "password_reset_requested",
+        });
+        return { ok: true as const };
+      }
+      case "revoke": {
+        await admin.auth.admin.updateUserById(data.user_id, { ban_duration: "876600h" });
+        await invalidateAllSessions(data.user_id);
+        await upsertLifecycle(
+          data.user_id,
+          "revoked",
+          data.blocked_reason ?? "Revogado pelo admin",
+        );
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "access_revoked",
+          detail: data.blocked_reason ?? undefined,
+        });
+        return { ok: true as const };
+      }
+      case "disable": {
+        await upsertLifecycle(
+          data.user_id,
+          "disabled",
+          data.blocked_reason ?? "Desativado pelo admin",
+        );
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "access_disabled",
+          detail: data.blocked_reason ?? undefined,
+        });
+        return { ok: true as const };
+      }
+      case "reactivate": {
+        await admin.auth.admin.updateUserById(data.user_id, { ban_duration: "none" });
+        const { isOnboardingComplete, parseLotsBiMetadata } =
+          await import("@/features/access/lots-bi-metadata");
+        const lotsBi = parseLotsBiMetadata(authUser.user_metadata);
+        const next: AccessLifecycleStatus = isOnboardingComplete(lotsBi)
+          ? "active"
+          : "awaiting_password";
+        await upsertLifecycle(data.user_id, next, null);
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "access_reactivated",
+        });
+        return { ok: true as const, lifecycle: next };
+      }
+      default:
+        throw new Error(`Ação desconhecida: ${action}`);
+    }
+  });

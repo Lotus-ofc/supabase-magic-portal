@@ -468,6 +468,9 @@ export const createUserAccount = createServerFn({ method: "POST" })
 
     if (!userId) throw new Error("Falha ao obter id do usuário criado.");
 
+    const { ensureAccessAccountRow } = await import("@/lib/access.functions.server");
+    await ensureAccessAccountRow(userId, inviteSent ? "invite_pending" : "active");
+
     if (data.tipo === "admin" || isPlatformOwnerEmail(data.email)) {
       const { error: er } = await supabaseAdmin
         .from("user_roles")
