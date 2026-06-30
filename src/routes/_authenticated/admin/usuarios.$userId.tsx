@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/usuarios/$userId")({
 
 function UsuarioDetalhePage() {
   const { userId } = Route.useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const profileFn = useServerFn(getUserAccessProfile);
   const auditFn = useServerFn(getUserAccessAuditLog);
@@ -64,11 +65,17 @@ function UsuarioDetalhePage() {
           client_origin: typeof window !== "undefined" ? window.location.origin : undefined,
         },
       }),
-    onSuccess: () => {
+    onSuccess: (result, action) => {
+      if (action === "delete_user") {
+        toast.success("Usuário excluído. O e-mail pode receber um novo convite.");
+        void navigate({ to: "/admin/usuarios" });
+        return;
+      }
       toast.success("Ação executada com sucesso.");
       void queryClient.invalidateQueries({ queryKey: ["admin", "access-profile", userId] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "access-audit", userId] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "access-profiles"] });
+      void result;
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Falha na ação"),
   });
@@ -104,7 +111,16 @@ function UsuarioDetalhePage() {
         <UserAccessDiagnostics profile={p} />
         <RecoveryModePanel
           busy={recoveryMut.isPending}
-          onAction={(action) => recoveryMut.mutate(action)}
+          defaultExpanded={p.effective_status !== "active"}
+          onAction={(action) => {
+            if (action === "delete_user") {
+              const ok = window.confirm(
+                "Excluir permanentemente este usuário? O e-mail poderá receber um novo convite.",
+              );
+              if (!ok) return;
+            }
+            recoveryMut.mutate(action);
+          }}
         />
       </div>
 

@@ -4,7 +4,11 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { requireServerSupabaseAnonConfig } from "@/integrations/supabase/env.server";
-import { buildAuthInviteRedirectUrl, normalizeAppUrl } from "@/lib/app-url";
+import {
+  buildAuthInviteRedirectUrl,
+  buildAuthRecoveryCallbackUrl,
+  normalizeAppUrl,
+} from "@/lib/app-url";
 import { resolveAuthInviteRedirectUrl, resolveServerAppUrl } from "@/lib/app-url.server";
 import { recordInviteAudit } from "@/lib/infra/invite-audit";
 import { recordInviteAccessAudit } from "@/features/access/access-audit.server";
@@ -256,4 +260,35 @@ export async function resendAuthInviteEmail(
     msg,
   );
   throw new AuthInviteError(msg, "invite_failed");
+}
+
+/** Envia e-mail de recovery com redirect estável (?flow=recovery). */
+export async function sendPasswordResetEmail(
+  email: string,
+  clientOrigin?: string | null,
+): Promise<{ redirectTo: string }> {
+  const { appUrl } = await assertCanSendInvites(clientOrigin);
+  const recoveryRedirect = buildAuthRecoveryCallbackUrl(appUrl);
+
+  const { url, anonKey } = requireServerSupabaseAnonConfig();
+  const anon = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error } = await anon.auth.resetPasswordForEmail(email, {
+    redirectTo: recoveryRedirect,
+  });
+  if (error) {
+    if (isInviteConfigError(error.message)) {
+      throw new AuthInviteError(
+        `Link de recovery rejeitado (${recoveryRedirect}). Adicione esta URL em Supabase → Redirect URLs. Detalhe: ${error.message}`,
+        "invite_config",
+      );
+    }
+    throw new AuthInviteError(
+      `Falha ao enviar e-mail de recovery: ${error.message}`,
+      "invite_failed",
+    );
+  }
+
+  return { redirectTo: recoveryRedirect };
 }

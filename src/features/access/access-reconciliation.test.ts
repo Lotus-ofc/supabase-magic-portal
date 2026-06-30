@@ -18,10 +18,13 @@ const user = (
 });
 
 describe("access-reconciliation", () => {
-  it("detecta active sem metadata → awaiting_password", () => {
+  it("detecta active sem metadata → invite_pending (sem login) ou awaiting_password (com login)", () => {
     const r = reconcileLifecycle("u1", "active", user());
     expect(r.changed).toBe(true);
-    expect(r.suggested_status).toBe("awaiting_password");
+    expect(r.suggested_status).toBe("invite_pending");
+
+    const r2 = reconcileLifecycle("u1", "active", user({}, "2025-01-03T00:00:00Z"));
+    expect(r2.suggested_status).toBe("awaiting_password");
   });
 
   it("detecta onboarding completo em awaiting_password → active", () => {

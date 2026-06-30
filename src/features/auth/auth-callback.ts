@@ -1,3 +1,5 @@
+import type { InferredAuthFlow } from "./auth-callback-inference";
+
 export type AuthCallbackType = "invite" | "recovery" | "signup" | "email" | "magiclink";
 
 export interface AuthCallbackParams {
@@ -6,6 +8,8 @@ export interface AuthCallbackParams {
   code: string | null;
   error: string | null;
   error_description: string | null;
+  has_implicit_tokens: boolean;
+  flow_hint: string | null;
 }
 
 const CALLBACK_TYPES = new Set<string>(["invite", "recovery", "signup", "email", "magiclink"]);
@@ -20,8 +24,10 @@ export function parseAuthCallbackParams(
   const code = search.get("code") ?? hash.get("code");
   const error = search.get("error") ?? hash.get("error");
   const error_description = search.get("error_description") ?? hash.get("error_description");
+  const has_implicit_tokens = Boolean(hash.get("access_token") || search.get("access_token"));
+  const flow_hint = search.get("flow") ?? hash.get("flow");
 
-  return { token_hash, type, code, error, error_description };
+  return { token_hash, type, code, error, error_description, has_implicit_tokens, flow_hint };
 }
 
 export function hasLegacyAuthTokensOnAuthRoute(search: URLSearchParams): boolean {
@@ -32,7 +38,7 @@ export function hasLegacyAuthTokensOnAuthRoute(search: URLSearchParams): boolean
 
 export function buildCallbackForwardSearch(search: URLSearchParams): string {
   const params = new URLSearchParams();
-  for (const key of ["token_hash", "type", "code", "error", "error_description"]) {
+  for (const key of ["token_hash", "type", "code", "error", "error_description", "flow"]) {
     const value = search.get(key);
     if (value) params.set(key, value);
   }
@@ -40,15 +46,27 @@ export function buildCallbackForwardSearch(search: URLSearchParams): string {
   return qs ? `?${qs}` : "";
 }
 
-export function resolvePostCallbackRedirect(type: AuthCallbackType | null): {
-  view: "set-password" | "login";
+export type PostCallbackView = "set-password" | "onboarding" | "login";
+
+export function resolvePostCallbackRedirect(flow: InferredAuthFlow): {
+  view: PostCallbackView;
   context?: "invite" | "recovery";
 } {
-  if (type === "invite" || type === "signup") {
+  if (flow === "invite" || flow === "signup") {
     return { view: "set-password", context: "invite" };
   }
-  if (type === "recovery") {
+  if (flow === "recovery") {
     return { view: "set-password", context: "recovery" };
   }
+  return { view: "login" };
+}
+
+/** Resolve próximo passo auth quando já existe sessão (pós-login ou pós-callback). */
+export function resolveAuthRouteForSession(
+  needsPassword: boolean,
+  needsOnboarding: boolean,
+): { view: PostCallbackView; context?: "invite" | "recovery" } {
+  if (needsPassword) return { view: "set-password", context: "invite" };
+  if (needsOnboarding) return { view: "onboarding" };
   return { view: "login" };
 }

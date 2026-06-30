@@ -2,10 +2,10 @@ import type { AccessLifecycleStatus, AuthUserSnapshot } from "./types";
 import { isOnboardingComplete, parseLotsBiMetadata } from "./lots-bi-metadata";
 
 const TRANSITIONS: Record<AccessLifecycleStatus, ReadonlySet<AccessLifecycleStatus>> = {
-  invite_pending: new Set(["awaiting_password", "invite_expired", "active", "revoked", "disabled"]),
+  invite_pending: new Set(["awaiting_password", "invite_expired", "revoked", "disabled"]),
   awaiting_password: new Set(["active", "invite_expired", "invite_pending", "revoked", "disabled"]),
   invite_expired: new Set(["invite_pending", "revoked", "disabled"]),
-  active: new Set(["revoked", "disabled", "awaiting_password"]),
+  active: new Set(["revoked", "disabled", "awaiting_password", "invite_pending"]),
   revoked: new Set(["active", "disabled", "invite_pending", "awaiting_password"]),
   disabled: new Set(["active", "invite_pending", "awaiting_password", "revoked"]),
 };

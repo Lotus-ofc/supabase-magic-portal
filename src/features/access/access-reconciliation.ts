@@ -27,8 +27,14 @@ export function reconcileLifecycle(
   }
 
   if (currentStatus === "active" && !isOnboardingComplete(lotsBi)) {
-    reasons.push("Lifecycle active mas onboarding metadata incompleto.");
-    suggested = "awaiting_password";
+    reasons.push("Lifecycle active sem onboarding completo — rebaixando.");
+    if (isPasswordSet(lotsBi)) {
+      suggested = "awaiting_password";
+    } else if (authUser.last_sign_in_at) {
+      suggested = "awaiting_password";
+    } else {
+      suggested = "invite_pending";
+    }
   }
 
   if (
@@ -52,10 +58,10 @@ export function reconcileLifecycle(
   if (
     currentStatus === "invite_pending" &&
     authUser.last_sign_in_at &&
-    isOnboardingComplete(lotsBi)
+    !isOnboardingComplete(lotsBi)
   ) {
-    reasons.push("Convite pendente inconsistente com onboarding completo.");
-    suggested = "active";
+    reasons.push("Convite aceito (sessão detectada) — aguardando senha/onboarding.");
+    suggested = "awaiting_password";
   }
 
   suggested = resolveEffectiveStatus(suggested, authUser);

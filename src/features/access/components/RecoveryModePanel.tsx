@@ -21,12 +21,24 @@ const RECOVERY_ACTIONS: {
   {
     action: "revalidate_metadata",
     label: "Revalidar metadata",
-    description: "Atualiza flags lots_bi para usuários legados com login.",
+    description: "Verifica flags lots_bi do usuário.",
   },
   {
     action: "resend_invite",
     label: "Reenviar convite",
     description: "Novo e-mail via Supabase Auth (redirect /auth/callback).",
+  },
+  {
+    action: "cancel_invite",
+    label: "Cancelar convite",
+    description: "Invalida sessões e marca convite como expirado.",
+    variant: "destructive",
+  },
+  {
+    action: "delete_user",
+    label: "Excluir usuário",
+    description: "Remove completamente para permitir novo convite ao mesmo e-mail.",
+    variant: "destructive",
   },
   {
     action: "restart_onboarding",
@@ -65,11 +77,13 @@ const RECOVERY_ACTIONS: {
 export function RecoveryModePanel({
   onAction,
   busy,
+  defaultExpanded = true,
 }: {
   onAction: (action: AccessRecoveryAction) => void;
   busy: boolean;
+  defaultExpanded?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
     <div className="lotus-surface space-y-4 p-4">

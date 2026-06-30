@@ -24,8 +24,13 @@ describe("access-lifecycle", () => {
     expect(canTransitionLifecycle("invite_pending", "awaiting_password")).toBe(true);
   });
 
-  it("bloqueia transição invite_expired → active direta", () => {
+  it("bloqueia transição invite_pending → active direta", () => {
     expect(canTransitionLifecycle("invite_expired", "active")).toBe(false);
+    expect(canTransitionLifecycle("invite_pending", "active")).toBe(false);
+  });
+
+  it("permite restart onboarding active → invite_pending", () => {
+    expect(canTransitionLifecycle("active", "invite_pending")).toBe(true);
   });
 
   it("resolve banned como revoked", () => {

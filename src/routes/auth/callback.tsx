@@ -39,25 +39,23 @@ function AuthCallbackPage() {
         return;
       }
 
-      if (result.type === "invite" || result.type === "signup") {
+      if (result.flow === "invite" || result.flow === "signup") {
         try {
           await markInviteAccepted();
         } catch {
-          /* lifecycle pode já estar atualizado */
+          /* idempotente — lifecycle pode já estar atualizado */
         }
       }
 
-      const redirect = resolvePostCallbackRedirect(result.type);
-      if (redirect.view === "set-password") {
-        router.navigate({
-          to: "/auth",
-          search: { view: redirect.view, context: redirect.context },
-          replace: true,
-        });
-        return;
-      }
-
-      router.navigate({ to: "/auth", search: { view: "login" }, replace: true });
+      const redirect = resolvePostCallbackRedirect(result.flow);
+      router.navigate({
+        to: "/auth",
+        search: {
+          view: redirect.view,
+          ...(redirect.context ? { context: redirect.context } : {}),
+        },
+        replace: true,
+      });
     }
 
     void run();

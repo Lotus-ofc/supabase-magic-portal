@@ -139,21 +139,6 @@ export const assertAccessActive = createServerFn({ method: "GET" })
         };
       }
 
-      // Compat: usuários legados com login anterior mas sem metadata lots_bi
-      const legacyActive =
-        profile.lifecycle_status === "active" &&
-        Boolean(profile.last_sign_in_at) &&
-        !profile.onboarding_completed_at;
-
-      if (legacyActive) {
-        return {
-          ok: true,
-          lifecycle_status: profile.lifecycle_status,
-          effective_status: "active",
-          legacy: true,
-        };
-      }
-
       return {
         ok: false,
         lifecycle_status: profile.lifecycle_status,
@@ -350,28 +335,93 @@ export const getUserAccessAuditLog = createServerFn({ method: "GET" })
     return fetchAuditForUser(data.user_id, data.limit);
   });
 
-// ---------- Callback / convite: aceitar invite (server) ----------
+// ---------- Callback / convite: aceitar invite (server, idempotente) ----------
 export const markInviteAccepted = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await upsertLifecycle(context.userId, "awaiting_password");
+    const [account, auditRows] = await Promise.all([
+      fetchAccessAccount(context.userId),
+      fetchAuditForUser(context.userId, 100),
+    ]);
+
+    const alreadyAccepted = auditRows.some((r) => r.action === "invite_accepted");
+    const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+
+    if (current === "invite_pending") {
+      await upsertLifecycle(context.userId, "awaiting_password");
+    }
+
+    if (!alreadyAccepted) {
+      await recordAccessAuditEntry({
+        user_id: context.userId,
+        actor_id: context.userId,
+        action: "invite_accepted",
+      });
+    }
+
+    return { ok: true as const, skipped: alreadyAccepted };
+  });
+
+// ---------- Senha inicial definida (mantém awaiting_password até onboarding) ----------
+export const markPasswordSet = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const account = await fetchAccessAccount(context.userId);
+    const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+
+    if (current === "invite_pending") {
+      await upsertLifecycle(context.userId, "awaiting_password");
+    }
+
     await recordAccessAuditEntry({
       user_id: context.userId,
       actor_id: context.userId,
-      action: "invite_accepted",
+      action: "password_changed",
+      detail: "Senha inicial definida",
     });
+
     return { ok: true as const };
   });
 
-// ---------- Set password concluído (server) ----------
+// ---------- Onboarding concluído → lifecycle active ----------
 export const markFirstAccessCompleted = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const admin = getSupabaseAdmin();
+    const { data, error } = await admin.auth.admin.getUserById(context.userId);
+    if (error) throw new Error(error.message);
+    if (!data.user) throw new Error("Usuário não encontrado.");
+
+    const { isOnboardingComplete, parseLotsBiMetadata } =
+      await import("@/features/access/lots-bi-metadata");
+    const lotsBi = parseLotsBiMetadata(data.user.user_metadata);
+    if (!isOnboardingComplete(lotsBi)) {
+      throw new Error("Onboarding incompleto — defina senha e conclua o primeiro acesso.");
+    }
+
     await upsertLifecycle(context.userId, "active");
     await recordAccessAuditEntry({
       user_id: context.userId,
       actor_id: context.userId,
       action: "first_access_completed",
+    });
+    return { ok: true as const };
+  });
+
+// ---------- Recovery: senha redefinida pelo usuário ----------
+export const markPasswordRecoveryCompleted = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await recordAccessAuditEntry({
+      user_id: context.userId,
+      actor_id: context.userId,
+      action: "password_reset_completed",
+    });
+    await recordAccessAuditEntry({
+      user_id: context.userId,
+      actor_id: context.userId,
+      action: "password_changed",
+      detail: "Senha redefinida via recovery",
     });
     return { ok: true as const };
   });
@@ -410,6 +460,8 @@ export type AccessRecoveryAction =
   | "recalculate_lifecycle"
   | "revalidate_metadata"
   | "resend_invite"
+  | "cancel_invite"
+  | "delete_user"
   | "restart_onboarding"
   | "invalidate_sessions"
   | "force_password_reset"
@@ -424,7 +476,7 @@ async function invalidateAllSessions(userId: string) {
   if (error) throw new Error(error.message);
 }
 
-async function patchLegacyMetadataIfNeeded(userId: string) {
+async function patchLegacyMetadataIfNeeded(userId: string): Promise<boolean> {
   const admin = getSupabaseAdmin();
   const { data, error } = await admin.auth.admin.getUserById(userId);
   if (error) throw new Error(error.message);
@@ -434,11 +486,21 @@ async function patchLegacyMetadataIfNeeded(userId: string) {
   const { parseLotsBiMetadata, buildLotsBiMetadataPatch, isOnboardingComplete } =
     await import("@/features/access/lots-bi-metadata");
   const lotsBi = parseLotsBiMetadata(user.user_metadata);
-  if (isOnboardingComplete(lotsBi) || !user.last_sign_in_at) return false;
+  if (isOnboardingComplete(lotsBi)) return false;
 
-  const stamp = user.last_sign_in_at ?? new Date().toISOString();
+  // Legado v2.1: login anterior sem metadata — nunca convite ainda pendente.
+  if (!user.last_sign_in_at) return false;
+
+  const account = await fetchAccessAccount(userId);
+  const lifecycle = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+  if (lifecycle === "invite_pending") return false;
+
+  const stamp = user.last_sign_in_at;
   const patch = buildLotsBiMetadataPatch(
-    { password_set_at: lotsBi.password_set_at ?? stamp, onboarding_completed_at: stamp },
+    {
+      password_set_at: lotsBi.password_set_at ?? stamp,
+      onboarding_completed_at: lotsBi.onboarding_completed_at ?? stamp,
+    },
     user.user_metadata,
   );
   const { error: updateError } = await admin.auth.admin.updateUserById(userId, {
@@ -446,6 +508,21 @@ async function patchLegacyMetadataIfNeeded(userId: string) {
   });
   if (updateError) throw new Error(updateError.message);
   return true;
+}
+
+async function reconcileLifecycleAfterMetadataPatch(userId: string) {
+  const admin = getSupabaseAdmin();
+  const account = await fetchAccessAccount(userId);
+  const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+  const { data: refreshed, error } = await admin.auth.admin.getUserById(userId);
+  if (error) throw new Error(error.message);
+  if (!refreshed.user) throw new Error("Usuário não encontrado.");
+
+  const result = reconcileLifecycle(userId, current, authUserFromSupabase(refreshed.user));
+  if (result.changed) {
+    await upsertLifecycle(userId, result.suggested_status);
+  }
+  return result;
 }
 
 // ---------- Admin: Recovery Mode ----------
@@ -459,6 +536,8 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
           "recalculate_lifecycle",
           "revalidate_metadata",
           "resend_invite",
+          "cancel_invite",
+          "delete_user",
           "restart_onboarding",
           "invalidate_sessions",
           "force_password_reset",
@@ -483,7 +562,27 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
     const action = data.action as AccessRecoveryAction;
 
     switch (action) {
-      case "recalculate_lifecycle":
+      case "recalculate_lifecycle": {
+        const account = await fetchAccessAccount(data.user_id);
+        const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+        const { data: refreshed } = await admin.auth.admin.getUserById(data.user_id);
+        const result = reconcileLifecycle(
+          data.user_id,
+          current,
+          authUserFromSupabase(refreshed.user ?? authUser),
+        );
+        if (result.changed) {
+          await upsertLifecycle(data.user_id, result.suggested_status);
+        }
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "lifecycle_reconciled",
+          detail: result.reasons.join(" ") || "Recálculo concluído.",
+          metadata: { action, ...result },
+        });
+        return { ok: true as const, result };
+      }
       case "auto_fix": {
         const account = await fetchAccessAccount(data.user_id);
         const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
@@ -510,15 +609,23 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
       }
       case "revalidate_metadata": {
         const patched = await patchLegacyMetadataIfNeeded(data.user_id);
+        let reconcileResult = null;
+        if (patched) {
+          reconcileResult = await reconcileLifecycleAfterMetadataPatch(data.user_id);
+        }
         await recordAccessAuditEntry({
           user_id: data.user_id,
           actor_id: context.userId,
           action: "metadata_revalidated",
-          detail: patched ? "Metadata lots_bi atualizada." : "Metadata já consistente.",
+          detail: patched
+            ? "Metadata lots_bi alinhada para usuário legado."
+            : "Metadata já consistente ou usuário ainda em convite.",
+          metadata: reconcileResult ? { reconcile: reconcileResult } : {},
         });
-        return { ok: true as const, patched };
+        return { ok: true as const, patched, reconcile: reconcileResult };
       }
       case "resend_invite": {
+        await invalidateAllSessions(data.user_id);
         const { resendAuthInviteEmail } = await import("@/lib/auth-invite.server");
         await resendAuthInviteEmail(
           admin,
@@ -532,8 +639,31 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
           user_id: data.user_id,
           actor_id: context.userId,
           action: "invite_resent",
+          detail: "Sessões anteriores invalidadas; novo convite enviado.",
         });
         return { ok: true as const };
+      }
+      case "cancel_invite": {
+        await invalidateAllSessions(data.user_id);
+        await upsertLifecycle(data.user_id, "invite_expired");
+        await recordAccessAuditEntry({
+          user_id: data.user_id,
+          actor_id: context.userId,
+          action: "invite_cancelled",
+          detail: "Convite cancelado pelo admin.",
+        });
+        return { ok: true as const };
+      }
+      case "delete_user": {
+        await invalidateAllSessions(data.user_id);
+        await Promise.all([
+          admin.from("client_access").delete().eq("user_id", data.user_id),
+          admin.from("user_roles").delete().eq("user_id", data.user_id),
+          admin.from("profiles").delete().eq("id", data.user_id),
+        ]);
+        const { error: deleteError } = await admin.auth.admin.deleteUser(data.user_id);
+        if (deleteError) throw new Error(deleteError.message);
+        return { ok: true as const, deleted: true };
       }
       case "restart_onboarding": {
         await invalidateAllSessions(data.user_id);
@@ -569,18 +699,13 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
       }
       case "force_password_reset": {
         await invalidateAllSessions(data.user_id);
-        const { resolveAuthInviteRedirectUrl } = await import("@/lib/app-url.server");
-        const redirectTo = resolveAuthInviteRedirectUrl();
-        const { error: linkError } = await admin.auth.admin.generateLink({
-          type: "recovery",
-          email: authUser.email,
-          options: { redirectTo },
-        });
-        if (linkError) throw new Error(linkError.message);
+        const { sendPasswordResetEmail } = await import("@/lib/auth-invite.server");
+        await sendPasswordResetEmail(authUser.email, data.client_origin);
         await recordAccessAuditEntry({
           user_id: data.user_id,
           actor_id: context.userId,
           action: "password_reset_requested",
+          detail: "E-mail de recovery enviado via Supabase Auth.",
         });
         return { ok: true as const };
       }
@@ -601,6 +726,7 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
         return { ok: true as const };
       }
       case "disable": {
+        await invalidateAllSessions(data.user_id);
         await upsertLifecycle(
           data.user_id,
           "disabled",

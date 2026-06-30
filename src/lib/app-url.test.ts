@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAuthCallbackUrl,
   buildAuthInviteRedirectUrl,
+  buildAuthRecoveryCallbackUrl,
   isLocalhostUrl,
   normalizeAppUrl,
 } from "./app-url";
@@ -23,6 +24,9 @@ describe("app-url", () => {
   it("monta redirect de callback auth", () => {
     expect(buildAuthCallbackUrl("https://portal.exemplo.com")).toBe(
       "https://portal.exemplo.com/auth/callback",
+    );
+    expect(buildAuthRecoveryCallbackUrl("https://portal.exemplo.com")).toBe(
+      "https://portal.exemplo.com/auth/callback?flow=recovery",
     );
     expect(buildAuthInviteRedirectUrl("https://portal.exemplo.com")).toBe(
       "https://portal.exemplo.com/auth/callback",

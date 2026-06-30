@@ -60,8 +60,15 @@ export const Route = createFileRoute("/_authenticated")({
       queryFn: () => assertAccessActive(),
     });
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (!access.ok) {
-      const blocked = resolveAccessBlockedRedirect(access.effective_status);
+      const blocked = resolveAccessBlockedRedirect(access.effective_status, {
+        hasSession: Boolean(session),
+        session,
+      });
       if (blocked.signOut) {
         await supabase.auth.signOut();
       }

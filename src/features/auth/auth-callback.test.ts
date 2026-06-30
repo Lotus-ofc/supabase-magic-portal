@@ -39,6 +39,19 @@ describe("auth-callback", () => {
       view: "set-password",
       context: "recovery",
     });
-    expect(resolvePostCallbackRedirect(null)).toEqual({ view: "login" });
+    expect(resolvePostCallbackRedirect("login")).toEqual({ view: "login" });
+  });
+
+  it("detecta tokens implícitos no hash", () => {
+    const hash = new URLSearchParams("access_token=abc&type=invite");
+    const params = parseAuthCallbackParams(new URLSearchParams(), hash);
+    expect(params.has_implicit_tokens).toBe(true);
+    expect(params.type).toBe("invite");
+  });
+
+  it("preserva flow=recovery na query do callback", () => {
+    const search = new URLSearchParams("flow=recovery");
+    const params = parseAuthCallbackParams(search, new URLSearchParams());
+    expect(params.flow_hint).toBe("recovery");
   });
 });
