@@ -38,11 +38,11 @@ Adotar transição **faseada e sem ruptura**:
 
 ## Alternativas consideradas
 
-| Alternativa | Por que não agora |
-| ----------- | ----------------- |
-| Remover Lovable imediatamente | Quebra deploy de produção |
-| Manter Lovable indefinidamente | Contraria ADR-0009 e controle de infra |
-| Migrar para Vercel antes de Cloudflare | Nitro já gera target Cloudflare |
+| Alternativa                            | Por que não agora                      |
+| -------------------------------------- | -------------------------------------- |
+| Remover Lovable imediatamente          | Quebra deploy de produção              |
+| Manter Lovable indefinidamente         | Contraria ADR-0009 e controle de infra |
+| Migrar para Vercel antes de Cloudflare | Nitro já gera target Cloudflare        |
 
 ## Consequências
 

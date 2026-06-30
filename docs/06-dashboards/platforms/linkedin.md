@@ -16,11 +16,11 @@ last_review: 2026-06-26
 
 ## Visão alvo
 
-| Item | Planejado |
-| ---- | --------- |
-| Coletor | `LinkedInCollector` (ver integrações alvo) |
-| PlatformDef | `linkedin-ads.ts` + registry |
-| Rota | `/cliente/{slug}/linkedin` (a definir) |
+| Item        | Planejado                                  |
+| ----------- | ------------------------------------------ |
+| Coletor     | `LinkedInCollector` (ver integrações alvo) |
+| PlatformDef | `linkedin-ads.ts` + registry               |
+| Rota        | `/cliente/{slug}/linkedin` (a definir)     |
 
 ## Por que ainda não existe
 

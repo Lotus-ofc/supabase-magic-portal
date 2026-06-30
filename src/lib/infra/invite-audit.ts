@@ -17,9 +17,7 @@ export interface InviteAuditEntry {
 const MAX_ENTRIES = 100;
 const buffer: InviteAuditEntry[] = [];
 
-export function recordInviteAudit(
-  entry: Omit<InviteAuditEntry, "id" | "at">,
-): InviteAuditEntry {
+export function recordInviteAudit(entry: Omit<InviteAuditEntry, "id" | "at">): InviteAuditEntry {
   const row: InviteAuditEntry = {
     ...entry,
     id: crypto.randomUUID(),

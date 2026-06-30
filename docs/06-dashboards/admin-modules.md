@@ -80,12 +80,12 @@ Filtro por estratégia: `/admin/editorial?estrategia={uuid}`.
 
 ## Plano Estratégico (`/admin/plano-estrategico`)
 
-| Item    | Detalhe                                              |
-| ------- | ---------------------------------------------------- |
-| Arquivo | `admin/plano-estrategico.tsx`                        |
-| Backend | `strategic-plan.functions.ts`                        |
-| Tabelas | `planos_estrategicos` + entidades relacionadas       |
-| Docs    | [plano-estrategico.md](./plano-estrategico.md)        |
+| Item    | Detalhe                                        |
+| ------- | ---------------------------------------------- |
+| Arquivo | `admin/plano-estrategico.tsx`                  |
+| Backend | `strategic-plan.functions.ts`                  |
+| Tabelas | `planos_estrategicos` + entidades relacionadas |
+| Docs    | [plano-estrategico.md](./plano-estrategico.md) |
 
 Centro de inteligência estratégica: diagnóstico automático, objetivos, estratégias com peso,
 hipóteses, oportunidades, decisões, aprendizados, radar e integração editorial.
@@ -156,12 +156,12 @@ Ferramentas operacionais de primeira classe. Ver [Runbook](../08-operations/runb
 
 ## Knowledge Center (`/admin/knowledge`)
 
-| Item | Detalhe |
-| ---- | ------- |
-| Rotas | `admin/knowledge/`, `admin/knowledge/$` (splat) |
+| Item   | Detalhe                                                         |
+| ------ | --------------------------------------------------------------- |
+| Rotas  | `admin/knowledge/`, `admin/knowledge/$` (splat)                 |
 | Código | `src/lib/knowledge-center/`, `src/components/knowledge-center/` |
-| Fonte | `docs/**/*.md` via `import.meta.glob` — auto-discovery |
-| Acesso | Somente admin |
+| Fonte  | `docs/**/*.md` via `import.meta.glob` — auto-discovery          |
+| Acesso | Somente admin                                                   |
 
 Centro de conhecimento integrado: navegação estilo GitBook, busca ⌘K, Mermaid, favoritos,
 recentes, breadcrumb e TOC. Ver [knowledge-center.md](./knowledge-center.md).

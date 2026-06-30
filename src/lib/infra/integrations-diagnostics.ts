@@ -34,8 +34,7 @@ export function buildIntegrationDiagnostics(
     for (const k of def.keys) {
       count += normalized.get(k) ?? 0;
     }
-    const status: IntegrationStatus =
-      count > 0 ? "ok" : normalized.size > 0 ? "warn" : "unknown";
+    const status: IntegrationStatus = count > 0 ? "ok" : normalized.size > 0 ? "warn" : "unknown";
     return {
       id: def.id,
       label: def.label,

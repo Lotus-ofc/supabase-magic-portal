@@ -133,7 +133,8 @@ export function StrategicPlanManageDrawer({
       if (vars.entity === "metric_ref" && editMetricRefId === vars.id) setEditMetricRefId(null);
       if (vars.entity === "oportunidade" && editOportunidadeId === vars.id)
         setEditOportunidadeId(null);
-      if (vars.entity === "aprendizado" && editAprendizadoId === vars.id) setEditAprendizadoId(null);
+      if (vars.entity === "aprendizado" && editAprendizadoId === vars.id)
+        setEditAprendizadoId(null);
       if (vars.entity === "roadmap_marco" && editRoadmapId === vars.id) setEditRoadmapId(null);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao excluir"),
@@ -508,9 +509,9 @@ function ObjetivoForm({
   const [descricao, setDescricao] = useState(editItem?.descricao ?? "");
   const [meta, setMeta] = useState(editItem?.meta_numerica?.toString() ?? "");
   const [dataAlvo, setDataAlvo] = useState(editItem?.data_alvo ?? "");
-  const [workflowFase, setWorkflowFase] = useState<
-    (typeof OBJETIVO_WORKFLOW_FASE)[number]
-  >(editItem?.workflow_fase ?? "em_andamento");
+  const [workflowFase, setWorkflowFase] = useState<(typeof OBJETIVO_WORKFLOW_FASE)[number]>(
+    editItem?.workflow_fase ?? "em_andamento",
+  );
 
   useEffect(() => {
     setTitulo(editItem?.titulo ?? "");
@@ -624,7 +625,9 @@ function EstrategiaForm({
       }}
     >
       {!editItem && !objetivoId && (
-        <p className="text-xs text-warning">Crie ou ative um objetivo antes de adicionar estratégias.</p>
+        <p className="text-xs text-warning">
+          Crie ou ative um objetivo antes de adicionar estratégias.
+        </p>
       )}
       <Field label="Título" required>
         <TextInput value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
@@ -707,7 +710,12 @@ function HipoteseForm({
       }}
     >
       <Field label="Hipótese" required>
-        <TextArea value={hipotese} onChange={(e) => setHipotese(e.target.value)} required rows={3} />
+        <TextArea
+          value={hipotese}
+          onChange={(e) => setHipotese(e.target.value)}
+          required
+          rows={3}
+        />
       </Field>
       <FormRow>
         <Field label="Status">
@@ -720,7 +728,11 @@ function HipoteseForm({
           </Select>
         </Field>
         <Field label="Resultado (%)">
-          <TextInput type="number" value={resultado} onChange={(e) => setResultado(e.target.value)} />
+          <TextInput
+            type="number"
+            value={resultado}
+            onChange={(e) => setResultado(e.target.value)}
+          />
         </Field>
       </FormRow>
       <Field label="Conclusão">
@@ -924,8 +936,8 @@ function KpiForm({
           plano_id: planoId,
           objetivo_id: editItem?.objetivo_id ?? objetivoId,
           platform_key: platformKey,
-          metric_key: entry?.kind === "metric" ? entry.key : editItem?.metric_key ?? null,
-          kpi_key: entry?.kind === "kpi" ? entry.key : editItem?.kpi_key ?? null,
+          metric_key: entry?.kind === "metric" ? entry.key : (editItem?.metric_key ?? null),
+          kpi_key: entry?.kind === "kpi" ? entry.key : (editItem?.kpi_key ?? null),
           meta_numerica: meta ? Number(meta) : null,
           positive_is_good: positiveIsGood,
         });
@@ -948,7 +960,11 @@ function KpiForm({
         </Select>
       </Field>
       <Field label="Métrica / KPI" required={!editItem}>
-        <Select value={metricKey} onChange={(e) => setMetricKey(e.target.value)} required={!editItem}>
+        <Select
+          value={metricKey}
+          onChange={(e) => setMetricKey(e.target.value)}
+          required={!editItem}
+        >
           <option value="">Selecione</option>
           {platformMetrics.map((m) => (
             <option key={`${m.kind}-${m.key}`} value={m.key}>
@@ -1053,9 +1069,7 @@ function RoadmapForm({
 }) {
   const [titulo, setTitulo] = useState(editItem?.titulo ?? "");
   const [descricao, setDescricao] = useState(editItem?.descricao ?? "");
-  const [tipo, setTipo] = useState<(typeof ROADMAP_MARCO_TIPO)[number]>(
-    editItem?.tipo ?? "marco",
-  );
+  const [tipo, setTipo] = useState<(typeof ROADMAP_MARCO_TIPO)[number]>(editItem?.tipo ?? "marco");
   const [dataPrevista, setDataPrevista] = useState(editItem?.data_prevista ?? "");
   const [status, setStatus] = useState<(typeof PLANO_ITEM_STATUS)[number]>(
     editItem?.status ?? "pendente",
@@ -1172,7 +1186,12 @@ function AprendizadoForm({
       }}
     >
       <Field label="Mês de referência" required hint="Formato AAAA-MM-DD (primeiro dia do mês).">
-        <TextInput type="date" value={mesRef} onChange={(e) => setMesRef(e.target.value)} required />
+        <TextInput
+          type="date"
+          value={mesRef}
+          onChange={(e) => setMesRef(e.target.value)}
+          required
+        />
       </Field>
       <Field label="Título" required>
         <TextInput value={titulo} onChange={(e) => setTitulo(e.target.value)} required />

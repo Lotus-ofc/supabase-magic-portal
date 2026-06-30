@@ -12,24 +12,24 @@ last_review: 2026-06-26
 
 ## Origem dos dados
 
-| Item | Valor |
-| ---- | ----- |
-| Platform key | `instagram` |
-| View SQL | `vw_instagram_diario` |
-| PlatformDef | `src/lib/platforms/instagram.ts` |
+| Item         | Valor                            |
+| ------------ | -------------------------------- |
+| Platform key | `instagram`                      |
+| View SQL     | `vw_instagram_diario`            |
+| PlatformDef  | `src/lib/platforms/instagram.ts` |
 
 ## Métricas oficiais
 
-| Key | Coluna | Agregação |
-| --- | ------ | --------- |
-| reach | reach | **max** |
-| accounts_engaged | accounts_engaged | **max** |
-| interactions | interactions | sum |
-| likes | likes | sum |
-| comments | comments | sum |
-| saves | saves | sum |
-| shares | shares | sum |
-| profile_links_taps | profile_links_taps | sum |
+| Key                | Coluna             | Agregação |
+| ------------------ | ------------------ | --------- |
+| reach              | reach              | **max**   |
+| accounts_engaged   | accounts_engaged   | **max**   |
+| interactions       | interactions       | sum       |
+| likes              | likes              | sum       |
+| comments           | comments           | sum       |
+| saves              | saves              | sum       |
+| shares             | shares             | sum       |
+| profile_links_taps | profile_links_taps | sum       |
 
 ## KPIs derivados
 

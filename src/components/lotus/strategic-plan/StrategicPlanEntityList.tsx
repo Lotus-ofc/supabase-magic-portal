@@ -42,7 +42,9 @@ export function StrategicPlanEntityList({
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-foreground">{item.title}</p>
             {item.subtitle && (
-              <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">{item.subtitle}</p>
+              <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
+                {item.subtitle}
+              </p>
             )}
           </div>
           <div className="flex shrink-0 gap-0.5">

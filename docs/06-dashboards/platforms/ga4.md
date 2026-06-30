@@ -12,22 +12,22 @@ last_review: 2026-06-26
 
 ## Origem dos dados
 
-| Item | Valor |
-| ---- | ----- |
-| Platform key | `ga4` |
-| View SQL | `vw_ga4_diario` |
-| PlatformDef | `src/lib/platforms/ga4.ts` |
+| Item         | Valor                      |
+| ------------ | -------------------------- |
+| Platform key | `ga4`                      |
+| View SQL     | `vw_ga4_diario`            |
+| PlatformDef  | `src/lib/platforms/ga4.ts` |
 
 ## Métricas oficiais
 
-| Key | Coluna | Agregação |
-| --- | ------ | --------- |
-| active_users | active_users | sum |
-| sessions | sessions | sum |
-| engaged_sessions | engaged_sessions | sum |
-| pageviews | pageviews | sum |
-| event_count | event_count | sum |
-| conversions | conversions | sum |
+| Key              | Coluna           | Agregação |
+| ---------------- | ---------------- | --------- |
+| active_users     | active_users     | sum       |
+| sessions         | sessions         | sum       |
+| engaged_sessions | engaged_sessions | sum       |
+| pageviews        | pageviews        | sum       |
+| event_count      | event_count      | sum       |
+| conversions      | conversions      | sum       |
 
 ## KPIs derivados
 

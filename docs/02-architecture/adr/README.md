@@ -36,8 +36,8 @@ Crie um ADR quando a decisão:
 | [0009](./0009-platform-proprietary-infrastructure.md)     | Infraestrutura proprietária (sem Lovable/Make) | Proposto (alvo)     |
 | [0010](./0010-cursor-official-development-environment.md) | Cursor como ambiente oficial de engenharia     | Aceito              |
 | [0011](./0011-engineering-system-foundation.md)           | Fundação do Sistema de Engenharia              | Aceito              |
-| [0012](./0012-internal-infrastructure-transition.md)    | Transição para infraestrutura interna Lotus      | Aceito              |
-| [0013](./0013-plano-estrategico-centro-estrategico.md)  | Plano Estratégico — Centro de Inteligência       | Aceito              |
+| [0012](./0012-internal-infrastructure-transition.md)      | Transição para infraestrutura interna Lotus    | Aceito              |
+| [0013](./0013-plano-estrategico-centro-estrategico.md)    | Plano Estratégico — Centro de Inteligência     | Aceito              |
 
 ## Template
 

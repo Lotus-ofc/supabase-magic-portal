@@ -128,8 +128,7 @@ export function buildAuthDiagnostics(input: AuthDiagnosticsInput): AuthDiagnosti
   // APP_URL vs esperado para o ambiente
   const configured = input.appUrlConfigured;
   if (configured && !hostnamesMatch(configured, expectedAppUrl)) {
-    const severity: DiagnosticStatus =
-      environment === "development" ? "warn" : "error";
+    const severity: DiagnosticStatus = environment === "development" ? "warn" : "error";
     checks.push({
       id: "app_url_expected",
       label: "APP_URL vs ambiente",
@@ -211,9 +210,7 @@ export function buildAuthDiagnostics(input: AuthDiagnosticsInput): AuthDiagnosti
     label: "SMTP / e-mail",
     status: input.smtpManagedBySupabase === false ? "warn" : "ok",
     detail:
-      input.smtpManagedBySupabase === false
-        ? "Não verificado"
-        : "Gerenciado pelo Supabase Auth",
+      input.smtpManagedBySupabase === false ? "Não verificado" : "Gerenciado pelo Supabase Auth",
   });
 
   const hasError = checks.some((c) => c.status === "error");

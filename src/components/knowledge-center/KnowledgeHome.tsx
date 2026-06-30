@@ -56,8 +56,8 @@ function KnowledgeHomeBody() {
         <h1 className="font-display text-2xl font-bold tracking-tight">Knowledge Center</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
           Handbook de engenharia e produto do {BRAND_NAME} — arquitetura, dados, dashboards e
-          operações. A pasta <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/</code>{" "}
-          é a fonte única; novos arquivos aparecem aqui após o build.
+          operações. A pasta <code className="rounded bg-muted px-1 py-0.5 text-xs">docs/</code> é a
+          fonte única; novos arquivos aparecem aqui após o build.
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           No celular, use o botão de menu no topo para abrir o índice lateral.

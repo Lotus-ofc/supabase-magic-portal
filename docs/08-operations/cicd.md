@@ -12,17 +12,17 @@ last_review: 2026-06-26
 
 ## Estado atual
 
-| Item                   | Status                              |
-| ---------------------- | ----------------------------------- |
-| GitHub Actions         | ✅ `.github/workflows/ci.yml`       |
-| Lint no PR             | ✅ `npm run lint`                   |
-| Testes no PR           | ✅ `npm run test` (Vitest)          |
-| Build no PR            | ✅ `npm run build`                  |
-| Validação engenharia   | ✅ `npm run validate:engineering`   |
-| Gate local             | ✅ `npm run check`                  |
-| Deploy automático      | ❌ Manual (Lovable transitório)     |
+| Item                   | Status                               |
+| ---------------------- | ------------------------------------ |
+| GitHub Actions         | ✅ `.github/workflows/ci.yml`        |
+| Lint no PR             | ✅ `npm run lint`                    |
+| Testes no PR           | ✅ `npm run test` (Vitest)           |
+| Build no PR            | ✅ `npm run build`                   |
+| Validação engenharia   | ✅ `npm run validate:engineering`    |
+| Gate local             | ✅ `npm run check`                   |
+| Deploy automático      | ❌ Manual (Lovable transitório)      |
 | Deploy proprietário    | 🟡 Preparado — `deploy.yml` (manual) |
-| Migrations automáticas | ❌ Manual no Supabase dashboard     |
+| Migrations automáticas | ❌ Manual no Supabase dashboard      |
 
 ---
 

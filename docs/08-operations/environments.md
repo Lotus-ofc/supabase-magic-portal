@@ -22,13 +22,13 @@ last_review: 2026-06-26
 
 ## Local (desenvolvimento)
 
-| Item     | Valor                                  |
-| -------- | -------------------------------------- |
+| Item     | Valor                                             |
+| -------- | ------------------------------------------------- |
 | Comando  | `npm run dev` · ver [SETUP.md](../../../SETUP.md) |
-| Setup    | `npm run setup` — valida Node e `.env`              |
-| URL      | `http://localhost:5173` (Vite default) |
-| Env      | `.env` (copiar de `.env.example`)      |
-| Supabase | Projeto `ywvhoctcmibjitvwkkhb`         |
+| Setup    | `npm run setup` — valida Node e `.env`            |
+| URL      | `http://localhost:5173` (Vite default)            |
+| Env      | `.env` (copiar de `.env.example`)                 |
+| Supabase | Projeto `ywvhoctcmibjitvwkkhb`                    |
 
 ### Variáveis necessárias
 
@@ -43,10 +43,10 @@ Em dev, **duplicar** URL e anon key com e sem prefixo `VITE_`:
 
 ## Produção
 
-| Item   | Observado                                         |
-| ------ | ------------------------------------------------- |
-| Build  | `npm run build` → Nitro → Cloudflare              |
-| Preset | `@lovable.dev/vite-tanstack-config` (transitório) |
+| Item   | Observado                                                                   |
+| ------ | --------------------------------------------------------------------------- |
+| Build  | `npm run build` → Nitro → Cloudflare                                        |
+| Preset | `@lovable.dev/vite-tanstack-config` (transitório)                           |
 | Deploy | Via Lovable (transitório) **ou** GitHub Actions → Cloudflare (`deploy.yml`) |
 
 Deploy proprietário: [CI/CD](./cicd.md) · ADR-0012.

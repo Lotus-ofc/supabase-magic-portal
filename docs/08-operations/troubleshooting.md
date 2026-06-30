@@ -48,10 +48,10 @@ Cards zerados, gráficos flat, "—" nos KPIs.
 
 ## 403 Forbidden (admin)
 
-| Causa                    | Solução                                     |
-| ------------------------ | ------------------------------------------- |
+| Causa                    | Solução                                      |
+| ------------------------ | -------------------------------------------- |
 | Usuário sem role `admin` | Ver seção **Restaurar admin do dono** abaixo |
-| Guard de rota            | Esperado — cliente não acessa `/admin`      |
+| Guard de rota            | Esperado — cliente não acessa `/admin`       |
 
 ### Restaurar admin do dono (`leandromajr@gmail.com`)
 

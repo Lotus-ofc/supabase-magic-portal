@@ -5,11 +5,11 @@ Lovable permanece apenas como pipeline transitório de build/deploy até a Fase 
 
 ## Pré-requisitos
 
-| Ferramenta | Versão |
-| ---------- | ------ |
-| Node.js    | 22+ (ver `.nvmrc`) |
-| npm        | 10+ |
-| Git        | qualquer recente |
+| Ferramenta | Versão                                    |
+| ---------- | ----------------------------------------- |
+| Node.js    | 22+ (ver `.nvmrc`)                        |
+| npm        | 10+                                       |
+| Git        | qualquer recente                          |
 | Cursor     | ambiente oficial de engenharia (ADR-0010) |
 
 ## Primeira vez
@@ -29,25 +29,25 @@ Abra `http://localhost:5173` (porta pode variar conforme o preset Vite).
 
 Prefixo **`OFFICIAL_`** (não `SUPABASE_`) — exigência transitória do preset Lovable.
 
-| Variável | Onde |
-| -------- | ---- |
-| `VITE_OFFICIAL_SUPABASE_*` | Browser (públicas) |
-| `OFFICIAL_SUPABASE_*` | Server functions |
+| Variável                    | Onde                                 |
+| --------------------------- | ------------------------------------ |
+| `VITE_OFFICIAL_SUPABASE_*`  | Browser (públicas)                   |
+| `OFFICIAL_SUPABASE_*`       | Server functions                     |
 | `OFFICIAL_SERVICE_ROLE_KEY` | **Somente servidor** — nunca `VITE_` |
 
 Template completo: [`.env.example`](./.env.example)
 
 ## Comandos do dia a dia
 
-| Comando | Uso |
-| ------- | --- |
-| `npm run dev` | Servidor local |
-| `npm run build` | Build de produção |
-| `npm run preview` | Preview do build |
-| `npm run test` | Testes (Vitest) |
-| `npm run lint` | ESLint |
-| `npm run check` | **Gate completo** — validate + lint + test + build |
-| `npm run setup` | Verificar ambiente local |
+| Comando           | Uso                                                |
+| ----------------- | -------------------------------------------------- |
+| `npm run dev`     | Servidor local                                     |
+| `npm run build`   | Build de produção                                  |
+| `npm run preview` | Preview do build                                   |
+| `npm run test`    | Testes (Vitest)                                    |
+| `npm run lint`    | ESLint                                             |
+| `npm run check`   | **Gate completo** — validate + lint + test + build |
+| `npm run setup`   | Verificar ambiente local                           |
 
 Antes de cada PR: **`npm run check`**.
 
@@ -76,6 +76,7 @@ Produção ainda pode ser publicada via **Lovable** (sync do branch `main`).
    - `APP_URL` — URL pública do portal (ex.: `https://seu-dominio.com`), usada nos convites por e-mail
 
 2. **Manual (local):** após `npm run build`:
+
    ```bash
    npm run deploy:cloudflare
    ```
@@ -86,15 +87,15 @@ Produção ainda pode ser publicada via **Lovable** (sync do branch `main`).
 
 ## Transição para stack 100% interna
 
-| Fase | Status | Ação |
-| ---- | ------ | ---- |
-| Dev no Cursor + Git | ✅ | ADR-0010 |
-| CI lint/test/build | ✅ | ADR-0011 |
-| Knowledge Center | ✅ | docs nativos |
-| Deploy GitHub → Cloudflare | 🟡 Preparado | workflow + script |
-| Remover preset Lovable | ⏳ Fase 6 | ADR-0012 |
-| Desconectar Lovable | ⏳ Após deploy validado | ops |
-| Horizons / leandromajr.com | ⏳ Futuro | fora deste repo |
+| Fase                       | Status                  | Ação              |
+| -------------------------- | ----------------------- | ----------------- |
+| Dev no Cursor + Git        | ✅                      | ADR-0010          |
+| CI lint/test/build         | ✅                      | ADR-0011          |
+| Knowledge Center           | ✅                      | docs nativos      |
+| Deploy GitHub → Cloudflare | 🟡 Preparado            | workflow + script |
+| Remover preset Lovable     | ⏳ Fase 6               | ADR-0012          |
+| Desconectar Lovable        | ⏳ Após deploy validado | ops               |
+| Horizons / leandromajr.com | ⏳ Futuro               | fora deste repo   |
 
 Roadmap: [docs/11-roadmap/roadmap.md](./docs/11-roadmap/roadmap.md) · ADR: [0012](./docs/02-architecture/adr/0012-internal-infrastructure-transition.md)
 
@@ -106,11 +107,11 @@ Roadmap: [docs/11-roadmap/roadmap.md](./docs/11-roadmap/roadmap.md) · ADR: [001
 
 ## Problemas comuns
 
-| Sintoma | Solução |
-| ------- | ------- |
-| Build falha sem env | Copie `.env.example` → `.env` ou use placeholders do CI |
+| Sintoma               | Solução                                                               |
+| --------------------- | --------------------------------------------------------------------- |
+| Build falha sem env   | Copie `.env.example` → `.env` ou use placeholders do CI               |
 | Plugin Vite duplicado | Não adicione plugins já inclusos no preset Lovable (`vite.config.ts`) |
-| Auth não funciona | Verifique `VITE_OFFICIAL_*` no `.env` |
-| `npm run check` falha | Corrija lint/test antes do push |
+| Auth não funciona     | Verifique `VITE_OFFICIAL_*` no `.env`                                 |
+| `npm run check` falha | Corrija lint/test antes do push                                       |
 
 Mais: [docs/08-operations/troubleshooting.md](./docs/08-operations/troubleshooting.md)

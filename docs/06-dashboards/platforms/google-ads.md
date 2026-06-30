@@ -15,29 +15,29 @@ related:
 
 ## Origem dos dados
 
-| Item | Valor |
-| ---- | ----- |
-| Platform key | `google_ads` |
-| View SQL | `vw_google_ads_diario` |
-| PlatformDef | `src/lib/platforms/google-ads.ts` |
-| Ingestão atual | Make → Supabase (transitório) |
-| Granularidade | Diária por campanha (`campanha`) |
+| Item           | Valor                             |
+| -------------- | --------------------------------- |
+| Platform key   | `google_ads`                      |
+| View SQL       | `vw_google_ads_diario`            |
+| PlatformDef    | `src/lib/platforms/google-ads.ts` |
+| Ingestão atual | Make → Supabase (transitório)     |
+| Granularidade  | Diária por campanha (`campanha`)  |
 
 ## Métricas oficiais
 
-| Key | Coluna | Agregação | Formato |
-| --- | ------ | --------- | ------- |
-| spend | spend | sum | currency |
-| impressions | impressions | sum | int |
-| clicks | clicks | sum | int |
+| Key         | Coluna      | Agregação | Formato  |
+| ----------- | ----------- | --------- | -------- |
+| spend       | spend       | sum       | currency |
+| impressions | impressions | sum       | int      |
+| clicks      | clicks      | sum       | int      |
 
 ## KPIs derivados
 
-| KPI | Fórmula |
-| --- | ------- |
+| KPI | Fórmula                    |
+| --- | -------------------------- |
 | CTR | `ctr(impressions, clicks)` |
-| CPC | `cpc(spend, clicks)` |
-| CPM | `cpm(spend, impressions)` |
+| CPC | `cpc(spend, clicks)`       |
+| CPM | `cpm(spend, impressions)`  |
 
 ## Limitações
 

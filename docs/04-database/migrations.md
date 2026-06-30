@@ -20,19 +20,19 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 
 ## Histórico
 
-| Arquivo                             | O que faz                                                                                                                                                                              |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `01_auth_roles_access.sql`          | `profiles` + trigger `handle_new_user`; enum `app_role`; `user_roles`; `has_role`; `client_access`; `current_user_clientes` (1ª versão); índices em `base_metricas`.                   |
-| `02_views_metricas.sql`             | 1ª versão das views analíticas (com `security_invoker = on`). Conversão de micros do Google Ads.                                                                                       |
-| `03_cadastro_clientes_extensao.sql` | Colunas aditivas em `cadastro_clientes`; RLS; `servicos` + seed; `cliente_servicos`; `vw_clientes_admin`.                                                                              |
-| `05_cadastro_clientes_make_ids.sql` | IDs técnicos consumidos pelo Make (instagram/meta/google/ga4/tiktok); recria `vw_clientes_admin` com **`DROP VIEW` + `CREATE VIEW`** (não `OR REPLACE` no meio da lista de colunas). |
-| `06_editorial.sql`                  | Enums e tabelas do editorial (`posts_editorial`, `post_revisions`) + RLS.                                                                                                              |
-| `07_views_fix_security_invoker.sql` | **Correção de dashboards vazios:** recria views como `SECURITY DEFINER`. Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md).                                        |
-| `08_aliases_e_null_guard.sql`       | `cliente_aliases` + `COALESCE` para nome canônico; guarda de `valor NULL`; recria views derivadas. Ver [ADR-0004](../02-architecture/adr/0004-chave-de-cliente-por-nome-e-aliases.md). |
-| `09_owner_admin_guard.sql`          | Admin permanente do dono da plataforma (`has_role` + trigger de bootstrap).                                                                                                            |
-| `10_editorial_media.sql`            | `post_media`, bucket `editorial-media`, snapshots.                                                                                                                                     |
+| Arquivo                             | O que faz                                                                                                                                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `01_auth_roles_access.sql`          | `profiles` + trigger `handle_new_user`; enum `app_role`; `user_roles`; `has_role`; `client_access`; `current_user_clientes` (1ª versão); índices em `base_metricas`.                                          |
+| `02_views_metricas.sql`             | 1ª versão das views analíticas (com `security_invoker = on`). Conversão de micros do Google Ads.                                                                                                              |
+| `03_cadastro_clientes_extensao.sql` | Colunas aditivas em `cadastro_clientes`; RLS; `servicos` + seed; `cliente_servicos`; `vw_clientes_admin`.                                                                                                     |
+| `05_cadastro_clientes_make_ids.sql` | IDs técnicos consumidos pelo Make (instagram/meta/google/ga4/tiktok); recria `vw_clientes_admin` com **`DROP VIEW` + `CREATE VIEW`** (não `OR REPLACE` no meio da lista de colunas).                          |
+| `06_editorial.sql`                  | Enums e tabelas do editorial (`posts_editorial`, `post_revisions`) + RLS.                                                                                                                                     |
+| `07_views_fix_security_invoker.sql` | **Correção de dashboards vazios:** recria views como `SECURITY DEFINER`. Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md).                                                               |
+| `08_aliases_e_null_guard.sql`       | `cliente_aliases` + `COALESCE` para nome canônico; guarda de `valor NULL`; recria views derivadas. Ver [ADR-0004](../02-architecture/adr/0004-chave-de-cliente-por-nome-e-aliases.md).                        |
+| `09_owner_admin_guard.sql`          | Admin permanente do dono da plataforma (`has_role` + trigger de bootstrap).                                                                                                                                   |
+| `10_editorial_media.sql`            | `post_media`, bucket `editorial-media`, snapshots.                                                                                                                                                            |
 | `11_plano_estrategico.sql`          | Plano Estratégico — tabelas, RLS colaborativa, FK `posts_editorial.estrategia_id`, view `vw_estrategia_editorial_stats`. Ver [ADR-0013](../02-architecture/adr/0013-plano-estrategico-centro-estrategico.md). |
-| `12_plano_objetivo_scope.sql`       | Escopo por objetivo no plano (estratégias/hipóteses/roadmap vinculados ao objetivo atual).                                                                                               |
+| `12_plano_objetivo_scope.sql`       | Escopo por objetivo no plano (estratégias/hipóteses/roadmap vinculados ao objetivo atual).                                                                                                                    |
 
 > **Não existe `04`.** A tentativa `04_integracoes_make.sql` foi **deprecada e substituída**
 > pela `05` (que usa nomes de coluna diferentes); a 04 nunca foi aplicada ao banco.

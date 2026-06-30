@@ -146,9 +146,7 @@ function AdminPlanoPage() {
               <Button
                 size="sm"
                 disabled={!editTitulo.trim() || updateMut.isPending}
-                onClick={() =>
-                  updateMut.mutate({ id: editingPlano.id, titulo: editTitulo.trim() })
-                }
+                onClick={() => updateMut.mutate({ id: editingPlano.id, titulo: editTitulo.trim() })}
               >
                 Salvar
               </Button>

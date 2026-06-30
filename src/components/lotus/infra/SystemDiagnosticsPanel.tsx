@@ -16,8 +16,10 @@ function StatusDot({ status }: { status: DiagnosticStatus | "unknown" }) {
 }
 
 function StatusLabel({ status }: { status: DiagnosticStatus }) {
-  if (status === "ok") return <span className="text-[var(--success)]">🟢 Configurado corretamente</span>;
-  if (status === "warn") return <span className="text-amber-600 dark:text-amber-400">🟡 Atenção</span>;
+  if (status === "ok")
+    return <span className="text-[var(--success)]">🟢 Configurado corretamente</span>;
+  if (status === "warn")
+    return <span className="text-amber-600 dark:text-amber-400">🟡 Atenção</span>;
   return <span className="text-destructive">🔴 Configuração inválida</span>;
 }
 
@@ -59,9 +61,7 @@ export function AuthDiagnosticsCard({ auth }: { auth: AuthDiagnosticsReport }) {
       <dl className="mb-4 grid gap-2 text-[12px] sm:grid-cols-2">
         <div>
           <dt className="text-muted-foreground">APP_URL configurada</dt>
-          <dd className="break-all font-mono text-foreground">
-            {auth.app_url_configured ?? "—"}
-          </dd>
+          <dd className="break-all font-mono text-foreground">{auth.app_url_configured ?? "—"}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Domínio atual</dt>
@@ -113,9 +113,7 @@ export function ProductionChecklistCard({
       <ul className="space-y-1.5">
         {checklist.map((item) => (
           <li key={item.id} className="flex items-center gap-2 text-[12px]">
-            <span>
-              {item.status === "ok" ? "✓" : item.status === "warn" ? "○" : "✗"}
-            </span>
+            <span>{item.status === "ok" ? "✓" : item.status === "warn" ? "○" : "✗"}</span>
             <span
               className={cn(
                 item.status === "error" && "text-destructive",
@@ -143,7 +141,10 @@ export function SystemDiagnosticsPanel({ data }: { data: SystemDiagnosticsReport
   return (
     <div className="space-y-4">
       <AuthDiagnosticsCard auth={data.auth} />
-      <ProductionChecklistCard checklist={data.production_checklist} systemReady={data.system_ready} />
+      <ProductionChecklistCard
+        checklist={data.production_checklist}
+        systemReady={data.system_ready}
+      />
 
       <SectionCard title="Supabase" description="Conexão e serviços do projeto.">
         <dl className="grid gap-2 text-[12px] sm:grid-cols-2">
@@ -172,11 +173,7 @@ export function SystemDiagnosticsPanel({ data }: { data: SystemDiagnosticsReport
           <div>
             <dt className="text-muted-foreground">Storage</dt>
             <dd>
-              {data.supabase.storage_ok === null
-                ? "—"
-                : data.supabase.storage_ok
-                  ? "OK"
-                  : "Falha"}
+              {data.supabase.storage_ok === null ? "—" : data.supabase.storage_ok ? "OK" : "Falha"}
             </dd>
           </div>
           <div>
@@ -222,7 +219,10 @@ export function SystemDiagnosticsPanel({ data }: { data: SystemDiagnosticsReport
         </dl>
       </SectionCard>
 
-      <SectionCard title="Integrações" description="Presença de dados em base_metricas por plataforma.">
+      <SectionCard
+        title="Integrações"
+        description="Presença de dados em base_metricas por plataforma."
+      >
         <div className="grid gap-2 sm:grid-cols-2">
           {data.integrations.map((i) => (
             <div
@@ -244,7 +244,9 @@ export function SystemDiagnosticsPanel({ data }: { data: SystemDiagnosticsReport
         description="Últimos envios registrados nesta instância (memória operacional)."
       >
         {data.invite_audit.length === 0 ? (
-          <p className="text-[12px] text-muted-foreground">Nenhum convite registrado nesta sessão.</p>
+          <p className="text-[12px] text-muted-foreground">
+            Nenhum convite registrado nesta sessão.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-max text-[11px]">
@@ -266,7 +268,9 @@ export function SystemDiagnosticsPanel({ data }: { data: SystemDiagnosticsReport
                     </td>
                     <td className="py-2 pr-3">{row.email}</td>
                     <td className="py-2 pr-3">{row.action}</td>
-                    <td className="max-w-[140px] truncate py-2 pr-3 font-mono">{row.redirect_to}</td>
+                    <td className="max-w-[140px] truncate py-2 pr-3 font-mono">
+                      {row.redirect_to}
+                    </td>
                     <td className="max-w-[120px] truncate py-2 pr-3 font-mono">{row.app_url}</td>
                     <td className="py-2">
                       {row.success ? (

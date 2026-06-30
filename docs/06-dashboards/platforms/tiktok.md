@@ -12,11 +12,11 @@ last_review: 2026-06-26
 
 ## Situação atual
 
-| Item | Valor |
-| ---- | ----- |
-| Rota cliente | `/cliente/{slug}/tiktok` |
-| View SQL | — (não documentada no catálogo) |
-| Status | `PlatformPlaceholder` |
+| Item         | Valor                           |
+| ------------ | ------------------------------- |
+| Rota cliente | `/cliente/{slug}/tiktok`        |
+| View SQL     | — (não documentada no catálogo) |
+| Status       | `PlatformPlaceholder`           |
 
 ## Origem dos dados (alvo)
 

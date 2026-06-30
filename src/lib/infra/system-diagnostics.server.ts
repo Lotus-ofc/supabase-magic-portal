@@ -16,7 +16,10 @@ import {
   type DiagnosticCheck,
 } from "./auth-diagnostics";
 import { getInviteAuditLog } from "./invite-audit";
-import { buildIntegrationDiagnostics, type IntegrationDiagnostic } from "./integrations-diagnostics";
+import {
+  buildIntegrationDiagnostics,
+  type IntegrationDiagnostic,
+} from "./integrations-diagnostics";
 import type { SystemDiagnosticsReport } from "./system-diagnostics.types";
 
 export type { SystemDiagnosticsReport };
@@ -104,10 +107,7 @@ export async function evaluateSystemDiagnostics(
   });
 
   const systemReady =
-    auth.production_ready &&
-    checklist.every((c) => c.status !== "error") &&
-    connectionOk &&
-    authOk;
+    auth.production_ready && checklist.every((c) => c.status !== "error") && connectionOk && authOk;
 
   return {
     diagnosed_at: new Date().toISOString(),
@@ -153,7 +153,16 @@ export function groupChecks(checks: DiagnosticCheck[]): Record<string, Diagnosti
     supabase: [],
   };
   for (const c of checks) {
-    if (["app_url", "current_domain", "environment", "app_url_expected", "domain_match", "site_url"].includes(c.id)) {
+    if (
+      [
+        "app_url",
+        "current_domain",
+        "environment",
+        "app_url_expected",
+        "domain_match",
+        "site_url",
+      ].includes(c.id)
+    ) {
       groups.url.push(c);
     } else if (c.id.includes("redirect") || c.id === "invites_enabled") {
       groups.auth.push(c);

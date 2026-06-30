@@ -5,13 +5,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import { repairOwnerAdminRole, resolveIsAdmin } from "@/lib/owner-admin";
 import { z } from "zod";
-import {
-  DEBUG_DAILY_VIEW_SAMPLE_SELECT,
-  SERVICOS_SELECT,
-} from "@/lib/db-selects";
+import { DEBUG_DAILY_VIEW_SAMPLE_SELECT, SERVICOS_SELECT } from "@/lib/db-selects";
 import { OVERVIEW_CLIENTE_SELECT } from "@/lib/metrics";
 import { resolveAuthInviteRedirectUrl } from "@/lib/app-url.server";
-import { AuthInviteError, resendAuthInviteEmail, sendAuthInviteEmail } from "@/lib/auth-invite.server";
+import {
+  AuthInviteError,
+  resendAuthInviteEmail,
+  sendAuthInviteEmail,
+} from "@/lib/auth-invite.server";
 import { getInviteStatsForEmail } from "@/lib/infra/invite-audit";
 import {
   evaluateAuthDiagnostics,
@@ -223,9 +224,7 @@ export const deactivateCliente = createServerFn({ method: "POST" })
 export const listServicos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("servicos")
-      .select(SERVICOS_SELECT);
+    const { data, error } = await context.supabase.from("servicos").select(SERVICOS_SELECT);
     if (error) throw new Error(error.message);
     return data ?? [];
   });

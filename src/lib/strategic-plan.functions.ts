@@ -1169,10 +1169,7 @@ export const deletePlano = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { error } = await context.supabase
-      .from("planos_estrategicos")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("planos_estrategicos").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
@@ -1208,10 +1205,7 @@ export const deletePlanoEntity = createServerFn({ method: "POST" })
       .object({
         plano_id: z.string().uuid(),
         entity: z.enum(
-          Object.keys(PLANO_ENTITY_TABLE) as [
-            PlanoDeleteEntity,
-            ...PlanoDeleteEntity[],
-          ],
+          Object.keys(PLANO_ENTITY_TABLE) as [PlanoDeleteEntity, ...PlanoDeleteEntity[]],
         ),
         id: z.string().uuid(),
       })

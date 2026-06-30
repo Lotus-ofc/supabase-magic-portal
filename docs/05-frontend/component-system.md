@@ -109,15 +109,14 @@ fórmulas** — ambos importam de `formulas.ts`.
 
 Breakpoints alvo: **320 / 375 / 390 / 414 / 768 px** e desktop.
 
-| Área | Padrão |
-| ---- | ------ |
-| Shell | `AppShell` — drawer &lt; `lg`, safe-area iOS, header sticky |
-| KPI grids | `grid-cols-1` em 320px → `min-[375px]:grid-cols-2` |
-| Tabelas | wrapper `lotus-scroll-x` em `ui/table` |
-| Drawers | `sheet.tsx` — `100dvh`, safe-area, largura fluida no mobile |
-| Formulários | `h-10` no mobile, `h-9` a partir de `sm` |
-| Gráficos | `AreaChartLotusLazy` (admin e plataformas); sem `min-width` fixo que force overflow |
-| KC | `KnowledgeLayout` — índice em Sheet no mobile |
+| Área        | Padrão                                                                              |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Shell       | `AppShell` — drawer &lt; `lg`, safe-area iOS, header sticky                         |
+| KPI grids   | `grid-cols-1` em 320px → `min-[375px]:grid-cols-2`                                  |
+| Tabelas     | wrapper `lotus-scroll-x` em `ui/table`                                              |
+| Drawers     | `sheet.tsx` — `100dvh`, safe-area, largura fluida no mobile                         |
+| Formulários | `h-10` no mobile, `h-9` a partir de `sm`                                            |
+| Gráficos    | `AreaChartLotusLazy` (admin e plataformas); sem `min-width` fixo que force overflow |
+| KC          | `KnowledgeLayout` — índice em Sheet no mobile                                       |
 
 Utilitários em `src/styles.css`: `lotus-scroll-x`, `lotus-safe-bottom`, `lotus-table-scroll`.
-

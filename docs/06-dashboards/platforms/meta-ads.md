@@ -12,20 +12,20 @@ last_review: 2026-06-26
 
 ## Origem dos dados
 
-| Item | Valor |
-| ---- | ----- |
-| Platform key | `meta_ads` |
-| View SQL | `vw_meta_ads_diario` |
-| PlatformDef | `src/lib/platforms/meta-ads.ts` |
+| Item         | Valor                           |
+| ------------ | ------------------------------- |
+| Platform key | `meta_ads`                      |
+| View SQL     | `vw_meta_ads_diario`            |
+| PlatformDef  | `src/lib/platforms/meta-ads.ts` |
 
 ## Métricas oficiais
 
-| Key | Coluna | Agregação | Nota |
-| --- | ------ | --------- | ---- |
-| spend | spend | sum | |
-| reach | reach | **sum** | Soma diária no dashboard |
-| impressions | impressions | sum | |
-| clicks | clicks | sum | |
+| Key         | Coluna      | Agregação | Nota                     |
+| ----------- | ----------- | --------- | ------------------------ |
+| spend       | spend       | sum       |                          |
+| reach       | reach       | **sum**   | Soma diária no dashboard |
+| impressions | impressions | sum       |                          |
+| clicks      | clicks      | sum       |                          |
 
 ## KPIs derivados
 

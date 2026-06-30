@@ -56,7 +56,7 @@ const clientesAtivosQuery = queryOptions({
   queryFn: async (): Promise<ClienteAtivo[]> => {
     const { data, error } = await supabase
       .from("vw_clientes_ativos")
-      .select(VW_CLIENTES_ATIVOS_SELECT)
+      .select(VW_CLIENTES_ATIVOS_SELECT);
     if (error) throw error;
     return (data ?? []) as ClienteAtivo[];
   },

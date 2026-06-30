@@ -12,11 +12,11 @@ last_review: 2026-06-26
 
 ## Origem dos dados
 
-| Item | Valor |
-| ---- | ----- |
-| View SQL | `vw_google_business_diario` |
-| Rota cliente | `/cliente/{slug}/google-business` |
-| Status | `PlatformPlaceholder` — sem PlatformDef completo |
+| Item         | Valor                                            |
+| ------------ | ------------------------------------------------ |
+| View SQL     | `vw_google_business_diario`                      |
+| Rota cliente | `/cliente/{slug}/google-business`                |
+| Status       | `PlatformPlaceholder` — sem PlatformDef completo |
 
 ## Situação atual
 

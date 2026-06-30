@@ -19,7 +19,9 @@ if (!fs.existsSync(wranglerJson)) {
 }
 
 const portArg = process.argv.find((a) => a.startsWith("--port"));
-const port = portArg?.includes("=") ? portArg.split("=")[1] : process.argv[process.argv.indexOf("--port") + 1];
+const port = portArg?.includes("=")
+  ? portArg.split("=")[1]
+  : process.argv[process.argv.indexOf("--port") + 1];
 const wranglerArgs = ["wrangler", "dev"];
 if (port) {
   wranglerArgs.push("--port", port);

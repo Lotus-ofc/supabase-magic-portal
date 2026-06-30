@@ -13,12 +13,12 @@ de tarefas — é o planejamento estratégico vivo, conectado às métricas da p
 
 ## Rotas
 
-| Rota | Público | Função |
-|------|---------|--------|
-| `/plano-estrategico` | Cliente + admin | Hub — um plano ativo por cliente |
-| `/cliente/$cliente/plano-estrategico` | Cliente + admin | Bootstrap: cria ou redireciona ao plano único |
-| `/cliente/$cliente/plano-estrategico/$planoId` | Colaborativo | **Centro Estratégico** (objetivo atual + histórico) |
-| `/admin/plano-estrategico` | Admin | Criar plano (apenas clientes sem plano ativo) |
+| Rota                                           | Público         | Função                                              |
+| ---------------------------------------------- | --------------- | --------------------------------------------------- |
+| `/plano-estrategico`                           | Cliente + admin | Hub — um plano ativo por cliente                    |
+| `/cliente/$cliente/plano-estrategico`          | Cliente + admin | Bootstrap: cria ou redireciona ao plano único       |
+| `/cliente/$cliente/plano-estrategico/$planoId` | Colaborativo    | **Centro Estratégico** (objetivo atual + histórico) |
+| `/admin/plano-estrategico`                     | Admin           | Criar plano (apenas clientes sem plano ativo)       |
 
 ## Conceito
 
@@ -64,13 +64,13 @@ KPIs **nunca duplicados** — apenas referência (`platform_key` + `metric_key`/
 
 ## Código
 
-| Camada | Local |
-|--------|-------|
-| Tipos + motores | `src/lib/strategic-plan/` |
-| Server functions | `src/lib/strategic-plan.functions.ts` |
-| UI | `src/components/lotus/strategic-plan/` |
-| Rotas cliente | `cliente.$cliente.plano-estrategico.tsx` (layout), `.index.tsx` (lista), `.$planoId.tsx` (centro) |
-| Testes | `src/lib/strategic-plan/*.test.ts` |
+| Camada           | Local                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| Tipos + motores  | `src/lib/strategic-plan/`                                                                         |
+| Server functions | `src/lib/strategic-plan.functions.ts`                                                             |
+| UI               | `src/components/lotus/strategic-plan/`                                                            |
+| Rotas cliente    | `cliente.$cliente.plano-estrategico.tsx` (layout), `.index.tsx` (lista), `.$planoId.tsx` (centro) |
+| Testes           | `src/lib/strategic-plan/*.test.ts`                                                                |
 
 ## Integrações
 

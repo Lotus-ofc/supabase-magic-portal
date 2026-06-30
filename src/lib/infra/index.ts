@@ -22,5 +22,8 @@ export {
   getInviteStatsForEmail,
   type InviteAuditEntry,
 } from "./invite-audit";
-export { buildIntegrationDiagnostics, type IntegrationDiagnostic } from "./integrations-diagnostics";
+export {
+  buildIntegrationDiagnostics,
+  type IntegrationDiagnostic,
+} from "./integrations-diagnostics";
 export type { SystemDiagnosticsReport } from "./system-diagnostics.types";

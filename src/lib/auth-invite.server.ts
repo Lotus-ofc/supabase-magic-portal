@@ -98,8 +98,7 @@ export async function sendAuthInviteEmail(
       throw new AuthInviteError(msg, "invite_config");
     }
     if (isUserAlreadyExists(error.message)) {
-      const msg =
-        "Este e-mail já está cadastrado. Use “Reenviar e-mail” na lista de usuários.";
+      const msg = "Este e-mail já está cadastrado. Use “Reenviar e-mail” na lista de usuários.";
       auditFailure({ email, action: "invite", app_url: appUrl, redirect_to: redirectTo }, msg);
       throw new AuthInviteError(msg, "user_exists");
     }
@@ -184,7 +183,10 @@ export async function resendAuthInviteEmail(
   if (invited.error) {
     if (isInviteConfigError(invited.error.message)) {
       const msg = `Link de convite rejeitado (${redirectTo}). Configure APP_URL e Redirect URLs no Supabase. Detalhe: ${invited.error.message}`;
-      auditFailure({ email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo }, msg);
+      auditFailure(
+        { email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo },
+        msg,
+      );
       throw new AuthInviteError(msg, "invite_config");
     }
 
@@ -203,16 +205,25 @@ export async function resendAuthInviteEmail(
       }
       const msg =
         "Não foi possível reenviar o e-mail. Verifique o endereço e tente novamente em alguns minutos.";
-      auditFailure({ email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo }, msg);
+      auditFailure(
+        { email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo },
+        msg,
+      );
       throw new AuthInviteError(msg, "invite_failed");
     }
 
     const msg = `Falha ao reenviar convite por e-mail: ${invited.error.message}`;
-    auditFailure({ email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo }, msg);
+    auditFailure(
+      { email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo },
+      msg,
+    );
     throw new AuthInviteError(msg, "invite_failed");
   }
 
   const msg = "Não foi possível reenviar o convite.";
-  auditFailure({ email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo }, msg);
+  auditFailure(
+    { email, user_id: userId, action: "resend", app_url: appUrl, redirect_to: redirectTo },
+    msg,
+  );
   throw new AuthInviteError(msg, "invite_failed");
 }

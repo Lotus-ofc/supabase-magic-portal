@@ -57,10 +57,10 @@ src/routes/_authenticated/admin/knowledge/
 
 O KC herda o `AppShell` (menu lateral em drawer no mobile). Dentro do módulo:
 
-| Breakpoint | Comportamento |
-| ---------- | ------------- |
-| &lt; `lg` | Sidebar oculta; botão **menu** abre Sheet com `KnowledgeSidebar` |
-| `lg+` | Sidebar fixa à esquerda (260px) + conteúdo scrollável |
+| Breakpoint | Comportamento                                                    |
+| ---------- | ---------------------------------------------------------------- |
+| &lt; `lg`  | Sidebar oculta; botão **menu** abre Sheet com `KnowledgeSidebar` |
+| `lg+`      | Sidebar fixa à esquerda (260px) + conteúdo scrollável            |
 
 Conteúdo markdown usa tipografia fluida e tabelas com `lotus-scroll-x` quando necessário.
 
