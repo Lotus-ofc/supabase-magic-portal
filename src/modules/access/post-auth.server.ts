@@ -119,10 +119,9 @@ export const postAuthOnLoginSuccess = createServerFn({ method: "GET" })
       };
     }
 
-    const { isOnboardingComplete, parseLotsBiMetadata } =
-      await import("@/features/access/lots-bi-metadata");
-    const lotsBi = parseLotsBiMetadata(profile.user_metadata);
-    if (profile.lifecycle_status === "awaiting_password" && isOnboardingComplete(lotsBi)) {
+    const onboardingComplete =
+      Boolean(profile.password_set_at) && Boolean(profile.onboarding_completed_at);
+    if (profile.lifecycle_status === "awaiting_password" && onboardingComplete) {
       await upsertLifecycle(context.userId, "active");
       await recordAccessAuditEntry({
         user_id: context.userId,

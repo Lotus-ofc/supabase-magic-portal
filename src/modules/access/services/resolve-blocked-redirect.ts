@@ -18,7 +18,6 @@ export function resolveBlockedRedirect(
     case "awaiting_password":
       return { to: "/auth", search: { view: "login" } };
     case "invite_pending":
-    case "invite_expired":
       if (hasSession) {
         return { to: "/auth", search: { view: "set-password", context: "invite" } };
       }
@@ -27,6 +26,15 @@ export function resolveBlockedRedirect(
         search: {
           view: "link-error",
           error: "Convite inválido ou expirado. Solicite um novo convite ao administrador.",
+        },
+        signOut: true,
+      };
+    case "invite_expired":
+      return {
+        to: "/auth",
+        search: {
+          view: "link-error",
+          error: "Convite expirado. Use Recovery Mode no admin para reenviar.",
         },
         signOut: true,
       };
