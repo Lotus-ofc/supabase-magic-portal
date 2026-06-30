@@ -3,6 +3,7 @@ import { adminTitle } from "@/lib/brand";
 // para criar / editar / aprovar / comentar. Sem dependências novas — usa
 // Sheet, Select, Button já presentes em src/components/ui/*.
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -111,6 +112,7 @@ type Post = {
 // ---------- Route ----------
 export const Route = createFileRoute("/_authenticated/admin/editorial")({
   head: () => ({ meta: [{ title: adminTitle("Calendário Editorial") }] }),
+  validateSearch: z.object({ estrategia: z.string().uuid().optional() }),
   component: EditorialPage,
   errorComponent: ({ error }) => (
     <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>
@@ -119,6 +121,7 @@ export const Route = createFileRoute("/_authenticated/admin/editorial")({
 });
 
 function EditorialPage() {
+  const { estrategia: filterEstrategia } = Route.useSearch();
   const today = new Date();
   const [cursor, setCursor] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [filterCli, setFilterCli] = useState<string>("all");
@@ -140,13 +143,14 @@ function EditorialPage() {
   });
 
   const postsQ = useQuery({
-    queryKey: ["editorial", "month", monthStart, monthEnd, filterCli],
+    queryKey: ["editorial", "month", monthStart, monthEnd, filterCli, filterEstrategia],
     queryFn: () =>
       listPosts({
         data: {
           from: monthStart,
           to: monthEnd,
           cadastro_cliente_id: filterCli === "all" ? null : Number(filterCli),
+          estrategia_id: filterEstrategia ?? null,
         },
       }),
   });

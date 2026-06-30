@@ -136,6 +136,7 @@ export const listPosts = createServerFn({ method: "GET" })
         cadastro_cliente_id: z.number().int().optional().nullable(),
         cliente_nome: z.string().optional().nullable(),
         status: z.enum(POST_STATUS).optional().nullable(),
+        estrategia_id: z.string().uuid().optional().nullable(),
       })
       .parse(d),
   )
@@ -149,6 +150,7 @@ export const listPosts = createServerFn({ method: "GET" })
     if (data.cadastro_cliente_id) q = q.eq("cadastro_cliente_id", data.cadastro_cliente_id);
     if (data.cliente_nome) q = q.eq("cliente_nome", data.cliente_nome);
     if (data.status) q = q.eq("status", data.status);
+    if (data.estrategia_id) q = q.eq("estrategia_id", data.estrategia_id);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
@@ -195,6 +197,7 @@ const postCreate = z.object({
   observacoes: z.string().trim().max(5000).optional().nullable(),
   responsavel_email: z.string().trim().email().max(200).optional().nullable().or(z.literal("")),
   status: z.enum(POST_STATUS).default("rascunho"),
+  estrategia_id: z.string().uuid().optional().nullable(),
 });
 
 export const createPost = createServerFn({ method: "POST" })
@@ -214,6 +217,7 @@ export const createPost = createServerFn({ method: "POST" })
       cliente_nome: cli.nome_cliente,
       capa_url: data.capa_url || null,
       responsavel_email: data.responsavel_email || null,
+      estrategia_id: data.estrategia_id || null,
       tags: data.tags ?? [],
       created_by: context.userId,
     };
