@@ -7,14 +7,13 @@ export function resolveBlockedRedirect(
   search?: Record<string, string>;
   signOut?: boolean;
 } {
-  if (
-    hasSession &&
-    (effectiveStatus === "invite_pending" || effectiveStatus === "awaiting_password")
-  ) {
+  const status = effectiveStatus === "invite_expired" ? "invite_pending" : effectiveStatus;
+
+  if (hasSession && (status === "invite_pending" || status === "awaiting_password")) {
     return { to: "/auth", search: { view: "set-password", context: "invite" } };
   }
 
-  switch (effectiveStatus) {
+  switch (status) {
     case "awaiting_password":
       return { to: "/auth", search: { view: "login" } };
     case "invite_pending":
@@ -26,15 +25,6 @@ export function resolveBlockedRedirect(
         search: {
           view: "link-error",
           error: "Convite inválido ou expirado. Solicite um novo convite ao administrador.",
-        },
-        signOut: true,
-      };
-    case "invite_expired":
-      return {
-        to: "/auth",
-        search: {
-          view: "link-error",
-          error: "Convite expirado. Use Recovery Mode no admin para reenviar.",
         },
         signOut: true,
       };

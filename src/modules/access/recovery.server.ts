@@ -41,7 +41,7 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
     switch (action) {
       case "resend_invite": {
         await invalidateAllSessions(data.user_id);
-        const { resendAuthInviteEmail } = await import("@/lib/auth-invite.server");
+        const { resendAuthInviteEmail } = await import("@/modules/admin/invites.server");
         await resendAuthInviteEmail(
           admin,
           authUser.email,
@@ -86,7 +86,7 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
       }
       case "force_password_reset": {
         await invalidateAllSessions(data.user_id);
-        const { sendPasswordResetEmail } = await import("@/lib/auth-invite.server");
+        const { sendPasswordResetEmail } = await import("@/modules/admin/invites.server");
         await sendPasswordResetEmail(authUser.email, data.client_origin);
         await recordAccessAuditEntry({
           user_id: data.user_id,
@@ -147,3 +147,6 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
         throw new Error(`Ação desconhecida: ${action}`);
     }
   });
+
+/** Alias do contrato Fase 1 — preferir em código novo. */
+export const applyRecoveryAction = performAccessRecovery;

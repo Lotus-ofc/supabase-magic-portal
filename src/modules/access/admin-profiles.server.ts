@@ -130,7 +130,6 @@ export const transitionUserLifecycle = createServerFn({ method: "POST" })
         lifecycle_status: z.enum([
           "invite_pending",
           "awaiting_password",
-          "invite_expired",
           "active",
           "revoked",
           "disabled",

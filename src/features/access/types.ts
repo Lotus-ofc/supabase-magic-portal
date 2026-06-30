@@ -5,7 +5,6 @@ export const AUTH_MODULE_VERSION = "2.1";
 export type AccessLifecycleStatus =
   | "invite_pending"
   | "awaiting_password"
-  | "invite_expired"
   | "active"
   | "revoked"
   | "disabled";

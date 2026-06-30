@@ -59,6 +59,22 @@ sequenceDiagram
 
 Código: `src/modules/auth/`, `src/modules/access/`, `src/modules/admin/`, `src/lib/access.functions.server.ts`.
 
+### Lifecycle (6 estados fechados)
+
+```
+invite_pending → awaiting_password → active → disabled / revoked
+```
+
+| Estado | Significado |
+|--------|-------------|
+| `invite_pending` | Convite enviado, senha não definida |
+| `awaiting_password` | Senha definida via convite, aguardando primeiro login |
+| `active` | Usuário operacional |
+| `disabled` | Soft ban de negócio |
+| `revoked` | Ban Auth + lifecycle revogado |
+
+Legado `invite_expired` migrado para `invite_pending` (migration `16_lifecycle_invite_expired_removal.sql`).
+
 ### Fronteira Supabase × Lots BI
 
 - **Supabase Auth:** identidade, e-mail, senha, ban, sessões, `user_metadata.lots_bi`

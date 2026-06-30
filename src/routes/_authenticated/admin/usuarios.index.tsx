@@ -29,7 +29,6 @@ const LIFECYCLE_FILTERS: { key: "all" | AccessLifecycleStatus; label: string }[]
   { key: "active", label: "Ativos" },
   { key: "revoked", label: "Revogados" },
   { key: "disabled", label: "Desativados" },
-  { key: "invite_expired", label: "Expirados" },
 ];
 
 function usersQuery(page: number) {

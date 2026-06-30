@@ -25,7 +25,6 @@ describe("access-lifecycle", () => {
   });
 
   it("bloqueia transição invite_pending → active direta", () => {
-    expect(canTransitionLifecycle("invite_expired", "active")).toBe(false);
     expect(canTransitionLifecycle("invite_pending", "active")).toBe(false);
   });
 

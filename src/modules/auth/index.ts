@@ -6,13 +6,13 @@ export {
   type AuthCallbackParams,
   type AuthCallbackType,
   type AuthFlow,
-} from "@/features/auth/auth-callback";
+} from "./callback/auth-callback";
 export {
   completeAuthCallback,
   waitForPasswordRecoveryEvent,
   type AuthCallbackResult,
-} from "@/features/auth/auth-callback-handler";
-export { AuthBootstrapping, AuthShell } from "@/features/auth/auth-shell";
+} from "./callback/auth-callback-handler";
+export { AuthBootstrapping, AuthShell } from "./components/auth-shell";
 export {
   authSearchSchema,
   resolveAuthView,
@@ -20,10 +20,8 @@ export {
   type AuthSearch,
   type AuthView,
   type SetPasswordContext,
-} from "@/features/auth/auth-views";
-export {
-  authCallbackSearchSchema,
-  type AuthCallbackSearch,
-} from "@/features/auth/auth-callback-search";
-export { useSignOut } from "@/features/auth/use-sign-out";
+} from "./views/auth-views";
+export { authCallbackSearchSchema, type AuthCallbackSearch } from "./callback/auth-callback-search";
+export { useSignOut } from "./hooks/use-sign-out";
 export { validatePasswordPair } from "./validation/password";
+export { ChangePasswordForm } from "./pages/change-password-form";

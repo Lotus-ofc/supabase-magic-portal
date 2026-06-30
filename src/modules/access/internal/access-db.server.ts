@@ -6,6 +6,7 @@ import {
   type AccessAuditAction,
   type AccessLifecycleStatus,
 } from "@/features/access";
+import { normalizeLifecycleStatus } from "@/modules/access/lifecycle-normalize";
 
 export type AdminCtx = {
   userId: string;
@@ -31,6 +32,9 @@ export async function fetchAccessAccount(userId: string) {
     .eq("user_id", userId)
     .maybeSingle();
   if (error) throw new Error(error.message);
+  if (data?.lifecycle_status) {
+    return { ...data, lifecycle_status: normalizeLifecycleStatus(data.lifecycle_status) };
+  }
   return data;
 }
 
@@ -71,8 +75,9 @@ export async function upsertLifecycle(
 ) {
   const admin = getSupabaseAdmin();
   const existing = await fetchAccessAccount(userId);
-  if (existing && !canTransitionLifecycle(existing.lifecycle_status, status)) {
-    throw new Error(`Transição de lifecycle inválida: ${existing.lifecycle_status} → ${status}`);
+  const fromStatus = existing ? normalizeLifecycleStatus(existing.lifecycle_status) : undefined;
+  if (fromStatus && !canTransitionLifecycle(fromStatus, status)) {
+    throw new Error(`Transição de lifecycle inválida: ${fromStatus} → ${status}`);
   }
   const { error } = await admin.from("access_accounts").upsert(
     {

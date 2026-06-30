@@ -71,4 +71,39 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ["src/modules/auth/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/modules/access",
+              message:
+                "Princípio Nº1: modules/auth não importa access — use orchestrator via rotas.",
+            },
+            {
+              name: "@/features/access",
+              message: "modules/auth não importa features/access.",
+            },
+            {
+              name: "@/lib/access.functions.server",
+              message: "modules/auth não consulta Postgres da aplicação.",
+            },
+            {
+              name: "@/lib/admin.functions",
+              message: "modules/auth não decide admin.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@/modules/access/**", "@/modules/access/internal/**"],
+              message: "modules/auth não importa módulo access.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

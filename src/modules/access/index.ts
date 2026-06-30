@@ -8,3 +8,5 @@ export {
 } from "./services/resolve-blocked-redirect";
 export { resolveUserIsAdmin } from "./services/resolve-user-context";
 export type { AccessRecoveryAction } from "./recovery-actions";
+export { normalizeLifecycleStatus, LIFECYCLE_STATUSES } from "./lifecycle-normalize";
+export { applyRecoveryAction, performAccessRecovery } from "./recovery.server";

@@ -31,8 +31,8 @@ describe("access redirect services", () => {
     expect(blocked.signOut).toBe(true);
   });
 
-  it("invite_expired com sessão exige reenvio pelo admin", () => {
-    const blocked = resolveBlockedRedirect("invite_expired", true);
+  it("invite_expired legado normaliza como invite_pending sem sessão", () => {
+    const blocked = resolveBlockedRedirect("invite_expired", false);
     expect(blocked.search?.view).toBe("link-error");
     expect(blocked.signOut).toBe(true);
   });

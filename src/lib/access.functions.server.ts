@@ -26,5 +26,5 @@ export {
   postAuthOnLoginSuccess,
 } from "@/modules/access/post-auth.server";
 
-export { performAccessRecovery } from "@/modules/access/recovery.server";
+export { performAccessRecovery, applyRecoveryAction } from "@/modules/access/recovery.server";
 export type { AccessRecoveryAction } from "@/modules/access/recovery-actions";

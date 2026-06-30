@@ -3,7 +3,6 @@ import type { AccessLifecycleStatus } from "../types";
 const LABELS: Record<AccessLifecycleStatus, string> = {
   invite_pending: "Convite pendente",
   awaiting_password: "Aguardando senha",
-  invite_expired: "Convite expirado",
   active: "Ativo",
   revoked: "Revogado",
   disabled: "Desativado",
@@ -12,7 +11,6 @@ const LABELS: Record<AccessLifecycleStatus, string> = {
 const STYLES: Record<AccessLifecycleStatus, string> = {
   invite_pending: "bg-amber-500/12 text-amber-800 dark:text-amber-200 border-amber-500/20",
   awaiting_password: "bg-sky-500/12 text-sky-800 dark:text-sky-200 border-sky-500/20",
-  invite_expired: "bg-orange-500/12 text-orange-800 dark:text-orange-200 border-orange-500/20",
   active: "bg-success/12 text-[color:var(--success)] border-success/20",
   revoked: "bg-destructive/12 text-destructive border-destructive/20",
   disabled: "bg-muted text-muted-foreground border-border",
