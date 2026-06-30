@@ -7,6 +7,8 @@ import { requireServerSupabaseAnonConfig } from "@/integrations/supabase/env.ser
 import { buildAuthInviteRedirectUrl, normalizeAppUrl } from "@/lib/app-url";
 import { resolveAuthInviteRedirectUrl, resolveServerAppUrl } from "@/lib/app-url.server";
 import { recordInviteAudit } from "@/lib/infra/invite-audit";
+import { recordInviteAccessAudit } from "@/features/access/access-audit.server";
+import { ensureAccessAccountRow } from "@/lib/access.functions.server";
 import { evaluateAuthDiagnostics } from "@/lib/infra/system-diagnostics.server";
 
 export class AuthInviteError extends Error {
@@ -76,6 +78,7 @@ function auditFailure(
   error: string,
 ) {
   recordInviteAudit({ ...params, success: false, error });
+  void recordInviteAccessAudit({ ...params, success: false, error });
 }
 
 export async function sendAuthInviteEmail(
@@ -122,6 +125,15 @@ export async function sendAuthInviteEmail(
     redirect_to: redirectTo,
     success: true,
   });
+  void recordInviteAccessAudit({
+    email,
+    user_id: userId,
+    action: "invite",
+    app_url: appUrl,
+    redirect_to: redirectTo,
+    success: true,
+  });
+  void ensureAccessAccountRow(userId, "invite_pending");
 
   return { userId, redirectTo, appUrl };
 }
@@ -177,6 +189,15 @@ export async function resendAuthInviteEmail(
       redirect_to: redirectTo,
       success: true,
     });
+    void recordInviteAccessAudit({
+      email,
+      user_id: invited.data.user.id,
+      action: "resend",
+      app_url: appUrl,
+      redirect_to: redirectTo,
+      success: true,
+    });
+    void ensureAccessAccountRow(invited.data.user.id, "invite_pending");
     return { userId: invited.data.user.id, redirectTo, appUrl };
   }
 
@@ -201,6 +222,15 @@ export async function resendAuthInviteEmail(
           redirect_to: redirectTo,
           success: true,
         });
+        void recordInviteAccessAudit({
+          email,
+          user_id: userId,
+          action: "resend",
+          app_url: appUrl,
+          redirect_to: redirectTo,
+          success: true,
+        });
+        void ensureAccessAccountRow(userId, "invite_pending");
         return { userId, redirectTo, appUrl };
       }
       const msg =

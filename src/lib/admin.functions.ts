@@ -15,6 +15,10 @@ import {
 } from "@/lib/auth-invite.server";
 import { getInviteStatsForEmail } from "@/lib/infra/invite-audit";
 import {
+  fetchInviteAuditLogFromDb,
+  fetchInviteStatsByUserIds,
+} from "@/features/access/access-audit.server";
+import {
   evaluateAuthDiagnostics,
   evaluateSystemDiagnostics,
 } from "@/lib/infra/system-diagnostics.server";
@@ -338,6 +342,8 @@ export const listUsersWithRoles = createServerFn({ method: "GET" })
       supabaseAdmin.from("client_access").select("user_id, cliente_nome"),
     ]);
     if (usersRes.error) throw new Error(usersRes.error.message);
+    const userIds = usersRes.data.users.map((u) => u.id);
+    const auditByUser = await fetchInviteStatsByUserIds(userIds);
     const rolesByUser = new Map<string, string[]>();
     (rolesRes.data ?? []).forEach((r: any) => {
       const arr = rolesByUser.get(r.user_id) ?? [];
@@ -354,7 +360,7 @@ export const listUsersWithRoles = createServerFn({ method: "GET" })
       const roles = rolesByUser.get(u.id) ?? [];
       const isAdmin = roles.includes("admin");
       const email = u.email ?? "";
-      const audit = getInviteStatsForEmail(email);
+      const audit = auditByUser.get(u.id) ?? getInviteStatsForEmail(email);
       return {
         id: u.id,
         email,

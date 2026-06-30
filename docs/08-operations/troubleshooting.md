@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Guia de diagnóstico para problemas comuns — dados, auth, build e deploy.
 status: living
 owner: Engenharia / Ops Lotus
-last_review: 2026-06-29
+last_review: 2026-06-30
 ---
 
 # Troubleshooting
@@ -89,11 +89,13 @@ O Supabase usa a **URL de redirecionamento** configurada no envio do convite. Se
 
 2. **Supabase Dashboard → Authentication → URL Configuration:**
    - **Site URL:** mesma URL de produção (`APP_URL`)
-   - **Redirect URLs:** inclua `https://portal.suaempresa.com/auth` (e `http://localhost:5173/auth` só para dev local)
+   - **Redirect URLs:** inclua `{APP_URL}/auth/callback` (obrigatório v2.1) e `{APP_URL}/auth` (compat links legados). Dev: `http://localhost:5173/auth/callback`
 
-3. **Redeploy** após alterar secrets (o convite é gerado no servidor com `redirectTo`).
+3. **Templates de e-mail (Invite / Recovery):** links devem apontar para `/auth/callback` com `token_hash` e `type` — o Supabase injeta isso quando `redirectTo` está correto.
 
-4. **Reenviar convite:** usuários já convidados com link antigo precisam de novo convite (Admin → Usuários → novo usuário ou fluxo de reenvio).
+4. **Redeploy** após alterar secrets (o convite é gerado no servidor com `redirectTo`).
+
+5. **Reenviar convite:** Admin → Usuários → **Gerenciar** → Recovery Mode → Reenviar convite (ou lista paginada).
 
 ### Local
 
@@ -147,10 +149,11 @@ Considerar `.gitattributes` com `eol=lf`.
 
 ## Migrations
 
-1. Aplicar em ordem numérica (`01` → `12`)
+1. Aplicar em ordem numérica (`01` → `13`)
 2. Cada migration tem bloco de validação no final
 3. Idempotente — safe re-run
 4. **View com colunas novas no meio:** use `DROP VIEW IF EXISTS` + `CREATE VIEW` (ver migration `05`)
+5. **Migration 13 (`13_access_management.sql`):** necessária para lifecycle, auditoria persistente e Recovery Mode. Idempotente — aplicar no SQL Editor antes de usar gestão de acessos v2.1 em produção.
 
 Ver [Migrations](../04-database/migrations.md).
 

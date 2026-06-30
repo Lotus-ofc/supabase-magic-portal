@@ -16,6 +16,7 @@ import {
   type DiagnosticCheck,
 } from "./auth-diagnostics";
 import { getInviteAuditLog } from "./invite-audit";
+import { fetchInviteAuditLogFromDb } from "@/features/access/access-audit.server";
 import {
   buildIntegrationDiagnostics,
   type IntegrationDiagnostic,
@@ -109,6 +110,9 @@ export async function evaluateSystemDiagnostics(
   const systemReady =
     auth.production_ready && checklist.every((c) => c.status !== "error") && connectionOk && authOk;
 
+  const dbInviteAudit = await fetchInviteAuditLogFromDb(30);
+  const inviteAudit = dbInviteAudit.length > 0 ? dbInviteAudit : getInviteAuditLog(30);
+
   return {
     diagnosed_at: new Date().toISOString(),
     auth,
@@ -132,7 +136,7 @@ export async function evaluateSystemDiagnostics(
       app_version: pickEnv("npm_package_version") ?? "0.0.0",
     },
     integrations,
-    invite_audit: getInviteAuditLog(30),
+    invite_audit: inviteAudit,
   };
 }
 

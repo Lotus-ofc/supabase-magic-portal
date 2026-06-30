@@ -1,4 +1,4 @@
-/** Registro em memória de envios de convite — diagnóstico operacional (sem persistência em DB). */
+/** Buffer legado em memória — fallback até migration 13; fonte primária: access_audit_log. */
 
 export type InviteAuditAction = "invite" | "resend";
 
