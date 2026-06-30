@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
+import type { Session } from "@supabase/supabase-js";
 import {
-  buildCallbackForwardSearch,
   hasLegacyAuthTokensOnAuthRoute,
   parseAuthCallbackParams,
+  resolveCallbackFlow,
   resolvePostCallbackRedirect,
 } from "./auth-callback";
+
+function session(partial: Partial<Session["user"]>): Session {
+  return {
+    access_token: "t",
+    user: { id: "u1", ...partial } as Session["user"],
+  } as Session;
+}
 
 describe("auth-callback", () => {
   it("parseia token_hash e type da query", () => {
@@ -25,11 +33,6 @@ describe("auth-callback", () => {
     expect(hasLegacyAuthTokensOnAuthRoute(new URLSearchParams("view=login"))).toBe(false);
   });
 
-  it("encaminha query para callback", () => {
-    const qs = buildCallbackForwardSearch(new URLSearchParams("token_hash=t&type=recovery"));
-    expect(qs).toBe("?token_hash=t&type=recovery");
-  });
-
   it("resolve redirect pós-callback", () => {
     expect(resolvePostCallbackRedirect("invite")).toEqual({
       view: "set-password",
@@ -42,16 +45,27 @@ describe("auth-callback", () => {
     expect(resolvePostCallbackRedirect("login")).toEqual({ view: "login" });
   });
 
-  it("detecta tokens implícitos no hash", () => {
+  it("parseia type do hash implicit", () => {
     const hash = new URLSearchParams("access_token=abc&type=invite");
     const params = parseAuthCallbackParams(new URLSearchParams(), hash);
-    expect(params.has_implicit_tokens).toBe(true);
     expect(params.type).toBe("invite");
   });
 
-  it("preserva flow=recovery na query do callback", () => {
-    const search = new URLSearchParams("flow=recovery");
-    const params = parseAuthCallbackParams(search, new URLSearchParams());
-    expect(params.flow_hint).toBe("recovery");
+  it("resolveCallbackFlow usa type recovery", () => {
+    expect(resolveCallbackFlow("recovery", session({ user_metadata: {} }))).toBe("recovery");
+  });
+
+  it("resolveCallbackFlow usa redirectType PKCE recovery", () => {
+    expect(resolveCallbackFlow(null, session({ user_metadata: {} }), "recovery")).toBe("recovery");
+  });
+
+  it("resolveCallbackFlow usa invited_at quando type sumiu", () => {
+    expect(
+      resolveCallbackFlow(null, session({ invited_at: "2025-01-02T00:00:00Z", user_metadata: {} })),
+    ).toBe("invite");
+  });
+
+  it("resolveCallbackFlow cai em login sem sinais de convite", () => {
+    expect(resolveCallbackFlow(null, session({ user_metadata: {} }))).toBe("login");
   });
 });

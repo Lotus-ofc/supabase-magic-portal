@@ -1,17 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AuthCallbackParams } from "./auth-callback";
-import {
-  hasValidAuthSession,
-  inferAuthFlowFromSession,
-  type InferredAuthFlow,
-} from "./auth-callback-inference";
+import type { AuthCallbackParams, AuthFlow } from "./auth-callback";
+import { resolveCallbackFlow } from "./auth-callback";
 
 export type AuthCallbackResult =
-  | { ok: true; flow: InferredAuthFlow; sessionEstablished: true }
+  | { ok: true; flow: AuthFlow; sessionEstablished: true }
   | { ok: false; message: string };
 
 const AUTH_READY_POLL_MS = 50;
 const AUTH_READY_MAX_MS = 8000;
+const PASSWORD_RECOVERY_WAIT_MS = 1500;
 
 function hasAuthSignalsInUrl(params: AuthCallbackParams): boolean {
   return Boolean(
@@ -23,6 +20,32 @@ function hasAuthSignalsInUrl(params: AuthCallbackParams): boolean {
   );
 }
 
+/** Aguarda evento oficial PASSWORD_RECOVERY (disparado pelo SDK após link de recovery). */
+export function waitForPasswordRecoveryEvent(
+  supabase: SupabaseClient,
+  timeoutMs = PASSWORD_RECOVERY_WAIT_MS,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let unsubscribe = () => undefined;
+
+    const finish = (value: boolean) => {
+      if (settled) return;
+      settled = true;
+      unsubscribe();
+      resolve(value);
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") finish(true);
+    });
+    unsubscribe = () => sub.subscription.unsubscribe();
+
+    setTimeout(() => finish(false), timeoutMs);
+  });
+}
+
+/** Aguarda o SDK processar tokens implicit (#access_token) — padrão oficial Supabase. */
 async function waitForSessionAfterSdkInit(
   supabase: SupabaseClient,
   params: AuthCallbackParams,
@@ -34,42 +57,26 @@ async function waitForSessionAfterSdkInit(
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (hasValidAuthSession(session)) return;
+    if (session?.access_token && session.user?.id) return;
     await new Promise((r) => setTimeout(r, AUTH_READY_POLL_MS));
   }
-}
-
-async function requireSession(supabase: SupabaseClient): Promise<
-  | {
-      session: NonNullable<
-        Awaited<ReturnType<SupabaseClient["auth"]["getSession"]>>["data"]["session"]
-      >;
-    }
-  | { error: string }
-> {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
-  if (error) return { error: error.message };
-  if (!hasValidAuthSession(session)) {
-    return { error: "Sessão não estabelecida. O link pode ter expirado ou já foi utilizado." };
-  }
-  return { session };
 }
 
 export async function completeAuthCallback(
   supabase: SupabaseClient,
   params: AuthCallbackParams,
 ): Promise<AuthCallbackResult> {
+  const recoveryPromise = waitForPasswordRecoveryEvent(supabase);
+
   if (params.error) {
+    recoveryPromise.then(() => undefined);
     return {
       ok: false,
       message: params.error_description ?? params.error ?? "Link de autenticação inválido.",
     };
   }
 
-  const urlTypeHint = params.type;
+  let redirectType: string | null = null;
 
   if (params.token_hash && params.type) {
     const { error } = await supabase.auth.verifyOtp({
@@ -77,20 +84,31 @@ export async function completeAuthCallback(
       type: params.type,
     });
     if (error) return { ok: false, message: error.message };
+    if (params.type === "recovery") redirectType = "recovery";
   } else if (params.code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(params.code);
-    if (error) {
-      await waitForSessionAfterSdkInit(supabase, params);
-    }
+    const { data, error } = await supabase.auth.exchangeCodeForSession(params.code);
+    redirectType = data?.redirectType ?? null;
+    if (error) await waitForSessionAfterSdkInit(supabase, params);
   } else {
     await waitForSessionAfterSdkInit(supabase, params);
   }
 
-  const sessionResult = await requireSession(supabase);
-  if ("error" in sessionResult) {
-    return { ok: false, message: sessionResult.error };
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error) return { ok: false, message: error.message };
+  if (!session?.access_token || !session.user?.id) {
+    return {
+      ok: false,
+      message: "Sessão não estabelecida. O link pode ter expirado ou já foi utilizado.",
+    };
   }
 
-  const flow = inferAuthFlowFromSession(sessionResult.session, urlTypeHint, params.flow_hint);
+  const passwordRecovery = await recoveryPromise;
+  let flow = resolveCallbackFlow(params.type, session, redirectType);
+  if (passwordRecovery) flow = "recovery";
+
   return { ok: true, flow, sessionEstablished: true };
 }

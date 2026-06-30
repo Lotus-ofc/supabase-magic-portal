@@ -1,27 +1,23 @@
 export {
   parseAuthCallbackParams,
   hasLegacyAuthTokensOnAuthRoute,
-  buildCallbackForwardSearch,
+  resolveCallbackFlow,
   resolvePostCallbackRedirect,
-  resolveAuthRouteForSession,
   type AuthCallbackParams,
   type AuthCallbackType,
+  type AuthFlow,
 } from "./auth-callback";
-export { completeAuthCallback, type AuthCallbackResult } from "./auth-callback-handler";
 export {
-  inferAuthFlowFromSession,
-  needsPasswordStep,
-  needsOnboardingStep,
-  hasValidAuthSession,
-  type InferredAuthFlow,
-} from "./auth-callback-inference";
+  completeAuthCallback,
+  waitForPasswordRecoveryEvent,
+  type AuthCallbackResult,
+} from "./auth-callback-handler";
 export { AuthBootstrapping, AuthShell } from "./auth-shell";
 export { resolvePostAuthPath, resolveAccessBlockedRedirect } from "./auth-redirect";
 export {
   authSearchSchema,
   resolveAuthView,
   isSetPasswordView,
-  isOnboardingView,
   type AuthSearch,
   type AuthView,
   type SetPasswordContext,

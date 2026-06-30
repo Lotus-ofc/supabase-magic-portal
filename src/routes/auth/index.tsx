@@ -1,31 +1,24 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  buildLotsBiMetadataPatch,
-  isOnboardingComplete,
-  parseLotsBiMetadata,
-} from "@/features/access/lots-bi-metadata";
+import { buildLotsBiMetadataPatch } from "@/features/access/lots-bi-metadata";
 import {
   AuthBootstrapping,
   AuthShell,
   authSearchSchema,
   hasLegacyAuthTokensOnAuthRoute,
-  isOnboardingView,
   isSetPasswordView,
-  needsOnboardingStep,
-  needsPasswordStep,
   resolveAuthView,
   resolvePostAuthPath,
+  waitForPasswordRecoveryEvent,
   type SetPasswordContext,
 } from "@/features/auth";
 import {
   markFirstAccessCompleted,
   markPasswordRecoveryCompleted,
-  markPasswordSet,
 } from "@/lib/access.functions.server";
 import { checkIsAdmin } from "@/lib/admin.functions";
-import { buildAuthRecoveryCallbackUrl } from "@/lib/app-url";
+import { buildAuthCallbackUrl } from "@/lib/app-url";
 import { BRAND_NAME, BRAND_TAGLINE, brandTitle } from "@/lib/brand";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 
@@ -54,6 +47,16 @@ export const Route = createFileRoute("/auth/")({
 });
 
 type AuthPhase = "bootstrapping" | "ready";
+
+async function resolveIsAdmin(email: string | undefined): Promise<boolean> {
+  if (isPlatformOwnerEmail(email)) return true;
+  try {
+    const result = await checkIsAdmin();
+    return !!result?.isAdmin;
+  } catch {
+    return false;
+  }
+}
 
 function AuthPage() {
   const router = useRouter();
@@ -96,72 +99,27 @@ function AuthPage() {
           });
           return;
         }
-        if (!needsPasswordStep(session)) {
-          router.navigate({
-            to: "/auth",
-            search: { view: needsOnboardingStep(session) ? "onboarding" : "login" },
-            replace: true,
-          });
-          return;
-        }
         setPhase("ready");
         return;
       }
 
-      if (isOnboardingView(view)) {
-        if (!session?.user) {
-          router.navigate({
-            to: "/auth",
-            search: { view: "link-error", error: "Sessão expirada. Solicite um novo link." },
-            replace: true,
-          });
-          return;
-        }
-        if (needsPasswordStep(session)) {
-          router.navigate({
-            to: "/auth",
-            search: { view: "set-password", context: "invite" },
-            replace: true,
-          });
-          return;
-        }
-        if (!needsOnboardingStep(session)) {
-          router.navigate({ to: "/dashboard" });
-          return;
-        }
+      if (view === "link-error" || view === "forgot-password") {
         setPhase("ready");
         return;
       }
 
-      if (view === "link-error") {
-        setPhase("ready");
-        return;
-      }
-
-      if (session?.user && view === "login") {
-        if (needsPasswordStep(session)) {
+      if (session?.user && view === "login" && !signingInRef.current) {
+        const recoveryPending = await waitForPasswordRecoveryEvent(supabase, 300);
+        if (cancelled) return;
+        if (recoveryPending) {
           router.navigate({
             to: "/auth",
-            search: { view: "set-password", context: "invite" },
+            search: { view: "set-password", context: "recovery" },
             replace: true,
           });
           return;
         }
-        if (needsOnboardingStep(session)) {
-          router.navigate({ to: "/auth", search: { view: "onboarding" }, replace: true });
-          return;
-        }
-
-        const isOwner = isPlatformOwnerEmail(session.user.email);
-        let isAdmin = isOwner;
-        if (!isOwner) {
-          try {
-            const result = await checkIsAdmin();
-            isAdmin = !!result?.isAdmin;
-          } catch {
-            isAdmin = false;
-          }
-        }
+        const isAdmin = await resolveIsAdmin(session.user.email);
         router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
         return;
       }
@@ -177,11 +135,6 @@ function AuthPage() {
     };
   }, [router, search.redirect, view]);
 
-  const clearAuthFragment = () => {
-    if (typeof window === "undefined") return;
-    window.history.replaceState(null, "", window.location.pathname + window.location.search);
-  };
-
   const submitSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -190,13 +143,7 @@ function AuthPage() {
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
-
-      const isOwner = isPlatformOwnerEmail(email);
-      let isAdmin = isOwner;
-      if (!isOwner) {
-        const result = await checkIsAdmin();
-        isAdmin = !!result?.isAdmin;
-      }
+      const isAdmin = await resolveIsAdmin(email);
       router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado");
@@ -212,7 +159,7 @@ function AuthPage() {
     setLoading(true);
     try {
       const appOrigin = typeof window !== "undefined" ? window.location.origin : "";
-      const redirectTo = buildAuthRecoveryCallbackUrl(appOrigin);
+      const redirectTo = buildAuthCallbackUrl(appOrigin);
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,
       });
@@ -244,78 +191,29 @@ function AuthPage() {
       if (!session?.user) throw new Error("Sessão expirada. Solicite um novo link.");
 
       const context: SetPasswordContext = search.context ?? "invite";
-      const now = new Date().toISOString();
-      const user = session.user;
-      const lotsBi = parseLotsBiMetadata(user.user_metadata);
 
       if (context === "recovery") {
         const { error: updateError } = await supabase.auth.updateUser({ password });
         if (updateError) throw updateError;
-
         await markPasswordRecoveryCompleted();
-        clearAuthFragment();
         await supabase.auth.signOut();
-
-        if (isOnboardingComplete(lotsBi)) {
-          router.navigate({ to: "/auth", search: { view: "login" }, replace: true });
-        } else {
-          router.navigate({ to: "/auth", search: { view: "onboarding" }, replace: true });
-        }
+        router.navigate({ to: "/auth", search: { view: "login" }, replace: true });
         return;
       }
 
-      const metadataPatch = buildLotsBiMetadataPatch({ password_set_at: now }, user.user_metadata);
+      const now = new Date().toISOString();
+      const metadataPatch = buildLotsBiMetadataPatch(
+        { password_set_at: now, onboarding_completed_at: now },
+        session.user.user_metadata,
+      );
       const { error: updateError } = await supabase.auth.updateUser({
         password,
         data: metadataPatch,
       });
       if (updateError) throw updateError;
 
-      await markPasswordSet();
-      clearAuthFragment();
-      router.navigate({ to: "/auth", search: { view: "onboarding" }, replace: true });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitOnboarding = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Sessão expirada. Solicite um novo link.");
-
-      const lotsBi = parseLotsBiMetadata(user.user_metadata);
-      if (!lotsBi.password_set_at) {
-        router.navigate({
-          to: "/auth",
-          search: { view: "set-password", context: "invite" },
-          replace: true,
-        });
-        return;
-      }
-
-      const now = new Date().toISOString();
-      const metadataPatch = buildLotsBiMetadataPatch(
-        { onboarding_completed_at: now },
-        user.user_metadata,
-      );
-      const { error: updateError } = await supabase.auth.updateUser({ data: metadataPatch });
-      if (updateError) throw updateError;
-
       await markFirstAccessCompleted();
-
-      const isOwner = isPlatformOwnerEmail(user.email);
-      let isAdmin = isOwner;
-      if (!isOwner) {
-        const result = await checkIsAdmin();
-        isAdmin = !!result?.isAdmin;
-      }
+      const isAdmin = await resolveIsAdmin(session.user.email);
       router.navigate({ to: resolvePostAuthPath(isAdmin, search.redirect) });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado");
@@ -389,28 +287,6 @@ function AuthPage() {
     );
   }
 
-  if (isOnboardingView(view)) {
-    return (
-      <AuthShell
-        title="Concluir primeiro acesso"
-        subtitle="Confirme para finalizar a configuração da sua conta."
-      >
-        <p className="text-center text-sm text-muted-foreground">
-          Sua senha foi definida. Clique abaixo para concluir o onboarding e acessar o portal.
-        </p>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => void submitOnboarding()}
-          className="mt-4 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-        >
-          {loading ? "Aguarde…" : "Concluir e entrar"}
-        </button>
-      </AuthShell>
-    );
-  }
-
   if (isSetPasswordView(view)) {
     const context: SetPasswordContext = search.context ?? "invite";
     return (
@@ -453,7 +329,7 @@ function AuthPage() {
             disabled={loading}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Aguarde…" : context === "invite" ? "Salvar senha" : "Salvar nova senha"}
+            {loading ? "Aguarde…" : context === "invite" ? "Salvar e entrar" : "Salvar nova senha"}
           </button>
         </form>
       </AuthShell>

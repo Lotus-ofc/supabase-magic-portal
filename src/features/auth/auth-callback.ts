@@ -1,6 +1,9 @@
-import type { InferredAuthFlow } from "./auth-callback-inference";
+import type { Session } from "@supabase/supabase-js";
 
 export type AuthCallbackType = "invite" | "recovery" | "signup" | "email" | "magiclink";
+
+/** Fluxos de autenticação suportados pelo portal. */
+export type AuthFlow = "invite" | "recovery" | "login";
 
 export interface AuthCallbackParams {
   token_hash: string | null;
@@ -8,8 +11,6 @@ export interface AuthCallbackParams {
   code: string | null;
   error: string | null;
   error_description: string | null;
-  has_implicit_tokens: boolean;
-  flow_hint: string | null;
 }
 
 const CALLBACK_TYPES = new Set<string>(["invite", "recovery", "signup", "email", "magiclink"]);
@@ -24,10 +25,8 @@ export function parseAuthCallbackParams(
   const code = search.get("code") ?? hash.get("code");
   const error = search.get("error") ?? hash.get("error");
   const error_description = search.get("error_description") ?? hash.get("error_description");
-  const has_implicit_tokens = Boolean(hash.get("access_token") || search.get("access_token"));
-  const flow_hint = search.get("flow") ?? hash.get("flow");
 
-  return { token_hash, type, code, error, error_description, has_implicit_tokens, flow_hint };
+  return { token_hash, type, code, error, error_description };
 }
 
 export function hasLegacyAuthTokensOnAuthRoute(search: URLSearchParams): boolean {
@@ -36,37 +35,28 @@ export function hasLegacyAuthTokensOnAuthRoute(search: URLSearchParams): boolean
   );
 }
 
-export function buildCallbackForwardSearch(search: URLSearchParams): string {
-  const params = new URLSearchParams();
-  for (const key of ["token_hash", "type", "code", "error", "error_description", "flow"]) {
-    const value = search.get(key);
-    if (value) params.set(key, value);
-  }
-  const qs = params.toString();
-  return qs ? `?${qs}` : "";
+/**
+ * Resolve fluxo pós-callback usando sinais oficiais do Supabase:
+ * - `type` na URL (query ou hash)
+ * - `redirectType` retornado por exchangeCodeForSession (PKCE recovery)
+ * - `invited_at` no usuário quando o SDK consome o hash implicit
+ */
+export function resolveCallbackFlow(
+  type: AuthCallbackType | null,
+  session: Session,
+  redirectType?: string | null,
+): AuthFlow {
+  if (type === "recovery" || redirectType === "recovery") return "recovery";
+  if (type === "invite" || type === "signup") return "invite";
+  if (session.user.invited_at) return "invite";
+  return "login";
 }
 
-export type PostCallbackView = "set-password" | "onboarding" | "login";
-
-export function resolvePostCallbackRedirect(flow: InferredAuthFlow): {
-  view: PostCallbackView;
+export function resolvePostCallbackRedirect(flow: AuthFlow): {
+  view: "set-password" | "login";
   context?: "invite" | "recovery";
 } {
-  if (flow === "invite" || flow === "signup") {
-    return { view: "set-password", context: "invite" };
-  }
-  if (flow === "recovery") {
-    return { view: "set-password", context: "recovery" };
-  }
-  return { view: "login" };
-}
-
-/** Resolve próximo passo auth quando já existe sessão (pós-login ou pós-callback). */
-export function resolveAuthRouteForSession(
-  needsPassword: boolean,
-  needsOnboarding: boolean,
-): { view: PostCallbackView; context?: "invite" | "recovery" } {
-  if (needsPassword) return { view: "set-password", context: "invite" };
-  if (needsOnboarding) return { view: "onboarding" };
+  if (flow === "invite") return { view: "set-password", context: "invite" };
+  if (flow === "recovery") return { view: "set-password", context: "recovery" };
   return { view: "login" };
 }

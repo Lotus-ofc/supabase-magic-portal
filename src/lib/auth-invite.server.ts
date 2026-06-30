@@ -4,11 +4,7 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { requireServerSupabaseAnonConfig } from "@/integrations/supabase/env.server";
-import {
-  buildAuthInviteRedirectUrl,
-  buildAuthRecoveryCallbackUrl,
-  normalizeAppUrl,
-} from "@/lib/app-url";
+import { buildAuthInviteRedirectUrl, buildAuthCallbackUrl, normalizeAppUrl } from "@/lib/app-url";
 import { resolveAuthInviteRedirectUrl, resolveServerAppUrl } from "@/lib/app-url.server";
 import { recordInviteAudit } from "@/lib/infra/invite-audit";
 import { recordInviteAccessAudit } from "@/features/access/access-audit.server";
@@ -262,13 +258,13 @@ export async function resendAuthInviteEmail(
   throw new AuthInviteError(msg, "invite_failed");
 }
 
-/** Envia e-mail de recovery com redirect estável (?flow=recovery). */
+/** Envia e-mail de recovery com redirect para /auth/callback. */
 export async function sendPasswordResetEmail(
   email: string,
   clientOrigin?: string | null,
 ): Promise<{ redirectTo: string }> {
   const { appUrl } = await assertCanSendInvites(clientOrigin);
-  const recoveryRedirect = buildAuthRecoveryCallbackUrl(appUrl);
+  const recoveryRedirect = buildAuthCallbackUrl(appUrl);
 
   const { url, anonKey } = requireServerSupabaseAnonConfig();
   const anon = createClient(url, anonKey, {

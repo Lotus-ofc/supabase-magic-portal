@@ -4,7 +4,6 @@ export const authCallbackSearchSchema = z.object({
   token_hash: z.string().optional(),
   type: z.string().optional(),
   code: z.string().optional(),
-  flow: z.string().optional(),
   error: z.string().optional(),
   error_description: z.string().optional(),
 });

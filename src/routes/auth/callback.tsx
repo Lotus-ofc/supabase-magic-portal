@@ -39,11 +39,11 @@ function AuthCallbackPage() {
         return;
       }
 
-      if (result.flow === "invite" || result.flow === "signup") {
+      if (result.flow === "invite") {
         try {
           await markInviteAccepted();
         } catch {
-          /* idempotente — lifecycle pode já estar atualizado */
+          /* idempotente */
         }
       }
 

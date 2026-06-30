@@ -472,7 +472,12 @@ export type AccessRecoveryAction =
 
 async function invalidateAllSessions(userId: string) {
   const admin = getSupabaseAdmin();
-  const { error } = await admin.auth.admin.signOut(userId, "global");
+  // admin.auth.admin.signOut() exige JWT do usuário — passar UUID causa
+  // "invalid JWT: token contains an invalid number of segments".
+  // Revogação por user_id via RPC (service role), alinhada ao schema auth.sessions.
+  const { error } = await admin.rpc("access_invalidate_auth_sessions", {
+    _user_id: userId,
+  });
   if (error) throw new Error(error.message);
 }
 
@@ -494,6 +499,9 @@ async function patchLegacyMetadataIfNeeded(userId: string): Promise<boolean> {
   const account = await fetchAccessAccount(userId);
   const lifecycle = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
   if (lifecycle === "invite_pending") return false;
+
+  // Legado: active/awaiting com login anterior — nunca convite ainda pendente.
+  if (lifecycle !== "active" && lifecycle !== "awaiting_password") return false;
 
   const stamp = user.last_sign_in_at;
   const patch = buildLotsBiMetadataPatch(
@@ -585,10 +593,14 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
       }
       case "auto_fix": {
         const account = await fetchAccessAccount(data.user_id);
-        const current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
-        if (action === "auto_fix") {
-          await patchLegacyMetadataIfNeeded(data.user_id);
+        let current = (account?.lifecycle_status ?? "invite_pending") as AccessLifecycleStatus;
+
+        if (!account && authUser.last_sign_in_at) {
+          current = "awaiting_password";
+          await upsertLifecycle(data.user_id, current);
         }
+
+        await patchLegacyMetadataIfNeeded(data.user_id);
         const { data: refreshed } = await admin.auth.admin.getUserById(data.user_id);
         const result = reconcileLifecycle(
           data.user_id,
@@ -608,6 +620,11 @@ export const performAccessRecovery = createServerFn({ method: "POST" })
         return { ok: true as const, result };
       }
       case "revalidate_metadata": {
+        const account = await fetchAccessAccount(data.user_id);
+        if (!account && authUser.last_sign_in_at) {
+          await upsertLifecycle(data.user_id, "awaiting_password");
+        }
+
         const patched = await patchLegacyMetadataIfNeeded(data.user_id);
         let reconcileResult = null;
         if (patched) {
