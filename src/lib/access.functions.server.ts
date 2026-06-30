@@ -129,12 +129,40 @@ async function buildProfileForUserId(userId: string) {
 export const assertAccessActive = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const profile = await buildProfileForUserId(context.userId);
-    return {
-      ok: profile.can_access_platform,
-      lifecycle_status: profile.lifecycle_status,
-      effective_status: profile.effective_status,
-    };
+    try {
+      const profile = await buildProfileForUserId(context.userId);
+      if (profile.can_access_platform) {
+        return {
+          ok: true,
+          lifecycle_status: profile.lifecycle_status,
+          effective_status: profile.effective_status,
+        };
+      }
+
+      // Compat: usuários legados com login anterior mas sem metadata lots_bi
+      const legacyActive =
+        profile.lifecycle_status === "active" &&
+        Boolean(profile.last_sign_in_at) &&
+        !profile.onboarding_completed_at;
+
+      if (legacyActive) {
+        return {
+          ok: true,
+          lifecycle_status: profile.lifecycle_status,
+          effective_status: "active",
+          legacy: true,
+        };
+      }
+
+      return {
+        ok: false,
+        lifecycle_status: profile.lifecycle_status,
+        effective_status: profile.effective_status,
+      };
+    } catch {
+      // Migration ainda não aplicada — não bloquear plataforma (zero-downtime)
+      return { ok: true, lifecycle_status: "active", effective_status: "active", legacy: true };
+    }
   });
 
 // ---------- Admin: versão do módulo ----------
@@ -344,6 +372,19 @@ export const markFirstAccessCompleted = createServerFn({ method: "POST" })
       user_id: context.userId,
       actor_id: context.userId,
       action: "first_access_completed",
+    });
+    return { ok: true as const };
+  });
+
+// ---------- Alteração de senha pelo usuário ----------
+export const markPasswordChangedByUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await recordAccessAuditEntry({
+      user_id: context.userId,
+      actor_id: context.userId,
+      action: "password_changed",
+      detail: "Senha alterada pelo usuário",
     });
     return { ok: true as const };
   });

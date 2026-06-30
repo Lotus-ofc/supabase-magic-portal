@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
-import {
-  createFileRoute,
-  Outlet,
-  redirect,
-  useRouter,
-  useRouterState,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAccessBlockedRedirect } from "@/features/auth";
+import { useSignOut } from "@/features/auth/use-sign-out";
+import { assertAccessActive } from "@/lib/access.functions.server";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
 import { AuthDiagnosticsBanner } from "@/components/lotus/infra/AuthDiagnosticsBanner";
 import { NotificationCenter } from "@/components/lotus/NotificationCenter";
-import { recordAudit } from "@/lib/audit-log";
 import { BRAND_NAME } from "@/lib/brand";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 import {
@@ -59,6 +55,19 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/dashboard" });
     }
 
+    const access = await context.queryClient.fetchQuery({
+      queryKey: ["me", "accessActive"],
+      queryFn: () => assertAccessActive(),
+    });
+
+    if (!access.ok) {
+      const blocked = resolveAccessBlockedRedirect(access.effective_status);
+      if (blocked.signOut) {
+        await supabase.auth.signOut();
+      }
+      throw redirect({ to: blocked.to, search: blocked.search });
+    }
+
     return { user: data.user, isAdmin };
   },
   component: AuthenticatedLayout,
@@ -86,19 +95,9 @@ function ShellImpersonateSlot() {
 
 function AuthenticatedLayout() {
   const { user, isAdmin } = Route.useRouteContext();
-  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inAdmin = pathname.startsWith("/admin");
-
-  const signOut = async () => {
-    recordAudit({
-      action: "logout",
-      detail: "Sessão encerrada pelo usuário",
-      userEmail: user.email ?? undefined,
-    });
-    await supabase.auth.signOut();
-    router.navigate({ to: "/auth" });
-  };
+  const signOut = useSignOut(user.email);
 
   const adminGroups: NavGroup[] = [
     {

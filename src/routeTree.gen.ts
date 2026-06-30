@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthenticatedPlanoEstrategicoRouteImport } from './routes/_authenticated/plano-estrategico'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAprovacoesRouteImport } from './routes/_authenticated/aprovacoes'
@@ -23,6 +25,7 @@ import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPlanoEstrategicoRouteImport } from './routes/_authenticated/admin/plano-estrategico'
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
+import { Route as AuthenticatedAccountSecurityRouteImport } from './routes/_authenticated/account/security'
 import { Route as AuthenticatedAdminKnowledgeRouteRouteImport } from './routes/_authenticated/admin/knowledge/route'
 import { Route as AuthenticatedClienteClienteIndexRouteImport } from './routes/_authenticated/cliente.$cliente.index'
 import { Route as AuthenticatedAdminUsuariosIndexRouteImport } from './routes/_authenticated/admin/usuarios.index'
@@ -44,7 +47,7 @@ import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedClienteClientePlanoEstrategicoIndexRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.index'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoPlanoIdRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.$planoId'
 
-const AuthRoute = AuthRouteImport.update({
+const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
@@ -57,6 +60,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthenticatedPlanoEstrategicoRoute =
   AuthenticatedPlanoEstrategicoRouteImport.update({
@@ -119,6 +132,12 @@ const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAccountSecurityRoute =
+  AuthenticatedAccountSecurityRouteImport.update({
+    id: '/account/security',
+    path: '/account/security',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminKnowledgeRouteRoute =
   AuthenticatedAdminKnowledgeRouteRouteImport.update({
     id: '/knowledge',
@@ -242,12 +261,15 @@ const AuthenticatedClienteClientePlanoEstrategicoPlanoIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/plano-estrategico': typeof AuthenticatedPlanoEstrategicoRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/': typeof AuthIndexRoute
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
+  '/account/security': typeof AuthenticatedAccountSecurityRoute
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -277,10 +299,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/plano-estrategico': typeof AuthenticatedPlanoEstrategicoRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth': typeof AuthIndexRoute
+  '/account/security': typeof AuthenticatedAccountSecurityRoute
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -309,12 +333,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/aprovacoes': typeof AuthenticatedAprovacoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/plano-estrategico': typeof AuthenticatedPlanoEstrategicoRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/': typeof AuthIndexRoute
   '/_authenticated/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
+  '/_authenticated/account/security': typeof AuthenticatedAccountSecurityRoute
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/_authenticated/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -351,7 +378,10 @@ export interface FileRouteTypes {
     | '/aprovacoes'
     | '/dashboard'
     | '/plano-estrategico'
+    | '/auth/callback'
+    | '/auth/'
     | '/admin/knowledge'
+    | '/account/security'
     | '/admin/debug'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
@@ -381,10 +411,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/aprovacoes'
     | '/dashboard'
     | '/plano-estrategico'
+    | '/auth/callback'
+    | '/auth'
+    | '/account/security'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
     | '/admin/relatorios'
@@ -417,7 +449,10 @@ export interface FileRouteTypes {
     | '/_authenticated/aprovacoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/plano-estrategico'
+    | '/auth/callback'
+    | '/auth/'
     | '/_authenticated/admin/knowledge'
+    | '/_authenticated/account/security'
     | '/_authenticated/admin/debug'
     | '/_authenticated/admin/editorial'
     | '/_authenticated/admin/plano-estrategico'
@@ -449,7 +484,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -458,7 +493,7 @@ declare module '@tanstack/react-router' {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -474,6 +509,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/': {
+      id: '/auth/'
+      path: '/'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/_authenticated/plano-estrategico': {
       id: '/_authenticated/plano-estrategico'
@@ -551,6 +600,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/debug'
       preLoaderRoute: typeof AuthenticatedAdminDebugRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/account/security': {
+      id: '/_authenticated/account/security'
+      path: '/account/security'
+      fullPath: '/account/security'
+      preLoaderRoute: typeof AuthenticatedAccountSecurityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/knowledge': {
       id: '/_authenticated/admin/knowledge'
@@ -825,6 +881,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAprovacoesRoute: typeof AuthenticatedAprovacoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPlanoEstrategicoRoute: typeof AuthenticatedPlanoEstrategicoRoute
+  AuthenticatedAccountSecurityRoute: typeof AuthenticatedAccountSecurityRoute
   AuthenticatedClienteClienteRoute: typeof AuthenticatedClienteClienteRouteWithChildren
 }
 
@@ -833,6 +890,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAprovacoesRoute: AuthenticatedAprovacoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPlanoEstrategicoRoute: AuthenticatedPlanoEstrategicoRoute,
+  AuthenticatedAccountSecurityRoute: AuthenticatedAccountSecurityRoute,
   AuthenticatedClienteClienteRoute:
     AuthenticatedClienteClienteRouteWithChildren,
 }
@@ -840,10 +898,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+}
+
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthIndexRoute: AuthIndexRoute,
+}
+
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
