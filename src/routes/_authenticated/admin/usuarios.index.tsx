@@ -1,11 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { listUsersWithRoles } from "@/lib/admin.functions";
+import { listUsersWithRoles, resendUserInvite } from "@/lib/admin.functions";
 import { adminTitle } from "@/lib/brand";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { TextInput } from "@/components/lotus/FormField";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/lotus/ConfirmDialog";
+import { toast } from "sonner";
 import {
   Search,
   ShieldCheck,
@@ -14,6 +18,7 @@ import {
   Users as UsersIcon,
   CheckCircle2,
   Clock3,
+  Send,
 } from "lucide-react";
 
 const usersQuery = {
@@ -30,6 +35,35 @@ export const Route = createFileRoute("/_authenticated/admin/usuarios/")({
   ),
 });
 
+type UserRow = {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+  invited_at: string | null;
+  invite_pending: boolean;
+  invite_last_sent_at: string | null;
+  invite_resend_count: number;
+  invite_last_success: boolean | null;
+  tipo: "admin" | "cliente";
+  clientes: string[];
+};
+
+function fmtDateTime(iso?: string | null) {
+  if (!iso) return "—";
+  try {
+    return new Date(iso).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "—";
+  }
+}
+
 function fmtDate(iso?: string | null) {
   if (!iso) return "—";
   try {
@@ -44,21 +78,42 @@ function fmtDate(iso?: string | null) {
 }
 
 function UsuariosPage() {
+  const queryClient = useQueryClient();
   const { data: users } = useSuspenseQuery(usersQuery);
+  const resendFn = useServerFn(resendUserInvite);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"todos" | "admin" | "cliente">("todos");
+  const [filter, setFilter] = useState<"todos" | "admin" | "cliente" | "pendente">("todos");
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const [confirmResend, setConfirmResend] = useState<UserRow | null>(null);
 
-  const all = users ?? [];
-  const rows = all.filter((u: any) => {
-    if (filter !== "todos" && u.tipo !== filter) return false;
+  const resendMut = useMutation({
+    mutationFn: (userId: string) =>
+      resendFn({
+        data: { user_id: userId, client_origin: window.location.origin },
+      }),
+    onSuccess: () => {
+      toast.success("E-mail de convite reenviado com sucesso.");
+      setConfirmResend(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "users-with-roles"] });
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Falha ao reenviar convite"),
+    onSettled: () => setResendingId(null),
+  });
+
+  const all = (users ?? []) as UserRow[];
+  const rows = all.filter((u) => {
+    if (filter === "pendente" && u.last_sign_in_at) return false;
+    if (filter === "admin" && u.tipo !== "admin") return false;
+    if (filter === "cliente" && u.tipo !== "cliente") return false;
     if (search && !u.email.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
   const counts = {
     todos: all.length,
-    admin: all.filter((u: any) => u.tipo === "admin").length,
-    cliente: all.filter((u: any) => u.tipo === "cliente").length,
+    admin: all.filter((u) => u.tipo === "admin").length,
+    cliente: all.filter((u) => u.tipo === "cliente").length,
+    pendente: all.filter((u) => !u.last_sign_in_at).length,
   };
 
   return (
@@ -66,7 +121,7 @@ function UsuariosPage() {
       <PageHeader
         eyebrow="Operações"
         title="Usuários"
-        description="Administradores e clientes com acesso à plataforma."
+        description="Convites pendentes podem receber novo e-mail sem recriar o usuário."
         actions={
           <Link
             to="/admin/usuarios/novo"
@@ -77,10 +132,11 @@ function UsuariosPage() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Total" value={String(counts.todos)} icon={UsersIcon} />
         <StatCard label="Administradores" value={String(counts.admin)} icon={ShieldCheck} />
         <StatCard label="Clientes" value={String(counts.cliente)} icon={User} />
+        <StatCard label="Convite pendente" value={String(counts.pendente)} icon={Clock3} />
       </div>
 
       <div className="lotus-surface overflow-hidden">
@@ -94,10 +150,11 @@ function UsuariosPage() {
               className="pl-9"
             />
           </div>
-          <div className="flex shrink-0 items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
+          <div className="flex shrink-0 flex-wrap items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
             {(
               [
                 { key: "todos", label: "Todos" },
+                { key: "pendente", label: "Pendentes" },
                 { key: "admin", label: "Admins" },
                 { key: "cliente", label: "Clientes" },
               ] as const
@@ -129,18 +186,20 @@ function UsuariosPage() {
                   Clientes vinculados
                 </th>
                 <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Cadastrado em</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Convite</th>
                 <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Status</th>
+                <th className="lotus-table-head-sticky px-4 py-2.5 font-medium">Ações</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     Nenhum usuário encontrado.
                   </td>
                 </tr>
               )}
-              {rows.map((u: any) => (
+              {rows.map((u) => (
                 <tr key={u.id} className="border-t border-border/60 hover:bg-muted/20">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -173,7 +232,7 @@ function UsuariosPage() {
                       <span className="text-[11.5px] text-muted-foreground">—</span>
                     ) : (
                       <div className="flex flex-wrap gap-1">
-                        {u.clientes.slice(0, 3).map((c: string) => (
+                        {u.clientes.slice(0, 3).map((c) => (
                           <span
                             key={c}
                             className="inline-flex items-center rounded-md border border-border/70 bg-muted/50 px-1.5 py-0.5 text-[10.5px] font-medium text-muted-foreground"
@@ -192,6 +251,29 @@ function UsuariosPage() {
                   <td className="px-4 py-3 text-[12px] text-muted-foreground">
                     {fmtDate(u.created_at)}
                   </td>
+                  <td className="px-4 py-3 text-[11.5px] text-muted-foreground">
+                    {u.invite_pending ? (
+                      <div className="space-y-0.5">
+                        <p>
+                          <span className="text-muted-foreground/80">Enviado: </span>
+                          {fmtDateTime(u.invited_at ?? u.invite_last_sent_at)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground/80">Último envio: </span>
+                          {fmtDateTime(u.invite_last_sent_at)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground/80">Reenvios: </span>
+                          {u.invite_resend_count}
+                        </p>
+                        {u.invite_last_success === false && (
+                          <p className="text-destructive">Último envio falhou</p>
+                        )}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {u.last_sign_in_at ? (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-success/12 px-2 py-0.5 text-[11px] font-medium text-[color:var(--success)]">
@@ -203,12 +285,48 @@ function UsuariosPage() {
                       </span>
                     )}
                   </td>
+                  <td className="px-4 py-3">
+                    {!u.last_sign_in_at && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1.5 text-[11px]"
+                        disabled={resendingId === u.id || resendMut.isPending}
+                        onClick={() => setConfirmResend(u)}
+                      >
+                        <Send className="h-3 w-3" />
+                        Reenviar e-mail
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!confirmResend}
+        onOpenChange={(open) => !open && setConfirmResend(null)}
+        title="Reenviar e-mail de convite?"
+        description={
+          confirmResend ? (
+            <>
+              Um novo e-mail será enviado para{" "}
+              <span className="font-medium text-foreground">{confirmResend.email}</span> com o link
+              correto de acesso. O usuário não será recriado.
+            </>
+          ) : undefined
+        }
+        confirmLabel="Reenviar e-mail"
+        onConfirm={() => {
+          if (!confirmResend) return;
+          setResendingId(confirmResend.id);
+          resendMut.mutate(confirmResend.id);
+        }}
+      />
     </div>
   );
 }

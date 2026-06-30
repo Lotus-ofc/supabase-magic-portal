@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Plus, ExternalLink } from "lucide-react";
-import { listPlanos, createPlano } from "@/lib/strategic-plan.functions";
+import { Plus, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { listPlanos, createPlano, deletePlano, updatePlano } from "@/lib/strategic-plan.functions";
 import { listClientes } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Field, TextInput, Select } from "@/components/lotus/FormField";
+import { ConfirmDialog } from "@/components/lotus/ConfirmDialog";
 import { adminTitle } from "@/lib/brand";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
@@ -18,9 +19,14 @@ export const Route = createFileRoute("/_authenticated/admin/plano-estrategico")(
   component: AdminPlanoPage,
 });
 
+type PlanoRow = { id: string; titulo: string; cliente_nome: string; cadastro_cliente_id: number };
+
 function AdminPlanoPage() {
   const listFn = useServerFn(listPlanos);
   const createFn = useServerFn(createPlano);
+  const deleteFn = useServerFn(deletePlano);
+  const updateFn = useServerFn(updatePlano);
+
   const { data: planos, refetch } = useQuery({
     queryKey: ["strategic-plan", "admin"],
     queryFn: () => listFn({ data: { status: "ativo" } }),
@@ -33,11 +39,35 @@ function AdminPlanoPage() {
   const [showForm, setShowForm] = useState(false);
   const [clienteId, setClienteId] = useState("");
   const [titulo, setTitulo] = useState("");
+  const [editingPlano, setEditingPlano] = useState<PlanoRow | null>(null);
+  const [editTitulo, setEditTitulo] = useState("");
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const clientesSemPlano = (clientes ?? []).filter(
     (c: { id: number; nome_cliente: string }) =>
-      !(planos ?? []).some((p: { cadastro_cliente_id: number }) => p.cadastro_cliente_id === c.id),
+      !(planos ?? []).some((p: PlanoRow) => p.cadastro_cliente_id === c.id),
   );
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Plano excluído");
+      setPendingDeleteId(null);
+      void refetch();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao excluir"),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: (p: { id: string; titulo: string }) =>
+      updateFn({ data: { id: p.id, titulo: p.titulo } }),
+    onSuccess: () => {
+      toast.success("Plano atualizado");
+      setEditingPlano(null);
+      void refetch();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao salvar"),
+  });
 
   const handleCreate = async () => {
     if (!clienteId) return;
@@ -63,7 +93,7 @@ function AdminPlanoPage() {
       <PageHeader
         eyebrow="Centro Estratégico"
         title="Planos Estratégicos"
-        description="Um plano contínuo por cliente. A evolução acontece por objetivos estratégicos."
+        description="Um plano contínuo por cliente. Edite ou exclua planos de teste quando necessário."
         actions={
           clientesSemPlano.length > 0 ? (
             <Button size="sm" className="gap-1.5" onClick={() => setShowForm((v) => !v)}>
@@ -105,21 +135,77 @@ function AdminPlanoPage() {
         </SectionCard>
       )}
 
+      {editingPlano && (
+        <SectionCard title="Renomear plano" className="max-w-lg">
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">{editingPlano.cliente_nome}</p>
+            <Field label="Nome do plano" required>
+              <TextInput value={editTitulo} onChange={(e) => setEditTitulo(e.target.value)} />
+            </Field>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                disabled={!editTitulo.trim() || updateMut.isPending}
+                onClick={() =>
+                  updateMut.mutate({ id: editingPlano.id, titulo: editTitulo.trim() })
+                }
+              >
+                Salvar
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setEditingPlano(null)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </SectionCard>
+      )}
+
       <SectionCard title="Clientes com plano ativo">
         <div className="space-y-2">
-          {(planos ?? []).map((p: { id: string; titulo: string; cliente_nome: string }) => (
-            <Link
+          {(planos ?? []).map((p: PlanoRow) => (
+            <div
               key={p.id}
-              to="/cliente/$cliente/plano-estrategico/$planoId"
-              params={{ cliente: slugify(p.cliente_nome), planoId: p.id }}
-              className="flex items-center justify-between rounded-lg border border-border/70 px-4 py-3 hover:border-primary/30"
+              className="flex items-center justify-between gap-2 rounded-lg border border-border/70 px-4 py-3"
             >
-              <div>
+              <div className="min-w-0">
                 <p className="font-medium text-foreground">{p.titulo}</p>
                 <p className="text-xs text-muted-foreground">{p.cliente_nome}</p>
               </div>
-              <ExternalLink className="h-4 w-4 text-muted-foreground" />
-            </Link>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  aria-label={`Renomear ${p.titulo}`}
+                  onClick={() => {
+                    setEditingPlano(p);
+                    setEditTitulo(p.titulo);
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive"
+                  aria-label={`Excluir ${p.titulo}`}
+                  onClick={() => setPendingDeleteId(p.id)}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                  <Link
+                    to="/cliente/$cliente/plano-estrategico/$planoId"
+                    params={{ cliente: slugify(p.cliente_nome), planoId: p.id }}
+                    aria-label={`Abrir ${p.titulo}`}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           ))}
           {(planos ?? []).length === 0 && (
             <p className="text-sm text-muted-foreground">
@@ -128,6 +214,16 @@ function AdminPlanoPage() {
           )}
         </div>
       </SectionCard>
+
+      <ConfirmDialog
+        open={!!pendingDeleteId}
+        onOpenChange={(o) => !o && setPendingDeleteId(null)}
+        title="Excluir plano permanentemente?"
+        description="Todos os objetivos, estratégias, KPIs e histórico vinculados serão removidos. Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        variant="destructive"
+        onConfirm={() => pendingDeleteId && deleteMut.mutate(pendingDeleteId)}
+      />
     </div>
   );
 }

@@ -10,6 +10,13 @@ import {
   SERVICOS_SELECT,
 } from "@/lib/db-selects";
 import { OVERVIEW_CLIENTE_SELECT } from "@/lib/metrics";
+import { resolveAuthInviteRedirectUrl } from "@/lib/app-url.server";
+import { AuthInviteError, resendAuthInviteEmail, sendAuthInviteEmail } from "@/lib/auth-invite.server";
+import { getInviteStatsForEmail } from "@/lib/infra/invite-audit";
+import {
+  evaluateAuthDiagnostics,
+  evaluateSystemDiagnostics,
+} from "@/lib/infra/system-diagnostics.server";
 
 type AuthCtx = {
   supabase: Parameters<typeof resolveIsAdmin>[0]["supabase"];
@@ -347,11 +354,20 @@ export const listUsersWithRoles = createServerFn({ method: "GET" })
     return usersRes.data.users.map((u) => {
       const roles = rolesByUser.get(u.id) ?? [];
       const isAdmin = roles.includes("admin");
+      const email = u.email ?? "";
+      const audit = getInviteStatsForEmail(email);
       return {
         id: u.id,
-        email: u.email ?? "",
+        email,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at ?? null,
+        invited_at: u.invited_at ?? null,
+        confirmation_sent_at: u.confirmation_sent_at ?? null,
+        email_confirmed_at: u.email_confirmed_at ?? null,
+        invite_pending: !u.last_sign_in_at,
+        invite_last_sent_at: audit.last_sent_at ?? u.confirmation_sent_at ?? u.invited_at ?? null,
+        invite_resend_count: audit.resend_count,
+        invite_last_success: audit.last_success,
         is_admin: isAdmin,
         tipo: isAdmin ? ("admin" as const) : ("cliente" as const),
         clientes: accessByUser.get(u.id) ?? [],
@@ -410,6 +426,7 @@ export const createUserAccount = createServerFn({ method: "POST" })
         mode: z.enum(["invite", "password"]).default("invite"),
         password: z.string().min(8).max(72).optional().nullable(),
         cadastro_cliente_id: z.number().int().optional().nullable(),
+        client_origin: z.string().url().optional().nullable(),
       })
       .parse(d),
   )
@@ -424,24 +441,18 @@ export const createUserAccount = createServerFn({ method: "POST" })
     const genPwd = () => `LotsBI#${Math.random().toString(36).slice(2, 10)}A1`;
 
     if (data.mode === "invite") {
-      const { data: invited, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(
-        data.email,
-        { data: { full_name: data.nome ?? undefined } },
-      );
-      if (error) {
-        const temp = data.password && data.password.length >= 8 ? data.password : genPwd();
-        const { data: created, error: e2 } = await supabaseAdmin.auth.admin.createUser({
-          email: data.email,
-          password: temp,
-          email_confirm: true,
-          user_metadata: { full_name: data.nome ?? undefined },
-        });
-        if (e2) throw new Error(translatePgError(e2.message));
-        userId = created.user?.id ?? null;
-        tempPassword = temp;
-      } else {
-        userId = invited.user?.id ?? null;
+      try {
+        const invite = await sendAuthInviteEmail(
+          supabaseAdmin,
+          data.email,
+          { full_name: data.nome },
+          data.client_origin,
+        );
+        userId = invite.userId;
         inviteSent = true;
+      } catch (err) {
+        if (err instanceof AuthInviteError) throw new Error(err.message);
+        throw err;
       }
     } else {
       const temp = data.password && data.password.length >= 8 ? data.password : genPwd();
@@ -482,7 +493,103 @@ export const createUserAccount = createServerFn({ method: "POST" })
       }
     }
 
-    return { user_id: userId, invite_sent: inviteSent, temp_password: tempPassword };
+    return {
+      user_id: userId,
+      invite_sent: inviteSent,
+      temp_password: tempPassword,
+      invite_redirect_to: inviteSent ? resolveAuthInviteRedirectUrl() : null,
+    };
+  });
+
+// ---------- REENVIAR CONVITE ----------
+export const resendUserInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        client_origin: z.string().url().optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(
+      data.user_id,
+    );
+    if (userError) throw new Error(userError.message);
+    const email = userData.user?.email;
+    if (!email) throw new Error("Usuário sem e-mail cadastrado.");
+
+    try {
+      const invite = await resendAuthInviteEmail(
+        supabaseAdmin,
+        email,
+        data.user_id,
+        {
+          full_name: (userData.user?.user_metadata?.full_name as string | undefined) ?? null,
+        },
+        data.client_origin,
+      );
+      return { ok: true as const, invite_redirect_to: invite.redirectTo };
+    } catch (err) {
+      if (err instanceof AuthInviteError) throw new Error(err.message);
+      throw err;
+    }
+  });
+
+// ---------- DIAGNÓSTICO AUTH (admin) ----------
+export const getAuthDiagnostics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ client_origin: z.string().url().optional().nullable() }).optional().parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    return evaluateAuthDiagnostics(data?.client_origin ?? null);
+  });
+
+// ---------- DIAGNÓSTICO SISTEMA (admin / debug) ----------
+export const getSystemDiagnostics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ client_origin: z.string().url().optional().nullable() }).optional().parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: plataformas } = await supabaseAdmin.from("base_metricas").select("plataforma");
+    const porPlataforma: Record<string, number> = {};
+    (plataformas ?? []).forEach((r: { plataforma?: string }) => {
+      const k = r?.plataforma ?? "(null)";
+      porPlataforma[k] = (porPlataforma[k] ?? 0) + 1;
+    });
+
+    return evaluateSystemDiagnostics(
+      data?.client_origin ?? null,
+      Object.entries(porPlataforma).map(([plataforma, total]) => ({ plataforma, total })),
+    );
+  });
+
+// ---------- CONFIG CONVITE (admin / diagnóstico legado) ----------
+export const getAuthInviteConfig = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const report = await evaluateAuthDiagnostics();
+    return {
+      ok: report.invites_allowed,
+      app_url: report.app_url_configured,
+      invite_redirect_to: report.invite_redirect,
+      localhost_warning: report.app_url_configured
+        ? report.app_url_configured.includes("localhost")
+        : false,
+      error: report.block_invites_reason,
+      auth: report,
+    };
   });
 
 // ---------- DEBUG / DIAGNÓSTICO ----------
@@ -583,6 +690,7 @@ export const getDebugSnapshot = createServerFn({ method: "GET" })
       total_registros: totalCount.count ?? null,
       total_clientes: clientesSet.size,
       ultima_data: (ultimaDataRes.data as any[] | null)?.[0]?.data ?? null,
+      auth_invite: await evaluateAuthDiagnostics(),
       por_plataforma: Object.entries(porPlataforma)
         .map(([plataforma, total]) => ({ plataforma, total }))
         .sort((a, b) => b.total - a.total),

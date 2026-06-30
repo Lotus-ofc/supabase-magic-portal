@@ -1149,6 +1149,92 @@ export const addPlanoComment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const PLANO_ENTITY_TABLE = {
+  objetivo: "plano_objetivos",
+  estrategia: "plano_estrategias",
+  hipotese: "plano_hipoteses",
+  decisao: "plano_decisoes",
+  acao: "plano_acoes",
+  metric_ref: "plano_metric_refs",
+  oportunidade: "plano_oportunidades",
+  aprendizado: "plano_aprendizados",
+  roadmap_marco: "plano_roadmap_marcos",
+} as const;
+
+type PlanoDeleteEntity = keyof typeof PLANO_ENTITY_TABLE;
+
+// ---------- DELETE PLANO (admin) ----------
+export const deletePlano = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase
+      .from("planos_estrategicos")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+// ---------- ARCHIVE PLANO (admin) ----------
+export const archivePlano = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: row, error } = await context.supabase
+      .from("planos_estrategicos")
+      .update({ status: "arquivado" })
+      .eq("id", data.id)
+      .select(PLANO_ESTRATEGICO_SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    await recordEvent(context, {
+      plano_id: data.id,
+      tipo: "edicao",
+      entity_type: "plano",
+      entity_id: data.id,
+      mensagem: "Plano arquivado",
+    });
+    return row;
+  });
+
+// ---------- DELETE PLANO ENTITY ----------
+export const deletePlanoEntity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        plano_id: z.string().uuid(),
+        entity: z.enum(
+          Object.keys(PLANO_ENTITY_TABLE) as [
+            PlanoDeleteEntity,
+            ...PlanoDeleteEntity[],
+          ],
+        ),
+        id: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const table = PLANO_ENTITY_TABLE[data.entity];
+    const { error } = await context.supabase
+      .from(table)
+      .delete()
+      .eq("id", data.id)
+      .eq("plano_id", data.plano_id);
+    if (error) throw new Error(error.message);
+    await recordEvent(context, {
+      plano_id: data.plano_id,
+      tipo: "edicao",
+      entity_type: data.entity,
+      entity_id: data.id,
+      mensagem: "Registro excluído",
+    });
+    return { ok: true as const };
+  });
+
 // ---------- LIST ESTRATEGIAS FOR CLIENT (editorial picker) ----------
 export const listEstrategiasForCliente = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

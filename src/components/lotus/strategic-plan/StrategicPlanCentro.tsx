@@ -125,8 +125,10 @@ export function StrategicPlanCentro({
         onOpenChange={setManageOpen}
         planoId={planoId}
         plano={data.plano}
+        data={data}
         objetivoAtualId={objetivoAtual?.id ?? null}
         estrategias={estrategiasDoObjetivo}
+        isAdmin={isAdmin}
         onComment={(msg) => commentMut.mutate(msg)}
       />
     </div>

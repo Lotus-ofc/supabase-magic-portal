@@ -73,6 +73,7 @@ Produção ainda pode ser publicada via **Lovable** (sync do branch `main`).
    - `CLOUDFLARE_API_TOKEN`
    - `VITE_OFFICIAL_SUPABASE_URL`, `VITE_OFFICIAL_SUPABASE_ANON_KEY`, `VITE_OFFICIAL_SUPABASE_PROJECT_ID`
    - `OFFICIAL_SUPABASE_URL`, `OFFICIAL_SUPABASE_ANON_KEY`, `OFFICIAL_SERVICE_ROLE_KEY`
+   - `APP_URL` — URL pública do portal (ex.: `https://seu-dominio.com`), usada nos convites por e-mail
 
 2. **Manual (local):** após `npm run build`:
    ```bash

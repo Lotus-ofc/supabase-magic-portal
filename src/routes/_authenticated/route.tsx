@@ -9,6 +9,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { AppShell, type NavGroup } from "@/components/lotus/AppShell";
+import { AuthDiagnosticsBanner } from "@/components/lotus/infra/AuthDiagnosticsBanner";
 import { NotificationCenter } from "@/components/lotus/NotificationCenter";
 import { recordAudit } from "@/lib/audit-log";
 import { BRAND_NAME } from "@/lib/brand";
@@ -115,7 +116,7 @@ function AuthenticatedLayout() {
     {
       label: "Diagnóstico",
       items: [
-        { to: "/admin/debug", label: "Debug de dados", icon: Bug },
+        { to: "/admin/debug", label: "Painel operacional", icon: Bug },
         { to: "/admin/debug/views", label: "Auditoria de views", icon: Bug },
       ],
     },
@@ -189,6 +190,7 @@ function AuthenticatedLayout() {
         </div>
       }
     >
+      {inAdmin && isAdmin && <AuthDiagnosticsBanner />}
       <Outlet />
     </AppShell>
   );

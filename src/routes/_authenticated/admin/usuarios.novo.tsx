@@ -36,6 +36,7 @@ function NovoUsuarioPage() {
     invite_sent: boolean;
     temp_password: string | null;
     user_id: string;
+    invite_redirect_to?: string | null;
   } | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
@@ -53,6 +54,7 @@ function NovoUsuarioPage() {
           tipo,
           mode,
           cadastro_cliente_id: clienteId ? Number(clienteId) : null,
+          client_origin: window.location.origin,
         },
       });
       setResult(res);
@@ -60,7 +62,13 @@ function NovoUsuarioPage() {
         res.invite_sent ? "Convite enviado por email." : "Usuário criado com senha temporária.",
       );
     } catch (err: any) {
-      toast.error(err?.message ?? "Falha ao criar usuário.");
+      const msg = err?.message ?? "Falha ao criar usuário.";
+      toast.error(msg);
+      if (/já está cadastrado|reenviar convite/i.test(msg)) {
+        toast.message("Dica", {
+          description: "Vá em Admin → Usuários, filtre por Pendentes e use “Reenviar e-mail”.",
+        });
+      }
     } finally {
       setSaving(false);
     }
@@ -77,10 +85,18 @@ function NovoUsuarioPage() {
         <SectionCard eyebrow="Acesso" title={email}>
           <div className="space-y-3 text-[13px]">
             {result.invite_sent ? (
-              <p className="flex items-center gap-2 text-foreground">
-                <Send className="h-4 w-4 text-primary" /> Convite enviado por email. O usuário
-                receberá um link para definir a senha.
-              </p>
+              <div className="space-y-2">
+                <p className="flex items-center gap-2 text-foreground">
+                  <Send className="h-4 w-4 text-primary" /> Convite enviado por email. O usuário
+                  receberá um link para definir a senha.
+                </p>
+                {result.invite_redirect_to && (
+                  <p className="rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
+                    Link de redirecionamento:{" "}
+                    <span className="font-mono text-foreground">{result.invite_redirect_to}</span>
+                  </p>
+                )}
+              </div>
             ) : (
               <>
                 <p className="flex items-center gap-2 text-foreground">

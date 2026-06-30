@@ -51,6 +51,7 @@ jobs:
           OFFICIAL_SUPABASE_URL: ${{ secrets.OFFICIAL_SUPABASE_URL }}
           OFFICIAL_SUPABASE_ANON_KEY: ${{ secrets.OFFICIAL_SUPABASE_ANON_KEY }}
           OFFICIAL_SERVICE_ROLE_KEY: ${{ secrets.OFFICIAL_SERVICE_ROLE_KEY }}
+          APP_URL: ${{ secrets.APP_URL }}
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

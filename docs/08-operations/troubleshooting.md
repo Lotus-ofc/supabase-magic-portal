@@ -72,6 +72,35 @@ Depois: logout → login novamente em `/auth` para atualizar a sessão.
 
 ---
 
+## Convite por e-mail aponta para localhost
+
+### Sintomas
+
+O botão do e-mail de convite (usuário ou admin) abre `http://localhost:...` em vez do portal em produção.
+
+### Causa
+
+O Supabase usa a **URL de redirecionamento** configurada no envio do convite. Sem `APP_URL` no servidor, o projeto pode cair no **Site URL** padrão do dashboard (muitas vezes `localhost` de dev).
+
+### Correção
+
+1. **Runtime do app (Lovable ou Cloudflare):** defina `APP_URL` com a URL pública do portal, **sem barra no final**  
+   Ex.: `https://portal.suaempresa.com`
+
+2. **Supabase Dashboard → Authentication → URL Configuration:**
+   - **Site URL:** mesma URL de produção (`APP_URL`)
+   - **Redirect URLs:** inclua `https://portal.suaempresa.com/auth` (e `http://localhost:5173/auth` só para dev local)
+
+3. **Redeploy** após alterar secrets (o convite é gerado no servidor com `redirectTo`).
+
+4. **Reenviar convite:** usuários já convidados com link antigo precisam de novo convite (Admin → Usuários → novo usuário ou fluxo de reenvio).
+
+### Local
+
+No `.env` local use `APP_URL=http://localhost:5173` para testar convites em dev.
+
+---
+
 ## Build falha
 
 ```bash

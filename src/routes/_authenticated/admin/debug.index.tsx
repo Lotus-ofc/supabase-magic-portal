@@ -1,11 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { adminTitle } from "@/lib/brand";
-import { getDebugSnapshot } from "@/lib/admin.functions";
+import { getDebugSnapshot, getSystemDiagnostics } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { StatCard } from "@/components/lotus/StatCard";
 import { SectionCard } from "@/components/lotus/SectionCard";
+import { SystemDiagnosticsPanel } from "@/components/lotus/infra/SystemDiagnosticsPanel";
 import { Database, Users, CalendarClock, Layers } from "lucide-react";
+
+const clientOrigin = typeof window !== "undefined" ? window.location.origin : null;
+
+const systemQuery = queryOptions({
+  queryKey: ["admin", "system-diagnostics", clientOrigin],
+  queryFn: () => getSystemDiagnostics({ data: { client_origin: clientOrigin } }),
+  staleTime: 30_000,
+});
 
 const debugQuery = queryOptions({
   queryKey: ["admin", "debug"],
@@ -14,13 +23,14 @@ const debugQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/debug/")({
-  head: () => ({ meta: [{ title: adminTitle("Debug de dados") }] }),
+  head: () => ({ meta: [{ title: adminTitle("Painel operacional") }] }),
   loader: ({ context }) => {
+    void context.queryClient.ensureQueryData(systemQuery);
     void context.queryClient.ensureQueryData(debugQuery);
   },
   component: DebugPage,
   errorComponent: ({ error }) => (
-    <div className="lotus-surface p-4 text-sm text-danger">Erro: {error.message}</div>
+    <div className="lotus-surface p-4 text-sm text-destructive">Erro: {error.message}</div>
   ),
 });
 
@@ -66,14 +76,23 @@ function ViewBlock({
 }
 
 function DebugPage() {
+  const { data: system } = useSuspenseQuery(systemQuery);
   const { data } = useSuspenseQuery(debugQuery);
 
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Diagnóstico"
-        title="Debug · Camada de dados"
-        description="Snapshot bruto de base_metricas e das views analíticas. Acesso restrito a administradores."
+        title="Painel operacional"
+        description="Infraestrutura, autenticação, integrações e camada de dados — acesso restrito a administradores."
+      />
+
+      <SystemDiagnosticsPanel data={system} />
+
+      <PageHeader
+        eyebrow="Dados"
+        title="Camada analítica"
+        description="Snapshot bruto de base_metricas e views."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -96,10 +115,7 @@ function DebugPage() {
         />
       </div>
 
-      <SectionCard
-        title="Registros por plataforma"
-        description="Contagem total agrupada por plataforma (raw)."
-      >
+      <SectionCard title="Registros por plataforma">
         {data.por_plataforma.length === 0 ? (
           <div className="rounded-md border border-dashed border-border p-4 text-xs text-muted-foreground">
             Nenhum dado encontrado em base_metricas.
@@ -123,19 +139,6 @@ function DebugPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </SectionCard>
-
-      <SectionCard
-        title="Últimos 20 registros inseridos"
-        description="Ordenado por created_at desc."
-      >
-        {data.ultimos.error ? (
-          <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
-            {data.ultimos.error}
-          </div>
-        ) : (
-          <JsonBlock data={data.ultimos.data ?? []} />
         )}
       </SectionCard>
 
