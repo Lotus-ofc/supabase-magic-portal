@@ -1,7 +1,7 @@
 -- =========================================================
--- 15_auth_invalidate_sessions.sql  (aditivo, idempotente)
--- Revoga sessões Auth por user_id via service role.
--- GoTrue admin.signOut() exige JWT do usuário (não UUID).
+-- 17_fix_invalidate_sessions_uuid_cast.sql  (aditivo, idempotente)
+-- Corrige: operator does not exist: character varying = uuid
+-- em auth.refresh_tokens (user_id varchar) vs parâmetro uuid.
 -- =========================================================
 
 CREATE OR REPLACE FUNCTION public.access_invalidate_auth_sessions(_user_id uuid)
@@ -15,7 +15,6 @@ BEGIN
     RAISE EXCEPTION 'user_id required';
   END IF;
 
-  -- refresh_tokens.user_id é varchar(255); sessions.user_id é uuid
   DELETE FROM auth.refresh_tokens WHERE user_id = _user_id::text;
   DELETE FROM auth.sessions WHERE user_id = _user_id;
 END;

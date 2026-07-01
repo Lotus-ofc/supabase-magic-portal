@@ -111,7 +111,6 @@ function UsuarioDetalhePage() {
         <UserAccessDiagnostics profile={p} />
         <RecoveryModePanel
           busy={recoveryMut.isPending}
-          defaultExpanded={p.effective_status !== "active"}
           onAction={(action) => {
             if (action === "delete_user") {
               const ok = window.confirm(
