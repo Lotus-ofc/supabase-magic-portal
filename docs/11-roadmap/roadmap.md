@@ -3,7 +3,7 @@ title: Roadmap & Dívidas Técnicas
 description: Direção de evolução da Lotus — estado atual, arquitetura alvo e dívidas priorizadas.
 status: living
 owner: Engenharia / Produto Lotus
-last_review: 2026-06-30
+last_review: 2026-07-01
 ---
 
 # Roadmap & Dívidas Técnicas
@@ -51,14 +51,18 @@ flowchart LR
   Ver [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md) e
   [Auth Module v3](../03-backend/auth-module-v3.md).
 - 🎯 Fluxos convite e recovery **sem auto-login**.
-- 🎯 Recovery Mode administrativo (7 ações).
-- 🎯 Migrations 13–16 para lifecycle e invalidação de sessões.
+- 🎯 Recovery Mode administrativo (3 ações operacionais).
+- 🎯 Migrations 13–17 para lifecycle, invalidação de sessões e correção de cast UUID.
 
 ### Auth & Access — Próximas evoluções
 
 > **Fora da versão v3.** Evoluções de autorização → módulo **Access**. Evoluções de identidade → **Auth**.
 
 - ✨ Melhorias Recovery Mode (UX, feedback por ação, confirmações).
+- ✨ **Reenvio confiável de convite em `invite_pending`** — investigar comportamento do Supabase
+  Auth (OTP/Invite) e estratégia de reenvio sem exclusão do usuário. _Baixa prioridade; não bloqueia
+  o sistema._ Workaround oficial documentado em
+  [Known Operational Limitation — Recovery Mode (v3)](../03-backend/auth-module-v3.md#known-operational-limitation--recovery-mode-v3).
 - ✨ **MFA** (TOTP / WebAuthn).
 - ✨ **OAuth** / provedores sociais.
 - ✨ **SSO** corporativo (SAML/OIDC).

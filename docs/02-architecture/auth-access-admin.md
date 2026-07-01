@@ -4,7 +4,7 @@ description: Fronteiras dos módulos de autenticação, autorização e gestão 
 status: living
 owner: Engenharia Lotus
 tags: [auth, access, admin, architecture]
-last_review: 2026-06-30
+last_review: 2026-07-01
 ---
 
 # Arquitetura Auth, Access e Admin
@@ -129,12 +129,9 @@ src/lib/access.functions.server.ts   # barrel de compatibilidade
 | -------- | ----------- |
 | Criar usuário | `createUserAccount` → `inviteUserByEmail` |
 | Excluir usuário | Recovery Mode → `delete_user` |
-| Reativar usuário | Recovery Mode → `reactivate` |
-| Desativar usuário | Recovery Mode → `disable` |
-| Revogar usuário | Recovery Mode → `revoke` |
 | Reenviar convite | Recovery Mode → `resend_invite` |
-| Enviar recuperação de senha | Recovery Mode → `force_password_reset` |
-| Recovery Mode (UI) | `/admin/usuarios/$userId` — 7 ações |
+| Enviar redefinição de senha | Recovery Mode → `force_password_reset` |
+| Recovery Mode (UI) | `/admin/usuarios/$userId` — 3 ações operacionais |
 | Auditoria | `access_audit_log` |
 
 Admin **dispara** operações Supabase Auth e **delega** lifecycle/audit ao Access.
@@ -146,7 +143,7 @@ Admin **não** implementa callback, sessão ou login.
 src/modules/admin/
 ├── invites.server.ts           # inviteUserByEmail, resetPasswordForEmail
 └── components/
-    └── RecoveryModePanel.tsx   # 7 ações fechadas
+    └── RecoveryModePanel.tsx   # 3 ações operacionais
 ```
 
 ---
@@ -213,6 +210,11 @@ forgot-password → e-mail → /auth/callback → set-password (recovery) → up
 ```
 /admin/usuarios/$userId → performAccessRecovery(action) → lifecycle + audit + Auth API
 ```
+
+Ações disponíveis: `resend_invite`, `force_password_reset`, `delete_user`.
+
+Limitação operacional conhecida e workaround oficial documentados em
+[Known Operational Limitation — Recovery Mode (v3)](../03-backend/auth-module-v3.md#known-operational-limitation--recovery-mode-v3).
 
 ---
 

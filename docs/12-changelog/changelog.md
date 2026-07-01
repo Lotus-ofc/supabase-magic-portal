@@ -3,7 +3,7 @@ title: Changelog
 description: Histórico de mudanças relevantes do Lots BI (produto, dados e infraestrutura).
 status: living
 owner: Engenharia Lots BI
-last_review: 2026-06-30
+last_review: 2026-07-01
 ---
 
 # Changelog
@@ -21,8 +21,14 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Recovery Mode — decisão operacional (pós Auth Module v3):** workaround oficial documentado
+  para usuários em `invite_pending` quando **Reenviar convite** não dispara novo e-mail
+  (excluir → recriar pelo painel admin). Ver
+  [Known Operational Limitation — Recovery Mode (v3)](../03-backend/auth-module-v3.md#known-operational-limitation--recovery-mode-v3).
+- **Migration 17 (`17_fix_invalidate_sessions_uuid_cast.sql`):** corrige
+  `operator does not exist: character varying = uuid` na RPC `access_invalidate_auth_sessions`.
 - **Auth Module v3 — encerramento oficial:** separação Auth / Access / Admin; orchestrator;
-  boundary validation no CI; Recovery Mode (7 ações); documentação completa no Knowledge Center
+  boundary validation no CI; Recovery Mode; documentação completa no Knowledge Center
   ([auth-module-v3.md](../03-backend/auth-module-v3.md),
   [auth-access-admin.md](../02-architecture/auth-access-admin.md),
   [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md)).
@@ -35,6 +41,11 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Alterado
 
+- **Recovery Mode:** reduzido a 3 ações operacionais diárias — reenviar convite, enviar
+  redefinição de senha, excluir usuário. Removidas ações auxiliares (invalidar sessões, reativar,
+  revogar, desativar) do painel administrativo.
+- **Knowledge Center (Auth Module v3):** documentação atualizada com comportamento atual do Recovery
+  Mode, limitação operacional conhecida e item de evolução futura no Roadmap.
 - **Auth & Access:** refactor completo — `src/modules/auth`, `src/modules/access`, `src/modules/admin`;
   rotas `/auth` thin adapters; convite/recovery sem auto-login; migrations 13–16 documentadas.
 - **Plano Estratégico — conceito contínuo:** um plano ativo por cliente; evolução por

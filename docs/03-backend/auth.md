@@ -3,7 +3,7 @@ title: Autenticação & Autorização
 description: Fluxo de auth Supabase, papéis, guards de rota e server functions.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-30
+last_review: 2026-07-01
 ---
 
 # Autenticação & Autorização
@@ -143,7 +143,10 @@ Links de convite/recovery usam `redirectTo` = `{APP_URL}/auth/callback`.
 | Detalhe + Recovery Mode | `/admin/usuarios/$userId` → `performAccessRecovery` |
 | Auditoria | `access_audit_log` (append-only) |
 
-Recovery Mode (7 ações fechadas): reenviar convite, forçar reset, invalidar sessões, reativar, revogar, desativar, excluir.
+Recovery Mode (3 ações operacionais): reenviar convite, enviar redefinição de senha, excluir usuário.
+
+Ver [Known Operational Limitation — Recovery Mode (v3)](./auth-module-v3.md#known-operational-limitation--recovery-mode-v3)
+para o workaround oficial quando o reenvio de convite não dispara e-mail em `invite_pending`.
 
 Código: `src/modules/admin/`, `src/modules/access/`, `src/lib/access.functions.server.ts`.
 
@@ -155,6 +158,7 @@ Código: `src/modules/admin/`, `src/modules/access/`, `src/lib/access.functions.
 | `14_access_lifecycle_fix.sql` | Backfill lifecycle pós-migration 13 |
 | `15_auth_invalidate_sessions.sql` | RPC `access_invalidate_auth_sessions` (Recovery Mode) |
 | `16_lifecycle_invite_expired_removal.sql` | Dados legados `invite_expired` → `invite_pending` |
+| `17_fix_invalidate_sessions_uuid_cast.sql` | Corrige cast `varchar` vs `uuid` na RPC de invalidação de sessões |
 
 Aplicar via Supabase CLI ou SQL Editor antes de usar Recovery Mode e gate de lifecycle.
 Ver [Migrations](../04-database/migrations.md).

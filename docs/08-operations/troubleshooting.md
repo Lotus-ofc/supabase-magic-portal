@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Guia de diagnóstico para problemas comuns — dados, auth, build e deploy.
 status: living
 owner: Engenharia / Ops Lotus
-last_review: 2026-06-30
+last_review: 2026-07-01
 ---
 
 # Troubleshooting
@@ -95,7 +95,11 @@ O Supabase usa a **URL de redirecionamento** configurada no envio do convite. Se
 
 4. **Redeploy** após alterar secrets (o convite é gerado no servidor com `redirectTo`).
 
-5. **Reenviar convite:** Admin → Usuários → **Gerenciar** → Recovery Mode → Reenviar convite (ou lista paginada).
+5. **Reenviar convite:** Admin → Usuários → **Gerenciar** → Recovery Mode → Reenviar convite.
+
+   Se o usuário permanecer em `invite_pending` e nenhum e-mail for recebido, use o workaround
+   oficial: **Excluir usuário** → recriar pelo painel admin. Ver
+   [Known Operational Limitation — Recovery Mode (v3)](../03-backend/auth-module-v3.md#known-operational-limitation--recovery-mode-v3).
 
 ### Local
 
@@ -147,6 +151,28 @@ Considerar `.gitattributes` com `eol=lf`.
 
 ---
 
+## Recovery Mode — convite não reenviado (`invite_pending`)
+
+### Sintomas
+
+Usuário em lifecycle `invite_pending`; botão **Reenviar convite** executa sem erro, mas o e-mail não
+chega (depende do estado interno OTP/Invite do Supabase Auth).
+
+### O que funciona normalmente
+
+Auth, convites na criação, login, logout, definição de senha e recuperação de senha.
+
+### Workaround oficial
+
+1. Admin → Usuários → **Gerenciar** → Recovery Mode → **Excluir usuário**
+2. Admin → Usuários → **Novo usuário** — recriar com o mesmo e-mail
+3. Novo convite enviado; fluxo completo até conta ativa
+
+Não é necessário acessar o Dashboard do Supabase. Documentação completa:
+[Known Operational Limitation — Recovery Mode (v3)](../03-backend/auth-module-v3.md#known-operational-limitation--recovery-mode-v3).
+
+---
+
 ## Migrations
 
 1. Aplicar em ordem numérica (`01` → `13`)
@@ -154,6 +180,7 @@ Considerar `.gitattributes` com `eol=lf`.
 3. Idempotente — safe re-run
 4. **View com colunas novas no meio:** use `DROP VIEW IF EXISTS` + `CREATE VIEW` (ver migration `05`)
 5. **Migration 13 (`13_access_management.sql`):** necessária para lifecycle, auditoria persistente e Recovery Mode. Idempotente — aplicar no SQL Editor antes de usar gestão de acessos v2.1 em produção.
+6. **Migration 17 (`17_fix_invalidate_sessions_uuid_cast.sql`):** obrigatória para Recovery Mode em produção se a migration 15 foi aplicada antes da correção de cast UUID.
 
 Ver [Migrations](../04-database/migrations.md).
 
