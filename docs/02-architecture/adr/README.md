@@ -3,7 +3,7 @@ title: Architecture Decision Records (ADRs)
 description: Índice e processo dos registros de decisão arquitetural da Lotus.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-26
+last_review: 2026-06-30
 ---
 
 # Architecture Decision Records (ADRs)
@@ -38,6 +38,7 @@ Crie um ADR quando a decisão:
 | [0011](./0011-engineering-system-foundation.md)           | Fundação do Sistema de Engenharia              | Aceito              |
 | [0012](./0012-internal-infrastructure-transition.md)      | Transição para infraestrutura interna Lotus    | Aceito              |
 | [0013](./0013-plano-estrategico-centro-estrategico.md)    | Plano Estratégico — Centro de Inteligência     | Aceito              |
+| [0014](./0014-auth-module-v3-architecture.md)              | Auth Module v3 — Auth, Access e Admin          | Aceito              |
 
 ## Template
 

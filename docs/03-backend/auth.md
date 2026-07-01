@@ -8,6 +8,42 @@ last_review: 2026-06-30
 
 # Autenticação & Autorização
 
+> **Auth Module v3 — concluído (30/06/2026).** Registro oficial:
+> [Auth Module v3](./auth-module-v3.md) · Arquitetura:
+> [Auth, Access e Admin](../02-architecture/auth-access-admin.md) ·
+> [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md)
+
+---
+
+## Responsabilidades por módulo
+
+### Auth
+
+Responsável **apenas** por: login, logout, sessão, callback, UI de convite/recovery,
+alteração da própria senha.
+
+**Não conhece:** clientes, permissões, dashboards, regras de negócio, lifecycle, Access.
+
+Código: `src/modules/auth/`, rotas `src/routes/auth/*`.
+
+### Access
+
+Responsável por: lifecycle, permissões, papéis, bloqueios, destino pós-login, autorização,
+Recovery Mode (server), orchestrator.
+
+Código: `src/modules/access/`, `src/lib/access.functions.server.ts`.
+
+### Admin
+
+Responsável por: criar/excluir/reativar/desativar usuário, reenviar convite, recovery por e-mail,
+Recovery Mode (UI), auditoria.
+
+Código: `src/modules/admin/`.
+
+### Cliente (domínio)
+
+Empresas, dados, dashboards, relatórios, integrações. **Auth nunca importa este domínio.**
+
 ---
 
 ## Visão geral
@@ -116,10 +152,12 @@ Código: `src/modules/admin/`, `src/modules/access/`, `src/lib/access.functions.
 | Migration | Propósito |
 |-----------|-----------|
 | `13_access_management.sql` | Tabelas `access_accounts`, audit |
+| `14_access_lifecycle_fix.sql` | Backfill lifecycle pós-migration 13 |
 | `15_auth_invalidate_sessions.sql` | RPC `access_invalidate_auth_sessions` (Recovery Mode) |
 | `16_lifecycle_invite_expired_removal.sql` | Dados legados `invite_expired` → `invite_pending` |
 
 Aplicar via Supabase CLI ou SQL Editor antes de usar Recovery Mode e gate de lifecycle.
+Ver [Migrations](../04-database/migrations.md).
 
 ---
 
@@ -211,6 +249,10 @@ Detalhes de policies: [RLS Policies](../04-database/rls-policies.md).
 
 ## Referências
 
+- [Auth Module v3 — entrega](./auth-module-v3.md)
+- [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admin.md)
+- [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md)
+- [Roadmap — evoluções Auth](../11-roadmap/roadmap.md#auth--access--próximas-evoluções)
 - [Segurança](./security.md)
 - [API Reference](./api-reference.md)
 - [Roteamento](../05-frontend/routing.md)

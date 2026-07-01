@@ -3,7 +3,7 @@ title: Changelog
 description: Histórico de mudanças relevantes do Lots BI (produto, dados e infraestrutura).
 status: living
 owner: Engenharia Lots BI
-last_review: 2026-06-29
+last_review: 2026-06-30
 ---
 
 # Changelog
@@ -21,6 +21,11 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Auth Module v3 — encerramento oficial:** separação Auth / Access / Admin; orchestrator;
+  boundary validation no CI; Recovery Mode (7 ações); documentação completa no Knowledge Center
+  ([auth-module-v3.md](../03-backend/auth-module-v3.md),
+  [auth-access-admin.md](../02-architecture/auth-access-admin.md),
+  [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md)).
 - **Sprint de performance:** `manualChunks` no Vite (react, supabase, recharts, mermaid, fuse…),
   `QueryClient` com `staleTime`/`gcTime`, lazy load de Recharts (`AreaChartLotusLazy`), registry
   do KC assíncrono, `db-selects.ts` para payloads menores, `React.memo` em `StatCard`.
@@ -30,6 +35,8 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Alterado
 
+- **Auth & Access:** refactor completo — `src/modules/auth`, `src/modules/access`, `src/modules/admin`;
+  rotas `/auth` thin adapters; convite/recovery sem auto-login; migrations 13–16 documentadas.
 - **Plano Estratégico — conceito contínuo:** um plano ativo por cliente; evolução por
   objetivos sucessivos (não múltiplos planos). Dashboard centrado no objetivo atual, histórico
   (ativos/concluídos/cancelados), onboarding do primeiro objetivo, estratégias/hipóteses/roadmap

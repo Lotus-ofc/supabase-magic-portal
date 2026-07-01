@@ -3,7 +3,7 @@ title: Organização de Código & Convenções
 description: Onde colocar código novo, naming, imports e padrões por camada.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-26
+last_review: 2026-06-30
 ---
 
 # Organização de Código & Convenções
@@ -18,11 +18,15 @@ Complementa [Padrões de desenvolvimento](./development.md) e
 | Se você está…                        | Coloque em…                                    |
 | ------------------------------------ | ---------------------------------------------- |
 | Adicionando rota/tela                | `src/routes/`                                  |
+| Código de **autenticação** (sessão)  | `src/modules/auth/` — **nunca** Access/Postgres |
+| Código de **autorização** (lifecycle)| `src/modules/access/`                          |
+| Gestão de **usuários** (admin)       | `src/modules/admin/`                           |
 | Adicionando componente de produto    | `src/components/lotus/`                        |
 | Adicionando primitivo UI genérico    | `src/components/ui/`                           |
 | Adicionando cálculo/KPI              | `src/lib/platforms/formulas.ts` ou `engine.ts` |
 | Adicionando plataforma               | `src/lib/platforms/{nome}.ts` + `registry.ts`  |
-| Adicionando server function          | `src/lib/*.functions.ts`                       |
+| Adicionando server function Access   | `src/modules/access/*.server.ts`               |
+| Adicionando server function admin    | `src/lib/admin.functions.ts` ou `modules/admin/` |
 | Adicionando hook reutilizável        | `src/hooks/`                                   |
 | Adicionando integração (campo admin) | `integrations-catalog.ts` + migration          |
 | Adicionando tabela/view              | `supabase/migrations-official/`                |
@@ -120,6 +124,18 @@ Bons exemplos: `instagram.ts` (MAX vs SUM), `period.ts` (BRT), migrations (causa
 | `toISOString()` para hoje   | `brtToday()`              |
 | `any` em server functions   | Tipos gerados Supabase    |
 | Feature no editor Lovable   | Cursor + este repo        |
+| Lifecycle dentro do Auth    | Access + orchestrator     |
+| Auth importando Access      | Rotas thin + orchestrator |
+
+---
+
+## Auth Module v3 — regras
+
+- `src/modules/auth/**` **não importa** `@/modules/access`, `@/features/access`, Postgres app.
+- Rotas `src/routes/auth/**` importam `@/modules/auth` + `post-auth-orchestrator.server` apenas.
+- Validação CI: `npm run validate:auth-boundaries`.
+
+Ver [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admin.md).
 
 ---
 

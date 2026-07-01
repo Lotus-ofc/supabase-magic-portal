@@ -34,6 +34,9 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 | `11_plano_estrategico.sql`          | Plano Estratégico — tabelas, RLS colaborativa, FK `posts_editorial.estrategia_id`, view `vw_estrategia_editorial_stats`. Ver [ADR-0013](../02-architecture/adr/0013-plano-estrategico-centro-estrategico.md). |
 | `12_plano_objetivo_scope.sql`       | Escopo por objetivo no plano (estratégias/hipóteses/roadmap vinculados ao objetivo atual).                                                                                                                    |
 | `13_access_management.sql`          | Módulo Auth + Gestão de Acessos v2.1: `access_accounts` (lifecycle), `access_audit_log`, `system_metadata` (`AUTH_MODULE_VERSION=2.1`), trigger em `auth.users`, backfill idempotente.                       |
+| `14_access_lifecycle_fix.sql`       | Backfill lifecycle: usuários `active` sem onboarding → `invite_pending` / `awaiting_password`.                                                                                                                |
+| `15_auth_invalidate_sessions.sql`   | RPC `access_invalidate_auth_sessions` — revoga sessões Auth por `user_id` (Recovery Mode).                                                                                                                  |
+| `16_lifecycle_invite_expired_removal.sql` | Dados legados `invite_expired` → `invite_pending` (Auth Module v3).                                                                                                                                     |
 
 > **Não existe `04`.** A tentativa `04_integracoes_make.sql` foi **deprecada e substituída**
 > pela `05` (que usa nomes de coluna diferentes); a 04 nunca foi aplicada ao banco.
@@ -67,7 +70,7 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 Projeto Supabase: `ywvhoctcmibjitvwkkhb`.
 
 1. Acesse o [Supabase Dashboard](https://supabase.com/dashboard) → SQL Editor.
-2. Execute cada arquivo em **ordem numérica** (`01` → `12`).
+2. Execute cada arquivo em **ordem numérica** (`01` → `16`).
 3. Cada migration é idempotente — re-executar é seguro (exceto editar arquivo já aplicado).
 4. Ao final de cada arquivo, rode o bloco de **validação** comentado (quando existir).
 5. Atualize este doc se criar migration `13+`.
@@ -87,6 +90,9 @@ Projeto Supabase: `ywvhoctcmibjitvwkkhb`.
 11_plano_estrategico.sql
 12_plano_objetivo_scope.sql
 13_access_management.sql
+14_access_lifecycle_fix.sql
+15_auth_invalidate_sessions.sql
+16_lifecycle_invite_expired_removal.sql
 ```
 
 ### Rollback

@@ -3,7 +3,7 @@ title: Estrutura do Repositório
 description: Organização de pastas, convenções de nomes e mapa de módulos do código.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-06-26
+last_review: 2026-06-30
 ---
 
 # Estrutura do Repositório
@@ -21,6 +21,11 @@ supabase-magic-portal/
 ├── public/                 # Assets estáticos
 ├── src/
 │   ├── routes/             # TanStack Router (file-based)
+│   ├── modules/            # Módulos de domínio (Auth v3)
+│   │   ├── auth/           # Autenticação — sessão apenas
+│   │   ├── access/         # Autorização — lifecycle, gate, orchestrator
+│   │   └── admin/          # Gestão de usuários — convites, Recovery Mode UI
+│   ├── features/           # Legado em migração (access, auth stubs deprecated)
 │   ├── components/
 │   │   ├── lotus/          # Componentes de domínio Lotus
 │   │   └── ui/             # Primitivos shadcn/Radix
@@ -48,7 +53,8 @@ Convenção TanStack Start: arquivo = rota.
 | Padrão                     | Exemplo               | Significado        |
 | -------------------------- | --------------------- | ------------------ |
 | `index.tsx`                | `/`                   | Raiz               |
-| `auth.tsx`                 | `/auth`               | Rota plana         |
+| `auth/index.tsx`           | `/auth`               | Auth thin adapter  |
+| `auth/callback.tsx`        | `/auth/callback`      | Callback Supabase  |
 | `_authenticated/route.tsx` | Layout                | Guard + shell      |
 | `cliente.$cliente.tsx`     | `/cliente/:cliente`   | Parâmetro dinâmico |
 | `admin/clientes.$id.tsx`   | `/admin/clientes/:id` | Aninhado           |
@@ -56,6 +62,18 @@ Convenção TanStack Start: arquivo = rota.
 `routeTree.gen.ts` é **gerado** — nunca editar manualmente.
 
 Detalhes: [Roteamento](./routing.md)
+
+---
+
+## `src/modules/` — Auth Module v3
+
+| Módulo   | Responsabilidade                                      |
+| -------- | ----------------------------------------------------- |
+| `auth/`  | Login, logout, sessão, callback, set-password UI      |
+| `access/`| Lifecycle, bloqueios, orchestrator, Recovery server   |
+| `admin/` | Convites, Recovery Mode UI, operações de usuário      |
+
+Detalhes: [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admin.md).
 
 ---
 
@@ -67,6 +85,7 @@ Detalhes: [Roteamento](./routing.md)
 | `metrics.ts`                 | Agregação overview cross-platform          |
 | `period.ts`                  | Datas BRT, presets de período              |
 | `admin.functions.ts`         | Server functions administrativas           |
+| `access.functions.server.ts` | Barrel Access (compat — preferir `modules/access`) |
 | `editorial.functions.ts`     | Server functions editorial                 |
 | `integrations-catalog.ts`    | Catálogo de integrações (formulário admin) |
 | `error-capture.ts`           | Recuperação de erros SSR (h3)              |
@@ -111,6 +130,14 @@ Migrations numeradas, aditivas, idempotentes. Ordem:
 | 06  | `editorial.sql`                  | Posts, revisões                      |
 | 07  | `views_fix_security_invoker.sql` | SECURITY DEFINER                     |
 | 08  | `aliases_e_null_guard.sql`       | Aliases + NULL guard                 |
+| 09  | `owner_admin_guard.sql`          | Admin permanente do dono             |
+| 10  | `editorial_media.sql`            | Mídia editorial                      |
+| 11  | `plano_estrategico.sql`          | Plano Estratégico                    |
+| 12  | `plano_objetivo_scope.sql`       | Escopo por objetivo no plano         |
+| 13  | `access_management.sql`          | Lifecycle, audit, access_accounts         |
+| 14  | `access_lifecycle_fix.sql`       | Backfill lifecycle                        |
+| 15  | `auth_invalidate_sessions.sql`   | RPC invalidação de sessões                |
+| 16  | `lifecycle_invite_expired_removal.sql` | Dados invite_expired → invite_pending |
 
 > Não existe migration `04` (deprecada).
 
@@ -128,7 +155,7 @@ Migrations numeradas, aditivas, idempotentes. Ordem:
 | --------------------------- | ---------------- |
 | Cenários Make               | Externo          |
 | CI/CD (`.github/workflows`) | Não implementado |
-| Testes (`*.test.ts`)        | Não implementado |
+| Testes (`*.test.ts`)        | Implementado (Vitest, 88+ testes) |
 | `supabase/config.toml`      | Não presente     |
 | Schema DDL `base_metricas`  | Não versionado   |
 
@@ -136,6 +163,7 @@ Migrations numeradas, aditivas, idempotentes. Ordem:
 
 ## Referências
 
+- [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admin.md)
 - [Organização de código](../09-standards/code-organization.md)
 - [Engine de métricas](../06-engine/overview.md)
 - [Arquitetura — estado atual](../02-architecture/current-state.md)

@@ -3,7 +3,7 @@ title: Roadmap & Dívidas Técnicas
 description: Direção de evolução da Lotus — estado atual, arquitetura alvo e dívidas priorizadas.
 status: living
 owner: Engenharia / Produto Lotus
-last_review: 2026-06-26
+last_review: 2026-06-30
 ---
 
 # Roadmap & Dívidas Técnicas
@@ -45,6 +45,32 @@ flowchart LR
 - 🎯 **Sistema de Engenharia fundado:** CI, Vitest, CONTRIBUTING, governança.
   Ver [ADR-0011](../02-architecture/adr/0011-engineering-system-foundation.md).
 
+## Auth & Access — Auth Module v3 ✅ (concluído 30/06/2026)
+
+- 🎯 **Separação Auth / Access / Admin** com orchestrator e boundary validation.
+  Ver [ADR-0014](../02-architecture/adr/0014-auth-module-v3-architecture.md) e
+  [Auth Module v3](../03-backend/auth-module-v3.md).
+- 🎯 Fluxos convite e recovery **sem auto-login**.
+- 🎯 Recovery Mode administrativo (7 ações).
+- 🎯 Migrations 13–16 para lifecycle e invalidação de sessões.
+
+### Auth & Access — Próximas evoluções
+
+> **Fora da versão v3.** Evoluções de autorização → módulo **Access**. Evoluções de identidade → **Auth**.
+
+- ✨ Melhorias Recovery Mode (UX, feedback por ação, confirmações).
+- ✨ **MFA** (TOTP / WebAuthn).
+- ✨ **OAuth** / provedores sociais.
+- ✨ **SSO** corporativo (SAML/OIDC).
+- ✨ Melhorias UX nos fluxos auth (copy, estados de loading, acessibilidade).
+- ✨ Auditorias avançadas (export, retenção, alertas).
+- 🔧 Consolidar onboarding em Postgres (`access_accounts`) — reduzir `user_metadata.lots_bi`.
+- 🔧 Completar migração `features/access` → `modules/access/domain`.
+- 🔧 Remover stubs deprecated `features/auth`.
+- 🔧 Fail-closed total em `postAuthOnLoginSuccess` (sem fallback em erro de profile).
+- 🔧 Remover valor `invite_expired` do enum Postgres.
+- 🔧 Desacoplar ciclo Access ↔ Admin (envio de e-mail em módulo de integração).
+
 ## Fase 1 — Fundações de dados (alta prioridade)
 
 - 🔧 **Chave de cliente por ID (FK), não por nome.** Migrar `base_metricas`/pipeline para
@@ -59,7 +85,7 @@ flowchart LR
 - 🔧 **Reavaliar `SECURITY DEFINER` das views.** Ver [ADR-0003](../02-architecture/adr/0003-views-security-definer.md).
 - 🔧 **Testes automatizados** — `formulas.ts` + `period.ts` ✅; expandir `engine.ts` + RLS.
 - 🔧 **Tipagem Supabase** (`supabase gen types`).
-- ✨ **Endurecer cadastro de usuários** (limitar `signUp` público).
+- ~~Endurecer cadastro de usuários (limitar signUp público)~~ — **Entregue** Auth Module v3.
 - 🔧 **Observabilidade de ingestão** (alertas por `ultima_ingestao`).
 
 ## Fase 3 — Cobertura de plataformas & consistência
@@ -110,7 +136,7 @@ flowchart LR
 | D4  | Views `SECURITY DEFINER`              | Alto            | Médio   | 2    |
 | D5  | Ausência de testes                    | Alto            | Médio   | 2    |
 | D6  | `any` em server functions             | Médio           | Baixo   | 2    |
-| D7  | `signUp` público aberto               | Médio           | Baixo   | 2    |
+| D7  | `signUp` público aberto               | ~~Médio~~ ✅ Auth v3 | —       | 2    |
 | D8  | Insights duplicados                   | Baixo           | Baixo   | 3    |
 | D9  | TikTok/GBP incompletos                | Médio           | Médio   | 3    |
 | D10 | Marca Majrá/Lotus                     | Baixo           | Baixo   | 3    |
