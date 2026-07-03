@@ -23,6 +23,7 @@ import {
   ClipboardCheck,
   BookOpen,
   Compass,
+  Palette,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -122,6 +123,10 @@ function AuthenticatedLayout() {
         { to: "/admin/debug", label: "Painel operacional", icon: Bug },
         { to: "/admin/debug/views", label: "Auditoria de views", icon: Bug },
       ],
+    },
+    {
+      label: "Plataforma",
+      items: [{ to: "/admin/branding", label: "Branding", icon: Palette }],
     },
     {
       label: "Conhecimento",

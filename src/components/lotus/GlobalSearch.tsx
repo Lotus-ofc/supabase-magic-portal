@@ -11,6 +11,7 @@ import {
   Search,
   Users,
   Compass,
+  Palette,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -110,6 +111,14 @@ const STATIC_ROUTES: SearchRoute[] = [
     icon: BookOpen,
     adminOnly: true,
     keywords: ["docs", "documentação"],
+  },
+  {
+    id: "branding",
+    label: "Branding Lots BI",
+    href: "/admin/branding",
+    icon: Palette,
+    adminOnly: true,
+    keywords: ["cores", "logo", "identidade", "marca", "hex"],
   },
   {
     id: "metricas",

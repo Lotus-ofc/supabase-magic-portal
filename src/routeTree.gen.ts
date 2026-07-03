@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPlanoEstrategicoRouteImport } from './routes/_authenticated/admin/plano-estrategico'
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
+import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
 import { Route as AuthenticatedAccountSecurityRouteImport } from './routes/_authenticated/account/security'
 import { Route as AuthenticatedAdminKnowledgeRouteRouteImport } from './routes/_authenticated/admin/knowledge/route'
 import { Route as AuthenticatedClienteClienteIndexRouteImport } from './routes/_authenticated/cliente.$cliente.index'
@@ -133,6 +134,12 @@ const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminBrandingRoute =
+  AuthenticatedAdminBrandingRouteImport.update({
+    id: '/branding',
+    path: '/branding',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAccountSecurityRoute =
   AuthenticatedAccountSecurityRouteImport.update({
     id: '/account/security',
@@ -277,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -313,6 +321,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -351,6 +360,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/_authenticated/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/_authenticated/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/admin/knowledge'
     | '/account/security'
+    | '/admin/branding'
     | '/admin/debug'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth'
     | '/account/security'
+    | '/admin/branding'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
     | '/admin/relatorios'
@@ -465,6 +477,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_authenticated/admin/knowledge'
     | '/_authenticated/account/security'
+    | '/_authenticated/admin/branding'
     | '/_authenticated/admin/debug'
     | '/_authenticated/admin/editorial'
     | '/_authenticated/admin/plano-estrategico'
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/debug'
       fullPath: '/admin/debug'
       preLoaderRoute: typeof AuthenticatedAdminDebugRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/branding': {
+      id: '/_authenticated/admin/branding'
+      path: '/branding'
+      fullPath: '/admin/branding'
+      preLoaderRoute: typeof AuthenticatedAdminBrandingRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/account/security': {
@@ -807,6 +827,7 @@ const AuthenticatedAdminDebugRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminKnowledgeRouteRoute: typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
+  AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
   AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
   AuthenticatedAdminEditorialRoute: typeof AuthenticatedAdminEditorialRoute
   AuthenticatedAdminPlanoEstrategicoRoute: typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -825,6 +846,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminKnowledgeRouteRoute:
       AuthenticatedAdminKnowledgeRouteRouteWithChildren,
+    AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
     AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
     AuthenticatedAdminEditorialRoute: AuthenticatedAdminEditorialRoute,
     AuthenticatedAdminPlanoEstrategicoRoute:
@@ -943,3 +965,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
