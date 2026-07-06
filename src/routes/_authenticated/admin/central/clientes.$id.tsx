@@ -5,17 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { adminTitle } from "@/lib/brand";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
 import { ClientHealthBadge } from "@/components/lotus/agency-os/ClientHealthBadge";
-import { ProjectsWidget } from "@/components/lotus/agency-os/workspace/ProjectsWidget";
-import { NotesWidget } from "@/components/lotus/agency-os/workspace/NotesWidget";
-import { TimelineWidget } from "@/components/lotus/agency-os/workspace/TimelineWidget";
-import {
-  HealthDiagnosisWidget,
-  InsightsWidget,
-  RecommendationsWidget,
-  PerformanceWidget,
-  FinanceWidget,
-  CampaignsWidget,
-} from "@/components/lotus/agency-os/workspace/IntelligenceWidgets";
+import { DashboardGrid } from "@/modules/core/dashboard/dashboard-engine";
+import "@/modules/os-bootstrap";
 import { getAgencyClient } from "@/modules/agency-os/agency-os.server";
 import { agencyOsKeys } from "@/modules/agency-os/query-keys";
 import { computeClientHealth } from "@/modules/agency-os/services/compute-client-health";
@@ -115,19 +106,11 @@ function ClientWorkspaceContent() {
         )}
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <HealthDiagnosisWidget clientId={clientId} />
-        <InsightsWidget clientId={clientId} />
-        <RecommendationsWidget clientId={clientId} />
-        <ProjectsWidget clientId={clientId} />
-        <NotesWidget clientId={clientId} />
-        <PerformanceWidget clientId={clientId} />
-        <CampaignsWidget clientId={clientId} />
-        <FinanceWidget clientId={clientId} />
-        <div className="lg:col-span-2">
-          <TimelineWidget clientId={clientId} />
-        </div>
-      </div>
+      <DashboardGrid
+        dashboardId="agency-os.client-workspace"
+        clientId={clientId}
+        className="grid gap-4 lg:grid-cols-2"
+      />
     </div>
   );
 }

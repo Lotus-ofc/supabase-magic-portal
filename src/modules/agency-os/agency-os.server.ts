@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  buildCommandContext,
+  dispatchCommand,
+} from "@/modules/core/server/dispatch-command.server";
+import "@/modules/os-bootstrap";
 import { assertAgencyOsAdmin, actorEmailFromClaims } from "./internal/assert-admin.server";
 import { agencyClientRepository } from "./repositories/client.repository.server";
 import { agencySummaryRepository } from "./repositories/summary.repository.server";
@@ -15,6 +20,7 @@ import { buildAgencyIntelligence } from "./intelligence/builders/build-agency-in
 import { buildClientIntelligence } from "./intelligence/builders/build-client-intelligence";
 import { fetchClientPerformance } from "./intelligence/services/fetch-client-performance";
 import { searchAgencyOs } from "./intelligence/services/search-agency-os";
+import { AGENCY_COMMANDS, dispatchAgencyCommand } from "./commands/register-commands";
 import {
   addNoteSchema,
   agencyCentralFiltersSchema,
@@ -107,7 +113,14 @@ export const moveAgencyProject = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => moveProjectSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAgencyOsAdmin(context);
-    await agencyProjectRepository.move(context.supabase, data);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "moveAgencyProject",
+    });
+    const result = await dispatchAgencyCommand("moveProject", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
     return { ok: true as const };
   });
 
@@ -116,7 +129,14 @@ export const completeAgencyTask = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => completeTaskSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAgencyOsAdmin(context);
-    await agencyTaskRepository.complete(context.supabase, data.id);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "completeAgencyTask",
+    });
+    const result = await dispatchAgencyCommand("completeTask", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
     return { ok: true as const };
   });
 
@@ -125,16 +145,14 @@ export const addAgencyNote = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => addNoteSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAgencyOsAdmin(context);
-    const email = actorEmailFromClaims(context.claims);
-
-    const { error } = await context.supabase.from("agency_notes").insert({
-      cadastro_cliente_id: data.cadastro_cliente_id,
-      body: data.body,
-      author_user_id: context.userId,
-      author_email: email,
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "addAgencyNote",
     });
-
-    if (error) throw new Error(error.message);
+    const result = await dispatchAgencyCommand("createNote", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
     return { ok: true as const };
   });
 
@@ -184,7 +202,14 @@ export const moveAgencyLead = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => moveLeadSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAgencyOsAdmin(context);
-    await agencyLeadRepository.move(context.supabase, data);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "moveAgencyLead",
+    });
+    const result = await dispatchAgencyCommand("moveLead", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
     return { ok: true as const };
   });
 
@@ -193,8 +218,15 @@ export const convertLeadToClient = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => convertLeadSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAgencyOsAdmin(context);
-    const result = await agencyLeadRepository.convertToClient(context.supabase, data);
-    return result;
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "convertLeadToClient",
+    });
+    const result = await dispatchAgencyCommand("convertLead", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
+    return result.data!;
   });
 
 export const getClientIntelligence = createServerFn({ method: "GET" })

@@ -1,18 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BarChart3,
-  BookOpen,
-  Building2,
-  ClipboardCheck,
-  Compass,
-  FileBarChart,
-  LayoutDashboard,
-  Palette,
-  Search,
-  Users,
-} from "lucide-react";
+import { Building2, LayoutDashboard, Search, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   CommandDialog,
@@ -24,120 +13,12 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { searchAgencyOsCommand } from "@/modules/agency-os/agency-os.server";
-import { agencyOsKeys } from "@/modules/agency-os/query-keys";
-
+import { searchEngine } from "@/modules/core/search/search-engine";
+import { mergeSearchResults } from "@/modules/core/search/merge-results";
+import { searchOs } from "@/modules/core/core.server";
+import { osKeys } from "@/modules/core/query-keys";
+import "@/modules/os-bootstrap";
 import { slugify } from "@/lib/slug";
-
-interface SearchRoute {
-  id: string;
-  label: string;
-  hint?: string;
-  href: string;
-  icon: typeof LayoutDashboard;
-  adminOnly?: boolean;
-  keywords?: string[];
-}
-
-const STATIC_ROUTES: SearchRoute[] = [
-  {
-    id: "dashboard",
-    label: "Visão geral (cliente)",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    keywords: ["home", "painel", "métricas"],
-  },
-  {
-    id: "aprovacoes",
-    label: "Aprovações pendentes",
-    href: "/aprovacoes",
-    icon: ClipboardCheck,
-    keywords: ["posts", "conteúdo", "aprovar"],
-  },
-  {
-    id: "plano-estrategico",
-    label: "Plano Estratégico",
-    href: "/plano-estrategico",
-    icon: Compass,
-    keywords: ["estratégia", "objetivos", "centro estratégico"],
-  },
-  {
-    id: "admin",
-    label: "Admin — Visão geral",
-    href: "/admin",
-    icon: LayoutDashboard,
-    adminOnly: true,
-  },
-  {
-    id: "central",
-    label: "Central — Agency OS",
-    href: "/admin/central",
-    icon: Building2,
-    adminOnly: true,
-    keywords: ["operações", "agência", "crm", "prioridades", "pipeline", "workspace"],
-  },
-  {
-    id: "relatorios",
-    label: "Relatórios",
-    href: "/admin/relatorios",
-    icon: FileBarChart,
-    adminOnly: true,
-    keywords: ["export", "pdf"],
-  },
-  {
-    id: "aprovacoes-kanban",
-    label: "Aprovações (Kanban)",
-    href: "/admin/aprovacoes",
-    icon: ClipboardCheck,
-    adminOnly: true,
-    keywords: ["kanban", "conteúdo", "produção", "workflow", "calendário", "editorial"],
-  },
-  {
-    id: "plano-admin",
-    label: "Plano Estratégico (admin)",
-    href: "/admin/plano-estrategico",
-    icon: Compass,
-    adminOnly: true,
-    keywords: ["estratégia", "objetivos"],
-  },
-  {
-    id: "clientes",
-    label: "Clientes",
-    href: "/admin/clientes",
-    icon: Users,
-    adminOnly: true,
-  },
-  {
-    id: "usuarios",
-    label: "Usuários",
-    href: "/admin/usuarios",
-    icon: Users,
-    adminOnly: true,
-  },
-  {
-    id: "knowledge",
-    label: "Knowledge Center",
-    href: "/admin/knowledge",
-    icon: BookOpen,
-    adminOnly: true,
-    keywords: ["docs", "documentação"],
-  },
-  {
-    id: "branding",
-    label: "Branding Lots BI",
-    href: "/admin/branding",
-    icon: Palette,
-    adminOnly: true,
-    keywords: ["cores", "logo", "identidade", "marca", "hex"],
-  },
-  {
-    id: "metricas",
-    label: "Métricas — glossário",
-    href: "/admin/knowledge",
-    icon: BarChart3,
-    keywords: ["ctr", "cpa", "cpc", "alcance", "sessões", "conversões"],
-  },
-];
 
 export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -169,39 +50,40 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const routes = useMemo(() => STATIC_ROUTES.filter((r) => !r.adminOnly || isAdmin), [isAdmin]);
+  const needle = q.trim();
 
-  const needle = q.trim().toLowerCase();
-
-  const filteredRoutes = useMemo(() => {
-    if (!needle) return routes;
-    return routes.filter((r) => {
-      const hay = [r.label, r.hint, ...(r.keywords ?? [])].join(" ").toLowerCase();
-      return hay.includes(needle);
-    });
-  }, [routes, needle]);
-
-  const filteredClientes = useMemo(() => {
-    if (!needle) return clientes.slice(0, 8);
-    return clientes.filter((c) => c.toLowerCase().includes(needle)).slice(0, 8);
+  const clientResults = useMemo(() => {
+    const n = needle.toLowerCase();
+    const list = n
+      ? clientes.filter((c) => c.toLowerCase().includes(n))
+      : clientes.slice(0, 8);
+    return list.slice(0, 8).map((nome) => ({
+      id: `portal-client-${nome}`,
+      label: nome,
+      href: `/cliente/${slugify(nome)}`,
+      group: "Clientes (portal)",
+      score: 5,
+    }));
   }, [clientes, needle]);
 
-  const { data: agencyResults = [] } = useQuery({
-    queryKey: agencyOsKeys.search(needle),
-    queryFn: () => searchAgencyOsCommand({ data: { query: needle } }),
+  const localResults = useMemo(() => {
+    if (!open) return [];
+    return searchEngine.searchLocal({ query: needle, isAdmin });
+  }, [needle, isAdmin, open]);
+
+  const { data: serverResults = [] } = useQuery({
+    queryKey: osKeys.search(needle),
+    queryFn: () => searchOs({ data: { query: needle } }),
     enabled: isAdmin && open && needle.length >= 2,
     staleTime: 30_000,
   });
 
-  const agencyGroups = useMemo(() => {
-    const map = new Map<string, typeof agencyResults>();
-    for (const r of agencyResults) {
-      const list = map.get(r.group) ?? [];
-      list.push(r);
-      map.set(r.group, list);
-    }
-    return [...map.entries()];
-  }, [agencyResults]);
+  const merged = useMemo(
+    () => mergeSearchResults(localResults, serverResults, clientResults),
+    [localResults, serverResults, clientResults],
+  );
+
+  const groups = useMemo(() => searchEngine.groupResults(merged), [merged]);
 
   const go = (href: string) => {
     setOpen(false);
@@ -236,64 +118,45 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
-          placeholder="Clientes, comandos Agency OS, rotas…"
+          placeholder="Comandos, rotas, clientes, Agency OS…"
           value={q}
           onValueChange={setQ}
         />
         <CommandList>
           <CommandEmpty>Nenhum resultado.</CommandEmpty>
 
-          {filteredRoutes.length > 0 && (
-            <CommandGroup heading="Navegação">
-              {filteredRoutes.map((r) => {
-                const Icon = r.icon;
-                return (
-                  <CommandItem key={r.id} value={r.label} onSelect={() => go(r.href)}>
-                    <Icon className="mr-2 h-4 w-4 text-muted-foreground" />
+          {groups.map(([group, items], idx) => (
+            <div key={group}>
+              {idx > 0 && <CommandSeparator />}
+              <CommandGroup heading={group}>
+                {items.map((r) => (
+                  <CommandItem
+                    key={r.id}
+                    value={`${r.label} ${r.hint ?? ""}`}
+                    onSelect={() => go(r.href)}
+                  >
+                    <GroupIcon group={group} />
                     <span>{r.label}</span>
+                    {r.hint && (
+                      <span className="ml-2 truncate text-xs text-muted-foreground">{r.hint}</span>
+                    )}
                   </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          )}
-
-          {agencyGroups.length > 0 && (
-            <>
-              <CommandSeparator />
-              {agencyGroups.map(([group, items]) => (
-                <CommandGroup key={group} heading={group}>
-                  {items.map((r) => (
-                    <CommandItem key={r.id} value={`${r.label} ${r.hint ?? ""}`} onSelect={() => go(r.href)}>
-                      <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{r.label}</span>
-                      {r.hint && (
-                        <span className="ml-2 truncate text-xs text-muted-foreground">{r.hint}</span>
-                      )}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ))}
-            </>
-          )}
-
-          {filteredClientes.length > 0 && (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading="Clientes">
-                {filteredClientes.map((nome) => {
-                  const slug = slugify(nome);
-                  return (
-                    <CommandItem key={nome} value={nome} onSelect={() => go(`/cliente/${slug}`)}>
-                      <Users className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span>{nome}</span>
-                    </CommandItem>
-                  );
-                })}
+                ))}
               </CommandGroup>
-            </>
-          )}
+            </div>
+          ))}
         </CommandList>
       </CommandDialog>
     </>
   );
+}
+
+function GroupIcon({ group }: { group: string }) {
+  if (group.includes("Clientes")) {
+    return <Users className="mr-2 h-4 w-4 text-muted-foreground" />;
+  }
+  if (group.includes("Agency") || group.includes("Pipeline") || group.includes("crítico")) {
+    return <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />;
+  }
+  return <LayoutDashboard className="mr-2 h-4 w-4 text-muted-foreground" />;
 }

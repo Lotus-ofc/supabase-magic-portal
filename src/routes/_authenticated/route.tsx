@@ -10,6 +10,7 @@ import { AuthDiagnosticsBanner } from "@/components/lotus/infra/AuthDiagnosticsB
 import { NotificationCenter } from "@/components/lotus/NotificationCenter";
 import { BRAND_NAME } from "@/lib/brand";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
+import "@/modules/os-bootstrap";
 import {
   LayoutDashboard,
   Users,
