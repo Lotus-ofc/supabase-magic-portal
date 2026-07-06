@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AgencyProject, AgencyProjectStatus, ChecklistItem, ProductionKanbanBoard } from "../types/operations";
+import type {
+  AgencyProject,
+  AgencyProjectStatus,
+  ChecklistItem,
+  ProductionKanbanBoard,
+} from "../types/operations";
 
 const SELECT =
   "id,cadastro_cliente_id,titulo,tipo,status_kanban,prioridade,etiqueta,prazo,responsavel_user_id,checklist,kanban_ordem,created_at,updated_at";

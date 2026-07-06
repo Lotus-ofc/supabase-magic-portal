@@ -26,6 +26,7 @@ import {
   Palette,
   Building2,
   GraduationCap,
+  BrainCircuit,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -102,6 +103,7 @@ function ShellImpersonateSlot() {
 
 function AuthenticatedLayout() {
   const { user, isAdmin } = Route.useRouteContext();
+  const isOwner = isPlatformOwnerEmail(user.email);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inAdmin = pathname.startsWith("/admin");
   const clienteSlugMatch = pathname.match(/^\/cliente\/([^/]+)/);
@@ -136,6 +138,9 @@ function AuthenticatedLayout() {
     {
       label: "Ajuda",
       items: [
+        ...(isOwner
+          ? [{ to: "/admin/ai-workspace", label: "AI Workspace", icon: BrainCircuit }]
+          : []),
         { to: "/admin/tutorial", label: "Tutorial", icon: GraduationCap },
         { to: "/admin/knowledge", label: "Knowledge Center", icon: BookOpen },
       ],

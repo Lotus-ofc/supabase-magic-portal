@@ -26,6 +26,7 @@ flowchart TB
     A --> D["/admin/debug"]
     D --> DV["/admin/debug/views"]
     A --> K["/admin/knowledge"]
+    A --> AI["/admin/ai-workspace\n(owner only)"]
 ```
 
 ---
@@ -180,6 +181,20 @@ Ferramentas operacionais de primeira classe. Ver [Runbook](../08-operations/runb
 
 Centro de conhecimento integrado: navegação estilo GitBook, busca ⌘K, Mermaid, favoritos,
 recentes, breadcrumb e TOC. Ver [knowledge-center.md](./knowledge-center.md).
+
+---
+
+## AI Workspace (`/admin/ai-workspace`)
+
+| Item   | Detalhe                                                         |
+| ------ | --------------------------------------------------------------- |
+| Rotas  | `admin/ai-workspace.tsx`                                        |
+| Código | `src/lib/ai-workspace/`, `src/components/ai-workspace/`         |
+| Fonte  | Agregação automática de docs, código, migrations, git snapshot  |
+| Acesso | **Somente Platform Owner** (`isPlatformOwnerEmail`)             |
+
+Context Pack para IAs — Prompt Generator, exportação, busca, Context Score. Não duplica o
+Knowledge Center. Ver [ai-workspace.md](./ai-workspace.md).
 
 ### `countPostsAguardando`
 

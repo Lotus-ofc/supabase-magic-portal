@@ -75,6 +75,13 @@ flowchart LR
 - 🔧 Remover valor `invite_expired` do enum Postgres.
 - 🔧 Desacoplar ciclo Access ↔ Admin (envio de e-mail em módulo de integração).
 
+## AI Workspace v1 ✅ (concluído 06/07/2026)
+
+- ✅ Módulo `/admin/ai-workspace` — Context Pack automático para IAs (Platform Owner only)
+- ✅ Prompt Generator, exportação MD/JSON/TXT, busca global, Context Score
+- ✅ AI Insights placeholders com contratos para scanners v2+
+- 📄 [ai-workspace.md](../06-dashboards/ai-workspace.md)
+
 ## Content Workflow — Aprovações v1 🎯 (aprovado 05/07/2026)
 
 > Módulo definitivo de **Workflow de Conteúdo**. Aggregate root oficial: **`content_cards`**.

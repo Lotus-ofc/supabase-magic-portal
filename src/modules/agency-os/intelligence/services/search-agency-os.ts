@@ -19,7 +19,7 @@ const COMMAND_ALIASES: Record<string, string> = {
   "pagamentos amanha": "payments_tomorrow",
   "pagamentos amanhã": "payments_tomorrow",
   "leads quentes": "hot_leads",
-  "pipeline": "pipeline",
+  pipeline: "pipeline",
 };
 
 function normalizeQuery(q: string) {

@@ -1,9 +1,5 @@
 import type { z } from "zod";
-import type {
-  CommandContext,
-  CommandDefinition,
-  CommandDispatchResult,
-} from "../types/commands";
+import type { CommandContext, CommandDefinition, CommandDispatchResult } from "../types/commands";
 import type { DomainEvent } from "../types/domain-events";
 import { eventBus } from "../event-bus/event-bus";
 

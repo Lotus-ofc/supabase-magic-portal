@@ -53,7 +53,12 @@ function NotesWidgetContent({ clientId }: { clientId: number }) {
       description="Contexto operacional"
       actions={
         !composing ? (
-          <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setComposing(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setComposing(true)}
+          >
             Nova
           </Button>
         ) : null

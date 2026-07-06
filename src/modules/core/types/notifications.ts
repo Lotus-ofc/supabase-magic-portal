@@ -8,7 +8,8 @@ export const NOTIFICATION_CHANNELS = {
   whatsapp: "whatsapp",
 } as const;
 
-export type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[keyof typeof NOTIFICATION_CHANNELS];
+export type NotificationChannel =
+  (typeof NOTIFICATION_CHANNELS)[keyof typeof NOTIFICATION_CHANNELS];
 
 export interface NotificationPayload {
   title: string;
@@ -26,6 +27,4 @@ export interface NotificationMessage extends NotificationPayload {
   read?: boolean;
 }
 
-export type NotificationChannelHandler = (
-  message: NotificationMessage,
-) => void | Promise<void>;
+export type NotificationChannelHandler = (message: NotificationMessage) => void | Promise<void>;

@@ -33,17 +33,9 @@ export function SmartBriefing({
             👋
           </span>
         </h1>
-        <div
-          className={cn(
-            "space-y-1.5 border-l-2 pl-4",
-            POSTURE_BORDER[posture],
-          )}
-        >
+        <div className={cn("space-y-1.5 border-l-2 pl-4", POSTURE_BORDER[posture])}>
           {lines.map((line, i) => (
-            <p
-              key={i}
-              className="text-sm leading-relaxed text-muted-foreground sm:text-[15px]"
-            >
+            <p key={i} className="text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
               {line}
             </p>
           ))}

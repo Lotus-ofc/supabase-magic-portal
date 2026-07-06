@@ -15,9 +15,7 @@ export function TutorialHome({ audience }: { audience: TutorialAudience }) {
         <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary-600 dark:text-primary-300">
           <GraduationCap className="h-5 w-5" />
         </div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">
-          Tutorial da plataforma
-        </h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight">Tutorial da plataforma</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
           {audience === "admin"
             ? `Guia completo para administradores do ${BRAND_NAME}: cada aba, cada campo, integrações e fluxos operacionais explicados passo a passo.`

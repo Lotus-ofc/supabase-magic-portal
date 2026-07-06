@@ -16,10 +16,7 @@ function timeGreeting(hour: number) {
   return "Boa noite";
 }
 
-function postureFrom(
-  summary: AgencyExecutiveSummary,
-  healthAvg: number,
-): AgencyPosture {
+function postureFrom(summary: AgencyExecutiveSummary, healthAvg: number): AgencyPosture {
   if (summary.clientes_atencao > 2 || healthAvg < 50) return "critical";
   if (summary.clientes_atencao > 0 || summary.projetos_atrasados > 0 || healthAvg < 65)
     return "attention";

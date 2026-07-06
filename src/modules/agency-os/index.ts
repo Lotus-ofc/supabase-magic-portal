@@ -19,7 +19,11 @@ export {
   getClientIntelligence,
   searchAgencyOsCommand,
 } from "./agency-os.server";
-export { computeClientHealth, computeHealthScore, scoreToTier } from "./services/compute-client-health";
+export {
+  computeClientHealth,
+  computeHealthScore,
+  scoreToTier,
+} from "./services/compute-client-health";
 export { analyzeClientHealth } from "./intelligence/health/analyze-health";
 export { buildMorningBriefing, buildContextualKpis } from "./services/build-morning-briefing";
 export { groupTimelineEvents, checklistProgress } from "./services/group-timeline-events";

@@ -64,10 +64,7 @@ export function UpdateClientOpsDialog({
           </Field>
           <FormRow>
             <Field label="Status operacional">
-              <Select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as typeof status)}
-              >
+              <Select value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
                 {STATUS.map((s) => (
                   <option key={s.value} value={s.value}>
                     {s.label}

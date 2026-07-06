@@ -35,9 +35,7 @@ export function AddNoteDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display">Observação</DialogTitle>
-          {client && (
-            <p className="text-sm text-muted-foreground">{client.nome_cliente}</p>
-          )}
+          {client && <p className="text-sm text-muted-foreground">{client.nome_cliente}</p>}
         </DialogHeader>
         <TextArea
           value={body}
@@ -50,10 +48,7 @@ export function AddNoteDialog({
           <Button variant="outline" onClick={() => handleOpen(false)} disabled={isPending}>
             Cancelar
           </Button>
-          <Button
-            onClick={() => onSubmit(body)}
-            disabled={!body.trim() || isPending}
-          >
+          <Button onClick={() => onSubmit(body)} disabled={!body.trim() || isPending}>
             {isPending ? "Salvando…" : "Salvar"}
           </Button>
         </DialogFooter>

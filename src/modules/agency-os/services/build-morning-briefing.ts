@@ -39,13 +39,10 @@ export function buildMorningBriefing(input: {
   );
 
   const priorityCount =
-    input.priorityCount ??
-    input.clients.filter((c) => c.proxima_acao?.trim()).length;
+    input.priorityCount ?? input.clients.filter((c) => c.proxima_acao?.trim()).length;
 
   if (priorityCount > 0) {
-    lines.push(
-      `Hoje existem ${priorityCount} prioridade${priorityCount === 1 ? "" : "s"}.`,
-    );
+    lines.push(`Hoje existem ${priorityCount} prioridade${priorityCount === 1 ? "" : "s"}.`);
     highlights.push({
       id: "priorities",
       text: `${priorityCount} prioridades`,
@@ -74,14 +71,14 @@ export function buildMorningBriefing(input: {
 
   const negociacao = input.summary.leads_negociacao;
   if (negociacao > 0) {
-    lines.push(
-      `${negociacao} cliente${negociacao === 1 ? "" : "s"} em negociação.`,
-    );
+    lines.push(`${negociacao} cliente${negociacao === 1 ? "" : "s"} em negociação.`);
   }
 
   lines.push(`Sua receita recorrente está em ${currency(input.summary.receita_mensal)}.`);
 
-  const hotClient = input.clients.find((c) => c.status_operacional === "negociacao" && c.proxima_acao);
+  const hotClient = input.clients.find(
+    (c) => c.status_operacional === "negociacao" && c.proxima_acao,
+  );
   if (hotClient?.proxima_acao) {
     lines.push(`${hotClient.nome_cliente}: ${hotClient.proxima_acao}.`);
   }
@@ -115,9 +112,7 @@ export function buildContextualKpis(summary: AgencyExecutiveSummary): Contextual
       label: "Projetos",
       value: String(summary.projetos_andamento),
       context:
-        summary.projetos_atrasados > 0
-          ? `${summary.projetos_atrasados} atrasados`
-          : "Em andamento",
+        summary.projetos_atrasados > 0 ? `${summary.projetos_atrasados} atrasados` : "Em andamento",
       filterKey: "section",
       filterValue: "projetos",
     },

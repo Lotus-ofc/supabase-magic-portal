@@ -21,6 +21,11 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **AI Workspace v1 (2026-07-06):** módulo exclusivo Platform Owner em `/admin/ai-workspace`.
+  Context Pack automático para IAs — agregação de docs, código, migrations, ADRs, roadmap e
+  changelog. Prompt Generator, exportação, busca e Context Score. Docs:
+  [ai-workspace.md](./06-dashboards/ai-workspace.md).
+
 - **Content Workflow Fase 5.1 — Integração Portal do Cliente (2026-07-06):** rota contextual
   `/cliente/:slug/aprovacoes` para admin em modo "Ver como cliente". `ClientScopeProvider` resolve
   escopo por `client_access` ou slug → `cadastro_cliente_id`. Adaptação em `modules/client` sem

@@ -99,44 +99,44 @@ export const ClientOperationalCard = memo(function ClientOperationalCard({
             </Button>
           )}
           <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0 opacity-60 group-hover:opacity-100"
-              aria-label="Ações do cliente"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild>
-              <Link to="/admin/central/clientes/$id" params={{ id: String(client.id) }}>
-                <ExternalLink className="mr-2 h-3.5 w-3.5" />
-                Abrir workspace
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/admin/clientes/$id" params={{ id: String(client.id) }}>
-                <Pencil className="mr-2 h-3.5 w-3.5" />
-                Configurações
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onAddNote?.(client)}>
-              <MessageSquarePlus className="mr-2 h-3.5 w-3.5" />
-              Adicionar observação
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled>
-              <Megaphone className="mr-2 h-3.5 w-3.5" />
-              Criar campanha
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled>
-              <Wallet className="mr-2 h-3.5 w-3.5" />
-              Ver financeiro
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 opacity-60 group-hover:opacity-100"
+                aria-label="Ações do cliente"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link to="/admin/central/clientes/$id" params={{ id: String(client.id) }}>
+                  <ExternalLink className="mr-2 h-3.5 w-3.5" />
+                  Abrir workspace
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/admin/clientes/$id" params={{ id: String(client.id) }}>
+                  <Pencil className="mr-2 h-3.5 w-3.5" />
+                  Configurações
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onAddNote?.(client)}>
+                <MessageSquarePlus className="mr-2 h-3.5 w-3.5" />
+                Adicionar observação
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled>
+                <Megaphone className="mr-2 h-3.5 w-3.5" />
+                Criar campanha
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled>
+                <Wallet className="mr-2 h-3.5 w-3.5" />
+                Ver financeiro
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

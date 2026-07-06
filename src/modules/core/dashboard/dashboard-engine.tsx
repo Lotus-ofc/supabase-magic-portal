@@ -38,10 +38,7 @@ export function DashboardGrid({ dashboardId, clientId, context, className }: Das
   return (
     <div className={className ?? "grid gap-4 lg:grid-cols-2"}>
       {widgets.map((widget) => (
-        <div
-          key={widget.id}
-          className={widget.colSpan === 2 ? "lg:col-span-2" : undefined}
-        >
+        <div key={widget.id} className={widget.colSpan === 2 ? "lg:col-span-2" : undefined}>
           <RegisteredWidget widget={widget} clientId={clientId} context={context} />
         </div>
       ))}

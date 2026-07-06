@@ -16,7 +16,10 @@ const DEFAULT_SUMMARY: AgencyExecutiveSummary = {
 
 export const agencySummaryRepository = {
   async getExecutiveSummary(supabase: SupabaseClient): Promise<AgencyExecutiveSummary> {
-    const { data, error } = await supabase.from("vw_agency_executive_summary").select("*").maybeSingle();
+    const { data, error } = await supabase
+      .from("vw_agency_executive_summary")
+      .select("*")
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) return DEFAULT_SUMMARY;
 

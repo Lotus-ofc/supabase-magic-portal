@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { groupTimelineEvents } from "./group-timeline-events";
 import type { AgencyTimelineEvent } from "../types";
 
-function event(partial: Partial<AgencyTimelineEvent> & { event_type: AgencyTimelineEvent["event_type"] }): AgencyTimelineEvent {
+function event(
+  partial: Partial<AgencyTimelineEvent> & { event_type: AgencyTimelineEvent["event_type"] },
+): AgencyTimelineEvent {
   return {
     id: partial.id ?? crypto.randomUUID(),
     cadastro_cliente_id: 1,

@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
-import type { AgencyCentralFilters, AgencyClientStatus, AgencyPriority, ClientHealthTier } from "@/modules/agency-os";
+import type {
+  AgencyCentralFilters,
+  AgencyClientStatus,
+  AgencyPriority,
+  ClientHealthTier,
+} from "@/modules/agency-os";
 import { ChevronDown, Filter, X } from "lucide-react";
 import { useState } from "react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const STATUS_OPTIONS: { value: AgencyClientStatus; label: string }[] = [
   { value: "ativo", label: "Ativo" },
@@ -58,9 +59,7 @@ export function AgencyFilterBar({
               {activeCount}
             </span>
           )}
-          <ChevronDown
-            className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")}
-          />
+          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
         </CollapsibleTrigger>
         {activeCount > 0 && (
           <button
@@ -148,9 +147,7 @@ export function AgencyFilterBar({
             <select
               className="lotus-focus h-9 w-full rounded-lg border border-border bg-background px-2 text-[13px]"
               value={filters.servico ?? ""}
-              onChange={(e) =>
-                onChange({ ...filters, servico: e.target.value || undefined })
-              }
+              onChange={(e) => onChange({ ...filters, servico: e.target.value || undefined })}
             >
               <option value="">Todos</option>
               {servicos.map((s) => (

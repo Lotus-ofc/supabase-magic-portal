@@ -2,11 +2,7 @@ import { Suspense } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { TutorialDoc } from "@/lib/platform-tutorial";
-import {
-  tutorialBasePath,
-  tutorialNavQuery,
-  type TutorialAudience,
-} from "@/lib/platform-tutorial";
+import { tutorialBasePath, tutorialNavQuery, type TutorialAudience } from "@/lib/platform-tutorial";
 import { KnowledgeMarkdown } from "@/components/knowledge-center/KnowledgeMarkdown";
 import { KnowledgeToc } from "@/components/knowledge-center/KnowledgeToc";
 import { useSuspenseQuery } from "@tanstack/react-query";

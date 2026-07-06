@@ -13,7 +13,8 @@ function mapRow(row: Record<string, unknown>): AgencyLead {
     empresa: (row.empresa as string | null) ?? null,
     origem: row.origem as AgencyLead["origem"],
     valor_estimado: row.valor_estimado != null ? Number(row.valor_estimado) : null,
-    probabilidade_manual: row.probabilidade_manual != null ? Number(row.probabilidade_manual) : null,
+    probabilidade_manual:
+      row.probabilidade_manual != null ? Number(row.probabilidade_manual) : null,
     probabilidade_score: Number(row.probabilidade_score ?? 30),
     probabilidade_efetiva: 0,
     proximo_contato: (row.proximo_contato as string | null) ?? null,
@@ -30,8 +31,7 @@ function mapRow(row: Record<string, unknown>): AgencyLead {
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
   };
-  lead.probabilidade_efetiva =
-    lead.probabilidade_manual ?? computeLeadScore(lead);
+  lead.probabilidade_efetiva = lead.probabilidade_manual ?? computeLeadScore(lead);
   return lead;
 }
 
@@ -69,7 +69,9 @@ export const agencyLeadRepository = {
       .maybeSingle();
     if (score.error) throw new Error(score.error.message);
     const lead = score.data ? mapRow(score.data as Record<string, unknown>) : null;
-    const probabilidade_score = lead ? computeLeadScore({ ...lead, pipeline_stage: input.pipeline_stage }) : 30;
+    const probabilidade_score = lead
+      ? computeLeadScore({ ...lead, pipeline_stage: input.pipeline_stage })
+      : 30;
 
     const { error } = await supabase
       .from("agency_leads")

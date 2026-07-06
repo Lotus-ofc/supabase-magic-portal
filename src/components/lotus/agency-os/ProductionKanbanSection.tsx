@@ -2,7 +2,10 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { GenericKanbanBoard } from "@/components/lotus/kanban/GenericKanbanBoard";
-import { MiniDashboardCard, priorityTypeIcon } from "@/components/lotus/agency-os/MiniDashboardCard";
+import {
+  MiniDashboardCard,
+  priorityTypeIcon,
+} from "@/components/lotus/agency-os/MiniDashboardCard";
 import { getProductionKanban, moveAgencyProject } from "@/modules/agency-os/agency-os.server";
 import { agencyOsKeys } from "@/modules/agency-os/query-keys";
 import type { AgencyProject, AgencyProjectStatus } from "@/modules/agency-os/types/operations";
@@ -15,7 +18,9 @@ const kanbanQuery = queryOptions({
   queryFn: () => getProductionKanban(),
 });
 
-export function ProductionKanbanSection({ onCreateProject }: { onCreateProject?: () => void } = {}) {
+export function ProductionKanbanSection({
+  onCreateProject,
+}: { onCreateProject?: () => void } = {}) {
   const qc = useQueryClient();
   const { data: board } = useSuspenseQuery(kanbanQuery);
   const totalItems = board.columns.reduce((n, c) => n + c.items.length, 0);
@@ -35,7 +40,10 @@ export function ProductionKanbanSection({ onCreateProject }: { onCreateProject?:
             if (col.id === input.status_kanban) {
               return {
                 ...col,
-                items: [...col.items.filter((i) => i.id !== input.id), { ...item, status_kanban: input.status_kanban }],
+                items: [
+                  ...col.items.filter((i) => i.id !== input.id),
+                  { ...item, status_kanban: input.status_kanban },
+                ],
               };
             }
             return { ...col, items: col.items.filter((i) => i.id !== input.id) };
@@ -70,19 +78,19 @@ export function ProductionKanbanSection({ onCreateProject }: { onCreateProject?:
         </div>
       )}
       <GenericKanbanBoard
-      columns={board.columns}
-      onMove={(item, _from, toColumnId) => {
-        const targetCol = board.columns.find((c) => c.id === toColumnId);
-        moveMutation.mutate({
-          id: item.id,
-          status_kanban: toColumnId as AgencyProjectStatus,
-          kanban_ordem: targetCol?.items.length ?? 0,
-        });
-      }}
-      renderCard={(project: AgencyProject, { isDragging }) => (
-        <ProjectKanbanCard project={project} isDragging={isDragging} />
-      )}
-    />
+        columns={board.columns}
+        onMove={(item, _from, toColumnId) => {
+          const targetCol = board.columns.find((c) => c.id === toColumnId);
+          moveMutation.mutate({
+            id: item.id,
+            status_kanban: toColumnId as AgencyProjectStatus,
+            kanban_ordem: targetCol?.items.length ?? 0,
+          });
+        }}
+        renderCard={(project: AgencyProject, { isDragging }) => (
+          <ProjectKanbanCard project={project} isDragging={isDragging} />
+        )}
+      />
     </>
   );
 }

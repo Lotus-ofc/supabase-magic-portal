@@ -77,9 +77,7 @@ function ClientWorkspaceContent() {
             <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               {client.nome_cliente}
             </h1>
-            {client.empresa && (
-              <p className="text-sm text-muted-foreground">{client.empresa}</p>
-            )}
+            {client.empresa && <p className="text-sm text-muted-foreground">{client.empresa}</p>}
           </div>
           <ClientHealthBadge tier={health.tier} />
         </div>

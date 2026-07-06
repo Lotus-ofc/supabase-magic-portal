@@ -56,7 +56,9 @@ export const agencySearchSchema = z.object({
 export const createLeadSchema = z.object({
   nome: z.string().trim().min(1).max(200),
   empresa: z.string().trim().max(200).optional().nullable(),
-  origem: z.enum(["indicacao", "inbound", "outbound", "site", "evento", "parceiro", "outro"]).optional(),
+  origem: z
+    .enum(["indicacao", "inbound", "outbound", "site", "evento", "parceiro", "outro"])
+    .optional(),
   valor_estimado: z.number().nonnegative().optional().nullable(),
   proxima_acao: z.string().trim().max(500).optional().nullable(),
   proximo_contato: z.string().datetime().optional().nullable(),

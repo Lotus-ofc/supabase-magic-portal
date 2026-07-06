@@ -1,8 +1,6 @@
 import { slugify } from "@/lib/slug";
 import type { ClientAccessScope } from "@/modules/approval/internal/client-access.server";
-import {
-  assertClientPortalAccess,
-} from "@/modules/approval/internal/client-access.server";
+import { assertClientPortalAccess } from "@/modules/approval/internal/client-access.server";
 import { assertStaffAccess } from "@/modules/approval/internal/staff-auth.server";
 import type { ClientScopeInput } from "../scope-input";
 

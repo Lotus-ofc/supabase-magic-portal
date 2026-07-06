@@ -21,5 +21,9 @@ export { configRegistry } from "./registry/config-registry";
 export { widgetRegistry } from "./registry/widget-registry";
 export { searchEngine } from "./search/search-engine";
 export { mergeSearchResults } from "./search/merge-results";
-export { DashboardGrid, resolveDashboard, resolveDashboardWidgets } from "./dashboard/dashboard-engine";
+export {
+  DashboardGrid,
+  resolveDashboard,
+  resolveDashboardWidgets,
+} from "./dashboard/dashboard-engine";
 export { osKeys } from "./query-keys";

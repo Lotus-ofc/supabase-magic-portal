@@ -9,6 +9,8 @@ interface CollapsibleSectionProps {
   description?: string;
   badge?: ReactNode;
   defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   children: ReactNode;
   className?: string;
 }
@@ -19,10 +21,14 @@ export function CollapsibleSection({
   description,
   badge,
   defaultOpen = true,
+  open: controlledOpen,
+  onOpenChange,
   children,
   className,
 }: CollapsibleSectionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   return (
     <Collapsible
       open={open}

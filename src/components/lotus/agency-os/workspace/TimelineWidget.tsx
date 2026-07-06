@@ -65,10 +65,7 @@ function TimelineWidgetContent({ clientId }: { clientId: number }) {
                           )}
                         </>
                       )}
-                      <time
-                        className="text-[10px] text-muted-foreground"
-                        dateTime={item.latestAt}
-                      >
+                      <time className="text-[10px] text-muted-foreground" dateTime={item.latestAt}>
                         {formatDistanceToNow(parseISO(item.latestAt), {
                           addSuffix: true,
                           locale: ptBR,

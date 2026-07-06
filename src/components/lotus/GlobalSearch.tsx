@@ -54,9 +54,7 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
 
   const clientResults = useMemo(() => {
     const n = needle.toLowerCase();
-    const list = n
-      ? clientes.filter((c) => c.toLowerCase().includes(n))
-      : clientes.slice(0, 8);
+    const list = n ? clientes.filter((c) => c.toLowerCase().includes(n)) : clientes.slice(0, 8);
     return list.slice(0, 8).map((nome) => ({
       id: `portal-client-${nome}`,
       label: nome,

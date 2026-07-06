@@ -26,8 +26,11 @@ export function PipelineKanbanSection({ onCreateLead }: { onCreateLead?: () => v
   const totalItems = board.columns.reduce((n, c) => n + c.items.length, 0);
 
   const moveMutation = useMutation({
-    mutationFn: (input: { id: string; pipeline_stage: AgencyPipelineStage; kanban_ordem: number }) =>
-      moveAgencyLead({ data: input }),
+    mutationFn: (input: {
+      id: string;
+      pipeline_stage: AgencyPipelineStage;
+      kanban_ordem: number;
+    }) => moveAgencyLead({ data: input }),
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: agencyOsKeys.pipeline() });
       const prev = qc.getQueryData(pipelineQuery.queryKey);
@@ -80,7 +83,9 @@ export function PipelineKanbanSection({ onCreateLead }: { onCreateLead?: () => v
     <>
       {totalItems === 0 && (
         <div className="mb-4 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-6 text-center">
-          <p className="text-sm text-muted-foreground">Pipeline vazio — cadastre seu primeiro lead.</p>
+          <p className="text-sm text-muted-foreground">
+            Pipeline vazio — cadastre seu primeiro lead.
+          </p>
           {onCreateLead && (
             <button
               type="button"
@@ -93,24 +98,24 @@ export function PipelineKanbanSection({ onCreateLead }: { onCreateLead?: () => v
         </div>
       )}
       <GenericKanbanBoard
-      columns={board.columns}
-      onMove={(item, _from, toColumnId) => {
-        const targetCol = board.columns.find((c) => c.id === toColumnId);
-        moveMutation.mutate({
-          id: item.id,
-          pipeline_stage: toColumnId as AgencyPipelineStage,
-          kanban_ordem: targetCol?.items.length ?? 0,
-        });
-      }}
-      renderCard={(lead: AgencyLead, { isDragging }) => (
-        <LeadKanbanCard
-          lead={lead}
-          isDragging={isDragging}
-          onConvert={() => convertMutation.mutate(lead.id)}
-          converting={convertMutation.isPending}
-        />
-      )}
-    />
+        columns={board.columns}
+        onMove={(item, _from, toColumnId) => {
+          const targetCol = board.columns.find((c) => c.id === toColumnId);
+          moveMutation.mutate({
+            id: item.id,
+            pipeline_stage: toColumnId as AgencyPipelineStage,
+            kanban_ordem: targetCol?.items.length ?? 0,
+          });
+        }}
+        renderCard={(lead: AgencyLead, { isDragging }) => (
+          <LeadKanbanCard
+            lead={lead}
+            isDragging={isDragging}
+            onConvert={() => convertMutation.mutate(lead.id)}
+            converting={convertMutation.isPending}
+          />
+        )}
+      />
     </>
   );
 }

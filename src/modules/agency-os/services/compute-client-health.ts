@@ -93,10 +93,7 @@ export function computeHealthScore(
   if (!client.ativo) return 0;
 
   const totalWeight = factors.reduce((sum, f) => sum + f.weight, 0);
-  const weighted = factors.reduce(
-    (sum, f) => sum + f.evaluate({ client, now }) * f.weight,
-    0,
-  );
+  const weighted = factors.reduce((sum, f) => sum + f.evaluate({ client, now }) * f.weight, 0);
   return Math.round(weighted / totalWeight);
 }
 

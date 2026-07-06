@@ -25,7 +25,8 @@ export function ProjectsWidget({
   context?: Record<string, unknown>;
 }) {
   if (!clientId) return null;
-  const clientNome = typeof context?.clientNome === "string" ? context.clientNome : `Cliente #${clientId}`;
+  const clientNome =
+    typeof context?.clientNome === "string" ? context.clientNome : `Cliente #${clientId}`;
   const clientEmpresa = typeof context?.clientEmpresa === "string" ? context.clientEmpresa : null;
 
   return (

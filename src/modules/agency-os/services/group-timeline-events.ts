@@ -1,10 +1,4 @@
-import {
-  differenceInCalendarDays,
-  isThisWeek,
-  isToday,
-  isYesterday,
-  parseISO,
-} from "date-fns";
+import { differenceInCalendarDays, isThisWeek, isToday, isYesterday, parseISO } from "date-fns";
 import type { AgencyTimelineEvent, AgencyTimelineEventType } from "../types";
 
 export type TimelinePeriod = "Hoje" | "Ontem" | "Esta semana" | "Mais antigos";
@@ -68,9 +62,7 @@ function aggregateEvents(events: AgencyTimelineEvent[]): TimelineGroupItem[] {
     }
   }
 
-  return singles.sort(
-    (a, b) => new Date(b.latestAt).getTime() - new Date(a.latestAt).getTime(),
-  );
+  return singles.sort((a, b) => new Date(b.latestAt).getTime() - new Date(a.latestAt).getTime());
 }
 
 export function groupTimelineEvents(
@@ -102,7 +94,8 @@ export function groupTimelineEvents(
 export function checklistProgress(checklist: unknown): number {
   if (!Array.isArray(checklist) || checklist.length === 0) return 0;
   const done = checklist.filter(
-    (item) => typeof item === "object" && item && "done" in item && (item as { done: boolean }).done,
+    (item) =>
+      typeof item === "object" && item && "done" in item && (item as { done: boolean }).done,
   ).length;
   return Math.round((done / checklist.length) * 100);
 }

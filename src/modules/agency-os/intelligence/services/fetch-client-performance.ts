@@ -27,10 +27,7 @@ export async function fetchClientPerformance(
     total_clicks: number | null;
   }[];
 
-  const spend30d = rows.reduce(
-    (acc, r) => acc + (r.meta_spend ?? 0) + (r.google_spend ?? 0),
-    0,
-  );
+  const spend30d = rows.reduce((acc, r) => acc + (r.meta_spend ?? 0) + (r.google_spend ?? 0), 0);
   const sessions30d = rows.reduce((acc, r) => acc + (r.ga4_sessions ?? 0), 0);
   const leads30d = rows.reduce((acc, r) => acc + (r.ga4_conversions ?? 0), 0);
   const clicks30d = rows.reduce((acc, r) => acc + (r.total_clicks ?? 0), 0);
@@ -45,5 +42,10 @@ export async function fetchClientPerformance(
   if (olderClicks > 0 && recentClicks > olderClicks * 1.1) trendLabel = "CTR em alta";
   else if (olderClicks > 0 && recentClicks < olderClicks * 0.9) trendLabel = "CTR em queda";
 
-  return { spend30d, leads30d, sessions30d, trendLabel: trendLabel ?? (clicks30d > 0 ? "Dados ativos" : null) };
+  return {
+    spend30d,
+    leads30d,
+    sessions30d,
+    trendLabel: trendLabel ?? (clicks30d > 0 ? "Dados ativos" : null),
+  };
 }

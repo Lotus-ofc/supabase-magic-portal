@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminCentralRouteImport } from './routes/_authenticated/admin/central'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
 import { Route as AuthenticatedAdminAprovacoesRouteImport } from './routes/_authenticated/admin/aprovacoes'
+import { Route as AuthenticatedAdminAiWorkspaceRouteImport } from './routes/_authenticated/admin/ai-workspace'
 import { Route as AuthenticatedAccountSecurityRouteImport } from './routes/_authenticated/account/security'
 import { Route as AuthenticatedAdminTutorialRouteRouteImport } from './routes/_authenticated/admin/tutorial/route'
 import { Route as AuthenticatedAdminKnowledgeRouteRouteImport } from './routes/_authenticated/admin/knowledge/route'
@@ -179,6 +180,12 @@ const AuthenticatedAdminAprovacoesRoute =
   AuthenticatedAdminAprovacoesRouteImport.update({
     id: '/aprovacoes',
     path: '/aprovacoes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAiWorkspaceRoute =
+  AuthenticatedAdminAiWorkspaceRouteImport.update({
+    id: '/ai-workspace',
+    path: '/ai-workspace',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAccountSecurityRoute =
@@ -363,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/admin/tutorial': typeof AuthenticatedAdminTutorialRouteRouteWithChildren
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/ai-workspace': typeof AuthenticatedAdminAiWorkspaceRoute
   '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
@@ -409,6 +417,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/ai-workspace': typeof AuthenticatedAdminAiWorkspaceRoute
   '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
@@ -459,6 +468,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/_authenticated/admin/tutorial': typeof AuthenticatedAdminTutorialRouteRouteWithChildren
   '/_authenticated/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/_authenticated/admin/ai-workspace': typeof AuthenticatedAdminAiWorkspaceRoute
   '/_authenticated/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge'
     | '/admin/tutorial'
     | '/account/security'
+    | '/admin/ai-workspace'
     | '/admin/aprovacoes'
     | '/admin/branding'
     | '/admin/central'
@@ -558,6 +569,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth'
     | '/account/security'
+    | '/admin/ai-workspace'
     | '/admin/aprovacoes'
     | '/admin/branding'
     | '/admin/central'
@@ -607,6 +619,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/knowledge'
     | '/_authenticated/admin/tutorial'
     | '/_authenticated/account/security'
+    | '/_authenticated/admin/ai-workspace'
     | '/_authenticated/admin/aprovacoes'
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/central'
@@ -806,6 +819,13 @@ declare module '@tanstack/react-router' {
       path: '/aprovacoes'
       fullPath: '/admin/aprovacoes'
       preLoaderRoute: typeof AuthenticatedAdminAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/ai-workspace': {
+      id: '/_authenticated/admin/ai-workspace'
+      path: '/ai-workspace'
+      fullPath: '/admin/ai-workspace'
+      preLoaderRoute: typeof AuthenticatedAdminAiWorkspaceRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/account/security': {
@@ -1090,6 +1110,7 @@ const AuthenticatedAdminDebugRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminKnowledgeRouteRoute: typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   AuthenticatedAdminTutorialRouteRoute: typeof AuthenticatedAdminTutorialRouteRouteWithChildren
+  AuthenticatedAdminAiWorkspaceRoute: typeof AuthenticatedAdminAiWorkspaceRoute
   AuthenticatedAdminAprovacoesRoute: typeof AuthenticatedAdminAprovacoesRouteWithChildren
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
   AuthenticatedAdminCentralRoute: typeof AuthenticatedAdminCentralRouteWithChildren
@@ -1113,6 +1134,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
       AuthenticatedAdminKnowledgeRouteRouteWithChildren,
     AuthenticatedAdminTutorialRouteRoute:
       AuthenticatedAdminTutorialRouteRouteWithChildren,
+    AuthenticatedAdminAiWorkspaceRoute: AuthenticatedAdminAiWorkspaceRoute,
     AuthenticatedAdminAprovacoesRoute:
       AuthenticatedAdminAprovacoesRouteWithChildren,
     AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,

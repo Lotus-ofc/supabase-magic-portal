@@ -50,10 +50,7 @@ function HealthDiagnosisContent({ clientId }: { clientId: number }) {
             </p>
             <ul className="space-y-1.5">
               {health.reasons.map((r) => (
-                <li
-                  key={r.id}
-                  className="flex items-start gap-2 text-sm text-foreground"
-                >
+                <li key={r.id} className="flex items-start gap-2 text-sm text-foreground">
                   <span
                     className={
                       r.impact === "positive"
@@ -224,14 +221,7 @@ function FinanceContent({ clientId }: { clientId: number }) {
         <p className="text-sm text-muted-foreground">Sem dados financeiros.</p>
       ) : (
         <div className="space-y-2">
-          <Metric
-            label="MRR"
-            value={
-              fin.mrr != null
-                ? formatCurrency(fin.mrr)
-                : "—"
-            }
-          />
+          <Metric label="MRR" value={fin.mrr != null ? formatCurrency(fin.mrr) : "—"} />
           <p className="text-xs text-muted-foreground">{fin.statusLabel}</p>
         </div>
       )}
@@ -291,5 +281,9 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 function formatCurrency(n: number) {
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return n.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  });
 }

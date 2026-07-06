@@ -94,12 +94,15 @@ export function analyzeClientHealth(ctx: HealthAnalysisContext): ClientHealthDia
     reasons.push({ id: "attention_status", label: "Marcado para atenção", impact: "negative" });
   }
 
-  const hasActivePlatforms =
-    client.servicos.some((s) =>
-      ["Google Ads", "Meta Ads", "Social Media"].some((k) => s.includes(k)),
-    );
+  const hasActivePlatforms = client.servicos.some((s) =>
+    ["Google Ads", "Meta Ads", "Social Media"].some((k) => s.includes(k)),
+  );
   if (hasActivePlatforms) {
-    reasons.push({ id: "campaigns_active", label: "Serviços de mídia contratados", impact: "positive" });
+    reasons.push({
+      id: "campaigns_active",
+      label: "Serviços de mídia contratados",
+      impact: "positive",
+    });
   }
 
   if (client.valor_mensal && client.valor_mensal > 0) {

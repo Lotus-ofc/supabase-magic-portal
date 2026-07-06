@@ -18,8 +18,7 @@ export function IntelligentFeed({
   rankedFeed?: RankedFeedItem[];
   className?: string;
 }) {
-  const orderedEvents =
-    rankedFeed?.map((r) => r.event) ?? events ?? [];
+  const orderedEvents = rankedFeed?.map((r) => r.event) ?? events ?? [];
 
   if (orderedEvents.length === 0) {
     return (
@@ -29,9 +28,7 @@ export function IntelligentFeed({
     );
   }
 
-  const criticalIds = new Set(
-    rankedFeed?.filter((r) => r.critical).map((r) => r.event.id) ?? [],
-  );
+  const criticalIds = new Set(rankedFeed?.filter((r) => r.critical).map((r) => r.event.id) ?? []);
   const groups = groupTimelineEvents(orderedEvents);
 
   return (
@@ -106,7 +103,10 @@ function FeedRow({ item, critical }: { item: TimelineGroupItem; critical?: boole
         {event.summary && (
           <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{event.summary}</p>
         )}
-        <time className="mt-0.5 block text-[10.5px] text-muted-foreground/80" dateTime={event.created_at}>
+        <time
+          className="mt-0.5 block text-[10.5px] text-muted-foreground/80"
+          dateTime={event.created_at}
+        >
           {formatDistanceToNow(parseISO(event.created_at), { addSuffix: true, locale: ptBR })}
         </time>
       </div>

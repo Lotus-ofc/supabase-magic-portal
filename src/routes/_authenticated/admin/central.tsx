@@ -3,15 +3,7 @@ import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from "@ta
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import {
-  DollarSign,
-  Users,
-  FolderKanban,
-  Target,
-  Radio,
-  Plus,
-  ListTodo,
-} from "lucide-react";
+import { DollarSign, Users, FolderKanban, Target, Radio, Plus, ListTodo } from "lucide-react";
 import { adminTitle, BRAND_NAME } from "@/lib/brand";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -36,7 +28,14 @@ import {
   PipelineKanbanSection,
   pipelineQuery,
 } from "@/components/lotus/agency-os/PipelineKanbanSection";
-import { addAgencyNote, createAgencyLead, createAgencyProject, createAgencyTask, getAgencyCentral, updateAgencyClientOperational } from "@/modules/agency-os/agency-os.server";
+import {
+  addAgencyNote,
+  createAgencyLead,
+  createAgencyProject,
+  createAgencyTask,
+  getAgencyCentral,
+  updateAgencyClientOperational,
+} from "@/modules/agency-os/agency-os.server";
 import { agencyOsKeys } from "@/modules/agency-os/query-keys";
 import type { AgencyCentralFilters, AgencyClientCard, ContextualKpi } from "@/modules/agency-os";
 import { listServicos, listClientes } from "@/lib/admin.functions";
@@ -250,7 +249,8 @@ function CentralContent() {
 
   const showPriorities = !search.section || search.section === "prioridades";
   const showPipeline = !search.section || search.section === "pipeline";
-  const showProducao = !search.section || search.section === "projetos" || search.section === "producao";
+  const showProducao =
+    !search.section || search.section === "projetos" || search.section === "producao";
   const showClients =
     !search.section || search.section === "clientes" || search.section === "financeiro";
 
@@ -262,11 +262,21 @@ function CentralContent() {
         description={`Cockpit operacional da ${BRAND_NAME} — prioridades, pipeline, produção e carteira.`}
         actions={
           <>
-            <Button variant="outline" size="sm" className="h-9 gap-1.5" onClick={() => setLeadOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 gap-1.5"
+              onClick={() => setLeadOpen(true)}
+            >
               <Target className="h-3.5 w-3.5" />
               Novo lead
             </Button>
-            <Button variant="outline" size="sm" className="h-9 gap-1.5" onClick={() => setProjectOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 gap-1.5"
+              onClick={() => setProjectOpen(true)}
+            >
               <FolderKanban className="h-3.5 w-3.5" />
               Novo projeto
             </Button>
@@ -289,9 +299,7 @@ function CentralContent() {
               value={kpi.value}
               context={kpi.context}
               icon={KPI_ICONS[kpi.id as keyof typeof KPI_ICONS]}
-              onClick={
-                kpi.filterKey && kpi.filterValue ? () => applyKpiFilter(kpi) : undefined
-              }
+              onClick={kpi.filterKey && kpi.filterValue ? () => applyKpiFilter(kpi) : undefined}
             />
           ))}
         </div>
@@ -304,7 +312,12 @@ function CentralContent() {
             description="O que merece sua atenção agora — ordenado por impacto."
             eyebrow="Motor operacional"
             actions={
-              <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setTaskOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 text-xs"
+                onClick={() => setTaskOpen(true)}
+              >
                 <Plus className="h-3.5 w-3.5" />
                 Nova tarefa
               </Button>
@@ -332,7 +345,12 @@ function CentralContent() {
             description="Leads com score automático — probabilidade calculada pelo sistema."
             eyebrow="Inteligência"
             actions={
-              <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setLeadOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 text-xs"
+                onClick={() => setLeadOpen(true)}
+              >
                 <Plus className="h-3.5 w-3.5" />
                 Novo lead
               </Button>
@@ -352,7 +370,12 @@ function CentralContent() {
             description="Kanban de entregas em andamento"
             eyebrow="Workspace"
             actions={
-              <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setProjectOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 text-xs"
+                onClick={() => setProjectOpen(true)}
+              >
                 <Plus className="h-3.5 w-3.5" />
                 Novo projeto
               </Button>

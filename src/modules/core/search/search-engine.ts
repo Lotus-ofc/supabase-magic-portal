@@ -37,10 +37,7 @@ class SearchEngine {
   }
 
   async search(ctx: SearchContext): Promise<SearchResult[]> {
-    const providers = [
-      ...configRegistry.allSearchProviders(),
-      ...this.serverProviders,
-    ];
+    const providers = [...configRegistry.allSearchProviders(), ...this.serverProviders];
 
     const results: SearchResult[] = [];
     const seen = new Set<string>();
@@ -58,9 +55,7 @@ class SearchEngine {
       }
     }
 
-    return results
-      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-      .slice(0, 24);
+    return results.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 24);
   }
 
   groupResults(results: SearchResult[]): [string, SearchResult[]][] {

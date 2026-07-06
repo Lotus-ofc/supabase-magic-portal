@@ -19,7 +19,9 @@ export const agencyTimelineRepository = {
     const events = (data ?? []) as AgencyTimelineEvent[];
     if (events.length === 0) return events;
 
-    const clientIds = [...new Set(events.map((e) => e.cadastro_cliente_id).filter(Boolean))] as number[];
+    const clientIds = [
+      ...new Set(events.map((e) => e.cadastro_cliente_id).filter(Boolean)),
+    ] as number[];
     if (clientIds.length === 0) return events;
 
     const { data: clients } = await supabase
@@ -27,7 +29,9 @@ export const agencyTimelineRepository = {
       .select("id,nome_cliente")
       .in("id", clientIds);
 
-    const nameById = new Map((clients ?? []).map((c) => [c.id as number, c.nome_cliente as string]));
+    const nameById = new Map(
+      (clients ?? []).map((c) => [c.id as number, c.nome_cliente as string]),
+    );
 
     return events.map((e) => ({
       ...e,

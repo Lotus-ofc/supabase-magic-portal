@@ -32,7 +32,10 @@ function mapRow(row: Record<string, unknown>): AgencyClientCard {
 
 export const agencyClientRepository = {
   async list(supabase: SupabaseClient, filters: AgencyCentralFilters = {}) {
-    let query = supabase.from("vw_agency_client_cards").select(CLIENT_CARD_SELECT).eq("ativo", true);
+    let query = supabase
+      .from("vw_agency_client_cards")
+      .select(CLIENT_CARD_SELECT)
+      .eq("ativo", true);
 
     if (filters.clienteId) query = query.eq("id", filters.clienteId);
     if (filters.responsavelId) query = query.eq("responsavel_user_id", filters.responsavelId);
@@ -40,7 +43,9 @@ export const agencyClientRepository = {
     if (filters.prioridade) query = query.eq("prioridade", filters.prioridade);
     if (filters.health) query = query.eq("health_tier", filters.health);
     if (filters.servico) query = query.contains("servicos", [filters.servico]);
-    query = query.order("prioridade", { ascending: true }).order("nome_cliente", { ascending: true });
+    query = query
+      .order("prioridade", { ascending: true })
+      .order("nome_cliente", { ascending: true });
 
     const { data, error } = await query;
     if (error) throw new Error(error.message);
@@ -79,7 +84,8 @@ export const agencyClientRepository = {
   ) {
     const payload: Record<string, unknown> = {};
     if (input.proxima_acao !== undefined) payload.proxima_acao = input.proxima_acao;
-    if (input.status_operacional !== undefined) payload.status_operacional = input.status_operacional;
+    if (input.status_operacional !== undefined)
+      payload.status_operacional = input.status_operacional;
     if (input.prioridade !== undefined) payload.prioridade = input.prioridade;
 
     const { error } = await supabase.from("cadastro_clientes").update(payload).eq("id", input.id);

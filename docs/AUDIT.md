@@ -32,6 +32,7 @@ operacionais explicitamente marcadas (produção URL, staging, canais do time, s
 | Fórmulas                       | ✅         | `06-engine/formulas.md`                              |
 | Dashboards analíticos          | ✅         | `06-dashboards/dashboards.md`                        |
 | Módulos admin/editorial        | ✅         | `06-dashboards/admin-modules.md`                     |
+| AI Workspace (Context Pack IA) | ✅         | `06-dashboards/ai-workspace.md` — owner-only         |
 | Backend / API                  | ✅         | `03-backend/api-reference.md`                        |
 | Auth / segurança               | ✅         | `03-backend/auth.md`, `security.md`                  |
 | Integrações / Make / coletores | ✅         | `07-integrations/*`                                  |
