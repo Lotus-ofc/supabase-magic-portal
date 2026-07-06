@@ -23,6 +23,7 @@ import {
   BookOpen,
   Compass,
   Palette,
+  Building2,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -109,7 +110,8 @@ function AuthenticatedLayout() {
     {
       label: "Operações",
       items: [
-        { to: "/admin", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
+        { to: "/admin/central", label: "Central", icon: Building2, prefixMatch: false },
+        { to: "/admin", label: "Visão geral", icon: LayoutDashboard },
         { to: "/admin/relatorios", label: "Relatórios", icon: FileBarChart },
         { to: "/admin/aprovacoes", label: "Aprovações", icon: ClipboardCheck },
         { to: "/admin/plano-estrategico", label: "Plano Estratégico", icon: Compass },

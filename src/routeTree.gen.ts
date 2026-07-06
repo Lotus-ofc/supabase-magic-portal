@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPlanoEstrategicoRouteImport } from './routes/_authenticated/admin/plano-estrategico'
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
+import { Route as AuthenticatedAdminCentralRouteImport } from './routes/_authenticated/admin/central'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
 import { Route as AuthenticatedAdminAprovacoesRouteImport } from './routes/_authenticated/admin/aprovacoes'
 import { Route as AuthenticatedAccountSecurityRouteImport } from './routes/_authenticated/account/security'
@@ -51,6 +52,7 @@ import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminAprovacoesDashboardRouteImport } from './routes/_authenticated/admin/aprovacoes.dashboard'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoIndexRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.index'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoPlanoIdRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.$planoId'
+import { Route as AuthenticatedAdminCentralClientesIdRouteImport } from './routes/_authenticated/admin/central/clientes.$id'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -137,6 +139,12 @@ const AuthenticatedAdminDebugRoute = AuthenticatedAdminDebugRouteImport.update({
   path: '/debug',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminCentralRoute =
+  AuthenticatedAdminCentralRouteImport.update({
+    id: '/central',
+    path: '/central',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminBrandingRoute =
   AuthenticatedAdminBrandingRouteImport.update({
     id: '/branding',
@@ -293,6 +301,12 @@ const AuthenticatedClienteClientePlanoEstrategicoPlanoIdRoute =
     path: '/$planoId',
     getParentRoute: () => AuthenticatedClienteClientePlanoEstrategicoRoute,
   } as any)
+const AuthenticatedAdminCentralClientesIdRoute =
+  AuthenticatedAdminCentralClientesIdRouteImport.update({
+    id: '/clientes/$id',
+    path: '/clientes/$id',
+    getParentRoute: () => AuthenticatedAdminCentralRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -307,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/account/security': typeof AuthenticatedAccountSecurityRoute
   '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -334,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/admin/usuarios/': typeof AuthenticatedAdminUsuariosIndexRoute
   '/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
+  '/admin/central/clientes/$id': typeof AuthenticatedAdminCentralClientesIdRoute
   '/cliente/$cliente/plano-estrategico/$planoId': typeof AuthenticatedClienteClientePlanoEstrategicoPlanoIdRoute
   '/cliente/$cliente/plano-estrategico/': typeof AuthenticatedClienteClientePlanoEstrategicoIndexRoute
 }
@@ -347,6 +363,7 @@ export interface FileRoutesByTo {
   '/account/security': typeof AuthenticatedAccountSecurityRoute
   '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -371,6 +388,7 @@ export interface FileRoutesByTo {
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosIndexRoute
   '/cliente/$cliente': typeof AuthenticatedClienteClienteIndexRoute
+  '/admin/central/clientes/$id': typeof AuthenticatedAdminCentralClientesIdRoute
   '/cliente/$cliente/plano-estrategico/$planoId': typeof AuthenticatedClienteClientePlanoEstrategicoPlanoIdRoute
   '/cliente/$cliente/plano-estrategico': typeof AuthenticatedClienteClientePlanoEstrategicoIndexRoute
 }
@@ -389,6 +407,7 @@ export interface FileRoutesById {
   '/_authenticated/account/security': typeof AuthenticatedAccountSecurityRoute
   '/_authenticated/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/_authenticated/admin/central': typeof AuthenticatedAdminCentralRouteWithChildren
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/_authenticated/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -416,6 +435,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/_authenticated/admin/usuarios/': typeof AuthenticatedAdminUsuariosIndexRoute
   '/_authenticated/cliente/$cliente/': typeof AuthenticatedClienteClienteIndexRoute
+  '/_authenticated/admin/central/clientes/$id': typeof AuthenticatedAdminCentralClientesIdRoute
   '/_authenticated/cliente/$cliente/plano-estrategico/$planoId': typeof AuthenticatedClienteClientePlanoEstrategicoPlanoIdRoute
   '/_authenticated/cliente/$cliente/plano-estrategico/': typeof AuthenticatedClienteClientePlanoEstrategicoIndexRoute
 }
@@ -434,6 +454,7 @@ export interface FileRouteTypes {
     | '/account/security'
     | '/admin/aprovacoes'
     | '/admin/branding'
+    | '/admin/central'
     | '/admin/debug'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
@@ -461,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge/'
     | '/admin/usuarios/'
     | '/cliente/$cliente/'
+    | '/admin/central/clientes/$id'
     | '/cliente/$cliente/plano-estrategico/$planoId'
     | '/cliente/$cliente/plano-estrategico/'
   fileRoutesByTo: FileRoutesByTo
@@ -474,6 +496,7 @@ export interface FileRouteTypes {
     | '/account/security'
     | '/admin/aprovacoes'
     | '/admin/branding'
+    | '/admin/central'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
     | '/admin/relatorios'
@@ -498,6 +521,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge'
     | '/admin/usuarios'
     | '/cliente/$cliente'
+    | '/admin/central/clientes/$id'
     | '/cliente/$cliente/plano-estrategico/$planoId'
     | '/cliente/$cliente/plano-estrategico'
   id:
@@ -515,6 +539,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account/security'
     | '/_authenticated/admin/aprovacoes'
     | '/_authenticated/admin/branding'
+    | '/_authenticated/admin/central'
     | '/_authenticated/admin/debug'
     | '/_authenticated/admin/editorial'
     | '/_authenticated/admin/plano-estrategico'
@@ -542,6 +567,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/knowledge/'
     | '/_authenticated/admin/usuarios/'
     | '/_authenticated/cliente/$cliente/'
+    | '/_authenticated/admin/central/clientes/$id'
     | '/_authenticated/cliente/$cliente/plano-estrategico/$planoId'
     | '/_authenticated/cliente/$cliente/plano-estrategico/'
   fileRoutesById: FileRoutesById
@@ -664,6 +690,13 @@ declare module '@tanstack/react-router' {
       path: '/debug'
       fullPath: '/admin/debug'
       preLoaderRoute: typeof AuthenticatedAdminDebugRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/central': {
+      id: '/_authenticated/admin/central'
+      path: '/central'
+      fullPath: '/admin/central'
+      preLoaderRoute: typeof AuthenticatedAdminCentralRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/branding': {
@@ -848,6 +881,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClienteClientePlanoEstrategicoPlanoIdRouteImport
       parentRoute: typeof AuthenticatedClienteClientePlanoEstrategicoRoute
     }
+    '/_authenticated/admin/central/clientes/$id': {
+      id: '/_authenticated/admin/central/clientes/$id'
+      path: '/clientes/$id'
+      fullPath: '/admin/central/clientes/$id'
+      preLoaderRoute: typeof AuthenticatedAdminCentralClientesIdRouteImport
+      parentRoute: typeof AuthenticatedAdminCentralRoute
+    }
   }
 }
 
@@ -884,6 +924,21 @@ const AuthenticatedAdminAprovacoesRouteWithChildren =
     AuthenticatedAdminAprovacoesRouteChildren,
   )
 
+interface AuthenticatedAdminCentralRouteChildren {
+  AuthenticatedAdminCentralClientesIdRoute: typeof AuthenticatedAdminCentralClientesIdRoute
+}
+
+const AuthenticatedAdminCentralRouteChildren: AuthenticatedAdminCentralRouteChildren =
+  {
+    AuthenticatedAdminCentralClientesIdRoute:
+      AuthenticatedAdminCentralClientesIdRoute,
+  }
+
+const AuthenticatedAdminCentralRouteWithChildren =
+  AuthenticatedAdminCentralRoute._addFileChildren(
+    AuthenticatedAdminCentralRouteChildren,
+  )
+
 interface AuthenticatedAdminDebugRouteChildren {
   AuthenticatedAdminDebugViewsRoute: typeof AuthenticatedAdminDebugViewsRoute
   AuthenticatedAdminDebugIndexRoute: typeof AuthenticatedAdminDebugIndexRoute
@@ -904,6 +959,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminKnowledgeRouteRoute: typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   AuthenticatedAdminAprovacoesRoute: typeof AuthenticatedAdminAprovacoesRouteWithChildren
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
+  AuthenticatedAdminCentralRoute: typeof AuthenticatedAdminCentralRouteWithChildren
   AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
   AuthenticatedAdminEditorialRoute: typeof AuthenticatedAdminEditorialRoute
   AuthenticatedAdminPlanoEstrategicoRoute: typeof AuthenticatedAdminPlanoEstrategicoRoute
@@ -925,6 +981,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAprovacoesRoute:
       AuthenticatedAdminAprovacoesRouteWithChildren,
     AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
+    AuthenticatedAdminCentralRoute: AuthenticatedAdminCentralRouteWithChildren,
     AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
     AuthenticatedAdminEditorialRoute: AuthenticatedAdminEditorialRoute,
     AuthenticatedAdminPlanoEstrategicoRoute:

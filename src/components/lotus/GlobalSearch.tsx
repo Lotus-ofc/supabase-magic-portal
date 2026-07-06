@@ -4,13 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
   BookOpen,
+  Building2,
   ClipboardCheck,
+  Compass,
   FileBarChart,
   LayoutDashboard,
+  Palette,
   Search,
   Users,
-  Compass,
-  Palette,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -23,6 +24,8 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
+import { searchAgencyOsCommand } from "@/modules/agency-os/agency-os.server";
+import { agencyOsKeys } from "@/modules/agency-os/query-keys";
 
 import { slugify } from "@/lib/slug";
 
@@ -64,6 +67,14 @@ const STATIC_ROUTES: SearchRoute[] = [
     href: "/admin",
     icon: LayoutDashboard,
     adminOnly: true,
+  },
+  {
+    id: "central",
+    label: "Central — Agency OS",
+    href: "/admin/central",
+    icon: Building2,
+    adminOnly: true,
+    keywords: ["operações", "agência", "crm", "prioridades", "pipeline", "workspace"],
   },
   {
     id: "relatorios",
@@ -175,6 +186,23 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
     return clientes.filter((c) => c.toLowerCase().includes(needle)).slice(0, 8);
   }, [clientes, needle]);
 
+  const { data: agencyResults = [] } = useQuery({
+    queryKey: agencyOsKeys.search(needle),
+    queryFn: () => searchAgencyOsCommand({ data: { query: needle } }),
+    enabled: isAdmin && open && needle.length >= 2,
+    staleTime: 30_000,
+  });
+
+  const agencyGroups = useMemo(() => {
+    const map = new Map<string, typeof agencyResults>();
+    for (const r of agencyResults) {
+      const list = map.get(r.group) ?? [];
+      list.push(r);
+      map.set(r.group, list);
+    }
+    return [...map.entries()];
+  }, [agencyResults]);
+
   const go = (href: string) => {
     setOpen(false);
     setQ("");
@@ -208,7 +236,7 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
-          placeholder="Clientes, rotas, métricas, aprovações…"
+          placeholder="Clientes, comandos Agency OS, rotas…"
           value={q}
           onValueChange={setQ}
         />
@@ -227,6 +255,25 @@ export function GlobalSearch({ isAdmin = false }: { isAdmin?: boolean }) {
                 );
               })}
             </CommandGroup>
+          )}
+
+          {agencyGroups.length > 0 && (
+            <>
+              <CommandSeparator />
+              {agencyGroups.map(([group, items]) => (
+                <CommandGroup key={group} heading={group}>
+                  {items.map((r) => (
+                    <CommandItem key={r.id} value={`${r.label} ${r.hint ?? ""}`} onSelect={() => go(r.href)}>
+                      <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <span>{r.label}</span>
+                      {r.hint && (
+                        <span className="ml-2 truncate text-xs text-muted-foreground">{r.hint}</span>
+                      )}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ))}
+            </>
           )}
 
           {filteredClientes.length > 0 && (
