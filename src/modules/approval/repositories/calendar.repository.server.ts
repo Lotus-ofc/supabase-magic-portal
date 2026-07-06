@@ -15,6 +15,7 @@ export type CalendarRangeFilters = {
   cadastroClienteId: number;
   from: string;
   to: string;
+  estrategiaId?: string;
 };
 
 function monthBounds(year: number, month: number): { from: string; to: string } {
@@ -26,7 +27,14 @@ function monthBounds(year: number, month: number): { from: string; to: string } 
 
 async function queryRange(
   supabase: SupabaseClient,
-  filters: { from: string; to: string; cadastroClienteId?: number; clientNames?: string[] },
+  filters: {
+    from: string;
+    to: string;
+    cadastroClienteId?: number;
+    cadastroClienteIds?: number[];
+    clientNames?: string[];
+    estrategiaId?: string;
+  },
 ): Promise<ContentCard[]> {
   let query = supabase
     .from(TABLE)
@@ -39,8 +47,14 @@ async function queryRange(
 
   if (filters.cadastroClienteId != null) {
     query = query.eq("cadastro_cliente_id", filters.cadastroClienteId);
+  } else if (filters.cadastroClienteIds?.length) {
+    query = query.in("cadastro_cliente_id", filters.cadastroClienteIds);
   } else if (filters.clientNames?.length) {
     query = query.in("cliente_nome", filters.clientNames);
+  }
+
+  if (filters.estrategiaId) {
+    query = query.eq("estrategia_id", filters.estrategiaId);
   }
 
   const { data, error } = await query;
@@ -65,7 +79,18 @@ export const calendarRepository = {
       from: filters.from,
       to: filters.to,
       cadastroClienteId: filters.cadastroClienteId,
+      estrategiaId: filters.estrategiaId,
     });
+  },
+
+  async listForCadastroClienteIdsByDateRange(
+    supabase: SupabaseClient,
+    cadastroClienteIds: number[],
+    from: string,
+    to: string,
+  ): Promise<ContentCard[]> {
+    if (cadastroClienteIds.length === 0) return [];
+    return queryRange(supabase, { from, to, cadastroClienteIds });
   },
 
   async listForClientNamesByDateRange(

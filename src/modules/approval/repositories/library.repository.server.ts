@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ContentCard } from "../types/content-card";
-import { LIBRARY_STATUSES } from "../services/migration-helpers";
+import { LIBRARY_STATUSES } from "../services/workflow-rules";
 import type { LibrarySearchFilters, LibrarySearchResult } from "../library/types/library";
 import { mapContentCardRow } from "./row-mappers";
 
@@ -9,12 +9,14 @@ const TABLE = "content_cards";
 function applyLibraryFilters(
   query: ReturnType<SupabaseClient["from"]>,
   filters: LibrarySearchFilters,
-  clientNames?: string[],
+  scope?: { cadastroClienteIds?: number[]; clientNames?: string[] },
 ) {
   let q = query.in("status", LIBRARY_STATUSES).not("published_at", "is", null);
 
-  if (clientNames?.length) {
-    q = q.in("cliente_nome", clientNames);
+  if (scope?.cadastroClienteIds?.length) {
+    q = q.in("cadastro_cliente_id", scope.cadastroClienteIds);
+  } else if (scope?.clientNames?.length) {
+    q = q.in("cliente_nome", scope.clientNames);
   }
   if (filters.cadastro_cliente_id != null) {
     q = q.eq("cadastro_cliente_id", filters.cadastro_cliente_id);
@@ -49,7 +51,7 @@ export const libraryRepository = {
   async search(
     supabase: SupabaseClient,
     filters: LibrarySearchFilters,
-    clientNames?: string[],
+    scope?: { cadastroClienteIds?: number[]; clientNames?: string[] },
   ): Promise<LibrarySearchResult> {
     const limit = filters.limit ?? 24;
     const offset = filters.offset ?? 0;
@@ -57,12 +59,12 @@ export const libraryRepository = {
     const countQuery = applyLibraryFilters(
       supabase.from(TABLE).select("id", { count: "exact", head: true }),
       filters,
-      clientNames,
+      scope,
     );
     const { count, error: countError } = await countQuery;
     if (countError) throw new Error(countError.message);
 
-    const dataQuery = applyLibraryFilters(supabase.from(TABLE).select("*"), filters, clientNames)
+    const dataQuery = applyLibraryFilters(supabase.from(TABLE).select("*"), filters, scope)
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
@@ -80,7 +82,7 @@ export const libraryRepository = {
   async findByIdInLibrary(
     supabase: SupabaseClient,
     id: string,
-    clientNames?: string[],
+    scope?: { cadastroClienteIds?: number[]; clientNames?: string[] },
   ): Promise<ContentCard | null> {
     let query = supabase
       .from(TABLE)
@@ -89,7 +91,11 @@ export const libraryRepository = {
       .in("status", LIBRARY_STATUSES)
       .not("published_at", "is", null);
 
-    if (clientNames?.length) query = query.in("cliente_nome", clientNames);
+    if (scope?.cadastroClienteIds?.length) {
+      query = query.in("cadastro_cliente_id", scope.cadastroClienteIds);
+    } else if (scope?.clientNames?.length) {
+      query = query.in("cliente_nome", scope.clientNames);
+    }
 
     const { data, error } = await query.maybeSingle();
     if (error) throw new Error(error.message);

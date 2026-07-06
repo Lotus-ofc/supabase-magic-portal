@@ -1,5 +1,4 @@
 import type { MediaAsset, MediaPreviewContext, ParsedCaption } from "./types";
-import type { EditorialPostMediaRow } from "./types";
 
 const HASHTAG_RE = /#[\w\u00C0-\u024F\u1E00-\u1EFF]+/g;
 
@@ -41,34 +40,14 @@ export function fakeLikeCount(seed: string): number {
   return 120 + (h % 8800);
 }
 
-/** Converte linhas DB + URLs assinadas em assets ordenados. */
-export function mapMediaRows(
-  rows: EditorialPostMediaRow[],
-  urlForPath: (path: string) => string,
-): MediaAsset[] {
-  return [...rows]
-    .sort((a, b) => a.ordem - b.ordem)
-    .map((r) => ({
-      id: r.id,
-      kind: r.kind,
-      url: urlForPath(r.storage_path),
-      posterUrl: r.poster_path ? urlForPath(r.poster_path) : null,
-      mimeType: r.mime_type,
-      width: r.width,
-      height: r.height,
-      durationSeconds: r.duration_seconds,
-      ordem: r.ordem,
-    }));
-}
-
-/** Fallback legacy: capa_url vira asset único (sem exibir URL). */
+/** Fallback: capa_url vira asset único (sem exibir URL). */
 export function capaUrlToAsset(capaUrl: string | null): MediaAsset[] {
   if (!capaUrl?.trim()) return [];
   const lower = capaUrl.toLowerCase();
   const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(lower);
   return [
     {
-      id: "legacy-capa",
+      id: "capa-fallback",
       kind: isVideo ? "video" : "image",
       url: capaUrl,
     },

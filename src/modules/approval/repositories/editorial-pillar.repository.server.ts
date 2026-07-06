@@ -21,6 +21,24 @@ export const editorialPillarRepository = {
     return (data ?? []).map(mapEditorialPillarRow);
   },
 
+  async listForCadastroClienteIds(
+    supabase: SupabaseClient,
+    cadastroClienteIds: number[],
+    activeOnly = true,
+  ): Promise<EditorialPillar[]> {
+    if (cadastroClienteIds.length === 0) return [];
+
+    let query = supabase
+      .from(TABLE)
+      .select("*")
+      .in("cadastro_cliente_id", cadastroClienteIds)
+      .order("ordem", { ascending: true });
+    if (activeOnly) query = query.eq("ativo", true);
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapEditorialPillarRow);
+  },
+
   async listForClientNames(
     supabase: SupabaseClient,
     clientNames: string[],

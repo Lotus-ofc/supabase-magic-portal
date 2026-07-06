@@ -13,20 +13,6 @@ export const CADASTRO_CLIENTES_SELECT =
 
 export const SERVICOS_SELECT = "id,nome,descricao,ativo,created_at";
 
-export const POST_EDITORIAL_SELECT =
-  "id,cadastro_cliente_id,cliente_nome,data_publicacao,titulo,legenda,plataforma,formato,capa_url,status,created_by,created_at,updated_at,localizacao,tags,observacoes,responsavel_email,estrategia_id";
-
-export const POST_EDITORIAL_APPROVAL_SELECT =
-  "id,cliente_nome,data_publicacao,titulo,legenda,plataforma,formato,capa_url,status,localizacao,tags,observacoes,responsavel_email,created_at,created_by";
-
-export const POST_MEDIA_SELECT =
-  "id,post_id,storage_path,mime_type,kind,ordem,width,height,duration_seconds,poster_path,created_at";
-
-export const POST_REVISION_SELECT =
-  "id,post_id,autor_id,autor_email,tipo,mensagem,status_de,status_para,created_at";
-
-export const POST_SNAPSHOT_SELECT = "id,post_id,snapshot,created_by,created_at";
-
 /** Amostra mínima para painel de debug (preview de views diárias). */
 export const DEBUG_DAILY_VIEW_SAMPLE_SELECT = "data,cliente";
 

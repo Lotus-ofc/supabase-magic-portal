@@ -69,7 +69,7 @@ Funcionalidades:
 | Domínio | Content Workflow (substitui Calendário Editorial)    |
 | Módulo  | `src/modules/approval/`                              |
 | Backend | `cards/`, `events/`, `attachments/` server fns       |
-| Tabelas | `posts_editorial`, `content_card_events`, `post_media`, `editorial_pillars`, `story_plan_rows` |
+| Tabelas | `content_cards`, `content_card_events`, `content_card_attachments`, `editorial_pillars`, `story_plan_rows` |
 | Docs    | [content-workflow.md](./content-workflow.md)         |
 
 Workflow completo de produção de conteúdo. **Kanban** é a visualização default; também:
@@ -85,9 +85,9 @@ Ver [ADR-0018](../02-architecture/adr/0018-content-workflow-module-v1.md).
 
 ---
 
-## ~~Editorial~~ (`/admin/editorial`) — DEPRECADO
+## ~~Editorial~~ (`/admin/editorial`) — REMOVIDO
 
-Substituído pelo Content Workflow. Rota mantida temporariamente com redirect.
+Redirect permanente para `/admin/aprovacoes`. UI MVP e `editorial.functions.ts` removidos na Fase 5.
 
 ## Plano Estratégico (`/admin/plano-estrategico`)
 

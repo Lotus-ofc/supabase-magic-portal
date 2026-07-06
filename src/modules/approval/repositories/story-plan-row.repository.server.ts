@@ -21,6 +21,24 @@ export const storyPlanRowRepository = {
     return (data ?? []).map(mapStoryPlanRowRow);
   },
 
+  async listForCadastroClienteIds(
+    supabase: SupabaseClient,
+    cadastroClienteIds: number[],
+    semanaInicio: string,
+  ): Promise<StoryPlanRow[]> {
+    if (cadastroClienteIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select("*")
+      .in("cadastro_cliente_id", cadastroClienteIds)
+      .eq("semana_inicio", semanaInicio)
+      .order("dia_semana", { ascending: true })
+      .order("ordem", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapStoryPlanRowRow);
+  },
+
   async listForClientNames(
     supabase: SupabaseClient,
     clientNames: string[],

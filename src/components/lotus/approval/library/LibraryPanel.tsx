@@ -26,6 +26,9 @@ import {
   setLibraryViewPreference,
   type LibraryViewMode,
 } from "./library-view-preference";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
+import { ApprovalEmptyState } from "../shared/ApprovalEmptyState";
+import { BookOpen } from "lucide-react";
 
 const PAGE_SIZE = 24;
 
@@ -229,12 +232,18 @@ export function LibraryPanel({
         </div>
       </div>
 
-      {searchQ.isLoading && <p className="text-sm text-muted-foreground">Carregando biblioteca…</p>}
+      {searchQ.isLoading && <ApprovalPanelSkeleton rows={6} />}
+
+      {searchQ.isError && (
+        <p className="text-sm text-destructive">Não foi possível carregar a biblioteca.</p>
+      )}
 
       {searchQ.data && searchQ.data.items.length === 0 && (
-        <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Nenhum conteúdo publicado encontrado.
-        </p>
+        <ApprovalEmptyState
+          icon={BookOpen}
+          title="Biblioteca vazia"
+          description="Nenhum conteúdo publicado encontrado com os filtros atuais."
+        />
       )}
 
       {searchQ.data && searchQ.data.items.length > 0 && viewMode === "grid" && (

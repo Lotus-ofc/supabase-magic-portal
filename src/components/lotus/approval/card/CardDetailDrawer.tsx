@@ -41,6 +41,8 @@ import { MediaPreview } from "@/components/lotus/MediaPreview/MediaPreview";
 import { buildPreviewContext } from "@/lib/media-preview";
 import { Copy, Archive, MessageSquare } from "lucide-react";
 import { PillarBadge } from "../shared/PillarBadge";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
+import { ApprovalConfirmDialog } from "../shared/ApprovalConfirmDialog";
 
 export function CardDetailDrawer({
   cardId,
@@ -75,6 +77,7 @@ export function CardDetailDrawer({
 
   const card = detailQ.data?.card;
   const [comment, setComment] = useState("");
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const [draft, setDraft] = useState({
     titulo: "",
     legenda: "",
@@ -166,6 +169,7 @@ export function CardDetailDrawer({
   const archiveMut = useMutation({
     mutationFn: () => archiveFn({ data: { id: cardId } }),
     onSuccess: () => {
+      setArchiveOpen(false);
       toast.success("Card arquivado.");
       onClose();
       invalidate();
@@ -229,7 +233,15 @@ export function CardDetailDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        {detailQ.isLoading && <p className="p-6 text-sm text-muted-foreground">Carregando card…</p>}
+        {detailQ.isLoading && (
+          <div className="p-6">
+            <ApprovalPanelSkeleton rows={5} />
+          </div>
+        )}
+
+        {detailQ.isError && (
+          <p className="p-6 text-sm text-destructive">Não foi possível carregar o card.</p>
+        )}
 
         {card && (
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-4">
@@ -268,7 +280,7 @@ export function CardDetailDrawer({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => archiveMut.mutate()}
+                onClick={() => setArchiveOpen(true)}
                 disabled={archiveMut.isPending || card.status === "arquivado"}
               >
                 <Archive className="mr-1.5 h-4 w-4" />
@@ -456,6 +468,16 @@ export function CardDetailDrawer({
           </div>
         )}
       </SheetContent>
+      <ApprovalConfirmDialog
+        open={archiveOpen}
+        onOpenChange={setArchiveOpen}
+        title="Arquivar conteúdo?"
+        description="O card sairá do Kanban ativo e ficará disponível na biblioteca como arquivado."
+        confirmLabel="Arquivar"
+        onConfirm={() => archiveMut.mutate()}
+        loading={archiveMut.isPending}
+        destructive
+      />
     </Sheet>
   );
 }

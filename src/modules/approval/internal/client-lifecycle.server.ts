@@ -29,7 +29,7 @@ export async function clientApproveCard(
   assertCardAction({ role: actor.role, action: "approve" });
   const card = await contentCardRepository.findById(supabase, input.card_id);
   if (!card) throw new Error("Card não encontrado");
-  await assertCardInClientAccess(supabase, actor.userId, card.cliente_nome);
+  await assertCardInClientAccess(supabase, actor.userId, card.cadastro_cliente_id);
   if (card.status !== "aguardando_aprovacao") {
     throw new Error("Só é possível aprovar conteúdos aguardando aprovação.");
   }
@@ -46,7 +46,7 @@ export async function clientRequestChanges(
   assertCardAction({ role: actor.role, action: "request_changes" });
   const card = await contentCardRepository.findById(supabase, input.card_id);
   if (!card) throw new Error("Card não encontrado");
-  await assertCardInClientAccess(supabase, actor.userId, card.cliente_nome);
+  await assertCardInClientAccess(supabase, actor.userId, card.cadastro_cliente_id);
   if (card.status !== "aguardando_aprovacao") {
     throw new Error("Só é possível solicitar alteração em conteúdos aguardando aprovação.");
   }
@@ -66,7 +66,7 @@ export async function clientCommentCard(
   assertCardAction({ role: actor.role, action: "comment" });
   const card = await contentCardRepository.findById(supabase, input.card_id);
   if (!card) throw new Error("Card não encontrado");
-  await assertCardInClientAccess(supabase, actor.userId, card.cliente_nome);
+  await assertCardInClientAccess(supabase, actor.userId, card.cadastro_cliente_id);
   if (!input.mensagem.trim()) throw new Error("Comentário obrigatório.");
   await appendClientEvent(supabase, input.card_id, actor, "commented", {
     mensagem: input.mensagem.trim(),

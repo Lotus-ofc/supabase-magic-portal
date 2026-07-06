@@ -7,7 +7,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { KanbanBoard } from "@/modules/approval/services/build-kanban-board";
 import type { ContentCard } from "@/modules/approval/types/content-card";
 import type { ContentCardStatus } from "@/modules/approval/types/content-card";
@@ -15,7 +15,7 @@ import type { PillarSummary } from "../shared/PillarBadge";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanCard } from "./KanbanCard";
 
-export function KanbanBoardView({
+export const KanbanBoardView = memo(function KanbanBoardView({
   board,
   pillarMap,
   thumbMap,
@@ -94,4 +94,4 @@ export function KanbanBoardView({
       </DragOverlay>
     </DndContext>
   );
-}
+});

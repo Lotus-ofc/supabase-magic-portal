@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ClientAccessScope } from "./client-access.server";
 import { libraryRepository } from "../repositories/library.repository.server";
 import { editorialPillarRepository } from "../repositories/editorial-pillar.repository.server";
 import { listCardAttachmentsWithUrls } from "./attachment-lifecycle.server";
@@ -7,17 +8,23 @@ import type { LibraryItemDetail, LibrarySearchFilters } from "../library/types/l
 export async function searchLibrary(
   supabase: SupabaseClient,
   filters: LibrarySearchFilters,
-  clientNames?: string[],
+  scope?: ClientAccessScope,
 ) {
-  return libraryRepository.search(supabase, filters, clientNames);
+  return libraryRepository.search(supabase, filters, {
+    cadastroClienteIds: scope?.cadastroClienteIds,
+    clientNames: scope?.clientNames,
+  });
 }
 
 export async function getLibraryItemDetail(
   supabase: SupabaseClient,
   id: string,
-  clientNames?: string[],
+  scope?: ClientAccessScope,
 ): Promise<LibraryItemDetail | null> {
-  const card = await libraryRepository.findByIdInLibrary(supabase, id, clientNames);
+  const card = await libraryRepository.findByIdInLibrary(supabase, id, {
+    cadastroClienteIds: scope?.cadastroClienteIds,
+    clientNames: scope?.clientNames,
+  });
   if (!card) return null;
 
   const attachments = await listCardAttachmentsWithUrls(supabase, card.id, card.capa_url);

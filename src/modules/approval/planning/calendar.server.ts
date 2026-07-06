@@ -9,6 +9,7 @@ const calendarInputSchema = z.object({
   cadastro_cliente_id: z.number().int().positive(),
   view: z.enum(["month", "week", "day"]),
   anchor: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  estrategia_id: z.string().uuid().optional(),
 });
 
 export const getCalendarCards = createServerFn({ method: "GET" })
@@ -21,6 +22,7 @@ export const getCalendarCards = createServerFn({ method: "GET" })
       cadastroClienteId: data.cadastro_cliente_id,
       from,
       to,
+      estrategiaId: data.estrategia_id,
     });
     return {
       view: data.view,

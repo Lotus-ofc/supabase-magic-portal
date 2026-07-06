@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
   BookOpen,
-  CalendarDays,
   ClipboardCheck,
   FileBarChart,
   LayoutDashboard,
@@ -80,15 +79,7 @@ const STATIC_ROUTES: SearchRoute[] = [
     href: "/admin/aprovacoes",
     icon: ClipboardCheck,
     adminOnly: true,
-    keywords: ["kanban", "conteúdo", "produção", "workflow"],
-  },
-  {
-    id: "editorial",
-    label: "Calendário editorial",
-    href: "/admin/editorial",
-    icon: CalendarDays,
-    adminOnly: true,
-    keywords: ["posts", "publicação"],
+    keywords: ["kanban", "conteúdo", "produção", "workflow", "calendário", "editorial"],
   },
   {
     id: "plano-admin",

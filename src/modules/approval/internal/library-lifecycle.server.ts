@@ -4,7 +4,7 @@ import { contentCardEventRepository } from "../repositories/content-card-event.r
 import type { ContentCard } from "../types/content-card";
 import type { ApprovalRole } from "../types/approval-role";
 import { assertCardAction } from "../permissions/resolve-card-action";
-import { isHardDeleteForbidden } from "../services/migration-helpers";
+import { isHardDeleteForbidden } from "../services/workflow-rules";
 import { eventTypeForTransition } from "../services/event-type-for-transition";
 import type { LifecycleActor } from "./card-lifecycle.server";
 

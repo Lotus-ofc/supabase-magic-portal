@@ -16,17 +16,17 @@ import { getActorEmail } from "../internal/staff-auth.server";
 import { contentCardCommentSchema } from "../validators/content-card-event";
 
 async function clientActor(context: {
-  supabase: Parameters<typeof assertClientPortalAccess>[0];
+  supabase: Parameters<typeof assertClientPortalAccess>[0]["supabase"];
   userId: string;
   claims?: { email?: string | null };
 }) {
-  const clientNames = await assertClientPortalAccess(context);
+  const scope = await assertClientPortalAccess(context);
   const email = await getActorEmail(context);
   return {
     userId: context.userId,
     email,
     role: "cliente" as const,
-    clientNames,
+    scope,
   };
 }
 
@@ -40,16 +40,16 @@ export const checkClientPortalAccess = createServerFn({ method: "GET" })
 export const getClientKanbanBoardFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { clientNames } = await clientActor(context);
-    return getClientKanbanBoard(context.supabase, clientNames);
+    const { scope } = await clientActor(context);
+    return getClientKanbanBoard(context.supabase, scope);
   });
 
 export const getClientContentCard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { clientNames } = await clientActor(context);
-    const detail = await getClientCardDetail(context.supabase, data.id, clientNames);
+    const { scope } = await clientActor(context);
+    const detail = await getClientCardDetail(context.supabase, data.id, scope);
     if (!detail) throw new Error("Card não encontrado");
     return detail;
   });
@@ -94,8 +94,8 @@ export const listClientCardMedia = createServerFn({ method: "GET" })
     z.object({ cardId: z.string().uuid(), capaUrl: z.string().nullable().optional() }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { clientNames } = await clientActor(context);
-    const card = await getClientCardDetail(context.supabase, data.cardId, clientNames);
+    const { scope } = await clientActor(context);
+    const card = await getClientCardDetail(context.supabase, data.cardId, scope);
     if (!card) throw new Error("Card não encontrado");
     const media = await listCardAttachmentsWithUrls(
       context.supabase,

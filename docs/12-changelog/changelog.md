@@ -21,6 +21,23 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Content Workflow Fase 5 — Consolidação (2026-07-06):** encerramento do Content Workflow v3.
+  Remoção de `editorial.functions.ts`, tabelas legado (`posts_editorial`, `post_media`,
+  `post_revisions`, `post_snapshots`) via migration 22. Redirect permanente `/admin/editorial` →
+  `/admin/aprovacoes`. UX padronizada (skeletons, empty states, confirmações). Lazy loading das abas.
+  Guia de manutenção e Product Tour. Spec:
+  [content-workflow-phase-5.md](../03-backend/content-workflow-phase-5.md).
+
+### Removido
+
+- **Editorial MVP legado:** rota `/admin/editorial` (UI), `ApprovalWorkflowCard`, componentes órfãos
+  de aprovação legada, selects `POST_*` em `db-selects.ts`.
+
+### Alterado
+
+- **Plano Estratégico:** stats editoriais via `content_cards` (`vw_estrategia_editorial_stats`).
+  Deep-link "Ver no calendário" aponta para `/admin/aprovacoes?tab=calendar&estrategia=…`.
+
 - **Content Workflow Fase 4 — Biblioteca + Dashboard (2026-07-06):** Biblioteca oficial de
   conteúdos publicados (`library/`) com busca server-side, filtros, paginação, grid/lista/detalhe
   e arquivamento sem hard delete. Dashboard operacional em `/admin/aprovacoes/dashboard` com

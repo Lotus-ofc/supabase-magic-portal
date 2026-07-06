@@ -1,10 +1,11 @@
 import { adminTitle } from "@/lib/brand";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Plus, BarChart3 } from "lucide-react";
+import { Plus, BarChart3, ClipboardList } from "lucide-react";
+import { z } from "zod";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
@@ -23,18 +24,46 @@ import {
   listEditorialPillars,
 } from "@/modules/approval/cards/cards.server";
 import { buildPillarMap } from "@/modules/approval/services/group-cards-by-date";
-import { KanbanBoardView } from "@/components/lotus/approval/kanban/KanbanBoard";
 import { CardDetailDrawer } from "@/components/lotus/approval/card/CardDetailDrawer";
 import { CardCreateSheet } from "@/components/lotus/approval/card/CardCreateSheet";
 import {
   ApprovalWorkspaceTabs,
   type ApprovalTab,
 } from "@/components/lotus/approval/shared/ApprovalWorkspaceTabs";
-import { ApprovalCalendar } from "@/components/lotus/approval/calendar/ApprovalCalendar";
-import { EditorialPillarsPanel } from "@/components/lotus/approval/pillars/EditorialPillarsPanel";
-import { StoryPlanSheet } from "@/components/lotus/approval/stories/StoryPlanSheet";
-import { LibraryPanel } from "@/components/lotus/approval/library/LibraryPanel";
+import { ApprovalEmptyState } from "@/components/lotus/approval/shared/ApprovalEmptyState";
+import { ApprovalPanelSkeleton } from "@/components/lotus/approval/shared/ApprovalPanelSkeleton";
 import type { ContentCardStatus } from "@/modules/approval/types/content-card";
+
+const KanbanBoardView = lazy(() =>
+  import("@/components/lotus/approval/kanban/KanbanBoard").then((m) => ({
+    default: m.KanbanBoardView,
+  })),
+);
+const ApprovalCalendar = lazy(() =>
+  import("@/components/lotus/approval/calendar/ApprovalCalendar").then((m) => ({
+    default: m.ApprovalCalendar,
+  })),
+);
+const EditorialPillarsPanel = lazy(() =>
+  import("@/components/lotus/approval/pillars/EditorialPillarsPanel").then((m) => ({
+    default: m.EditorialPillarsPanel,
+  })),
+);
+const StoryPlanSheet = lazy(() =>
+  import("@/components/lotus/approval/stories/StoryPlanSheet").then((m) => ({
+    default: m.StoryPlanSheet,
+  })),
+);
+const LibraryPanel = lazy(() =>
+  import("@/components/lotus/approval/library/LibraryPanel").then((m) => ({
+    default: m.LibraryPanel,
+  })),
+);
+
+const aprovacoesSearchSchema = z.object({
+  tab: z.enum(["kanban", "calendar", "pillars", "stories", "library"]).optional(),
+  estrategia: z.string().uuid().optional(),
+});
 
 function invalidateApprovalViews(
   qc: ReturnType<typeof useQueryClient>,
@@ -52,10 +81,13 @@ function invalidateApprovalViews(
 
 export const Route = createFileRoute("/_authenticated/admin/aprovacoes")({
   head: () => ({ meta: [{ title: adminTitle("Aprovações") }] }),
+  validateSearch: aprovacoesSearchSchema,
   component: AprovacoesAdminPage,
 });
 
 function AprovacoesAdminPage() {
+  const search = Route.useSearch();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const listClientesFn = useServerFn(listClientes);
   const boardFn = useServerFn(getKanbanBoard);
@@ -63,13 +95,27 @@ function AprovacoesAdminPage() {
   const pillarsFn = useServerFn(listEditorialPillars);
 
   const [clienteId, setClienteId] = useState<string>("");
-  const [tab, setTab] = useState<ApprovalTab>("kanban");
+  const [tab, setTab] = useState<ApprovalTab>(search.tab ?? "kanban");
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+
+  useEffect(() => {
+    if (search.tab && search.tab !== tab) setTab(search.tab);
+  }, [search.tab, tab]);
+
+  const setTabAndUrl = (next: ApprovalTab) => {
+    setTab(next);
+    navigate({
+      to: "/admin/aprovacoes",
+      search: { tab: next, estrategia: search.estrategia },
+      replace: true,
+    });
+  };
 
   const clientesQ = useQuery({
     queryKey: ["admin", "clientes"],
     queryFn: () => listClientesFn(),
+    staleTime: 60_000,
   });
 
   const clientes = useMemo(
@@ -95,6 +141,7 @@ function AprovacoesAdminPage() {
         data: { cadastro_cliente_id: Number(clienteId), include_archived: true },
       }),
     enabled: !!clienteId,
+    staleTime: 30_000,
   });
 
   const pillarMap = useMemo(() => buildPillarMap(pillarsQ.data ?? []), [pillarsQ.data]);
@@ -193,43 +240,58 @@ function AprovacoesAdminPage() {
         </Select>
       </SectionCard>
 
-      {clienteId && <ApprovalWorkspaceTabs value={tab} onChange={setTab} />}
+      {clienteId && <ApprovalWorkspaceTabs value={tab} onChange={setTabAndUrl} />}
 
       {!clienteId && (
-        <p className="text-sm text-muted-foreground">
-          Selecione um cliente para carregar o workspace.
-        </p>
+        <ApprovalEmptyState
+          icon={ClipboardList}
+          title="Selecione um cliente"
+          description="Escolha um cliente acima para carregar o workspace de aprovações."
+        />
       )}
 
-      {clienteId && tab === "kanban" && boardQ.isLoading && <DashboardSkeleton />}
+      {clienteId && tab === "kanban" && boardQ.isLoading && <ApprovalPanelSkeleton rows={6} />}
 
       {clienteId && tab === "kanban" && boardQ.data && (
-        <KanbanBoardView
-          board={boardQ.data}
-          pillarMap={pillarMap}
-          thumbMap={thumbMap}
-          onMoveCard={(input) => moveMut.mutate(input)}
-          onOpenCard={setOpenCardId}
-        />
+        <Suspense fallback={<ApprovalPanelSkeleton rows={6} />}>
+          <KanbanBoardView
+            board={boardQ.data}
+            pillarMap={pillarMap}
+            thumbMap={thumbMap}
+            onMoveCard={(input) => moveMut.mutate(input)}
+            onOpenCard={setOpenCardId}
+          />
+        </Suspense>
       )}
 
       {clienteId && tab === "calendar" && (
-        <ApprovalCalendar
-          cadastroClienteId={Number(clienteId)}
-          pillarMap={pillarMap}
-          onOpenCard={setOpenCardId}
-        />
+        <Suspense fallback={<ApprovalPanelSkeleton rows={8} />}>
+          <ApprovalCalendar
+            cadastroClienteId={Number(clienteId)}
+            estrategiaId={search.estrategia}
+            pillarMap={pillarMap}
+            onOpenCard={setOpenCardId}
+          />
+        </Suspense>
       )}
 
       {clienteId && tab === "pillars" && (
-        <EditorialPillarsPanel cadastroClienteId={Number(clienteId)} />
+        <Suspense fallback={<ApprovalPanelSkeleton />}>
+          <EditorialPillarsPanel cadastroClienteId={Number(clienteId)} />
+        </Suspense>
       )}
 
       {clienteId && tab === "stories" && (
-        <StoryPlanSheet cadastroClienteId={Number(clienteId)} onOpenCard={setOpenCardId} />
+        <Suspense fallback={<ApprovalPanelSkeleton rows={10} />}>
+          <StoryPlanSheet cadastroClienteId={Number(clienteId)} onOpenCard={setOpenCardId} />
+        </Suspense>
       )}
 
-      {clienteId && tab === "library" && <LibraryPanel cadastroClienteId={Number(clienteId)} />}
+      {clienteId && tab === "library" && (
+        <Suspense fallback={<ApprovalPanelSkeleton rows={6} />}>
+          <LibraryPanel cadastroClienteId={Number(clienteId)} />
+        </Suspense>
+      )}
 
       {openCardId && selectedCliente && (
         <CardDetailDrawer

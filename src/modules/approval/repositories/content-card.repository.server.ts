@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ContentCard, ContentCardInsert, ContentCardUpdate } from "../types/content-card";
-import { isHardDeleteForbidden } from "../services/migration-helpers";
+import { isHardDeleteForbidden } from "../services/workflow-rules";
 import { mapContentCardRow } from "./row-mappers";
 
 const TABLE = "content_cards";
@@ -14,19 +14,6 @@ export type ContentCardListFilters = {
 export const contentCardRepository = {
   async findById(supabase: SupabaseClient, id: string): Promise<ContentCard | null> {
     const { data, error } = await supabase.from(TABLE).select("*").eq("id", id).maybeSingle();
-    if (error) throw new Error(error.message);
-    return data ? mapContentCardRow(data) : null;
-  },
-
-  async findByLegacyPostId(
-    supabase: SupabaseClient,
-    legacyPostId: string,
-  ): Promise<ContentCard | null> {
-    const { data, error } = await supabase
-      .from(TABLE)
-      .select("*")
-      .eq("legacy_post_id", legacyPostId)
-      .maybeSingle();
     if (error) throw new Error(error.message);
     return data ? mapContentCardRow(data) : null;
   },
@@ -53,7 +40,31 @@ export const contentCardRepository = {
     return (data ?? []).map(mapContentCardRow);
   },
 
-  /** Lista cards filtrados por client_access — filtro no repository, não na UI. */
+  /** Lista cards do portal cliente — escopo por cadastro_cliente_id (mesma chave do admin). */
+  async listForCadastroClienteIds(
+    supabase: SupabaseClient,
+    cadastroClienteIds: number[],
+    options?: { excludeArchived?: boolean },
+  ): Promise<ContentCard[]> {
+    if (cadastroClienteIds.length === 0) return [];
+
+    let query = supabase
+      .from(TABLE)
+      .select("*")
+      .in("cadastro_cliente_id", cadastroClienteIds)
+      .order("data_publicacao", { ascending: true })
+      .order("kanban_ordem", { ascending: true });
+
+    if (options?.excludeArchived) {
+      query = query.neq("status", "arquivado");
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapContentCardRow);
+  },
+
+  /** @deprecated Use listForCadastroClienteIds */
   async listForClientNames(
     supabase: SupabaseClient,
     clientNames: string[],
@@ -75,6 +86,22 @@ export const contentCardRepository = {
     const { data, error } = await query;
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapContentCardRow);
+  },
+
+  async findByIdForCadastroClienteIds(
+    supabase: SupabaseClient,
+    id: string,
+    cadastroClienteIds: number[],
+  ): Promise<ContentCard | null> {
+    if (cadastroClienteIds.length === 0) return null;
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select("*")
+      .eq("id", id)
+      .in("cadastro_cliente_id", cadastroClienteIds)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data ? mapContentCardRow(data) : null;
   },
 
   async findByIdForClientNames(

@@ -219,7 +219,8 @@ function parseEditorialStats(
     if (r.status === "publicado") cur.publicados += n;
     else if (r.status === "aprovado") cur.aprovados += n;
     else if (r.status === "aguardando_aprovacao") cur.aguardando += n;
-    else if (r.status === "em_producao") cur.em_producao += n;
+    else if (r.status === "producao" || r.status === "edicao" || r.status === "em_producao")
+      cur.em_producao += n;
     else if (r.status === "rascunho") cur.rascunho += n;
     map[r.estrategia_id] = cur;
   }

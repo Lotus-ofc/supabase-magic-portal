@@ -24,6 +24,9 @@ import {
   reorderEditorialPillarsFn,
 } from "@/modules/approval/planning/pillars.server";
 import { listClientEditorialPillars } from "@/modules/approval/planning/client-planning.server";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
+import { ApprovalEmptyState } from "../shared/ApprovalEmptyState";
+import { Layers } from "lucide-react";
 
 type PillarForm = {
   titulo: string;
@@ -152,7 +155,11 @@ export function EditorialPillarsPanel({
   };
 
   if (pillarsQ.isLoading) {
-    return <p className="text-sm text-muted-foreground">Carregando pilares…</p>;
+    return <ApprovalPanelSkeleton rows={4} />;
+  }
+
+  if (pillarsQ.isError) {
+    return <p className="text-sm text-destructive">Não foi possível carregar os pilares.</p>;
   }
 
   return (
@@ -167,11 +174,23 @@ export function EditorialPillarsPanel({
       )}
 
       {activePillars.length === 0 && (
-        <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          {readOnly
-            ? "Nenhum pilar editorial cadastrado."
-            : "Crie o primeiro pilar editorial para estruturar o conteúdo."}
-        </p>
+        <ApprovalEmptyState
+          icon={Layers}
+          title="Nenhum pilar editorial"
+          description={
+            readOnly
+              ? "Nenhum pilar editorial cadastrado para este cliente."
+              : "Crie o primeiro pilar editorial para estruturar o conteúdo."
+          }
+          action={
+            !readOnly && cadastroClienteId ? (
+              <Button type="button" onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" />
+                Novo pilar
+              </Button>
+            ) : undefined
+          }
+        />
       )}
 
       <ul className="space-y-3">

@@ -102,13 +102,10 @@ Hard delete bloqueado por trigger em `content_cards`.
 
 ---
 
-## Legado (transição)
+## Legado (removido na Fase 5)
 
-| Tabela legada | Destino | Estado |
-| ------------- | ------- | ------ |
-| `posts_editorial` | `content_cards` | backfill migration 18; código MVP ainda usa legado |
-| `post_media` | `content_card_attachments` | backfill |
-| `post_revisions` | `content_card_events` | backfill; escrita descontinuada Fase 1 |
+Tabelas `posts_editorial`, `post_media`, `post_revisions`, `post_snapshots` foram descontinuadas na
+migration **22**. Dados migrados na migration 18 permanecem em `content_cards` e tabelas relacionadas.
 
 ---
 
@@ -117,8 +114,10 @@ Hard delete bloqueado por trigger em `content_cards`.
 | # | Arquivo | Fase |
 | - | ------- | ---- |
 | **18** | `18_content_workflow_foundation.sql` | 0 |
-| 19 | `19_content_workflow_roles_rls.sql` | 1 |
-| 20 | `20_content_workflow_ops_views.sql` | 4 |
+| 19 | `19_content_workflow_client_phase2.sql` | 2 |
+| 20 | `20_content_workflow_editorial_planning.sql` | 3 |
+| 21 | `21_content_workflow_ops_views.sql` | 4 |
+| 22 | `22_content_workflow_legacy_deprecation.sql` | 5 |
 
 ---
 

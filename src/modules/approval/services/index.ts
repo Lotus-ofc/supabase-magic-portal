@@ -1,4 +1,4 @@
-export * from "./migration-helpers";
+export * from "./workflow-rules";
 export * from "./build-kanban-board";
 export * from "./build-card-timeline";
 export * from "./compute-stage-durations";

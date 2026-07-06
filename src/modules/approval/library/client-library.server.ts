@@ -9,16 +9,16 @@ export const searchClientLibraryFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => librarySearchSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const clientNames = await assertClientPortalAccess(context);
-    return searchLibrary(context.supabase, data, clientNames);
+    const scope = await assertClientPortalAccess(context);
+    return searchLibrary(context.supabase, data, scope);
   });
 
 export const getClientLibraryItemFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const clientNames = await assertClientPortalAccess(context);
-    const detail = await getLibraryItemDetail(context.supabase, data.id, clientNames);
+    const scope = await assertClientPortalAccess(context);
+    const detail = await getLibraryItemDetail(context.supabase, data.id, scope);
     if (!detail) throw new Error("Conteúdo não encontrado");
     return detail;
   });

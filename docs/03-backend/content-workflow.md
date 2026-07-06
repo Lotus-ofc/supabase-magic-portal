@@ -9,7 +9,7 @@ last_review: 2026-07-06
 # Content Workflow — Backend
 
 Módulo: `src/modules/approval/`  
-Legado em transição: `src/lib/editorial.functions.ts` (ainda usado por `/admin/editorial` e `/aprovacoes`)
+**Status:** Content Workflow v3 concluído (Fase 5). Sem código legado editorial.
 
 **Fase 1 entregue:** Kanban admin em `/admin/aprovacoes`.
 

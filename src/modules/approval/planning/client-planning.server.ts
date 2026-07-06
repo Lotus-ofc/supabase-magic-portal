@@ -10,8 +10,12 @@ import { groupCardsByDate } from "../services/group-cards-by-date";
 export const listClientEditorialPillars = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const clientNames = await assertClientPortalAccess(context);
-    return editorialPillarRepository.listForClientNames(context.supabase, clientNames, true);
+    const scope = await assertClientPortalAccess(context);
+    return editorialPillarRepository.listForCadastroClienteIds(
+      context.supabase,
+      scope.cadastroClienteIds,
+      true,
+    );
   });
 
 export const getClientCalendarCards = createServerFn({ method: "GET" })
@@ -25,11 +29,11 @@ export const getClientCalendarCards = createServerFn({ method: "GET" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const clientNames = await assertClientPortalAccess(context);
+    const scope = await assertClientPortalAccess(context);
     const { from, to } = calendarRepository.resolveRange(data.view, data.anchor);
-    const cards = await calendarRepository.listForClientNamesByDateRange(
+    const cards = await calendarRepository.listForCadastroClienteIdsByDateRange(
       context.supabase,
-      clientNames,
+      scope.cadastroClienteIds,
       from,
       to,
     );
@@ -49,10 +53,10 @@ export const listClientStoryPlanRows = createServerFn({ method: "GET" })
     z.object({ semana_inicio: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    const clientNames = await assertClientPortalAccess(context);
-    return storyPlanRowRepository.listForClientNames(
+    const scope = await assertClientPortalAccess(context);
+    return storyPlanRowRepository.listForCadastroClienteIds(
       context.supabase,
-      clientNames,
+      scope.cadastroClienteIds,
       data.semana_inicio,
     );
   });

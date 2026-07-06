@@ -17,15 +17,18 @@ import { getCalendarCards } from "@/modules/approval/planning/calendar.server";
 import { getClientCalendarCards } from "@/modules/approval/planning/client-planning.server";
 import { KANBAN_COLUMN_META } from "../kanban/kanban-meta";
 import type { PillarSummary } from "../shared/PillarBadge";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
 
 export function ApprovalCalendar({
   cadastroClienteId,
+  estrategiaId,
   pillarMap,
   onOpenCard,
   readOnly = false,
   clientMode = false,
 }: {
   cadastroClienteId?: number;
+  estrategiaId?: string;
   pillarMap: Record<string, PillarSummary>;
   onOpenCard: (id: string) => void;
   readOnly?: boolean;
@@ -38,12 +41,27 @@ export function ApprovalCalendar({
   const [anchor, setAnchor] = useState(() => isoDay(new Date()));
 
   const calendarQ = useQuery({
-    queryKey: ["approval", "calendar", clientMode ? "client" : cadastroClienteId, view, anchor],
+    queryKey: [
+      "approval",
+      "calendar",
+      clientMode ? "client" : cadastroClienteId,
+      estrategiaId ?? null,
+      view,
+      anchor,
+    ],
     queryFn: () =>
       clientMode
         ? clientFn({ data: { view, anchor } })
-        : staffFn({ data: { cadastro_cliente_id: cadastroClienteId!, view, anchor } }),
+        : staffFn({
+            data: {
+              cadastro_cliente_id: cadastroClienteId!,
+              view,
+              anchor,
+              estrategia_id: estrategiaId,
+            },
+          }),
     enabled: clientMode || !!cadastroClienteId,
+    staleTime: 30_000,
   });
 
   const byDay = useMemo(() => {
@@ -112,8 +130,10 @@ export function ApprovalCalendar({
         </div>
       </div>
 
-      {calendarQ.isLoading && (
-        <p className="text-sm text-muted-foreground">Carregando calendário…</p>
+      {calendarQ.isLoading && <ApprovalPanelSkeleton rows={8} />}
+
+      {calendarQ.isError && (
+        <p className="text-sm text-destructive">Não foi possível carregar o calendário.</p>
       )}
 
       {calendarQ.data && view === "month" && (

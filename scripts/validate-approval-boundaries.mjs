@@ -76,6 +76,16 @@ function hasDisallowedSupabaseImport(content, filePath) {
   return true;
 }
 
+// Rule 3 — app-wide: no imports of deprecated editorial.functions
+for (const file of walk(srcRoot)) {
+  const r = rel(file);
+  if (r.startsWith("src/modules/approval/")) continue;
+  const content = fs.readFileSync(file, "utf8");
+  if (content.includes(EDITORIAL_LEGACY)) {
+    errors.push(`${r}: import proibido de editorial.functions.ts (removido na Fase 5)`);
+  }
+}
+
 // Rule 1 & 4 — approval module boundaries
 for (const file of walk(approvalRoot)) {
   const r = rel(file);

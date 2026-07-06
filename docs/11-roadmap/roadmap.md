@@ -112,8 +112,14 @@ flowchart LR
 - Biblioteca oficial, dashboard operacional, hard delete bloqueado, ports IA
 - 📄 [content-workflow-phase-4.md](../03-backend/content-workflow-phase-4.md)
 
-### Escopo v1 restante (Fase 5)
-- 🔧 Deprecar `/admin/editorial` → redirect quando estável
+### Fase 5 — Consolidação ✅ (concluída 06/07/2026)
+
+- ✅ Legado removido (`editorial.functions`, tabelas `posts_editorial`+)
+- ✅ Redirect `/admin/editorial` → `/admin/aprovacoes`
+- ✅ UX polish, boundaries estendidos, migration 22
+- 📄 [content-workflow-phase-5.md](../03-backend/content-workflow-phase-5.md)
+
+**Content Workflow v3 encerrado.**
 
 Plano: [content-workflow-implementation-plan.md](../03-backend/content-workflow-implementation-plan.md)
 
@@ -126,7 +132,7 @@ Plano: [content-workflow-implementation-plan.md](../03-backend/content-workflow-
 - ✨ Agendamento automático de publicação
 - ✨ Métricas pós-publicação (engajamento real vs planejado)
 - ✨ Biblioteca → IA, relatórios, pesquisa, cases, portfólio
-- ✨ Descontinuar tabelas legado (`posts_editorial`, `post_media`, `post_revisions`)
+- ✨ ~~Descontinuar tabelas legado (`posts_editorial`, `post_media`, `post_revisions`)~~ ✅ Fase 5
 - ✨ Notificações server-side (substituir localStorage)
 
 ---

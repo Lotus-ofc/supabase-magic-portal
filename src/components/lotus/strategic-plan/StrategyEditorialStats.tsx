@@ -29,8 +29,8 @@ export function StrategyEditorialStats({
       </span>
       {adminLink && stats.total > 0 && (
         <Link
-          to="/admin/editorial"
-          search={{ estrategia: estrategiaId }}
+          to="/admin/aprovacoes"
+          search={{ tab: "calendar", estrategia: estrategiaId }}
           className="text-primary hover:underline"
         >
           Ver no calendário
