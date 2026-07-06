@@ -15,6 +15,8 @@ import {
 } from "@/modules/approval/services/calendar-date-utils";
 import { getCalendarCards } from "@/modules/approval/planning/calendar.server";
 import { getClientCalendarCards } from "@/modules/approval/planning/client-planning.server";
+import { getScopedCalendarCardsFn } from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 import { KANBAN_COLUMN_META } from "../kanban/kanban-meta";
 import type { PillarSummary } from "../shared/PillarBadge";
 import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
@@ -36,21 +38,23 @@ export function ApprovalCalendar({
 }) {
   const staffFn = useServerFn(getCalendarCards);
   const clientFn = useServerFn(getClientCalendarCards);
+  const scopedFn = useServerFn(getScopedCalendarCardsFn);
+  const portalScope = useOptionalClientScope();
 
   const [view, setView] = useState<CalendarView>("month");
   const [anchor, setAnchor] = useState(() => isoDay(new Date()));
 
+  const scopeKey = portalScope?.scopeQueryKey ?? (clientMode ? "client" : cadastroClienteId);
+
   const calendarQ = useQuery({
-    queryKey: [
-      "approval",
-      "calendar",
-      clientMode ? "client" : cadastroClienteId,
-      estrategiaId ?? null,
-      view,
-      anchor,
-    ],
-    queryFn: () =>
-      clientMode
+    queryKey: ["approval", "calendar", scopeKey, estrategiaId ?? null, view, anchor],
+    queryFn: () => {
+      if (portalScope) {
+        return scopedFn({
+          data: { scope: portalScope.scopeInput, view, anchor },
+        });
+      }
+      return clientMode
         ? clientFn({ data: { view, anchor } })
         : staffFn({
             data: {
@@ -59,8 +63,9 @@ export function ApprovalCalendar({
               anchor,
               estrategia_id: estrategiaId,
             },
-          }),
-    enabled: clientMode || !!cadastroClienteId,
+          });
+    },
+    enabled: !!portalScope || clientMode || !!cadastroClienteId,
     staleTime: 30_000,
   });
 

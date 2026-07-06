@@ -19,6 +19,8 @@ import {
   clientApproveCardFn,
   clientRequestChangesFn,
 } from "@/modules/approval/cards/client-cards.server";
+import { getScopedContentCardFn } from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 import { KANBAN_COLUMNS } from "@/modules/approval/workflow/column-config";
 import { KANBAN_COLUMN_META, formatCardSchedule } from "../kanban/kanban-meta";
 import { CardTimeline } from "../card/CardTimeline";
@@ -49,6 +51,8 @@ export function ClientCardDetailDrawer({
 }) {
   const qc = useQueryClient();
   const getFn = useServerFn(getClientContentCard);
+  const scopedGetFn = useServerFn(getScopedContentCardFn);
+  const portalScope = useOptionalClientScope();
   const commentFn = useServerFn(clientCommentCardFn);
   const approveFn = useServerFn(clientApproveCardFn);
   const changesFn = useServerFn(clientRequestChangesFn);
@@ -56,18 +60,23 @@ export function ClientCardDetailDrawer({
   const [comment, setComment] = useState("");
   const [changeNote, setChangeNote] = useState("");
 
+  const scopeKey = portalScope?.scopeQueryKey ?? "client";
+
   const detailQ = useQuery({
-    queryKey: ["client-content-card", cardId],
-    queryFn: () => getFn({ data: { id: cardId } }),
+    queryKey: ["client-content-card", scopeKey, cardId],
+    queryFn: () =>
+      portalScope
+        ? scopedGetFn({ data: { scope: portalScope.scopeInput, id: cardId } })
+        : getFn({ data: { id: cardId } }),
     enabled: !!cardId,
   });
 
   const card = detailQ.data?.card;
-  const canAct = card?.status === "aguardando_aprovacao";
+  const canAct = card?.status === "aguardando_aprovacao" && portalScope?.mode !== "slug_context";
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ["client-content-card", cardId] });
-    qc.invalidateQueries({ queryKey: ["client-aprovacoes", "kanban"] });
+    qc.invalidateQueries({ queryKey: ["client-content-card", scopeKey, cardId] });
+    qc.invalidateQueries({ queryKey: ["client-aprovacoes", "kanban", scopeKey] });
     onMutated();
   };
 

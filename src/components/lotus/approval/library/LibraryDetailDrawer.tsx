@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { getLibraryItemFn } from "@/modules/approval/library/library.server";
 import { getClientLibraryItemFn } from "@/modules/approval/library/client-library.server";
+import { getScopedLibraryItemFn } from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 import { PillarBadge } from "../shared/PillarBadge";
 import { formatCardSchedule } from "../kanban/kanban-meta";
 import { KANBAN_COLUMN_META } from "../kanban/kanban-meta";
@@ -30,11 +32,19 @@ export function LibraryDetailDrawer({
 }) {
   const staffFn = useServerFn(getLibraryItemFn);
   const clientFn = useServerFn(getClientLibraryItemFn);
+  const scopedFn = useServerFn(getScopedLibraryItemFn);
+  const portalScope = useOptionalClientScope();
+
+  const scopeKey = portalScope?.scopeQueryKey ?? (clientMode ? "client" : "staff");
 
   const detailQ = useQuery({
-    queryKey: ["library-item", clientMode ? "client" : "staff", itemId],
-    queryFn: () =>
-      clientMode ? clientFn({ data: { id: itemId } }) : staffFn({ data: { id: itemId } }),
+    queryKey: ["library-item", scopeKey, itemId],
+    queryFn: () => {
+      if (portalScope) {
+        return scopedFn({ data: { scope: portalScope.scopeInput, id: itemId } });
+      }
+      return clientMode ? clientFn({ data: { id: itemId } }) : staffFn({ data: { id: itemId } });
+    },
     enabled: !!itemId,
   });
 

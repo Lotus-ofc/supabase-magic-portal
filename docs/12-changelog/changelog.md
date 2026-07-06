@@ -21,6 +21,12 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Content Workflow Fase 5.1 — Integração Portal do Cliente (2026-07-06):** rota contextual
+  `/cliente/:slug/aprovacoes` para admin em modo "Ver como cliente". `ClientScopeProvider` resolve
+  escopo por `client_access` ou slug → `cadastro_cliente_id`. Adaptação em `modules/client` sem
+  alterar domínio Approval. Spec:
+  [content-workflow-phase-5-1.md](../03-backend/content-workflow-phase-5-1.md).
+
 - **Content Workflow Fase 5 — Consolidação (2026-07-06):** encerramento do Content Workflow v3.
   Remoção de `editorial.functions.ts`, tabelas legado (`posts_editorial`, `post_media`,
   `post_revisions`, `post_snapshots`) via migration 22. Redirect permanente `/admin/editorial` →

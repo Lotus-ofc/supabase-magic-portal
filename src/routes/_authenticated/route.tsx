@@ -101,6 +101,8 @@ function AuthenticatedLayout() {
   const { user, isAdmin } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inAdmin = pathname.startsWith("/admin");
+  const clienteSlugMatch = pathname.match(/^\/cliente\/([^/]+)/);
+  const clienteSlug = clienteSlugMatch?.[1];
   const signOut = useSignOut(user.email);
 
   const adminGroups: NavGroup[] = [
@@ -139,7 +141,11 @@ function AuthenticatedLayout() {
       items: [
         { to: "/dashboard", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
         { to: "/plano-estrategico", label: "Plano Estratégico", icon: Compass },
-        { to: "/aprovacoes", label: "Aprovações", icon: ClipboardCheck },
+        {
+          to: clienteSlug ? `/cliente/${clienteSlug}/aprovacoes` : "/aprovacoes",
+          label: "Aprovações",
+          icon: ClipboardCheck,
+        },
       ],
     },
     ...(isAdmin

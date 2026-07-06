@@ -107,12 +107,17 @@ hipóteses, oportunidades, decisões, aprendizados, radar e integração editori
 
 | Item    | Detalhe                                     |
 | ------- | ------------------------------------------- |
-| Arquivo | `aprovacoes/` (layout + tabs)               |
-| Persona | **Cliente final**                           |
-| Backend | Content Workflow server fns (RLS cliente)   |
+| Arquivo | `modules/client/components/ClientApprovalWorkspace.tsx` |
+| Persona | **Cliente final** ou **admin em `/cliente/:slug/aprovacoes`** |
+| Backend | `modules/client/scoped-portal.functions.ts` → Approval |
 
-Portal read-only: Kanban, Pilares, Stories, Biblioteca. Cliente comenta, aprova e reprova.
-Preview social via MediaPreview.
+| Rota | Modo `ClientScope` |
+| ---- | ------------------ |
+| `/aprovacoes` | `client_access` |
+| `/cliente/:slug/aprovacoes` | `slug_context` |
+
+Portal read-only: Kanban, Calendário, Pilares, Stories, Biblioteca. Cliente comenta, aprova e reprova
+(no modo slug, visualização sem ações de aprovação).
 
 ---
 

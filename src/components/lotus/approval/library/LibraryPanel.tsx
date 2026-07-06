@@ -18,6 +18,11 @@ import { listEditorialPillars } from "@/modules/approval/cards/cards.server";
 import { listClientEditorialPillars } from "@/modules/approval/planning/client-planning.server";
 import { searchLibraryFn, archiveLibraryItemFn } from "@/modules/approval/library/library.server";
 import { searchClientLibraryFn } from "@/modules/approval/library/client-library.server";
+import {
+  searchScopedLibraryFn,
+  listScopedEditorialPillarsFn,
+} from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 import type { LibraryStatusFilter } from "@/modules/approval/library/types/library";
 import { LibraryCardTile } from "./LibraryCardTile";
 import { LibraryDetailDrawer } from "./LibraryDetailDrawer";
@@ -44,9 +49,12 @@ export function LibraryPanel({
   const qc = useQueryClient();
   const staffSearchFn = useServerFn(searchLibraryFn);
   const clientSearchFn = useServerFn(searchClientLibraryFn);
+  const scopedSearchFn = useServerFn(searchScopedLibraryFn);
   const archiveFn = useServerFn(archiveLibraryItemFn);
   const pillarsFn = useServerFn(listEditorialPillars);
   const clientPillarsFn = useServerFn(listClientEditorialPillars);
+  const scopedPillarsFn = useServerFn(listScopedEditorialPillarsFn);
+  const portalScope = useOptionalClientScope();
 
   const [viewMode, setViewMode] = useState<LibraryViewMode>("grid");
   const [q, setQ] = useState("");
@@ -73,11 +81,13 @@ export function LibraryPanel({
     setPage(0);
   }, [debouncedQ, status, plataforma, formato, pilarId, year, month, cadastroClienteId]);
 
+  const scopeKey = portalScope?.scopeQueryKey ?? (clientMode ? "client" : cadastroClienteId);
+
   const searchQ = useQuery({
     queryKey: [
       "approval",
       "library",
-      clientMode ? "client" : cadastroClienteId,
+      scopeKey,
       debouncedQ,
       status,
       plataforma,
@@ -90,7 +100,7 @@ export function LibraryPanel({
     queryFn: () => {
       const payload = {
         q: debouncedQ || undefined,
-        cadastro_cliente_id: clientMode ? undefined : cadastroClienteId,
+        cadastro_cliente_id: clientMode && !portalScope ? undefined : cadastroClienteId,
         status,
         plataforma: plataforma || undefined,
         formato: formato || undefined,
@@ -100,9 +110,13 @@ export function LibraryPanel({
         limit: PAGE_SIZE,
         offset: page * PAGE_SIZE,
       };
+      if (portalScope) {
+        const { cadastro_cliente_id: _c, ...rest } = payload;
+        return scopedSearchFn({ data: { scope: portalScope.scopeInput, ...rest } });
+      }
       return clientMode ? clientSearchFn({ data: payload }) : staffSearchFn({ data: payload });
     },
-    enabled: clientMode || !!cadastroClienteId,
+    enabled: !!portalScope || clientMode || !!cadastroClienteId,
   });
 
   const pillarsQ = useQuery({
@@ -111,18 +125,26 @@ export function LibraryPanel({
       pillarsFn({
         data: { cadastro_cliente_id: cadastroClienteId!, include_archived: false },
       }),
-    enabled: !clientMode && !!cadastroClienteId,
+    enabled: !clientMode && !portalScope && !!cadastroClienteId,
   });
 
   const clientPillarsQ = useQuery({
-    queryKey: ["editorial-pillars", "client"],
-    queryFn: () => clientPillarsFn(),
-    enabled: clientMode,
+    queryKey: ["editorial-pillars", scopeKey],
+    queryFn: () => {
+      if (portalScope) {
+        return scopedPillarsFn({ data: { scope: portalScope.scopeInput } });
+      }
+      return clientPillarsFn();
+    },
+    enabled: !!portalScope || clientMode,
   });
 
   const pillarMap = useMemo(
-    () => buildPillarMap(clientMode ? (clientPillarsQ.data ?? []) : (pillarsQ.data ?? [])),
-    [clientMode, clientPillarsQ.data, pillarsQ.data],
+    () =>
+      buildPillarMap(
+        portalScope || clientMode ? (clientPillarsQ.data ?? []) : (pillarsQ.data ?? []),
+      ),
+    [portalScope, clientMode, clientPillarsQ.data, pillarsQ.data],
   );
 
   const total = searchQ.data?.total ?? 0;

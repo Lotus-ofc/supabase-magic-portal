@@ -24,6 +24,8 @@ import {
   reorderEditorialPillarsFn,
 } from "@/modules/approval/planning/pillars.server";
 import { listClientEditorialPillars } from "@/modules/approval/planning/client-planning.server";
+import { listScopedEditorialPillarsFn } from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
 import { ApprovalEmptyState } from "../shared/ApprovalEmptyState";
 import { Layers } from "lucide-react";
@@ -54,6 +56,8 @@ export function EditorialPillarsPanel({
   const qc = useQueryClient();
   const staffListFn = useServerFn(listEditorialPillarsFn);
   const clientListFn = useServerFn(listClientEditorialPillars);
+  const scopedListFn = useServerFn(listScopedEditorialPillarsFn);
+  const portalScope = useOptionalClientScope();
   const createFn = useServerFn(createEditorialPillarFn);
   const updateFn = useServerFn(updateEditorialPillarFn);
   const archiveFn = useServerFn(archiveEditorialPillarFn);
@@ -63,15 +67,21 @@ export function EditorialPillarsPanel({
   const [editing, setEditing] = useState<EditorialPillar | null>(null);
   const [form, setForm] = useState<PillarForm>(EMPTY_FORM);
 
+  const scopeKey = portalScope?.scopeQueryKey ?? (clientMode ? "client" : cadastroClienteId);
+
   const pillarsQ = useQuery({
-    queryKey: ["editorial-pillars", clientMode ? "client" : cadastroClienteId, !readOnly],
-    queryFn: () =>
-      clientMode
+    queryKey: ["editorial-pillars", scopeKey, !readOnly],
+    queryFn: () => {
+      if (portalScope) {
+        return scopedListFn({ data: { scope: portalScope.scopeInput } });
+      }
+      return clientMode
         ? clientListFn()
         : staffListFn({
             data: { cadastro_cliente_id: cadastroClienteId!, include_archived: !readOnly },
-          }),
-    enabled: clientMode || !!cadastroClienteId,
+          });
+    },
+    enabled: !!portalScope || clientMode || !!cadastroClienteId,
   });
 
   const pillars = useMemo(() => pillarsQ.data ?? [], [pillarsQ.data]);
@@ -79,7 +89,7 @@ export function EditorialPillarsPanel({
 
   const invalidate = () => {
     qc.invalidateQueries({
-      queryKey: ["editorial-pillars", clientMode ? "client" : cadastroClienteId],
+      queryKey: ["editorial-pillars", scopeKey],
     });
   };
 

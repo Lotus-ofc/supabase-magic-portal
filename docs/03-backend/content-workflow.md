@@ -15,6 +15,10 @@ Módulo: `src/modules/approval/`
 
 **Fase 2 entregue:** Portal cliente em `/aprovacoes` via `client-cards.server.ts`.
 
+**Fase 5.1 entregue:** Integração contextual em `/cliente/:slug/aprovacoes` via
+`modules/client/` (`ClientScopeProvider` + `scoped-portal.functions.ts`). O módulo Approval permanece
+inalterado; a adaptação resolve `ClientAccessScope` e delega aos services existentes.
+
 ---
 
 ## Fluxo obrigatório

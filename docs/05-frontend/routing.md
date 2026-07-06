@@ -29,7 +29,8 @@ flowchart TD
     authed --> aprov["/aprovacoes"]
     authed --> cli["/cliente/$cliente (layout)"]
     cli --> cliIdx["/cliente/$cliente (visão geral)"]
-    cli --> cliPlat["/cliente/$cliente/{instagram,meta-ads,google-ads,ga4,google-business,tiktok}"]
+    cli --> cliAprov["/cliente/$cliente/aprovacoes"]
+    cli --> cliPlat["/cliente/$cliente/{instagram,meta-ads,...}"]
 
     authed --> admin["/admin (guarda admin na UI)"]
     admin --> admIdx["/admin (centro executivo)"]
@@ -71,6 +72,8 @@ sequenceDiagram
 No layout autenticado, `checkIsAdmin` (server fn) define os grupos de navegação:
 
 - **Cliente:** Visão geral (`/dashboard`), Aprovações (`/aprovacoes`).
+- **Admin visualizando cliente:** em `/cliente/:slug/*`, Aprovações aponta para
+  `/cliente/:slug/aprovacoes` (modo `slug_context` via `ClientScopeProvider`).
 - **Admin:** Operações (visão geral, relatórios, editorial, clientes, usuários, serviços) +
   Diagnóstico (debug, auditoria de views).
 - Admin também vê atalho "Painel admin" e o seletor **"Ver como cliente"**

@@ -121,6 +121,13 @@ flowchart LR
 
 **Content Workflow v3 encerrado.**
 
+### Fase 5.1 — Integração Portal do Cliente ✅ (06/07/2026)
+
+- ✅ `ClientScopeProvider` — modos `client_access` e `slug_context`
+- ✅ Rota `/cliente/:slug/aprovacoes` reutiliza `ClientApprovalWorkspace`
+- ✅ Camada `modules/client/scoped-portal.functions.ts` (adaptação, sem duplicar Approval)
+- 📄 [content-workflow-phase-5-1.md](../03-backend/content-workflow-phase-5-1.md)
+
 Plano: [content-workflow-implementation-plan.md](../03-backend/content-workflow-implementation-plan.md)
 
 ### Content Workflow — Evoluções futuras (pós-v1)

@@ -13,6 +13,7 @@ import {
   Megaphone,
   type LucideIcon,
   Compass,
+  ClipboardCheck,
 } from "lucide-react";
 import { brandTitle } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -214,6 +215,14 @@ function PlatformSideNav({ slug, queryName }: { slug: string; queryName: string 
           href={`/cliente/${slug}/plano-estrategico`}
           icon={Compass}
           label="Plano Estratégico"
+        />
+        <SubNavLink
+          to="/cliente/$cliente/aprovacoes"
+          params={{ cliente: slug }}
+          pathname={pathname}
+          href={`/cliente/${slug}/aprovacoes`}
+          icon={ClipboardCheck}
+          label="Aprovações"
         />
 
         <p className="hidden px-3 pb-1 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground lg:mt-3 lg:block">

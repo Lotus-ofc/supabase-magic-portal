@@ -20,6 +20,8 @@ import {
   deleteStoryPlanRowFn,
 } from "@/modules/approval/planning/stories.server";
 import { listClientStoryPlanRows } from "@/modules/approval/planning/client-planning.server";
+import { listScopedStoryPlanRowsFn } from "@/modules/client/scoped-portal.functions";
+import { useOptionalClientScope } from "@/modules/client/context";
 
 export function StoryPlanSheet({
   cadastroClienteId,
@@ -35,21 +37,31 @@ export function StoryPlanSheet({
   const qc = useQueryClient();
   const staffListFn = useServerFn(listStoryPlanRows);
   const clientListFn = useServerFn(listClientStoryPlanRows);
+  const scopedListFn = useServerFn(listScopedStoryPlanRowsFn);
+  const portalScope = useOptionalClientScope();
   const createFn = useServerFn(createStoryPlanRowFn);
   const updateFn = useServerFn(updateStoryPlanRowFn);
   const deleteFn = useServerFn(deleteStoryPlanRowFn);
 
   const [semanaInicio, setSemanaInicio] = useState(() => mondayOfWeek(isoDay(new Date())));
 
+  const scopeKey = portalScope?.scopeQueryKey ?? (clientMode ? "client" : cadastroClienteId);
+
   const rowsQ = useQuery({
-    queryKey: ["story-plan", clientMode ? "client" : cadastroClienteId, semanaInicio],
-    queryFn: () =>
-      clientMode
+    queryKey: ["story-plan", scopeKey, semanaInicio],
+    queryFn: () => {
+      if (portalScope) {
+        return scopedListFn({
+          data: { scope: portalScope.scopeInput, semana_inicio: semanaInicio },
+        });
+      }
+      return clientMode
         ? clientListFn({ data: { semana_inicio: semanaInicio } })
         : staffListFn({
             data: { cadastro_cliente_id: cadastroClienteId!, semana_inicio: semanaInicio },
-          }),
-    enabled: clientMode || !!cadastroClienteId,
+          });
+    },
+    enabled: !!portalScope || clientMode || !!cadastroClienteId,
   });
 
   const rowsByDay = useMemo(() => {
@@ -68,7 +80,7 @@ export function StoryPlanSheet({
 
   const invalidate = () => {
     qc.invalidateQueries({
-      queryKey: ["story-plan", clientMode ? "client" : cadastroClienteId, semanaInicio],
+      queryKey: ["story-plan", scopeKey, semanaInicio],
     });
   };
 
