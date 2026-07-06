@@ -3,7 +3,7 @@ title: Módulos Admin & Operacionais
 description: Telas administrativas, editorial, aprovações, relatórios e debug.
 status: living
 owner: Engenharia / Produto Lotus
-last_review: 2026-06-26
+last_review: 2026-07-05
 ---
 
 # Módulos Admin & Operacionais
@@ -18,7 +18,7 @@ Telas além dos dashboards analíticos padrão. Persona principal: **admin da ag
 flowchart TB
     A["/admin"] --> B["Dashboard executivo"]
     A --> R["/admin/relatorios"]
-    A --> E["/admin/editorial"]
+    A --> CW["/admin/aprovacoes\nContent Workflow"]
     A --> PE["/admin/plano-estrategico"]
     A --> C["/admin/clientes"]
     A --> U["/admin/usuarios"]
@@ -61,22 +61,33 @@ Funcionalidades:
 
 ---
 
-## Editorial (`/admin/editorial`)
+## Content Workflow — Aprovações (`/admin/aprovacoes`)
 
-| Item    | Detalhe                             |
-| ------- | ----------------------------------- |
-| Arquivo | `admin/editorial.tsx`               |
-| Backend | `editorial.functions.ts`            |
-| Tabelas | `posts_editorial`, `post_revisions` |
+| Item    | Detalhe                                              |
+| ------- | ---------------------------------------------------- |
+| Nome UI | **Aprovações**                                       |
+| Domínio | Content Workflow (substitui Calendário Editorial)    |
+| Módulo  | `src/modules/approval/`                              |
+| Backend | `cards/`, `events/`, `attachments/` server fns       |
+| Tabelas | `posts_editorial`, `content_card_events`, `post_media`, `editorial_pillars`, `story_plan_rows` |
+| Docs    | [content-workflow.md](./content-workflow.md)         |
 
-Calendário de conteúdo: criar, editar, transicionar status, comentários.
+Workflow completo de produção de conteúdo. **Kanban** é a visualização default; também:
+Calendário, Pilares editoriais, Plano de Stories, Biblioteca, Dashboard operacional.
 
-Status do fluxo (enum): rascunho → aguardando_aprovacao → aprovado / rejeitado / publicado.
+Status: `producao` → `edicao` → `aguardando_aprovacao` → `aprovado` → `publicado` → `arquivado`.
 
-Posts podem ser vinculados a uma **estratégia** do Plano Estratégico (`estrategia_id`).
-Filtro por estratégia: `/admin/editorial?estrategia={uuid}`.
+Card = entidade central. Timeline imutável em `content_card_events`.
+
+Legado `/admin/editorial` → redirect para `/admin/aprovacoes`.
+
+Ver [ADR-0018](../02-architecture/adr/0018-content-workflow-module-v1.md).
 
 ---
+
+## ~~Editorial~~ (`/admin/editorial`) — DEPRECADO
+
+Substituído pelo Content Workflow. Rota mantida temporariamente com redirect.
 
 ## Plano Estratégico (`/admin/plano-estrategico`)
 
@@ -92,17 +103,16 @@ hipóteses, oportunidades, decisões, aprendizados, radar e integração editori
 
 ---
 
-## Aprovações (`/aprovacoes`)
+## Aprovações — Portal Cliente (`/aprovacoes`)
 
 | Item    | Detalhe                                     |
 | ------- | ------------------------------------------- |
-| Arquivo | `aprovacoes.tsx`                            |
+| Arquivo | `aprovacoes/` (layout + tabs)               |
 | Persona | **Cliente final**                           |
-| Backend | `listPosts`, `transitionPost` (RLS cliente) |
+| Backend | Content Workflow server fns (RLS cliente)   |
 
-Cliente aprova ou solicita alteração em posts com status `aguardando_aprovacao`.
-
-Policy SQL: `posts_client_update` (migration 06).
+Portal read-only: Kanban, Pilares, Stories, Biblioteca. Cliente comenta, aprova e reprova.
+Preview social via MediaPreview.
 
 ---
 

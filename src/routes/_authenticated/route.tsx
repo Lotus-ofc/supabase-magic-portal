@@ -111,6 +111,7 @@ function AuthenticatedLayout() {
         { to: "/admin", label: "Visão geral", icon: LayoutDashboard, prefixMatch: false },
         { to: "/admin/relatorios", label: "Relatórios", icon: FileBarChart },
         { to: "/admin/editorial", label: "Calendário Editorial", icon: CalendarDays },
+        { to: "/admin/aprovacoes", label: "Aprovações", icon: ClipboardCheck },
         { to: "/admin/plano-estrategico", label: "Plano Estratégico", icon: Compass },
         { to: "/admin/clientes", label: "Clientes", icon: Users },
         { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },

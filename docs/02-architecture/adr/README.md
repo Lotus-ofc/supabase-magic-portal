@@ -39,6 +39,7 @@ Crie um ADR quando a decisão:
 | [0012](./0012-internal-infrastructure-transition.md)      | Transição para infraestrutura interna Lotus    | Aceito              |
 | [0013](./0013-plano-estrategico-centro-estrategico.md)    | Plano Estratégico — Centro de Inteligência     | Aceito              |
 | [0014](./0014-auth-module-v3-architecture.md)              | Auth Module v3 — Auth, Access e Admin          | Aceito              |
+| [0018](./0018-content-workflow-module-v1.md)             | Content Workflow Module v1 (Aprovações)        | Aceito              |
 
 ## Template
 

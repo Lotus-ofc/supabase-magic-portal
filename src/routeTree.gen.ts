@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminPlanoEstrategicoRouteImport } from './routes
 import { Route as AuthenticatedAdminEditorialRouteImport } from './routes/_authenticated/admin/editorial'
 import { Route as AuthenticatedAdminDebugRouteImport } from './routes/_authenticated/admin/debug'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
+import { Route as AuthenticatedAdminAprovacoesRouteImport } from './routes/_authenticated/admin/aprovacoes'
 import { Route as AuthenticatedAccountSecurityRouteImport } from './routes/_authenticated/account/security'
 import { Route as AuthenticatedAdminKnowledgeRouteRouteImport } from './routes/_authenticated/admin/knowledge/route'
 import { Route as AuthenticatedClienteClienteIndexRouteImport } from './routes/_authenticated/cliente.$cliente.index'
@@ -46,6 +47,7 @@ import { Route as AuthenticatedAdminKnowledgeSplatRouteImport } from './routes/_
 import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
 import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_authenticated/admin/clientes.$id'
+import { Route as AuthenticatedAdminAprovacoesDashboardRouteImport } from './routes/_authenticated/admin/aprovacoes.dashboard'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoIndexRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.index'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoPlanoIdRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico.$planoId'
 
@@ -138,6 +140,12 @@ const AuthenticatedAdminBrandingRoute =
   AuthenticatedAdminBrandingRouteImport.update({
     id: '/branding',
     path: '/branding',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAprovacoesRoute =
+  AuthenticatedAdminAprovacoesRouteImport.update({
+    id: '/aprovacoes',
+    path: '/aprovacoes',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAccountSecurityRoute =
@@ -260,6 +268,12 @@ const AuthenticatedAdminClientesIdRoute =
     path: '/clientes/$id',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAprovacoesDashboardRoute =
+  AuthenticatedAdminAprovacoesDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAdminAprovacoesRoute,
+  } as any)
 const AuthenticatedClienteClientePlanoEstrategicoIndexRoute =
   AuthenticatedClienteClientePlanoEstrategicoIndexRouteImport.update({
     id: '/',
@@ -284,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
@@ -292,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
@@ -321,12 +337,14 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth': typeof AuthIndexRoute
   '/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/editorial': typeof AuthenticatedAdminEditorialRoute
   '/admin/plano-estrategico': typeof AuthenticatedAdminPlanoEstrategicoRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
@@ -360,6 +378,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/admin/knowledge': typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
   '/_authenticated/account/security': typeof AuthenticatedAccountSecurityRoute
+  '/_authenticated/admin/aprovacoes': typeof AuthenticatedAdminAprovacoesRouteWithChildren
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/debug': typeof AuthenticatedAdminDebugRouteWithChildren
   '/_authenticated/admin/editorial': typeof AuthenticatedAdminEditorialRoute
@@ -368,6 +387,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
   '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
@@ -402,6 +422,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/admin/knowledge'
     | '/account/security'
+    | '/admin/aprovacoes'
     | '/admin/branding'
     | '/admin/debug'
     | '/admin/editorial'
@@ -410,6 +431,7 @@ export interface FileRouteTypes {
     | '/admin/servicos'
     | '/cliente/$cliente'
     | '/admin/'
+    | '/admin/aprovacoes/dashboard'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
     | '/admin/debug/views'
@@ -439,12 +461,14 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth'
     | '/account/security'
+    | '/admin/aprovacoes'
     | '/admin/branding'
     | '/admin/editorial'
     | '/admin/plano-estrategico'
     | '/admin/relatorios'
     | '/admin/servicos'
     | '/admin'
+    | '/admin/aprovacoes/dashboard'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
     | '/admin/debug/views'
@@ -477,6 +501,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_authenticated/admin/knowledge'
     | '/_authenticated/account/security'
+    | '/_authenticated/admin/aprovacoes'
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/debug'
     | '/_authenticated/admin/editorial'
@@ -485,6 +510,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/servicos'
     | '/_authenticated/cliente/$cliente'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/aprovacoes/dashboard'
     | '/_authenticated/admin/clientes/$id'
     | '/_authenticated/admin/clientes/novo'
     | '/_authenticated/admin/debug/views'
@@ -634,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBrandingRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/aprovacoes': {
+      id: '/_authenticated/admin/aprovacoes'
+      path: '/aprovacoes'
+      fullPath: '/admin/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedAdminAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/account/security': {
       id: '/_authenticated/account/security'
       path: '/account/security'
@@ -774,6 +807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesIdRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/aprovacoes/dashboard': {
+      id: '/_authenticated/admin/aprovacoes/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/aprovacoes/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminAprovacoesDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminAprovacoesRoute
+    }
     '/_authenticated/cliente/$cliente/plano-estrategico/': {
       id: '/_authenticated/cliente/$cliente/plano-estrategico/'
       path: '/'
@@ -809,6 +849,21 @@ const AuthenticatedAdminKnowledgeRouteRouteWithChildren =
     AuthenticatedAdminKnowledgeRouteRouteChildren,
   )
 
+interface AuthenticatedAdminAprovacoesRouteChildren {
+  AuthenticatedAdminAprovacoesDashboardRoute: typeof AuthenticatedAdminAprovacoesDashboardRoute
+}
+
+const AuthenticatedAdminAprovacoesRouteChildren: AuthenticatedAdminAprovacoesRouteChildren =
+  {
+    AuthenticatedAdminAprovacoesDashboardRoute:
+      AuthenticatedAdminAprovacoesDashboardRoute,
+  }
+
+const AuthenticatedAdminAprovacoesRouteWithChildren =
+  AuthenticatedAdminAprovacoesRoute._addFileChildren(
+    AuthenticatedAdminAprovacoesRouteChildren,
+  )
+
 interface AuthenticatedAdminDebugRouteChildren {
   AuthenticatedAdminDebugViewsRoute: typeof AuthenticatedAdminDebugViewsRoute
   AuthenticatedAdminDebugIndexRoute: typeof AuthenticatedAdminDebugIndexRoute
@@ -827,6 +882,7 @@ const AuthenticatedAdminDebugRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminKnowledgeRouteRoute: typeof AuthenticatedAdminKnowledgeRouteRouteWithChildren
+  AuthenticatedAdminAprovacoesRoute: typeof AuthenticatedAdminAprovacoesRouteWithChildren
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
   AuthenticatedAdminDebugRoute: typeof AuthenticatedAdminDebugRouteWithChildren
   AuthenticatedAdminEditorialRoute: typeof AuthenticatedAdminEditorialRoute
@@ -846,6 +902,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminKnowledgeRouteRoute:
       AuthenticatedAdminKnowledgeRouteRouteWithChildren,
+    AuthenticatedAdminAprovacoesRoute:
+      AuthenticatedAdminAprovacoesRouteWithChildren,
     AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
     AuthenticatedAdminDebugRoute: AuthenticatedAdminDebugRouteWithChildren,
     AuthenticatedAdminEditorialRoute: AuthenticatedAdminEditorialRoute,

@@ -3,7 +3,7 @@ title: Roadmap & Dívidas Técnicas
 description: Direção de evolução da Lotus — estado atual, arquitetura alvo e dívidas priorizadas.
 status: living
 owner: Engenharia / Produto Lotus
-last_review: 2026-07-01
+last_review: 2026-07-05
 ---
 
 # Roadmap & Dívidas Técnicas
@@ -74,6 +74,62 @@ flowchart LR
 - 🔧 Fail-closed total em `postAuthOnLoginSuccess` (sem fallback em erro de profile).
 - 🔧 Remover valor `invite_expired` do enum Postgres.
 - 🔧 Desacoplar ciclo Access ↔ Admin (envio de e-mail em módulo de integração).
+
+## Content Workflow — Aprovações v1 🎯 (aprovado 05/07/2026)
+
+> Módulo definitivo de **Workflow de Conteúdo**. Aggregate root oficial: **`content_cards`**.
+> Kanban = visualização. Ver [ADR-0018](../02-architecture/adr/0018-content-workflow-module-v1.md).
+
+### Fase 0 — Infraestrutura ✅ (concluída 06/07/2026)
+
+- ✅ Migration 18, scaffold `src/modules/approval/`, repository pattern, boundaries CI, ports stubs
+- 📄 Spec: [content-workflow-phase-0.md](../03-backend/content-workflow-phase-0.md)
+
+### Fase 1 — Kanban interno ✅ (concluída 06/07/2026)
+
+- ✅ Rota `/admin/aprovacoes` — Kanban DnD, CRUD, drawer, upload, timeline
+- 📄 [content-workflow-phase-1.md](../03-backend/content-workflow-phase-1.md)
+
+### Fase 2 — Portal Cliente ✅ (concluída 06/07/2026)
+
+- ✅ `/aprovacoes` com domínio `content_cards` — Kanban read-only
+- ✅ Preview social (`MediaPreview`), comentários, aprovar, solicitar alteração
+- ✅ Eventos `approved`, `changes_requested`, `commented` — sem alterar Card
+- ✅ Migration 19 (enum + RLS cliente)
+- 📄 [content-workflow-phase-2.md](../03-backend/content-workflow-phase-2.md)
+
+### Fase 3 — Planejamento Editorial ✅ (concluída 06/07/2026)
+
+- ✅ Pilares editoriais (CRUD, reordenar, arquivar) — agência; leitura cliente
+- ✅ Calendário editorial (mês/semana/dia) sobre `content_cards`
+- ✅ Plano de Stories (`story_plan_rows`) estilo planilha
+- ✅ Abas Kanban | Calendário | Pilares | Stories em `/admin/aprovacoes` e `/aprovacoes`
+- ✅ Migration 20 (triggers `updated_at`)
+- 📄 [content-workflow-phase-3.md](../03-backend/content-workflow-phase-3.md)
+
+### Fase 4 — Biblioteca + Dashboard ops ✅
+
+- Biblioteca oficial, dashboard operacional, hard delete bloqueado, ports IA
+- 📄 [content-workflow-phase-4.md](../03-backend/content-workflow-phase-4.md)
+
+### Escopo v1 restante (Fase 5)
+- 🔧 Deprecar `/admin/editorial` → redirect quando estável
+
+Plano: [content-workflow-implementation-plan.md](../03-backend/content-workflow-implementation-plan.md)
+
+### Content Workflow — Evoluções futuras (pós-v1)
+
+- ✨ Integração **Meta Graph** (Instagram, Facebook)
+- ✨ Publicação **TikTok**, **LinkedIn**
+- ✨ **OpenAI** / **Claude** via `ContentAiPort`
+- ✨ Automação **Make** / **n8n** via `WorkflowAutomationPort`
+- ✨ Agendamento automático de publicação
+- ✨ Métricas pós-publicação (engajamento real vs planejado)
+- ✨ Biblioteca → IA, relatórios, pesquisa, cases, portfólio
+- ✨ Descontinuar tabelas legado (`posts_editorial`, `post_media`, `post_revisions`)
+- ✨ Notificações server-side (substituir localStorage)
+
+---
 
 ## Fase 1 — Fundações de dados (alta prioridade)
 

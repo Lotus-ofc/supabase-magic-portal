@@ -75,6 +75,14 @@ const STATIC_ROUTES: SearchRoute[] = [
     keywords: ["export", "pdf"],
   },
   {
+    id: "aprovacoes-kanban",
+    label: "Aprovações (Kanban)",
+    href: "/admin/aprovacoes",
+    icon: ClipboardCheck,
+    adminOnly: true,
+    keywords: ["kanban", "conteúdo", "produção", "workflow"],
+  },
+  {
     id: "editorial",
     label: "Calendário editorial",
     href: "/admin/editorial",

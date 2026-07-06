@@ -1,11 +1,25 @@
 import { createFileRoute, Outlet, redirect, isRedirect } from "@tanstack/react-router";
 import { checkIsAdmin } from "@/lib/admin.functions";
+import { checkIsStaff } from "@/modules/approval/cards/cards.server";
 import { isPlatformOwnerEmail } from "@/lib/platform-owner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     const user = context.user;
-    // Dono: não depende de server function no beforeLoad (evita tela preta se env server falhar).
+    const isAprovacoes =
+      location.pathname === "/admin/aprovacoes" ||
+      location.pathname.startsWith("/admin/aprovacoes/");
+
+    if (isAprovacoes) {
+      if (isPlatformOwnerEmail(user?.email)) return;
+      try {
+        const { isStaff } = await checkIsStaff();
+        if (isStaff) return;
+      } catch {
+        /* fall through to admin check */
+      }
+    }
+
     if (isPlatformOwnerEmail(user?.email)) return;
 
     try {

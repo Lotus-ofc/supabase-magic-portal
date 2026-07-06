@@ -21,6 +21,42 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **Content Workflow Fase 4 — Biblioteca + Dashboard (2026-07-06):** Biblioteca oficial de
+  conteúdos publicados (`library/`) com busca server-side, filtros, paginação, grid/lista/detalhe
+  e arquivamento sem hard delete. Dashboard operacional em `/admin/aprovacoes/dashboard` com
+  métricas derivadas de `content_card_events`. Migration 21. Ports IA (contratos). Spec:
+  [content-workflow-phase-4.md](../03-backend/content-workflow-phase-4.md).
+
+- **Content Workflow Fase 3 — Planejamento Editorial (2026-07-06):** módulo de estratégia antes da
+  produção. Pilares editoriais (CRUD, reordenar, arquivar), Calendário editorial (mês/semana/dia
+  sobre `content_cards`), Plano de Stories (`story_plan_rows`). Abas em `/admin/aprovacoes` e
+  `/aprovacoes` (cliente read-only). `pilar_id` obrigatório em novos cards. Migration 20 (triggers).
+  Spec: [content-workflow-phase-3.md](../03-backend/content-workflow-phase-3.md).
+
+- **Content Workflow Fase 2 — portal cliente (2026-07-06):** `/aprovacoes` migrado para
+  `content_cards`. Kanban read-only, drawer com preview social (`MediaPreview`), comentários
+  ilimitados e ações Aprovar / Solicitar alteração via eventos (`approved`, `changes_requested`).
+  Migration 19. Filtro `client_access` no repository. Spec:
+  [content-workflow-phase-2.md](../03-backend/content-workflow-phase-2.md).
+
+- **Content Workflow Fase 1 — Kanban interno (2026-07-06):** rota `/admin/aprovacoes` com Kanban
+  funcional para agência. DnD entre colunas (`@dnd-kit`), CRUD completo (criar, editar, mover,
+  arquivar, duplicar), drawer lateral com timeline via `content_card_events`, upload de anexos.
+  Server functions em `modules/approval/cards/cards.server.ts`. Legado `posts_editorial` e
+  `/admin/editorial` **mantidos** — sem redirect ainda. Spec:
+  [content-workflow-phase-1.md](../03-backend/content-workflow-phase-1.md).
+
+- **Content Workflow Fase 0 — infraestrutura (2026-07-06):** domínio oficial **`content_cards`**
+  (aggregate root). Repository pattern (UI → Server Fn → Service → Repository → Supabase).
+  Migration 18, `validate-approval-boundaries.mjs`, ports stubs. Spec:
+  [content-workflow-phase-0.md](../03-backend/content-workflow-phase-0.md).
+
+- **Content Workflow Module v1 — arquitetura aprovada (refinamento 2026-07-05):** módulo
+  definitivo de Workflow de Conteúdo (UI: Aprovações). Documentação:
+  [ADR-0018](../02-architecture/adr/0018-content-workflow-module-v1.md),
+  [content-workflow.md](../02-architecture/content-workflow.md),
+  [plano de implementação](../03-backend/content-workflow-implementation-plan.md).
+
 - **Recovery Mode — decisão operacional (pós Auth Module v3):** workaround oficial documentado
   para usuários em `invite_pending` quando **Reenviar convite** não dispara novo e-mail
   (excluir → recriar pelo painel admin). Ver

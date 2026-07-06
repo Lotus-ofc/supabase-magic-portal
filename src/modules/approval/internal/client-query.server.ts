@@ -1,0 +1,42 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { contentCardRepository } from "../repositories/content-card.repository.server";
+import { contentCardEventRepository } from "../repositories/content-card-event.repository.server";
+import { editorialPillarRepository } from "../repositories/editorial-pillar.repository.server";
+import { buildKanbanBoard } from "../services/build-kanban-board";
+import { buildCardTimeline } from "../services/build-card-timeline";
+import { listCardAttachmentsWithUrls } from "./attachment-lifecycle.server";
+import type { CardDetail } from "./card-query.server";
+
+export async function getClientKanbanBoard(supabase: SupabaseClient, clientNames: string[]) {
+  const cards = await contentCardRepository.listForClientNames(supabase, clientNames, {
+    excludeArchived: true,
+  });
+  return buildKanbanBoard(cards);
+}
+
+export async function getClientCardDetail(
+  supabase: SupabaseClient,
+  cardId: string,
+  clientNames: string[],
+): Promise<CardDetail | null> {
+  const card = await contentCardRepository.findByIdForClientNames(supabase, cardId, clientNames);
+  if (!card) return null;
+
+  const [events, attachments] = await Promise.all([
+    contentCardEventRepository.listByCardId(supabase, cardId),
+    listCardAttachmentsWithUrls(supabase, cardId, card.capa_url),
+  ]);
+
+  let pillar: CardDetail["pillar"] = null;
+  if (card.pilar_id) {
+    const p = await editorialPillarRepository.findById(supabase, card.pilar_id);
+    if (p) pillar = { id: p.id, titulo: p.titulo, objetivo: p.objetivo, cor: p.cor };
+  }
+
+  return {
+    card,
+    events: buildCardTimeline(events),
+    attachments,
+    pillar,
+  };
+}

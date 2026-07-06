@@ -167,6 +167,13 @@
   --info: var(--secondary-500);
   --info-foreground: oklch(0.985 0.005 230);
 
+  /* Content Workflow — Kanban column accents */
+  --cw-col-producao: oklch(0.63 0.22 25);
+  --cw-col-edicao: oklch(0.79 0.16 85);
+  --cw-col-aguardando: oklch(0.58 0.18 250);
+  --cw-col-aprovado: oklch(0.64 0.17 155);
+  --cw-col-publicado: oklch(0.52 0.02 260);
+
   /* Sidebar — slightly tinted, sticks to the brand without screaming */
   --sidebar: oklch(0.99 0.004 200);
   --sidebar-foreground: oklch(0.3 0.02 280);

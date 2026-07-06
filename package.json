@@ -17,12 +17,16 @@
     "test:watch": "vitest",
     "validate:engineering": "node scripts/validate-engineering.mjs",
     "validate:auth-boundaries": "node scripts/validate-auth-boundaries.mjs",
-    "check": "npm run validate:engineering && npm run validate:auth-boundaries && npm run lint && npm run test && npm run build"
+    "validate:approval-boundaries": "node scripts/validate-approval-boundaries.mjs",
+    "check": "npm run validate:engineering && npm run validate:auth-boundaries && npm run validate:approval-boundaries && npm run lint && npm run test && npm run build"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/epilogue": "^5.2.8",
     "@fontsource-variable/urbanist": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",
