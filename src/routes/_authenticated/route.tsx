@@ -25,6 +25,7 @@ import {
   Compass,
   Palette,
   Building2,
+  GraduationCap,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -133,8 +134,11 @@ function AuthenticatedLayout() {
       items: [{ to: "/admin/branding", label: "Branding", icon: Palette }],
     },
     {
-      label: "Conhecimento",
-      items: [{ to: "/admin/knowledge", label: "Knowledge Center", icon: BookOpen }],
+      label: "Ajuda",
+      items: [
+        { to: "/admin/tutorial", label: "Tutorial", icon: GraduationCap },
+        { to: "/admin/knowledge", label: "Knowledge Center", icon: BookOpen },
+      ],
     },
   ];
 
@@ -149,6 +153,7 @@ function AuthenticatedLayout() {
           label: "Aprovações",
           icon: ClipboardCheck,
         },
+        { to: "/tutorial", label: "Tutorial", icon: GraduationCap },
       ],
     },
     ...(isAdmin
