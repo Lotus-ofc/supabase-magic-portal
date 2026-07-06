@@ -52,7 +52,9 @@ export function RecoveryModePanel({
             className="h-auto flex-col items-start gap-0.5 px-3 py-2.5 text-left"
           >
             <span className="text-[13px] font-medium">{item.label}</span>
-            <span className="text-[11px] font-normal text-muted-foreground">{item.description}</span>
+            <span className="text-[11px] font-normal text-muted-foreground">
+              {item.description}
+            </span>
           </Button>
         ))}
       </div>

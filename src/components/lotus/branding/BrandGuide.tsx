@@ -165,7 +165,10 @@ export function BrandGuide() {
             <div className="space-y-2">
               <p className="text-[13px] font-medium">Lockup ao vivo</p>
               <p className="text-[11px] text-muted-foreground">
-                Componente <code className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">LotusWordmark</code>
+                Componente{" "}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">
+                  LotusWordmark
+                </code>
               </p>
             </div>
           </div>
