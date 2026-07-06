@@ -67,4 +67,22 @@ export const agencyClientRepository = {
     if (error) throw new Error(error.message);
     return data ? mapRow(data as Record<string, unknown>) : null;
   },
+
+  async updateOperational(
+    supabase: SupabaseClient,
+    input: {
+      id: number;
+      proxima_acao?: string | null;
+      status_operacional?: AgencyClientCard["status_operacional"];
+      prioridade?: AgencyClientCard["prioridade"];
+    },
+  ) {
+    const payload: Record<string, unknown> = {};
+    if (input.proxima_acao !== undefined) payload.proxima_acao = input.proxima_acao;
+    if (input.status_operacional !== undefined) payload.status_operacional = input.status_operacional;
+    if (input.prioridade !== undefined) payload.prioridade = input.prioridade;
+
+    const { error } = await supabase.from("cadastro_clientes").update(payload).eq("id", input.id);
+    if (error) throw new Error(error.message);
+  },
 };

@@ -109,6 +109,7 @@ function ClientWorkspaceContent() {
       <DashboardGrid
         dashboardId="agency-os.client-workspace"
         clientId={clientId}
+        context={{ clientNome: client.nome_cliente, clientEmpresa: client.empresa }}
         className="grid gap-4 lg:grid-cols-2"
       />
     </div>

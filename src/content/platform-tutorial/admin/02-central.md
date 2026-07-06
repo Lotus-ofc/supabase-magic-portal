@@ -13,6 +13,11 @@ A **Central** é o cockpit operacional da agência (Agency OS). Reúne em uma ú
 - Reunião de operação — visão unificada sem abrir dez abas.
 - Triagem de clientes em atenção ou implantação.
 
+## Pré-requisitos
+
+- Usuário com papel **admin** (RLS exige `has_role` para criar/editar).
+- Migrations **24–26** aplicadas no Supabase (`agency_leads`, `agency_projects`, `agency_tasks`, `agency_notes`). Sem isso, a tela carrega mas **salvar** falha com erro de tabela.
+
 ## Passo a passo ao abrir a tela
 
 ### 1. Barra de filtros (`AgencyFilterBar`)
@@ -69,10 +74,28 @@ Grade com um card por cliente filtrado. Em cada card você vê:
 
 ### 9. Adicionar nota (`AddNoteDialog`)
 
-1. Clique em **Adicionar nota**.
-2. Escolha o **cliente** (se aplicável).
+1. No card do cliente, clique no ícone **balão+** (ou menu ⋯ → Adicionar observação).
+2. Escolha o **cliente** (se abriu pelo menu geral).
 3. Escreva o texto — notas ficam no histórico operacional.
 4. Confirme — a nota aparece no feed e no contexto do cliente.
+
+### 10. Ações rápidas no topo
+
+Na barra superior da Central você encontra:
+
+| Botão | O que cria |
+| ----- | ---------- |
+| **Novo lead** | Card no pipeline (coluna Lead) |
+| **Novo projeto** | Card no kanban de Produção |
+| **Nova tarefa** | Item nas prioridades do dia |
+
+Os mesmos botões aparecem nas seções **Pipeline** e **Produção**. Nos cards de cliente use **lápis** para editar status/prioridade/próxima ação.
+
+### 11. Editar operação do cliente
+
+1. No card do cliente, clique no ícone **lápis**.
+2. Atualize **próxima ação**, **status operacional** ou **prioridade**.
+3. Salve — reflete na carteira e nos filtros.
 
 ## Workspace do cliente (`/admin/central/clientes/{id}`)
 

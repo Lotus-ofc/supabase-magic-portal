@@ -52,3 +52,46 @@ export const convertLeadSchema = z.object({
 export const agencySearchSchema = z.object({
   query: z.string().min(1).max(120),
 });
+
+export const createLeadSchema = z.object({
+  nome: z.string().trim().min(1).max(200),
+  empresa: z.string().trim().max(200).optional().nullable(),
+  origem: z.enum(["indicacao", "inbound", "outbound", "site", "evento", "parceiro", "outro"]).optional(),
+  valor_estimado: z.number().nonnegative().optional().nullable(),
+  proxima_acao: z.string().trim().max(500).optional().nullable(),
+  proximo_contato: z.string().datetime().optional().nullable(),
+  notas: z.string().trim().max(2000).optional().nullable(),
+});
+
+export const createProjectSchema = z.object({
+  cadastro_cliente_id: z.number().int().positive(),
+  titulo: z.string().trim().min(1).max(200),
+  tipo: z.enum(["landing", "site", "sistema", "automacao", "seo", "design", "outro"]).optional(),
+  prioridade: agencyPriority.optional(),
+  etiqueta: z.string().trim().max(200).optional().nullable(),
+  prazo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .nullable(),
+});
+
+export const createTaskSchema = z.object({
+  cadastro_cliente_id: z.number().int().positive(),
+  titulo: z.string().trim().min(1).max(200),
+  descricao: z.string().trim().max(2000).optional().nullable(),
+  prioridade: agencyPriority.optional(),
+  due_at: z.string().datetime().optional().nullable(),
+  agenda_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .nullable(),
+});
+
+export const updateClientOperationalSchema = z.object({
+  id: z.number().int().positive(),
+  proxima_acao: z.string().trim().max(500).optional().nullable(),
+  status_operacional: agencyClientStatus.optional(),
+  prioridade: agencyPriority.optional(),
+});

@@ -55,4 +55,34 @@ export const agencyTaskRepository = {
       .eq("id", id);
     if (error) throw new Error(error.message);
   },
+
+  async create(
+    supabase: SupabaseClient,
+    input: {
+      cadastro_cliente_id: number;
+      titulo: string;
+      descricao?: string | null;
+      prioridade?: AgencyTask["prioridade"];
+      due_at?: string | null;
+      agenda_date?: string | null;
+      created_by?: string | null;
+    },
+  ) {
+    const { data, error } = await supabase
+      .from("agency_tasks")
+      .insert({
+        cadastro_cliente_id: input.cadastro_cliente_id,
+        titulo: input.titulo,
+        descricao: input.descricao ?? null,
+        prioridade: input.prioridade ?? "C",
+        due_at: input.due_at ?? null,
+        agenda_date: input.agenda_date ?? null,
+        status: "open",
+        created_by: input.created_by ?? null,
+      })
+      .select(SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    return mapRow(data as Record<string, unknown>);
+  },
 };

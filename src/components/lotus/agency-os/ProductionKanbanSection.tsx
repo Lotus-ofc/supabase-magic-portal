@@ -15,9 +15,10 @@ const kanbanQuery = queryOptions({
   queryFn: () => getProductionKanban(),
 });
 
-export function ProductionKanbanSection() {
+export function ProductionKanbanSection({ onCreateProject }: { onCreateProject?: () => void } = {}) {
   const qc = useQueryClient();
   const { data: board } = useSuspenseQuery(kanbanQuery);
+  const totalItems = board.columns.reduce((n, c) => n + c.items.length, 0);
 
   const moveMutation = useMutation({
     mutationFn: (input: { id: string; status_kanban: AgencyProjectStatus; kanban_ordem: number }) =>
@@ -53,7 +54,22 @@ export function ProductionKanbanSection() {
   });
 
   return (
-    <GenericKanbanBoard
+    <>
+      {totalItems === 0 && (
+        <div className="mb-4 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-6 text-center">
+          <p className="text-sm text-muted-foreground">Nenhum projeto em produção ainda.</p>
+          {onCreateProject && (
+            <button
+              type="button"
+              className="lotus-focus mt-2 text-sm font-medium text-primary hover:underline"
+              onClick={onCreateProject}
+            >
+              Criar primeiro projeto
+            </button>
+          )}
+        </div>
+      )}
+      <GenericKanbanBoard
       columns={board.columns}
       onMove={(item, _from, toColumnId) => {
         const targetCol = board.columns.find((c) => c.id === toColumnId);
@@ -67,6 +83,7 @@ export function ProductionKanbanSection() {
         <ProjectKanbanCard project={project} isDragging={isDragging} />
       )}
     />
+    </>
   );
 }
 

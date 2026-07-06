@@ -4,12 +4,17 @@ import { DOMAIN_EVENTS, type DomainEvent } from "@/modules/core/types/domain-eve
 import { agencyLeadRepository } from "../repositories/lead.repository.server";
 import { agencyProjectRepository } from "../repositories/project.repository.server";
 import { agencyTaskRepository } from "../repositories/task.repository.server";
+import { agencyClientRepository } from "../repositories/client.repository.server";
 import {
   addNoteSchema,
   completeTaskSchema,
   convertLeadSchema,
+  createLeadSchema,
+  createProjectSchema,
+  createTaskSchema,
   moveLeadSchema,
   moveProjectSchema,
+  updateClientOperationalSchema,
 } from "../validators";
 import { commandBus } from "@/modules/core/commands/command-bus";
 import { dispatchCommand } from "@/modules/core/server/dispatch-command.server";
@@ -144,6 +149,92 @@ export function registerAgencyOsCommands(): void {
       ];
     },
   });
+
+  commandBus.register({
+    name: "CreateLead",
+    module: "agency-os",
+    schema: createLeadSchema,
+    async execute(ctx, input) {
+      const lead = await agencyLeadRepository.create(supabaseFrom(ctx), {
+        ...input,
+        created_by: ctx.userId,
+      });
+      return { ok: true as const, leadId: lead.id };
+    },
+    toEvents(ctx, _input, result) {
+      return [
+        {
+          type: DOMAIN_EVENTS.LEAD_CREATED,
+          payload: { leadId: result.leadId },
+          metadata: baseMeta(ctx),
+        },
+      ];
+    },
+  });
+
+  commandBus.register({
+    name: "CreateProject",
+    module: "agency-os",
+    schema: createProjectSchema,
+    async execute(ctx, input) {
+      const project = await agencyProjectRepository.create(supabaseFrom(ctx), {
+        ...input,
+        created_by: ctx.userId,
+      });
+      return { ok: true as const, projectId: project.id };
+    },
+    toEvents(ctx, input, result) {
+      return [
+        {
+          type: DOMAIN_EVENTS.PROJECT_CREATED,
+          payload: { projectId: result.projectId, clienteId: input.cadastro_cliente_id },
+          metadata: baseMeta(ctx),
+        },
+      ];
+    },
+  });
+
+  commandBus.register({
+    name: "CreateTask",
+    module: "agency-os",
+    schema: createTaskSchema,
+    async execute(ctx, input) {
+      const task = await agencyTaskRepository.create(supabaseFrom(ctx), {
+        ...input,
+        created_by: ctx.userId,
+      });
+      return { ok: true as const, taskId: task.id };
+    },
+    toEvents(ctx, input, result) {
+      return [
+        {
+          type: DOMAIN_EVENTS.TASK_CREATED,
+          payload: { taskId: result.taskId, clienteId: input.cadastro_cliente_id },
+          metadata: baseMeta(ctx),
+        },
+      ];
+    },
+  });
+
+  commandBus.register({
+    name: "UpdateClientOperational",
+    module: "agency-os",
+    schema: updateClientOperationalSchema,
+    async execute(ctx, input) {
+      const { id, ...fields } = input;
+      await agencyClientRepository.updateOperational(supabaseFrom(ctx), { id, ...fields });
+      return { ok: true as const, clienteId: id };
+    },
+    toEvents(ctx, input) {
+      return [
+        {
+          type: DOMAIN_EVENTS.CLIENT_UPDATED,
+          payload: { cadastroClienteId: input.id },
+          metadata: baseMeta(ctx),
+        },
+      ];
+    },
+  });
 }
 
 /** Mapa legado command name → bus name para compatibilidade interna. */
@@ -153,6 +244,10 @@ export const AGENCY_COMMANDS = {
   createNote: "CreateNote",
   moveLead: "MoveLead",
   convertLead: "ConvertLead",
+  createLead: "CreateLead",
+  createProject: "CreateProject",
+  createTask: "CreateTask",
+  updateClientOperational: "UpdateClientOperational",
 } as const;
 
 export async function dispatchAgencyCommand<T>(

@@ -27,8 +27,12 @@ import {
   agencySearchSchema,
   completeTaskSchema,
   convertLeadSchema,
+  createLeadSchema,
+  createProjectSchema,
+  createTaskSchema,
   moveLeadSchema,
   moveProjectSchema,
+  updateClientOperationalSchema,
 } from "./validators";
 
 export const getAgencyCentral = createServerFn({ method: "GET" })
@@ -227,6 +231,70 @@ export const convertLeadToClient = createServerFn({ method: "POST" })
     const result = await dispatchAgencyCommand("convertLead", cmdCtx, data);
     if (!result.ok) throw new Error(result.error);
     return result.data!;
+  });
+
+export const createAgencyLead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => createLeadSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAgencyOsAdmin(context);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "createAgencyLead",
+    });
+    const result = await dispatchAgencyCommand("createLead", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
+    return result.data!;
+  });
+
+export const createAgencyProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => createProjectSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAgencyOsAdmin(context);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "createAgencyProject",
+    });
+    const result = await dispatchAgencyCommand("createProject", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
+    return result.data!;
+  });
+
+export const createAgencyTask = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => createTaskSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAgencyOsAdmin(context);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "createAgencyTask",
+    });
+    const result = await dispatchAgencyCommand("createTask", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
+    return result.data!;
+  });
+
+export const updateAgencyClientOperational = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => updateClientOperationalSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAgencyOsAdmin(context);
+    const cmdCtx = buildCommandContext({
+      userId: context.userId,
+      actorEmail: actorEmailFromClaims(context.claims),
+      supabase: context.supabase,
+      source: "updateAgencyClientOperational",
+    });
+    const result = await dispatchAgencyCommand("updateClientOperational", cmdCtx, data);
+    if (!result.ok) throw new Error(result.error);
+    return { ok: true as const };
   });
 
 export const getClientIntelligence = createServerFn({ method: "GET" })

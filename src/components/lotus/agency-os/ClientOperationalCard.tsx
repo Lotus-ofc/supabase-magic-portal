@@ -44,10 +44,12 @@ const currency = (v: number | null) =>
 export const ClientOperationalCard = memo(function ClientOperationalCard({
   client,
   onAddNote,
+  onEditOps,
   className,
 }: {
   client: AgencyClientCard;
   onAddNote?: (client: AgencyClientCard) => void;
+  onEditOps?: (client: AgencyClientCard) => void;
   className?: string;
 }) {
   return (
@@ -73,7 +75,30 @@ export const ClientOperationalCard = memo(function ClientOperationalCard({
             <p className="mt-0.5 truncate text-xs text-muted-foreground">{client.empresa}</p>
           )}
         </div>
-        <DropdownMenu>
+        <div className="flex shrink-0 items-center gap-0.5">
+          {onEditOps && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-60 group-hover:opacity-100"
+              aria-label="Editar operação"
+              onClick={() => onEditOps(client)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {onAddNote && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 opacity-60 group-hover:opacity-100"
+              aria-label="Adicionar observação"
+              onClick={() => onAddNote(client)}
+            >
+              <MessageSquarePlus className="h-4 w-4" />
+            </Button>
+          )}
+          <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
@@ -112,6 +137,7 @@ export const ClientOperationalCard = memo(function ClientOperationalCard({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 text-xs">

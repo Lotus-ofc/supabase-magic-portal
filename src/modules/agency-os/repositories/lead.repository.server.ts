@@ -133,4 +133,44 @@ export const agencyLeadRepository = {
 
     return { cadastro_cliente_id: clienteId };
   },
+
+  async create(
+    supabase: SupabaseClient,
+    input: {
+      nome: string;
+      empresa?: string | null;
+      origem?: AgencyLead["origem"];
+      valor_estimado?: number | null;
+      proxima_acao?: string | null;
+      proximo_contato?: string | null;
+      notas?: string | null;
+      created_by?: string | null;
+    },
+  ) {
+    const { count, error: countErr } = await supabase
+      .from("agency_leads")
+      .select("id", { count: "exact", head: true })
+      .eq("pipeline_stage", "lead");
+    if (countErr) throw new Error(countErr.message);
+
+    const { data, error } = await supabase
+      .from("agency_leads")
+      .insert({
+        nome: input.nome,
+        empresa: input.empresa ?? null,
+        origem: input.origem ?? "outro",
+        valor_estimado: input.valor_estimado ?? null,
+        proxima_acao: input.proxima_acao ?? null,
+        proximo_contato: input.proximo_contato ?? null,
+        notas: input.notas ?? null,
+        pipeline_stage: "lead",
+        kanban_ordem: count ?? 0,
+        probabilidade_score: 30,
+        created_by: input.created_by ?? null,
+      })
+      .select(SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    return mapRow(data as Record<string, unknown>);
+  },
 };

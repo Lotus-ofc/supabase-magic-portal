@@ -99,4 +99,41 @@ export const agencyProjectRepository = {
       .eq("id", input.id);
     if (error) throw new Error(error.message);
   },
+
+  async create(
+    supabase: SupabaseClient,
+    input: {
+      cadastro_cliente_id: number;
+      titulo: string;
+      tipo?: AgencyProject["tipo"];
+      prioridade?: AgencyProject["prioridade"];
+      etiqueta?: string | null;
+      prazo?: string | null;
+      created_by?: string | null;
+    },
+  ) {
+    const { count, error: countErr } = await supabase
+      .from("agency_projects")
+      .select("id", { count: "exact", head: true })
+      .eq("status_kanban", "producao");
+    if (countErr) throw new Error(countErr.message);
+
+    const { data, error } = await supabase
+      .from("agency_projects")
+      .insert({
+        cadastro_cliente_id: input.cadastro_cliente_id,
+        titulo: input.titulo,
+        tipo: input.tipo ?? "outro",
+        prioridade: input.prioridade ?? "C",
+        etiqueta: input.etiqueta ?? null,
+        prazo: input.prazo ?? null,
+        status_kanban: "producao",
+        kanban_ordem: count ?? 0,
+        created_by: input.created_by ?? null,
+      })
+      .select(SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    return mapRow(data as Record<string, unknown>);
+  },
 };
