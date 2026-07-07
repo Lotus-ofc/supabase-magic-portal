@@ -136,7 +136,8 @@ export type AiWorkspaceSectionId =
   | "roadmap"
   | "changelog"
   | "conventions"
-  | "insights";
+  | "insights"
+  | "chat-context";
 
 export interface SearchableSection {
   id: AiWorkspaceSectionId;
@@ -159,5 +160,13 @@ export interface AiWorkspaceSnapshot {
   limitations: string[];
   insights: AiInsightContract[];
   contextScore: ContextScoreBreakdown;
+  /** Markdown do AI Chat Context — gerado junto ao snapshot para busca e export. */
+  chatContextMarkdown: string;
   searchableSections: SearchableSection[];
 }
+
+/** Snapshot antes de chat context, score e busca — usado internamente na agregação. */
+export type AiWorkspaceSnapshotCore = Omit<
+  AiWorkspaceSnapshot,
+  "chatContextMarkdown" | "searchableSections" | "contextScore"
+>;

@@ -38,6 +38,7 @@ flowchart LR
     subgraph lib [src/lib/ai-workspace/]
         Snap[snapshot.ts]
         Prompt[prompt-generator.ts]
+        Chat[chat-context-generator.ts]
         Score[context-score.ts]
     end
 
@@ -47,8 +48,10 @@ flowchart LR
 
     sources --> Snap
     Snap --> Prompt
+    Snap --> Chat
     Snap --> Score
     Prompt --> Page
+    Chat --> Page
 ```
 
 ### Estrutura de arquivos
@@ -57,7 +60,8 @@ flowchart LR
 src/lib/ai-workspace/
 ├── types.ts
 ├── snapshot.ts              # orquestrador
-├── prompt-generator.ts      # Context Pack markdown
+├── prompt-generator.ts      # Context Pack técnico (editores de código)
+├── chat-context-generator.ts # AI Chat Context (modelos conversacionais)
 ├── context-score.ts
 ├── export.ts
 ├── search.ts
@@ -88,7 +92,7 @@ src/routes/_authenticated/admin/ai-workspace.tsx  # guard owner-only
 
 ## Prompt Generator
 
-Botão **"Gerar Contexto para IA"** compõe markdown com:
+Botão **"Gerar Contexto para IA"** compõe markdown **técnico** para editores de código:
 
 - Resumo executivo, stack, arquitetura
 - Módulos, fluxos, banco, ADRs
@@ -96,7 +100,17 @@ Botão **"Gerar Contexto para IA"** compõe markdown com:
 - Changelog, convenções, limitações
 - Objetivo atual, últimas implementações, próximos passos
 
-Pronto para colar em ChatGPT, Cursor, Claude ou Gemini.
+Pronto para colar em Cursor, Copilot ou sessões de coding com IA.
+
+## AI Chat Context Generator (v1.1)
+
+Botão **"Gerar AI Chat Context"** compõe markdown **conversacional** para ChatGPT, Claude, Gemini e Perplexity.
+
+14 seções em linguagem natural: produto, filosofia, história, arquitetura narrativa, módulos com regras de uso, banco, stack, funcionalidades prontas/planejadas, regras de ouro, estado atual, objetivo do momento, instruções para a IA e resumo executivo.
+
+Exportação: Copiar, Exportar MD, TXT e JSON (mesmo padrão do Prompt Generator). Indexado na busca do AI Workspace.
+
+Ver [ai-chat-context.md](./ai-chat-context.md) para diferença detalhada entre os dois geradores.
 
 ## Context Score
 

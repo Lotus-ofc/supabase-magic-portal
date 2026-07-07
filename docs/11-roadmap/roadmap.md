@@ -82,6 +82,13 @@ flowchart LR
 - ✅ AI Insights placeholders com contratos para scanners v2+
 - 📄 [ai-workspace.md](../06-dashboards/ai-workspace.md)
 
+## AI Workspace v1.1 — AI Chat Context ✅ (concluído 06/07/2026)
+
+- ✅ Gerador conversacional para ChatGPT, Claude, Gemini, Perplexity
+- ✅ 14 seções em linguagem natural (produto, filosofia, história, módulos, regras de ouro, instruções para IA)
+- ✅ Exportação Copiar / MD / TXT / JSON; indexado na busca
+- 📄 [ai-chat-context.md](../06-dashboards/ai-chat-context.md)
+
 ## Content Workflow — Aprovações v1 🎯 (aprovado 05/07/2026)
 
 > Módulo definitivo de **Workflow de Conteúdo**. Aggregate root oficial: **`content_cards`**.

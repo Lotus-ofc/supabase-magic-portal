@@ -4,7 +4,8 @@ import { parseChangelogMarkdown } from "./extractors/changelog-parser";
 import { parseMigrationSql, mergeMigrationTables } from "./extractors/migration-parser";
 import { computeContextScore } from "./context-score";
 import { generateContextPrompt } from "./prompt-generator";
-import type { AiWorkspaceSnapshot } from "./types";
+import { generateChatContext } from "./chat-context-generator";
+import type { AiWorkspaceSnapshot, AiWorkspaceSnapshotCore } from "./types";
 
 describe("roadmap-parser", () => {
   it("classifies completed, in progress and planned items", () => {
@@ -163,6 +164,7 @@ describe("prompt-generator", () => {
       },
       limitations: ["Lacuna X"],
       insights: [],
+      chatContextMarkdown: "",
       contextScore: { total: 80, criteria: [] },
       searchableSections: [],
     } satisfies AiWorkspaceSnapshot;
@@ -180,5 +182,96 @@ describe("prompt-generator", () => {
     expect(prompt).toContain("Limitações Conhecidas");
     expect(prompt).toContain("Objetivo Atual");
     expect(prompt).toContain("Próximos Passos");
+  });
+});
+
+const mockCoreSnapshot = {
+  generatedAt: new Date().toISOString(),
+  overview: {
+    title: "T",
+    summary: "Lots BI é um SaaS de BI para agências de marketing digital com operação integrada.",
+    bullets: ["b1"],
+    sourceSlugs: ["start-here"],
+  },
+  architecture: {
+    summary: "TanStack Start + Supabase com módulos de domínio isolados e RLS multi-tenant.",
+    layers: [{ name: "Frontend", description: "React" }],
+    sourceSlugs: [],
+  },
+  modules: [
+    {
+      id: "auth",
+      label: "Auth",
+      objective: "Autenticação de sessão",
+      responsibilities: ["Login"],
+      mainFiles: ["modules/auth"],
+      dependencies: ["Supabase Auth"],
+    },
+  ],
+  flows: [{ id: "f", name: "Flow", steps: ["a", "b", "c"], sourceSlug: "" }],
+  database: {
+    tables: [{ name: "profiles", migration: "01.sql", foreignKeys: [] }],
+    migrationFiles: ["01.sql"],
+    summaryMarkdown: "Postgres com RLS",
+  },
+  adrs: [
+    {
+      id: "ADR-0001",
+      title: "Base",
+      status: "Aceito",
+      date: "2026-01-01",
+      summary: "TanStack + Supabase",
+      slug: "",
+    },
+  ],
+  roadmap: {
+    completed: [{ text: "Auth v3 concluído" }],
+    inProgress: [{ text: "Agency OS em evolução" }],
+    planned: [{ text: "Coletores proprietários" }],
+  },
+  changelog: { unreleased: ["AI Workspace"], recentReleases: [], recentCommits: [] },
+  conventions: [
+    { id: "r", title: "Repository Pattern", description: "Supabase só em repos", source: "ci" },
+  ],
+  stack: {
+    framework: ["TanStack"],
+    runtime: "Node 22",
+    keyDependencies: { react: "19" },
+    scripts: [],
+  },
+  limitations: [],
+  insights: [],
+} satisfies AiWorkspaceSnapshotCore;
+
+describe("chat-context-generator", () => {
+  it("includes all 14 mandatory sections", () => {
+    const docs = new Map<
+      string,
+      {
+        slug: string;
+        path: string;
+        frontmatter: object;
+        body: string;
+        title: string;
+        description: string;
+        toc: [];
+        searchText: string;
+      }
+    >();
+    const chat = generateChatContext({ snapshot: mockCoreSnapshot, docs });
+    expect(chat).toContain("## 1. Produto");
+    expect(chat).toContain("## 2. Filosofia");
+    expect(chat).toContain("## 3. História da plataforma");
+    expect(chat).toContain("## 4. Arquitetura geral");
+    expect(chat).toContain("## 5. Todos os módulos");
+    expect(chat).toContain("## 6. Banco de dados");
+    expect(chat).toContain("## 7. Tecnologias");
+    expect(chat).toContain("## 8. Funcionalidades prontas");
+    expect(chat).toContain("## 9. Funcionalidades planejadas");
+    expect(chat).toContain("## 10. Regras de Ouro");
+    expect(chat).toContain("## 11. Estado atual do projeto");
+    expect(chat).toContain("## 12. Objetivo do momento");
+    expect(chat).toContain("## 13. INSTRUÇÕES PARA A IA");
+    expect(chat).toContain("## 14. Resumo executivo");
   });
 });

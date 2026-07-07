@@ -46,3 +46,35 @@ export function exportMimeType(format: ExportFormat): string {
       return "text/markdown";
   }
 }
+
+export function exportChatContext(snapshot: AiWorkspaceSnapshot, format: ExportFormat): string {
+  switch (format) {
+    case "markdown":
+      return snapshot.chatContextMarkdown;
+    case "json":
+      return JSON.stringify(
+        {
+          type: "ai-chat-context",
+          generatedAt: snapshot.generatedAt,
+          markdown: snapshot.chatContextMarkdown,
+          snapshot,
+        },
+        null,
+        2,
+      );
+    case "txt":
+      return markdownToPlainText(snapshot.chatContextMarkdown);
+    default:
+      return snapshot.chatContextMarkdown;
+  }
+}
+
+export function exportChatContextFilename(format: ExportFormat): string {
+  const date = new Date().toISOString().slice(0, 10);
+  const ext = format === "json" ? "json" : format === "txt" ? "txt" : "md";
+  return `lots-bi-ai-chat-context-${date}.${ext}`;
+}
+
+export function exportChatContextMimeType(format: ExportFormat): string {
+  return exportMimeType(format);
+}

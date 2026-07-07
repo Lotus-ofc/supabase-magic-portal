@@ -21,6 +21,12 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 
 ### Adicionado
 
+- **AI Workspace v1.1 — AI Chat Context (2026-07-06):** gerador conversacional em
+  `/admin/ai-workspace` para modelos de chat (ChatGPT, Claude, Gemini, Perplexity). Sintetiza
+  automaticamente Knowledge Center, ADRs, roadmap, changelog e módulos em 14 seções de linguagem
+  natural. Exportação Copiar / MD / TXT / JSON; busca indexada. Docs:
+  [ai-chat-context.md](./06-dashboards/ai-chat-context.md).
+
 - **AI Workspace v1 (2026-07-06):** módulo exclusivo Platform Owner em `/admin/ai-workspace`.
   Context Pack automático para IAs — agregação de docs, código, migrations, ADRs, roadmap e
   changelog. Prompt Generator, exportação, busca e Context Score. Docs:

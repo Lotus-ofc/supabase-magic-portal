@@ -1,12 +1,10 @@
-import type { AiWorkspaceSnapshot, ContextScoreBreakdown } from "./types";
-
-type PartialSnapshot = Omit<AiWorkspaceSnapshot, "searchableSections" | "contextScore">;
+import type { AiWorkspaceSnapshotCore, ContextScoreBreakdown } from "./types";
 
 const CRITERIA: Array<{
   id: string;
   label: string;
   weight: number;
-  check: (s: PartialSnapshot) => boolean;
+  check: (s: AiWorkspaceSnapshotCore) => boolean;
 }> = [
   {
     id: "architecture",
@@ -59,7 +57,7 @@ const CRITERIA: Array<{
   },
 ];
 
-export function computeContextScore(snapshot: PartialSnapshot): ContextScoreBreakdown {
+export function computeContextScore(snapshot: AiWorkspaceSnapshotCore): ContextScoreBreakdown {
   const criteria = CRITERIA.map((c) => {
     const met = c.check(snapshot);
     return {

@@ -11,6 +11,7 @@ import { invalidateAiWorkspaceSnapshot } from "@/lib/ai-workspace/snapshot";
 import { createAiWorkspaceSearchIndex, searchAiWorkspace } from "@/lib/ai-workspace/search";
 import type { AiWorkspaceSectionId } from "@/lib/ai-workspace/types";
 import { PromptGeneratorPanel } from "./PromptGeneratorPanel";
+import { ChatContextGeneratorPanel } from "./ChatContextGeneratorPanel";
 import { FlowTimeline } from "./FlowTimeline";
 import { ModuleCardGrid } from "./ModuleCardGrid";
 import { AiInsightsPlaceholder } from "./AiInsightsPlaceholder";
@@ -24,6 +25,7 @@ export function AiWorkspacePage() {
   );
   const [prompt, setPrompt] = useState("");
   const sectionRefs = useRef<Partial<Record<AiWorkspaceSectionId, HTMLDivElement | null>>>({});
+  const chatContextRef = useRef<HTMLDivElement | null>(null);
 
   const fuse = useMemo(
     () => (snapshot ? createAiWorkspaceSearchIndex(snapshot.searchableSections) : null),
@@ -42,7 +44,11 @@ export function AiWorkspacePage() {
     const first = searchHits[0]?.sectionId;
     if (first) {
       requestAnimationFrame(() => {
-        sectionRefs.current[first]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (first === "chat-context") {
+          chatContextRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          sectionRefs.current[first]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     }
   }, [searchHits]);
@@ -122,7 +128,7 @@ export function AiWorkspacePage() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar módulos, ADRs, roadmap, banco, convenções…"
+            placeholder="Buscar módulos, ADRs, roadmap, chat context, convenções…"
             className="pl-9"
           />
           {searchHits.length > 0 && (
@@ -134,6 +140,10 @@ export function AiWorkspacePage() {
       </header>
 
       <PromptGeneratorPanel snapshot={snapshot} prompt={prompt} onRegenerate={handleRefresh} />
+
+      <div ref={chatContextRef}>
+        <ChatContextGeneratorPanel snapshot={snapshot} onRegenerate={handleRefresh} />
+      </div>
 
       <div className="space-y-4">
         <div

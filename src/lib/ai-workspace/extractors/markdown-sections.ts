@@ -63,3 +63,40 @@ export function firstParagraphs(body: string, count = 2): string {
   if (current.length && paragraphs.length < count) paragraphs.push(current.join(" "));
   return paragraphs.map(stripMarkdownInline).join("\n\n").slice(0, 1200);
 }
+
+export interface DocSection {
+  title: string;
+  content: string;
+  level: number;
+}
+
+/** Extrai seções H2/H3 de um documento markdown. */
+export function extractAllSections(body: string, minLevel = 2, maxLevel = 3): DocSection[] {
+  const sections: DocSection[] = [];
+  const lines = body.split("\n");
+  let current: DocSection | null = null;
+  const buf: string[] = [];
+
+  function flush() {
+    if (current) {
+      current.content = buf.join("\n").trim();
+      sections.push(current);
+    }
+    buf.length = 0;
+  }
+
+  for (const line of lines) {
+    const m = line.match(/^(#{2,3})\s+(.+)$/);
+    if (m) {
+      const level = m[1].length;
+      if (level >= minLevel && level <= maxLevel) {
+        flush();
+        current = { title: stripMarkdownInline(m[2]), content: "", level };
+        continue;
+      }
+    }
+    if (current) buf.push(line);
+  }
+  flush();
+  return sections;
+}

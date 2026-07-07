@@ -1,6 +1,11 @@
 import type { DocEntry } from "@/lib/knowledge-center/types";
 import { ensureRegistry } from "@/lib/knowledge-center/registry";
-import type { AiWorkspaceSnapshot, GitSnapshot, SearchableSection } from "./types";
+import type {
+  AiWorkspaceSnapshot,
+  AiWorkspaceSnapshotCore,
+  GitSnapshot,
+  SearchableSection,
+} from "./types";
 import { buildOverview } from "./sources/overview";
 import { buildArchitecture } from "./sources/architecture";
 import { buildModules } from "./sources/modules";
@@ -13,6 +18,7 @@ import { buildConventions } from "./sources/conventions";
 import { buildStack } from "./sources/stack";
 import { buildInsights } from "./sources/insights";
 import { computeContextScore } from "./context-score";
+import { generateChatContext, chatContextSearchText } from "./chat-context-generator";
 import gitSnapshotFallback from "./generated/git-snapshot.json";
 
 let snapshotPromise: Promise<AiWorkspaceSnapshot> | null = null;
@@ -44,7 +50,8 @@ function buildLimitations(
 }
 
 function buildSearchableSections(
-  snapshot: Omit<AiWorkspaceSnapshot, "searchableSections" | "contextScore">,
+  snapshot: AiWorkspaceSnapshotCore,
+  chatContextMarkdown: string,
 ): SearchableSection[] {
   return [
     {
@@ -112,6 +119,11 @@ function buildSearchableSections(
       title: "AI Insights",
       content: snapshot.insights.map((i) => `${i.title} ${i.description}`).join(" "),
     },
+    {
+      id: "chat-context",
+      title: "AI Chat Context",
+      content: chatContextSearchText(chatContextMarkdown),
+    },
   ];
 }
 
@@ -149,10 +161,11 @@ export async function buildAiWorkspaceSnapshot(): Promise<AiWorkspaceSnapshot> {
     insights,
   };
 
-  const searchableSections = buildSearchableSections(partial);
+  const chatContextMarkdown = generateChatContext({ snapshot: partial, docs: map });
+  const searchableSections = buildSearchableSections(partial, chatContextMarkdown);
   const contextScore = computeContextScore(partial);
 
-  return { ...partial, searchableSections, contextScore };
+  return { ...partial, chatContextMarkdown, searchableSections, contextScore };
 }
 
 export async function ensureAiWorkspaceSnapshot(): Promise<AiWorkspaceSnapshot> {
