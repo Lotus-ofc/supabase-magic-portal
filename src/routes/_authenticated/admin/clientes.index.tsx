@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { listClientes, toggleClienteAtivo } from "@/lib/admin.functions";
 import { PageHeader } from "@/components/lotus/PageHeader";
+import { Button } from "@/components/ui/button";
 import { adminTitle } from "@/lib/brand";
 import { Search, Plus, MoreHorizontal, Filter, X } from "lucide-react";
 
@@ -65,12 +66,11 @@ function ClientesList() {
         title="Clientes"
         description="Gerencie o portfólio. Soft delete preserva todo o histórico de métricas, acessos e serviços."
         actions={
-          <Link
-            to="/admin/clientes/novo"
-            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:-translate-y-px"
-          >
-            <Plus className="h-3.5 w-3.5" /> Novo cliente
-          </Link>
+          <Button asChild>
+            <Link to="/admin/clientes/novo" className="inline-flex items-center gap-1.5">
+              <Plus className="h-3.5 w-3.5" /> Novo cliente
+            </Link>
+          </Button>
         }
       />
 

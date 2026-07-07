@@ -13,6 +13,7 @@ import { getLibraryItemFn } from "@/modules/approval/library/library.server";
 import { getClientLibraryItemFn } from "@/modules/approval/library/client-library.server";
 import { getScopedLibraryItemFn } from "@/modules/client/scoped-portal.functions";
 import { useOptionalClientScope } from "@/modules/client/context";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
 import { PillarBadge } from "../shared/PillarBadge";
 import { formatCardSchedule } from "../kanban/kanban-meta";
 import { KANBAN_COLUMN_META } from "../kanban/kanban-meta";
@@ -67,7 +68,9 @@ export function LibraryDetailDrawer({
         </SheetHeader>
 
         {detailQ.isLoading && (
-          <p className="mt-4 text-sm text-muted-foreground">Carregando detalhe…</p>
+          <div className="mt-4">
+            <ApprovalPanelSkeleton rows={4} />
+          </div>
         )}
 
         {card && (

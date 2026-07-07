@@ -109,8 +109,6 @@ export function CardDetailDrawer({
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["content-card", cardId] });
-    qc.invalidateQueries({ queryKey: ["approval", "kanban", cadastroClienteId] });
-    qc.invalidateQueries({ queryKey: ["approval", "calendar", cadastroClienteId] });
     onMutated();
   };
 

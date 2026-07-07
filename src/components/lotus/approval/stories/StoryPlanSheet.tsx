@@ -22,6 +22,7 @@ import {
 import { listClientStoryPlanRows } from "@/modules/approval/planning/client-planning.server";
 import { listScopedStoryPlanRowsFn } from "@/modules/client/scoped-portal.functions";
 import { useOptionalClientScope } from "@/modules/client/context";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
 
 export function StoryPlanSheet({
   cadastroClienteId,
@@ -162,77 +163,79 @@ export function StoryPlanSheet({
         <p className="text-sm font-medium">{weekLabel}</p>
       </div>
 
-      {rowsQ.isLoading && <p className="text-sm text-muted-foreground">Carregando plano…</p>}
-
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full min-w-[720px] border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/40">
-              <th className="px-3 py-2 text-left font-medium">Dia</th>
-              <th className="px-3 py-2 text-left font-medium">Período</th>
-              <th className="px-3 py-2 text-left font-medium">Objetivo / Título</th>
-              <th className="px-3 py-2 text-left font-medium">Observações</th>
-              <th className="px-3 py-2 text-left font-medium">Checklist</th>
-              <th className="px-3 py-2 text-left font-medium">Card</th>
-              {!readOnly && <th className="w-10" />}
-            </tr>
-          </thead>
-          <tbody>
-            {STORY_DAY_LABELS.map((label, diaSemana) => {
-              const dayRows = rowsByDay.get(diaSemana) ?? [];
-              if (dayRows.length === 0) {
-                return (
-                  <tr key={diaSemana} className="border-b border-border/60">
-                    <td className="px-3 py-2 font-medium text-muted-foreground">{label}</td>
-                    <td colSpan={readOnly ? 5 : 6} className="px-3 py-2">
-                      <span className="text-muted-foreground">—</span>
-                      {!readOnly && (
+      {rowsQ.isLoading ? (
+        <ApprovalPanelSkeleton rows={8} />
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-border">
+          <table className="w-full min-w-[720px] border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/40">
+                <th className="px-3 py-2 text-left font-medium">Dia</th>
+                <th className="px-3 py-2 text-left font-medium">Período</th>
+                <th className="px-3 py-2 text-left font-medium">Objetivo / Título</th>
+                <th className="px-3 py-2 text-left font-medium">Observações</th>
+                <th className="px-3 py-2 text-left font-medium">Checklist</th>
+                <th className="px-3 py-2 text-left font-medium">Card</th>
+                {!readOnly && <th className="w-10" />}
+              </tr>
+            </thead>
+            <tbody>
+              {STORY_DAY_LABELS.map((label, diaSemana) => {
+                const dayRows = rowsByDay.get(diaSemana) ?? [];
+                if (dayRows.length === 0) {
+                  return (
+                    <tr key={diaSemana} className="border-b border-border/60">
+                      <td className="px-3 py-2 font-medium text-muted-foreground">{label}</td>
+                      <td colSpan={readOnly ? 5 : 6} className="px-3 py-2">
+                        <span className="text-muted-foreground">—</span>
+                        {!readOnly && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => addRow(diaSemana)}
+                          >
+                            <Plus className="mr-1 h-3 w-3" />
+                            Linha
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                }
+                return dayRows.map((row, rowIdx) => (
+                  <tr key={row.id} className="border-b border-border/60 align-top">
+                    {rowIdx === 0 && (
+                      <td className="px-3 py-2 font-medium" rowSpan={dayRows.length}>
+                        {label}
+                      </td>
+                    )}
+                    <StoryRowCells
+                      row={row}
+                      readOnly={readOnly}
+                      onPatch={(patch) => patchRow(row.id, patch)}
+                      onOpenCard={onOpenCard}
+                    />
+                    {!readOnly && (
+                      <td className="px-2 py-2">
                         <Button
                           type="button"
                           variant="ghost"
-                          size="sm"
-                          className="ml-2"
-                          onClick={() => addRow(diaSemana)}
+                          size="icon"
+                          onClick={() => removeRow(row.id)}
                         >
-                          <Plus className="mr-1 h-3 w-3" />
-                          Linha
+                          <Trash2 className="h-4 w-4 text-muted-foreground" />
                         </Button>
-                      )}
-                    </td>
+                      </td>
+                    )}
                   </tr>
-                );
-              }
-              return dayRows.map((row, rowIdx) => (
-                <tr key={row.id} className="border-b border-border/60 align-top">
-                  {rowIdx === 0 && (
-                    <td className="px-3 py-2 font-medium" rowSpan={dayRows.length}>
-                      {label}
-                    </td>
-                  )}
-                  <StoryRowCells
-                    row={row}
-                    readOnly={readOnly}
-                    onPatch={(patch) => patchRow(row.id, patch)}
-                    onOpenCard={onOpenCard}
-                  />
-                  {!readOnly && (
-                    <td className="px-2 py-2">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeRow(row.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                    </td>
-                  )}
-                </tr>
-              ));
-            })}
-          </tbody>
-        </table>
-      </div>
+                ));
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

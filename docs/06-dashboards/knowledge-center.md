@@ -5,7 +5,7 @@ status: living
 owner: Engenharia Lots BI
 tags: [knowledge-center, admin, documentation]
 difficulty: intermediate
-last_review: 2026-06-29
+last_review: 2026-07-07
 ---
 
 # Knowledge Center
@@ -63,6 +63,18 @@ O KC herda o `AppShell` (menu lateral em drawer no mobile). Dentro do módulo:
 | `lg+`      | Sidebar fixa à esquerda (260px) + conteúdo scrollável            |
 
 Conteúdo markdown usa tipografia fluida e tabelas com `lotus-scroll-x` quando necessário.
+
+## Relação com AI Workspace
+
+O Knowledge Center é a **fonte única de verdade** (`docs/**/*.md`). O [AI Workspace](./ai-workspace.md)
+consome o mesmo registry via `ensureRegistry()` para sintetizar Context Packs — sem duplicar conteúdo.
+Tutorial em `/admin/tutorial` cobre uso operacional; KC cobre engenharia.
+
+## Tutorial da plataforma
+
+Guias passo a passo para admin e clientes vivem em `src/content/platform-tutorial/` e são
+renderizados em `/admin/tutorial` e `/tutorial`. Atualize ambos (KC + tutorial) quando mudar
+fluxos visíveis ao usuário.
 
 ## Futuro (arquitetura preparada)
 

@@ -82,6 +82,21 @@ flowchart LR
 - ✅ AI Insights placeholders com contratos para scanners v2+
 - 📄 [ai-workspace.md](../06-dashboards/ai-workspace.md)
 
+## AI Workspace v1.2 — UX finalização ✅ (concluído 07/07/2026)
+
+- ✅ Dois cards: Contexto para Editor de Código vs IA Conversacional
+- ✅ Geração sob demanda, skeleton, toasts, export names unificados
+- ✅ Tutorial cap. 13–14 + docs KC atualizados
+- 📄 [ai-workspace.md](../06-dashboards/ai-workspace.md)
+
+## Refinement Sprint v1 ✅ (concluído 07/07/2026)
+
+- ✅ UX Aprovações: skeletons, empty state kanban, invalidação DnD mais estreita
+- ✅ Agency OS: `DashboardSkeleton` props corrigidas
+- ✅ Admin CRUD: links `asChild` em Novo cliente/usuário
+- ✅ AI Workspace: loading skeleton e empty states nos geradores
+- ✅ Kanban mobile scroll padding; `console.warn` só em DEV
+
 ## AI Workspace v1.1 — AI Chat Context ✅ (concluído 06/07/2026)
 
 - ✅ Gerador conversacional para ChatGPT, Claude, Gemini, Perplexity

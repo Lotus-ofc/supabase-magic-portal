@@ -28,7 +28,7 @@ import { SocialPreviewPanel } from "../preview/SocialPreviewPanel";
 import { buildPreviewContext } from "@/lib/media-preview";
 import { CheckCircle2, MessageSquare, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PillarBadge } from "../shared/PillarBadge";
+import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
 
 function ReadField({ label, value }: { label: string; value: string | null | undefined }) {
   if (!value?.trim()) return null;
@@ -76,7 +76,6 @@ export function ClientCardDetailDrawer({
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["client-content-card", scopeKey, cardId] });
-    qc.invalidateQueries({ queryKey: ["client-aprovacoes", "kanban", scopeKey] });
     onMutated();
   };
 
@@ -142,7 +141,9 @@ export function ClientCardDetailDrawer({
         </SheetHeader>
 
         {detailQ.isLoading && (
-          <p className="p-6 text-sm text-muted-foreground">Carregando conteúdo…</p>
+          <div className="p-6">
+            <ApprovalPanelSkeleton rows={5} />
+          </div>
         )}
 
         {card && (

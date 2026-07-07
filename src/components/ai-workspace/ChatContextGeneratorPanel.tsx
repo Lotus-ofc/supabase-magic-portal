@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Check, Copy, Download, FileJson, FileText, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/lotus/EmptyState";
 import type { AiWorkspaceSnapshot } from "@/lib/ai-workspace/types";
 import {
   copyToClipboard,
@@ -42,12 +44,15 @@ export function ChatContextGeneratorPanel({
   onGenerate,
   isGenerating,
 }: ChatContextGeneratorPanelProps) {
+  const [copied, setCopied] = useState(false);
   const hasContent = Boolean(content);
 
   async function handleCopyMarkdown() {
     if (!content) return;
     await copyToClipboard(content);
+    setCopied(true);
     toast.success("Contexto para IA Conversacional copiado (Markdown)");
+    setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleCopyText() {
@@ -107,7 +112,7 @@ export function ChatContextGeneratorPanel({
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-b border-border/70 px-5 py-4">
-        <Button onClick={onGenerate} disabled={isGenerating} variant="secondary" className="gap-2">
+        <Button onClick={onGenerate} disabled={isGenerating} className="gap-2">
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
@@ -124,7 +129,7 @@ export function ChatContextGeneratorPanel({
           className="gap-1.5"
         >
           <Copy className="h-3.5 w-3.5" />
-          Copiar Markdown
+          {copied ? "Copiado!" : "Copiar Markdown"}
         </Button>
 
         <Button
@@ -158,7 +163,7 @@ export function ChatContextGeneratorPanel({
         </DropdownMenu>
       </div>
 
-      <div className="max-h-[360px] flex-1 overflow-auto bg-muted/10 p-5">
+      <div className="max-h-[360px] min-h-[360px] flex-1 overflow-auto bg-muted/15 p-5">
         {hasContent ? (
           <>
             {generatedAt && (
@@ -171,16 +176,12 @@ export function ChatContextGeneratorPanel({
             </pre>
           </>
         ) : (
-          <div className="flex min-h-[200px] flex-col items-center justify-center text-center">
-            <MessageSquare className="mb-3 h-8 w-8 text-muted-foreground/40" />
-            <p className="text-sm font-medium text-muted-foreground">
-              Nenhum contexto gerado ainda
-            </p>
-            <p className="mt-1 max-w-xs text-xs text-muted-foreground/80">
-              Clique em <strong>Gerar Contexto</strong> para sintetizar o resumo conversacional da
-              plataforma.
-            </p>
-          </div>
+          <EmptyState
+            compact
+            icon={MessageSquare}
+            title="Nenhum contexto gerado ainda"
+            description='Clique em "Gerar Contexto" para sintetizar o resumo conversacional da plataforma.'
+          />
         )}
       </div>
     </div>

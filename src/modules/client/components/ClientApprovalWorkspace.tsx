@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { SectionCard } from "@/components/lotus/SectionCard";
 import { EmptyState } from "@/components/lotus/EmptyState";
-import { DashboardSkeleton } from "@/components/lotus/DashboardSkeleton";
+import { ApprovalPanelSkeleton } from "@/components/lotus/approval/shared/ApprovalPanelSkeleton";
 import { KanbanBoardView } from "@/components/lotus/approval/kanban/KanbanBoard";
 import { ClientCardDetailDrawer } from "@/components/lotus/approval/card/ClientCardDetailDrawer";
 import { buildPillarMap } from "@/modules/approval/services/group-cards-by-date";
@@ -87,7 +87,7 @@ export function ClientApprovalWorkspace() {
     [boardQ.data],
   );
 
-  if (accessQ.isLoading) return <DashboardSkeleton kpiCount={0} withChart={false} />;
+  if (accessQ.isLoading) return <ApprovalPanelSkeleton rows={4} />;
 
   if (!isSlugMode && accessQ.data?.role === "staff_redirect") {
     return (
@@ -120,7 +120,7 @@ export function ClientApprovalWorkspace() {
 
       <ApprovalWorkspaceTabs value={tab} onChange={setTab} />
 
-      {tab === "kanban" && boardQ.isLoading && <DashboardSkeleton kpiCount={0} withChart={false} />}
+      {tab === "kanban" && boardQ.isLoading && <ApprovalPanelSkeleton rows={6} />}
 
       {tab === "kanban" && !boardQ.isLoading && totalCards === 0 && (
         <SectionCard eyebrow="Workflow" title="Seu pipeline">

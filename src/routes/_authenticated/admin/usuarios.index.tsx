@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { PageHeader } from "@/components/lotus/PageHeader";
+import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/lotus/StatCard";
 import { TextInput } from "@/components/lotus/FormField";
 import {
@@ -98,12 +99,11 @@ function UsuariosPage() {
         title="Usuários"
         description="Gestão de acessos v2.1 — lifecycle, diagnóstico e recovery mode por usuário."
         actions={
-          <Link
-            to="/admin/usuarios/novo"
-            className="lotus-focus inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-[13px] font-medium text-primary-foreground"
-          >
-            <UserPlus className="h-3.5 w-3.5" /> Novo usuário
-          </Link>
+          <Button asChild>
+            <Link to="/admin/usuarios/novo" className="inline-flex items-center gap-1.5">
+              <UserPlus className="h-3.5 w-3.5" /> Novo usuário
+            </Link>
+          </Button>
         }
       />
 

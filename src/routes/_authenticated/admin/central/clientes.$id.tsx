@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/admin/central/clientes/$id
 
 function ClientWorkspacePage() {
   return (
-    <Suspense fallback={<DashboardSkeleton kpiCount={0} charts={0} />}>
+    <Suspense fallback={<DashboardSkeleton kpiCount={0} withChart={false} />}>
       <ClientWorkspaceContent />
     </Suspense>
   );

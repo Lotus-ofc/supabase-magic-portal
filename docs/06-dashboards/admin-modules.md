@@ -3,7 +3,7 @@ title: Módulos Admin & Operacionais
 description: Telas administrativas, editorial, aprovações, relatórios e debug.
 status: living
 owner: Engenharia / Produto Lotus
-last_review: 2026-07-05
+last_review: 2026-07-07
 ---
 
 # Módulos Admin & Operacionais
@@ -193,8 +193,15 @@ recentes, breadcrumb e TOC. Ver [knowledge-center.md](./knowledge-center.md).
 | Fonte  | Agregação automática de docs, código, migrations, git snapshot  |
 | Acesso | **Somente Platform Owner** (`isPlatformOwnerEmail`)             |
 
-Context Pack para IAs — Prompt Generator, exportação, busca, Context Score. Não duplica o
-Knowledge Center. Ver [ai-workspace.md](./ai-workspace.md).
+Dois geradores em cards distintos (v1.2):
+
+| Gerador | Uso | Exportação |
+| ------- | --- | ---------- |
+| **Contexto para Editor de Código** | Cursor, Windsurf, Copilot | `lots-bi-code-context.*` |
+| **Contexto para IA Conversacional** | ChatGPT, Claude, Gemini, Perplexity | `lots-bi-chat-context.*` |
+
+Context Score, busca global, seções expansíveis. Não duplica o Knowledge Center.
+Ver [ai-workspace.md](./ai-workspace.md) e [ai-chat-context.md](./ai-chat-context.md).
 
 ### `countPostsAguardando`
 

@@ -3,7 +3,7 @@ title: Changelog
 description: Histórico de mudanças relevantes do Lots BI (produto, dados e infraestrutura).
 status: living
 owner: Engenharia Lots BI
-last_review: 2026-07-01
+last_review: 2026-07-07
 ---
 
 # Changelog
@@ -20,6 +20,11 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
 ## [Não lançado]
 
 ### Adicionado
+
+- **Tutorial — Knowledge Center e AI Workspace (2026-07-07):** capítulos admin
+  `13-knowledge-center` e `14-ai-workspace`; mapa de menus, atalhos e Aprovações atualizados.
+  Docs KC: [knowledge-center.md](../06-dashboards/knowledge-center.md),
+  [ai-workspace.md](../06-dashboards/ai-workspace.md).
 
 - **AI Workspace v1.1 — AI Chat Context (2026-07-06):** gerador conversacional em
   `/admin/ai-workspace` para modelos de chat (ChatGPT, Claude, Gemini, Perplexity). Sintetiza
@@ -51,6 +56,16 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
   de aprovação legada, selects `POST_*` em `db-selects.ts`.
 
 ### Alterado
+
+- **Refinement Sprint v1 — UX e estabilidade (2026-07-07):** skeletons consistentes em
+  Aprovações (kanban vazio com CTA, drawers, Story Plan); invalidação React Query mais
+  estreita no DnD; `DashboardSkeleton` corrigido no Agency OS; botões `asChild` em listagens
+  admin; padding mobile no Kanban; `console.warn` restrito a DEV.
+
+- **AI Workspace v1.2 — UX finalização (2026-07-07):** dois cards distintos (Editor de Código
+  vs IA Conversacional); geração sob demanda; loading skeleton; exportação unificada
+  (`lots-bi-code-context.*`, `lots-bi-chat-context.*`); footer “Como utilizar este contexto” no
+  chat context.
 
 - **Plano Estratégico:** stats editoriais via `content_cards` (`vw_estrategia_editorial_stats`).
   Deep-link "Ver no calendário" aponta para `/admin/aprovacoes?tab=calendar&estrategia=…`.
@@ -128,6 +143,9 @@ Categorias: `Adicionado`, `Alterado`, `Corrigido`, `Removido`, `Segurança`, `Da
   migrations, troubleshooting, módulo KC).
 
 ### Corrigido
+
+- **AI Workspace — startup:** removido `router.invalidate()` em `SIGNED_IN` que causava erro
+  esporádico ao abrir a plataforma; bootstrap Supabase aguardado em `_authenticated`.
 
 - **`column vw_clientes_admin.tiktok_ativo does not exist`:** select explícito pedia colunas da
   migration 05 antes dela estar em produção; `listClientes`/`getCliente` voltaram a `select("*")`

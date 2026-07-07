@@ -37,6 +37,7 @@ Se você é **cliente final** (marca contratante), use o tutorial em **Tutorial*
 | Plataforma | **Branding** | `/admin/branding` | Nome, cores e identidade visual |
 | Ajuda | **Tutorial** | `/admin/tutorial` | Este guia passo a passo |
 | Ajuda | **Knowledge Center** | `/admin/knowledge` | Documentação técnica interna (engenharia) |
+| Ajuda | **AI Workspace** | `/admin/ai-workspace` | Context Pack para IAs — **somente Platform Owner** |
 
 ## Elementos comuns em todas as telas
 

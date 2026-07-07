@@ -3,7 +3,7 @@ title: AI Workspace
 description: Context Pack automático para IAs — agregação e síntese do repositório, exclusivo para Platform Owner.
 status: living
 owner: Engenharia Lotus
-last_review: 2026-07-06
+last_review: 2026-07-07
 ---
 
 # AI Workspace
@@ -90,9 +90,9 @@ src/routes/_authenticated/admin/ai-workspace.tsx  # guard owner-only
 | Changelog | `12-changelog/changelog.md` + git snapshot |
 | Convenções | `09-standards/*`, `.cursor/rules/*.mdc`, boundary scripts |
 
-## Prompt Generator
+## Prompt Generator — Contexto para Editor de Código
 
-Botão **"Gerar Contexto para IA"** compõe markdown **técnico** para editores de código:
+Card **"Contexto para Editor de Código"** — clique **Gerar Contexto** para montar o Context Pack técnico:
 
 - Resumo executivo, stack, arquitetura
 - Módulos, fluxos, banco, ADRs
@@ -100,17 +100,24 @@ Botão **"Gerar Contexto para IA"** compõe markdown **técnico** para editores 
 - Changelog, convenções, limitações
 - Objetivo atual, últimas implementações, próximos passos
 
-Pronto para colar em Cursor, Copilot ou sessões de coding com IA.
+Pronto para colar em Cursor, Copilot ou sessões de coding com IA. Export: `lots-bi-code-context.md`.
 
-## AI Chat Context Generator (v1.1)
+## AI Chat Context — Contexto para IA Conversacional (v1.1)
 
-Botão **"Gerar AI Chat Context"** compõe markdown **conversacional** para ChatGPT, Claude, Gemini e Perplexity.
+Card **"Contexto para IA Conversacional"** — markdown conversacional para ChatGPT, Claude, Gemini e Perplexity.
 
-14 seções em linguagem natural: produto, filosofia, história, arquitetura narrativa, módulos com regras de uso, banco, stack, funcionalidades prontas/planejadas, regras de ouro, estado atual, objetivo do momento, instruções para a IA e resumo executivo.
+14 seções em linguagem natural: produto, filosofia, história, arquitetura narrativa, módulos com regras de uso, banco, stack, funcionalidades prontas/planejadas, regras de ouro, estado atual, objetivo do momento, instruções para a IA e resumo executivo. Inclui seção **Como utilizar este contexto** no final.
 
-Exportação: Copiar, Exportar MD, TXT e JSON (mesmo padrão do Prompt Generator). Indexado na busca do AI Workspace.
+Exportação: Copiar, Exportar MD, TXT e JSON (`lots-bi-chat-context.*`). Indexado na busca.
 
 Ver [ai-chat-context.md](./ai-chat-context.md) para diferença detalhada entre os dois geradores.
+
+## UX v1.2 (finalização)
+
+- Dois cards lado a lado com **Ideal para** e **Use quando**
+- Geração sob demanda (preview vazio até clicar **Gerar Contexto**)
+- Loading skeleton na página; feedback “Gerando…” e toast
+- Header orientativo sobre qual formato escolher
 
 ## Context Score
 

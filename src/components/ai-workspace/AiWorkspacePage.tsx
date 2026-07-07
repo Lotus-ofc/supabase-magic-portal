@@ -18,6 +18,30 @@ import { FlowTimeline } from "./FlowTimeline";
 import { ModuleCardGrid } from "./ModuleCardGrid";
 import { AiInsightsPlaceholder } from "./AiInsightsPlaceholder";
 
+function AiWorkspaceLoadingSkeleton() {
+  return (
+    <div
+      className="mx-auto max-w-5xl space-y-6 pb-12"
+      aria-busy="true"
+      aria-label="Carregando AI Workspace"
+    >
+      <div className="space-y-3">
+        <div className="lotus-skeleton h-3 w-28" />
+        <div className="lotus-skeleton h-8 w-56" />
+        <div className="lotus-skeleton h-4 w-full max-w-xl" />
+      </div>
+      <div className="lotus-surface h-24 p-4">
+        <div className="lotus-skeleton mb-2 h-3 w-40" />
+        <div className="lotus-skeleton h-2 w-full" />
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="lotus-surface min-h-[280px]" />
+        <div className="lotus-surface min-h-[280px]" />
+      </div>
+    </div>
+  );
+}
+
 export function AiWorkspacePage() {
   const queryClient = useQueryClient();
   const { data: snapshot, isLoading, error } = useQuery(aiWorkspaceSnapshotQuery);
@@ -99,11 +123,7 @@ export function AiWorkspacePage() {
   }, [refreshSnapshot]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground">
-        Agregando contexto da plataforma…
-      </div>
-    );
+    return <AiWorkspaceLoadingSkeleton />;
   }
 
   if (error || !snapshot) {

@@ -157,6 +157,11 @@ function AprovacoesAdminPage() {
     return map;
   }, [boardQ.data]);
 
+  const totalCards = useMemo(
+    () => boardQ.data?.columns.reduce((sum, col) => sum + col.cards.length, 0) ?? 0,
+    [boardQ.data],
+  );
+
   const moveMut = useMutation({
     mutationFn: (input: { id: string; status: ContentCardStatus; kanban_ordem: number }) =>
       moveFn({ data: input }),
@@ -191,7 +196,9 @@ function AprovacoesAdminPage() {
       toast.error(e.message);
     },
     onSettled: () => {
-      if (selectedCliente) invalidateApprovalViews(qc, selectedCliente.id);
+      if (clienteId) {
+        void qc.invalidateQueries({ queryKey: ["approval", "kanban", Number(clienteId)] });
+      }
     },
   });
 
@@ -252,7 +259,21 @@ function AprovacoesAdminPage() {
 
       {clienteId && tab === "kanban" && boardQ.isLoading && <ApprovalPanelSkeleton rows={6} />}
 
-      {clienteId && tab === "kanban" && boardQ.data && (
+      {clienteId && tab === "kanban" && !boardQ.isLoading && boardQ.data && totalCards === 0 && (
+        <ApprovalEmptyState
+          icon={ClipboardList}
+          title="Nenhum card no pipeline"
+          description="Crie o primeiro conteúdo editorial para este cliente."
+          action={
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Novo card
+            </Button>
+          }
+        />
+      )}
+
+      {clienteId && tab === "kanban" && boardQ.data && totalCards > 0 && (
         <Suspense fallback={<ApprovalPanelSkeleton rows={6} />}>
           <KanbanBoardView
             board={boardQ.data}

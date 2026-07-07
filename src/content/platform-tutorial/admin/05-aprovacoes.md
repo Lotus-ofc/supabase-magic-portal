@@ -118,6 +118,17 @@ Na URL você pode passar `?estrategia={uuid}` para filtrar cards vinculados a um
 - Use comentários no drawer em vez de WhatsApp — fica na timeline.
 - Arquive cards antigos para o Kanban não poluir.
 
+## Estados de carregamento e vazio
+
+Após o Refinement Sprint v1:
+
+- **Kanban sem cards** — mensagem clara com botão para criar o primeiro card (admin)
+- **Drawer de card** — skeleton enquanto carrega detalhes e timeline
+- **Story Plan** — skeleton na aba de plano semanal
+- **Biblioteca** — skeleton ao abrir detalhe de item publicado
+
+Se a tela parecer “travada”, aguarde o skeleton ou recarregue a página.
+
 ## Próximo capítulo
 
 **Plano Estratégico** — diagnóstico, objetivos, hipóteses e decisões.

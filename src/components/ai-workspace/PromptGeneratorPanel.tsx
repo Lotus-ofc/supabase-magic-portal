@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/lotus/EmptyState";
 import type { AiWorkspaceSnapshot } from "@/lib/ai-workspace/types";
 import {
   copyToClipboard,
@@ -161,7 +162,7 @@ export function PromptGeneratorPanel({
         </DropdownMenu>
       </div>
 
-      <div className="max-h-[360px] flex-1 overflow-auto bg-muted/20 p-5">
+      <div className="max-h-[360px] min-h-[360px] flex-1 overflow-auto bg-muted/15 p-5">
         {hasContent ? (
           <>
             {generatedAt && (
@@ -174,16 +175,12 @@ export function PromptGeneratorPanel({
             </pre>
           </>
         ) : (
-          <div className="flex min-h-[200px] flex-col items-center justify-center text-center">
-            <Sparkles className="mb-3 h-8 w-8 text-muted-foreground/40" />
-            <p className="text-sm font-medium text-muted-foreground">
-              Nenhum contexto gerado ainda
-            </p>
-            <p className="mt-1 max-w-xs text-xs text-muted-foreground/80">
-              Clique em <strong>Gerar Contexto</strong> para montar o Context Pack técnico a partir
-              do repositório.
-            </p>
-          </div>
+          <EmptyState
+            compact
+            icon={Sparkles}
+            title="Nenhum contexto gerado ainda"
+            description='Clique em "Gerar Contexto" para montar o Context Pack técnico a partir do repositório.'
+          />
         )}
       </div>
     </div>

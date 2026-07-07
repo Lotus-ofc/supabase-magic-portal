@@ -36,7 +36,7 @@ export const KanbanBoardView = memo(function KanbanBoardView({
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const columns = (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-4 sm:mx-0 sm:px-0">
       {board.columns.map((col) => (
         <KanbanColumn
           key={col.status}

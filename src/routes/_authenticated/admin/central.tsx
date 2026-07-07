@@ -109,7 +109,7 @@ export const Route = createFileRoute("/_authenticated/admin/central")({
 
 function CentralPage() {
   return (
-    <Suspense fallback={<DashboardSkeleton kpiCount={5} charts={0} />}>
+    <Suspense fallback={<DashboardSkeleton kpiCount={5} withChart={false} />}>
       <CentralContent />
     </Suspense>
   );
@@ -356,7 +356,7 @@ function CentralContent() {
               </Button>
             }
           >
-            <Suspense fallback={<DashboardSkeleton kpiCount={0} charts={1} />}>
+            <Suspense fallback={<DashboardSkeleton kpiCount={0} withChart={true} />}>
               <PipelineKanbanSection onCreateLead={() => setLeadOpen(true)} />
             </Suspense>
           </SectionCard>
@@ -381,7 +381,7 @@ function CentralContent() {
               </Button>
             }
           >
-            <Suspense fallback={<DashboardSkeleton kpiCount={0} charts={1} />}>
+            <Suspense fallback={<DashboardSkeleton kpiCount={0} withChart={true} />}>
               <ProductionKanbanSection onCreateProject={() => setProjectOpen(true)} />
             </Suspense>
           </SectionCard>

@@ -62,7 +62,9 @@ export const clienteRefQuery = (slug: string) =>
       }
 
       if (!queryName) {
-        console.warn("[cliente-ref] sem match para slug", slug);
+        if (import.meta.env.DEV) {
+          console.warn("[cliente-ref] sem match para slug", slug);
+        }
         return null;
       }
       return {
