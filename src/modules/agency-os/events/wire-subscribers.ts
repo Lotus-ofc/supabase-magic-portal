@@ -4,8 +4,22 @@ import { notificationDispatcher } from "@/modules/core/notifications/notificatio
 import { NOTIFICATION_CHANNELS } from "@/modules/core/types/notifications";
 import { DOMAIN_EVENTS } from "@/modules/core/types/domain-events";
 
+const WIRED_KEY = Symbol.for("lots.bi.agencyOs.wired");
+
 /** Reações cross-cutting ao Agency OS — sem acoplamento entre módulos. */
 export function wireAgencyOsEventSubscribers(): void {
+  const g = globalThis as typeof globalThis & { [WIRED_KEY]?: boolean };
+  if (g[WIRED_KEY]) return;
+  g[WIRED_KEY] = true;
+
+  eventBus.on(DOMAIN_EVENTS.LEAD_CREATED, async () => {
+    cacheManager.invalidatePrefix("agency-os");
+  });
+
+  eventBus.on(DOMAIN_EVENTS.LEAD_MOVED, async () => {
+    cacheManager.invalidatePrefix("agency-os");
+  });
+
   eventBus.on(DOMAIN_EVENTS.LEAD_CONVERTED, async (event) => {
     cacheManager.invalidatePrefix("agency-os");
     await notificationDispatcher.dispatch(NOTIFICATION_CHANNELS.in_app, {

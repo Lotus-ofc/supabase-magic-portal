@@ -3,13 +3,13 @@ import type { CommandContext, CommandDefinition, CommandDispatchResult } from ".
 import type { DomainEvent } from "../types/domain-events";
 import { eventBus } from "../event-bus/event-bus";
 
+const COMMAND_BUS_KEY = Symbol.for("lots.bi.commandBus");
+
 export class CommandBus {
   private commands = new Map<string, CommandDefinition>();
 
   register<TInput, TResult>(def: CommandDefinition<TInput, TResult>): void {
-    if (this.commands.has(def.name)) {
-      throw new Error(`Command already registered: ${def.name}`);
-    }
+    if (this.commands.has(def.name)) return;
     this.commands.set(def.name, def as CommandDefinition);
   }
 
@@ -51,4 +51,12 @@ export class CommandBus {
   }
 }
 
-export const commandBus = new CommandBus();
+function getCommandBus(): CommandBus {
+  const g = globalThis as typeof globalThis & { [COMMAND_BUS_KEY]?: CommandBus };
+  if (!g[COMMAND_BUS_KEY]) {
+    g[COMMAND_BUS_KEY] = new CommandBus();
+  }
+  return g[COMMAND_BUS_KEY];
+}
+
+export const commandBus = getCommandBus();

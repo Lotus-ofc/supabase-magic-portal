@@ -204,13 +204,15 @@ const TimelineWidget = lazy(() =>
   })),
 );
 
-let registered = false;
+const AGENCY_MODULE_KEY = Symbol.for("lots.bi.agencyOsModule");
 
 export function registerAgencyOsModule(): void {
-  if (registered) return;
-  registered = true;
-
   registerAgencyOsCommands();
+
+  const g = globalThis as typeof globalThis & { [AGENCY_MODULE_KEY]?: boolean };
+  if (g[AGENCY_MODULE_KEY]) return;
+  g[AGENCY_MODULE_KEY] = true;
+
   wireAgencyOsEventSubscribers();
 
   configRegistry.register({
@@ -224,6 +226,7 @@ export function registerAgencyOsModule(): void {
       DOMAIN_EVENTS.PROJECT_COMPLETED,
       DOMAIN_EVENTS.TASK_COMPLETED,
       DOMAIN_EVENTS.LEAD_CONVERTED,
+      DOMAIN_EVENTS.LEAD_CREATED,
       DOMAIN_EVENTS.LEAD_MOVED,
       DOMAIN_EVENTS.NOTE_CREATED,
     ],

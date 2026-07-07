@@ -3,6 +3,7 @@ import type { CommandContext, CommandDispatchResult } from "../types/commands";
 import { commandBus } from "../commands/command-bus";
 import { auditLogger } from "../audit/audit-logger";
 import { wireAuditPersistence } from "../audit/audit-sink.server";
+import { bootstrapOs } from "@/modules/os-bootstrap";
 
 const wiredSupabase = new WeakSet<SupabaseClient>();
 
@@ -23,6 +24,8 @@ export async function dispatchCommand<TResult>(
     before?: Record<string, unknown> | null;
   },
 ): Promise<CommandDispatchResult<TResult>> {
+  bootstrapOs();
+
   const supabase = ctx.services?.supabase as SupabaseClient | undefined;
   if (supabase) ensureAuditSink(supabase);
 

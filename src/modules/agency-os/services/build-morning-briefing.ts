@@ -86,7 +86,11 @@ export function buildMorningBriefing(input: {
   return { greeting, lines, highlights };
 }
 
-export function buildContextualKpis(summary: AgencyExecutiveSummary): ContextualKpi[] {
+export function buildContextualKpis(
+  summary: AgencyExecutiveSummary,
+  options?: { pipelineLeads?: number },
+): ContextualKpi[] {
+  const pipelineLeads = options?.pipelineLeads;
   return [
     {
       id: "receita",
@@ -119,13 +123,17 @@ export function buildContextualKpis(summary: AgencyExecutiveSummary): Contextual
     {
       id: "leads",
       label: "Leads",
-      value: String(summary.leads_negociacao),
+      value: String(pipelineLeads ?? summary.leads_negociacao),
       context:
-        summary.leads_quentes > 0
-          ? `${summary.leads_quentes} muito quente${summary.leads_quentes === 1 ? "" : "s"}`
-          : "Em negociação",
-      filterKey: "status",
-      filterValue: "negociacao",
+        pipelineLeads !== undefined
+          ? pipelineLeads > 0
+            ? `${pipelineLeads} no pipeline comercial`
+            : "Pipeline vazio — cadastre um lead"
+          : summary.leads_quentes > 0
+            ? `${summary.leads_quentes} muito quente${summary.leads_quentes === 1 ? "" : "s"}`
+            : "Em negociação",
+      filterKey: "section",
+      filterValue: "pipeline",
     },
     {
       id: "campanhas",

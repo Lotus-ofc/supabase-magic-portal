@@ -56,7 +56,7 @@ export const getAgencyCentral = createServerFn({ method: "GET" })
       summary,
       clients,
     });
-    const kpis = buildContextualKpis(summary);
+    const kpis = buildContextualKpis(summary, { pipelineLeads: leads.length });
 
     const intelligence = buildAgencyIntelligence({
       userDisplayName: email,
