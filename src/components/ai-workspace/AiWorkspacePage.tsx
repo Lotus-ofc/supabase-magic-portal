@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import { aiWorkspaceSnapshotQuery } from "@/lib/ai-workspace/queries";
 import { generateContextPrompt } from "@/lib/ai-workspace/prompt-generator";
 import { invalidateAiWorkspaceSnapshot } from "@/lib/ai-workspace/snapshot";
 import { createAiWorkspaceSearchIndex, searchAiWorkspace } from "@/lib/ai-workspace/search";
+import { withChatContextUsageFooter } from "@/lib/ai-workspace/export";
 import type { AiWorkspaceSectionId } from "@/lib/ai-workspace/types";
 import { PromptGeneratorPanel } from "./PromptGeneratorPanel";
 import { ChatContextGeneratorPanel } from "./ChatContextGeneratorPanel";
@@ -23,7 +25,12 @@ export function AiWorkspacePage() {
   const [expandedSections, setExpandedSections] = useState<Set<AiWorkspaceSectionId>>(
     () => new Set(["overview"]),
   );
-  const [prompt, setPrompt] = useState("");
+  const [codeContext, setCodeContext] = useState<string | null>(null);
+  const [chatContext, setChatContext] = useState<string | null>(null);
+  const [codeGeneratedAt, setCodeGeneratedAt] = useState<string | null>(null);
+  const [chatGeneratedAt, setChatGeneratedAt] = useState<string | null>(null);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const [isGeneratingChat, setIsGeneratingChat] = useState(false);
   const sectionRefs = useRef<Partial<Record<AiWorkspaceSectionId, HTMLDivElement | null>>>({});
   const chatContextRef = useRef<HTMLDivElement | null>(null);
 
@@ -53,18 +60,43 @@ export function AiWorkspacePage() {
     }
   }, [searchHits]);
 
-  useEffect(() => {
-    if (snapshot && !prompt) {
-      setPrompt(generateContextPrompt(snapshot));
-    }
-  }, [snapshot, prompt]);
-
-  const handleRefresh = useCallback(async () => {
+  const refreshSnapshot = useCallback(async () => {
     invalidateAiWorkspaceSnapshot();
     await queryClient.invalidateQueries({ queryKey: ["ai-workspace"] });
-    const fresh = await queryClient.fetchQuery(aiWorkspaceSnapshotQuery);
-    setPrompt(generateContextPrompt(fresh));
+    return queryClient.fetchQuery(aiWorkspaceSnapshotQuery);
   }, [queryClient]);
+
+  const handleGenerateCode = useCallback(async () => {
+    setIsGeneratingCode(true);
+    try {
+      const fresh = await refreshSnapshot();
+      setCodeContext(generateContextPrompt(fresh));
+      setCodeGeneratedAt(fresh.generatedAt);
+      toast.success("Context Pack gerado para Editor de Código");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Falha ao gerar contexto para Editor de Código",
+      );
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  }, [refreshSnapshot]);
+
+  const handleGenerateChat = useCallback(async () => {
+    setIsGeneratingChat(true);
+    try {
+      const fresh = await refreshSnapshot();
+      setChatContext(withChatContextUsageFooter(fresh.chatContextMarkdown));
+      setChatGeneratedAt(fresh.generatedAt);
+      toast.success("Contexto conversacional gerado");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Falha ao gerar contexto para IA Conversacional",
+      );
+    } finally {
+      setIsGeneratingChat(false);
+    }
+  }, [refreshSnapshot]);
 
   if (isLoading) {
     return (
@@ -101,8 +133,11 @@ export function AiWorkspacePage() {
           </p>
           <h1 className="font-display text-2xl font-semibold tracking-tight">AI Workspace</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Context Pack automático da plataforma — bootloader para IAs. Tudo derivado do
-            repositório, sem duplicação.
+            O AI Workspace gera automaticamente o contexto da plataforma para diferentes tipos de
+            Inteligência Artificial.
+          </p>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Escolha abaixo o formato mais adequado para sua necessidade.
           </p>
         </div>
 
@@ -139,10 +174,24 @@ export function AiWorkspacePage() {
         </div>
       </header>
 
-      <PromptGeneratorPanel snapshot={snapshot} prompt={prompt} onRegenerate={handleRefresh} />
+      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <PromptGeneratorPanel
+          snapshot={snapshot}
+          content={codeContext}
+          generatedAt={codeGeneratedAt}
+          onGenerate={handleGenerateCode}
+          isGenerating={isGeneratingCode}
+        />
 
-      <div ref={chatContextRef}>
-        <ChatContextGeneratorPanel snapshot={snapshot} onRegenerate={handleRefresh} />
+        <div ref={chatContextRef}>
+          <ChatContextGeneratorPanel
+            snapshot={snapshot}
+            content={chatContext}
+            generatedAt={chatGeneratedAt}
+            onGenerate={handleGenerateChat}
+            isGenerating={isGeneratingChat}
+          />
+        </div>
       </div>
 
       <div className="space-y-4">

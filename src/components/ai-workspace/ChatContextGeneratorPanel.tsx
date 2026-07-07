@@ -1,4 +1,4 @@
-import { Copy, Download, FileJson, FileText, MessageSquare } from "lucide-react";
+import { Check, Copy, Download, FileJson, FileText, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,70 +15,132 @@ import {
   exportChatContextFilename,
   exportChatContextMimeType,
 } from "@/lib/ai-workspace/export";
+import { markdownToPlainText } from "@/lib/ai-workspace/prompt-generator";
 
 interface ChatContextGeneratorPanelProps {
   snapshot: AiWorkspaceSnapshot;
-  onRegenerate: () => void;
-  isRegenerating?: boolean;
+  content: string | null;
+  generatedAt: string | null;
+  onGenerate: () => void;
+  isGenerating?: boolean;
 }
+
+const IDEAL_FOR = ["ChatGPT", "Claude", "Gemini", "Perplexity"] as const;
+
+const USE_WHEN = [
+  "deseja discutir ideias",
+  "revisar arquitetura",
+  "planejar funcionalidades",
+  "pedir análises",
+  "conversar sobre o projeto",
+] as const;
 
 export function ChatContextGeneratorPanel({
   snapshot,
-  onRegenerate,
-  isRegenerating,
+  content,
+  generatedAt,
+  onGenerate,
+  isGenerating,
 }: ChatContextGeneratorPanelProps) {
-  const chatContext = snapshot.chatContextMarkdown;
+  const hasContent = Boolean(content);
 
   async function handleCopyMarkdown() {
-    await copyToClipboard(chatContext);
-    toast.success("AI Chat Context copiado (Markdown)");
+    if (!content) return;
+    await copyToClipboard(content);
+    toast.success("Contexto para IA Conversacional copiado (Markdown)");
   }
 
   async function handleCopyText() {
-    await copyToClipboard(exportChatContext(snapshot, "txt"));
-    toast.success("AI Chat Context copiado (texto)");
+    if (!content) return;
+    await copyToClipboard(markdownToPlainText(content));
+    toast.success("Contexto para IA Conversacional copiado (texto)");
   }
 
   function handleExport(format: "markdown" | "json" | "txt") {
-    const content = exportChatContext(snapshot, format);
-    downloadFile(content, exportChatContextFilename(format), exportChatContextMimeType(format));
-    toast.success(`AI Chat Context exportado como ${format.toUpperCase()}`);
+    if (!content && format !== "json") return;
+    const exported =
+      format === "json"
+        ? exportChatContext(snapshot, format)
+        : format === "txt"
+          ? markdownToPlainText(content!)
+          : content!;
+    downloadFile(exported, exportChatContextFilename(format), exportChatContextMimeType(format));
+    toast.success(`Contexto para IA Conversacional exportado como ${format.toUpperCase()}`);
   }
 
   return (
-    <div className="lotus-surface overflow-hidden">
-      <div className="mb-0 border-b border-border/70 px-5 py-3">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Modelos conversacionais
+    <div className="lotus-surface flex h-full flex-col overflow-hidden">
+      <div className="border-b border-border/70 px-5 py-4">
+        <h2 className="font-display text-lg font-semibold tracking-tight">
+          Contexto para IA Conversacional
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Gera um resumo inteligente da plataforma para ChatGPT, Claude, Gemini, Perplexity e outros
+          modelos conversacionais.
         </p>
-        <p className="text-sm text-muted-foreground">
-          ChatGPT, Claude, Gemini, Perplexity — contexto em linguagem natural, não técnico.
-        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Ideal para
+            </p>
+            <ul className="mt-2 space-y-1">
+              {IDEAL_FOR.map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm">
+                  <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Use quando
+            </p>
+            <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+              {USE_WHEN.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
+
       <div className="flex flex-wrap items-center gap-2 border-b border-border/70 px-5 py-4">
-        <Button
-          onClick={onRegenerate}
-          disabled={isRegenerating}
-          variant="secondary"
-          className="gap-2"
-        >
-          <MessageSquare className="h-4 w-4" />
-          Gerar AI Chat Context
+        <Button onClick={onGenerate} disabled={isGenerating} variant="secondary" className="gap-2">
+          {isGenerating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <MessageSquare className="h-4 w-4" />
+          )}
+          {isGenerating ? "Gerando…" : "Gerar Contexto"}
         </Button>
 
-        <Button variant="outline" size="sm" onClick={handleCopyMarkdown} className="gap-1.5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopyMarkdown}
+          disabled={!hasContent}
+          className="gap-1.5"
+        >
           <Copy className="h-3.5 w-3.5" />
           Copiar Markdown
         </Button>
 
-        <Button variant="outline" size="sm" onClick={handleCopyText} className="gap-1.5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopyText}
+          disabled={!hasContent}
+          className="gap-1.5"
+        >
           <FileText className="h-3.5 w-3.5" />
           Copiar Texto
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
+            <Button variant="outline" size="sm" disabled={!hasContent} className="gap-1.5">
               <Download className="h-3.5 w-3.5" />
               Exportar
             </Button>
@@ -96,10 +158,30 @@ export function ChatContextGeneratorPanel({
         </DropdownMenu>
       </div>
 
-      <div className="max-h-[420px] overflow-auto bg-muted/10 p-5">
-        <pre className="whitespace-pre-wrap font-mono text-[11.5px] leading-relaxed text-foreground/90">
-          {chatContext}
-        </pre>
+      <div className="max-h-[360px] flex-1 overflow-auto bg-muted/10 p-5">
+        {hasContent ? (
+          <>
+            {generatedAt && (
+              <p className="mb-3 text-[10.5px] text-muted-foreground">
+                Gerado em {new Date(generatedAt).toLocaleString("pt-BR")}
+              </p>
+            )}
+            <pre className="whitespace-pre-wrap font-mono text-[11.5px] leading-relaxed text-foreground/90">
+              {content}
+            </pre>
+          </>
+        ) : (
+          <div className="flex min-h-[200px] flex-col items-center justify-center text-center">
+            <MessageSquare className="mb-3 h-8 w-8 text-muted-foreground/40" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Nenhum contexto gerado ainda
+            </p>
+            <p className="mt-1 max-w-xs text-xs text-muted-foreground/80">
+              Clique em <strong>Gerar Contexto</strong> para sintetizar o resumo conversacional da
+              plataforma.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

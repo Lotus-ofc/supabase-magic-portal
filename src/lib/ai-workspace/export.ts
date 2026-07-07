@@ -31,9 +31,8 @@ export function exportSnapshot(snapshot: AiWorkspaceSnapshot, format: ExportForm
 }
 
 export function exportFilename(format: ExportFormat): string {
-  const date = new Date().toISOString().slice(0, 10);
   const ext = format === "json" ? "json" : format === "txt" ? "txt" : "md";
-  return `lots-bi-context-pack-${date}.${ext}`;
+  return `lots-bi-code-context.${ext}`;
 }
 
 export function exportMimeType(format: ExportFormat): string {
@@ -47,32 +46,53 @@ export function exportMimeType(format: ExportFormat): string {
   }
 }
 
+const CHAT_CONTEXT_USAGE_FOOTER = `# Como utilizar este contexto
+
+Cole este documento como a primeira mensagem de uma nova conversa.
+
+Depois descreva apenas a tarefa desejada.
+
+**Exemplos:**
+
+• Implementar uma funcionalidade
+• Auditar arquitetura
+• Revisar código
+• Criar plano de implementação
+• Explicar um módulo
+
+A IA deve considerar este documento como a principal fonte de contexto antes de responder.`;
+
+export function withChatContextUsageFooter(markdown: string): string {
+  if (markdown.includes("Como utilizar este contexto")) return markdown;
+  return `${markdown.trimEnd()}\n\n---\n\n${CHAT_CONTEXT_USAGE_FOOTER}`;
+}
+
 export function exportChatContext(snapshot: AiWorkspaceSnapshot, format: ExportFormat): string {
+  const markdown = withChatContextUsageFooter(snapshot.chatContextMarkdown);
   switch (format) {
     case "markdown":
-      return snapshot.chatContextMarkdown;
+      return markdown;
     case "json":
       return JSON.stringify(
         {
           type: "ai-chat-context",
           generatedAt: snapshot.generatedAt,
-          markdown: snapshot.chatContextMarkdown,
+          markdown,
           snapshot,
         },
         null,
         2,
       );
     case "txt":
-      return markdownToPlainText(snapshot.chatContextMarkdown);
+      return markdownToPlainText(markdown);
     default:
-      return snapshot.chatContextMarkdown;
+      return markdown;
   }
 }
 
 export function exportChatContextFilename(format: ExportFormat): string {
-  const date = new Date().toISOString().slice(0, 10);
   const ext = format === "json" ? "json" : format === "txt" ? "txt" : "md";
-  return `lots-bi-ai-chat-context-${date}.${ext}`;
+  return `lots-bi-chat-context.${ext}`;
 }
 
 export function exportChatContextMimeType(format: ExportFormat): string {

@@ -5,7 +5,7 @@ import { AiWorkspacePage } from "@/components/ai-workspace/AiWorkspacePage";
 
 export const Route = createFileRoute("/_authenticated/admin/ai-workspace")({
   beforeLoad: ({ context }) => {
-    if (!isPlatformOwnerEmail(context.user?.email)) {
+    if (!("user" in context) || !isPlatformOwnerEmail(context.user?.email)) {
       throw redirect({ to: "/admin" });
     }
   },

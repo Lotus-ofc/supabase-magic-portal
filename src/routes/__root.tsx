@@ -167,11 +167,6 @@ function RootComponent() {
         queryClient.clear();
         return;
       }
-      if (event === "SIGNED_IN") {
-        router.invalidate();
-        void queryClient.invalidateQueries({ queryKey: ["me"] });
-        return;
-      }
       if (event === "USER_UPDATED") {
         void queryClient.invalidateQueries({ queryKey: ["me"] });
       }

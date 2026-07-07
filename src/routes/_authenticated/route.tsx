@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { bootstrapSupabase, supabase } from "@/integrations/supabase/client";
 import { resolveBlockedRedirect } from "@/modules/access";
 import { useSignOut } from "@/modules/auth";
 import { assertAccessActive } from "@/lib/access.functions.server";
@@ -42,6 +42,7 @@ const ImpersonateClienteMenu = lazy(() =>
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ context, location }) => {
+    await bootstrapSupabase();
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
 
