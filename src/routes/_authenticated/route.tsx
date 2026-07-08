@@ -110,6 +110,7 @@ function AuthenticatedLayout() {
   const inAdmin = pathname.startsWith("/admin");
   const clienteSlugMatch = pathname.match(/^\/cliente\/([^/]+)/);
   const clienteSlug = clienteSlugMatch?.[1];
+  const isClientBrandbook = /^\/cliente\/[^/]+\/brandbook\/?$/.test(pathname);
   const signOut = useSignOut(user.email);
 
   const adminGroups: NavGroup[] = [
@@ -189,6 +190,7 @@ function AuthenticatedLayout() {
   return (
     <AppShell
       variant={variant}
+      fullBleed={isClientBrandbook}
       groups={groups}
       topRight={
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">

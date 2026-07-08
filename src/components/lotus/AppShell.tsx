@@ -27,6 +27,8 @@ export interface AppShellProps {
   children: ReactNode;
   groups: NavGroup[];
   variant?: "admin" | "client";
+  /** Conteúdo edge-to-edge (ex.: brand book do cliente). */
+  fullBleed?: boolean;
   topRight?: ReactNode;
   bottomSlot?: ReactNode;
 }
@@ -35,6 +37,7 @@ export function AppShell({
   children,
   groups,
   variant = "admin",
+  fullBleed = false,
   topRight,
   bottomSlot,
 }: AppShellProps) {
@@ -132,9 +135,11 @@ export function AppShell({
         <div
           className={cn(
             "mx-auto w-full min-w-0 max-w-full pb-[max(0.5rem,env(safe-area-inset-bottom))]",
-            variant === "admin"
-              ? "max-w-[1400px] px-3 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7"
-              : "max-w-[1240px] px-3 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
+            fullBleed
+              ? "max-w-none px-0 py-0"
+              : variant === "admin"
+                ? "max-w-[1400px] px-3 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7"
+                : "max-w-[1240px] px-3 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
           )}
         >
           <div className="animate-lotus-fade min-w-0">{children}</div>

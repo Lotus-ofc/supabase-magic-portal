@@ -8,9 +8,12 @@ import { cn } from "@/lib/utils";
 type BrandbookViewerProps = {
   entry: BrandbookEntry;
   clientLabel?: string;
+  /** Admin: painel com navegação. Cliente: apenas o brand book em tela cheia. */
+  mode?: "admin" | "client";
 };
 
-export function BrandbookViewer({ entry, clientLabel }: BrandbookViewerProps) {
+export function BrandbookViewer({ entry, clientLabel, mode = "admin" }: BrandbookViewerProps) {
+  const isClient = mode === "client";
   const [activeSection, setActiveSection] = useState(entry.sections[0]?.id ?? "");
   const [fullscreen, setFullscreen] = useState(false);
   const BrandbookComponent = useMemo(() => getBrandbookLazyComponent(entry), [entry]);
@@ -23,8 +26,7 @@ export function BrandbookViewer({ entry, clientLabel }: BrandbookViewerProps) {
   }, []);
 
   useEffect(() => {
-    const root = document.getElementById("brandbook-scroll-root");
-    if (!root) return;
+    const root = isClient ? null : document.getElementById("brandbook-scroll-root");
 
     const ids = entry.sections.map((s) => s.id);
     const elements = ids
@@ -40,12 +42,16 @@ export function BrandbookViewer({ entry, clientLabel }: BrandbookViewerProps) {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible?.target?.id) setActiveSection(visible.target.id);
       },
-      { root, rootMargin: "-20% 0px -55% 0px", threshold: [0.1, 0.35, 0.6] },
+      {
+        root,
+        rootMargin: isClient ? "-15% 0px -60% 0px" : "-20% 0px -55% 0px",
+        threshold: [0.1, 0.35, 0.6],
+      },
     );
 
     for (const el of elements) observer.observe(el);
     return () => observer.disconnect();
-  }, [entry.sections, entry.id]);
+  }, [entry.sections, entry.id, isClient]);
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -58,6 +64,22 @@ export function BrandbookViewer({ entry, clientLabel }: BrandbookViewerProps) {
       document.head.querySelector(`link[data-brandbook-fonts="${entry.id}"]`)?.remove();
     };
   }, [entry.id]);
+
+  if (isClient) {
+    return (
+      <div id="brandbook-scroll-root" className="min-h-[calc(100dvh-3.5rem)] w-full">
+        <Suspense
+          fallback={
+            <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground">
+              Carregando brand book…
+            </div>
+          }
+        >
+          <BrandbookComponent />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div

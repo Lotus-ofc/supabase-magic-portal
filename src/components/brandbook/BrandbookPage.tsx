@@ -21,15 +21,21 @@ import {
   type BrandbookEntry,
 } from "@/lib/brandbook/registry";
 import { BrandbookViewer } from "./BrandbookViewer";
+import { cn } from "@/lib/utils";
 
 type BrandbookPageProps = {
   /** Quando definido, fixa o brand book do cliente (portal do cliente). */
   fixedClient?: { slug: string; nome: string | null };
   /** Quando definido, abre diretamente um brand book (deep link admin). */
   initialBrandbookId?: string;
+  mode?: "admin" | "client";
 };
 
-export function BrandbookPage({ fixedClient, initialBrandbookId }: BrandbookPageProps) {
+export function BrandbookPage({
+  fixedClient,
+  initialBrandbookId,
+  mode = "admin",
+}: BrandbookPageProps) {
   const listClientesFn = useServerFn(listClientes);
   const { data: clientes = [], isLoading } = useQuery({
     queryKey: ["admin", "clientes"],
@@ -91,13 +97,17 @@ export function BrandbookPage({ fixedClient, initialBrandbookId }: BrandbookPage
     return { brandbook: fallback, client: fixedClient ?? null };
   }, [available, fixedClient, selectedId]);
 
+  const isClient = mode === "client" || Boolean(fixedClient);
+
   return (
-    <div className="space-y-6">
-      <PageHeader
-        eyebrow={fixedClient ? "Cliente" : "Operações"}
-        title="Brand book"
-        description="Visualização integrada dos manuais de marca exportados do Figma — um repositório Git por cliente."
-      />
+    <div className={cn(isClient ? "w-full" : "space-y-6")}>
+      {!isClient ? (
+        <PageHeader
+          eyebrow="Operações"
+          title="Brand book"
+          description="Visualização integrada dos manuais de marca exportados do Figma — um repositório Git por cliente."
+        />
+      ) : null}
 
       {!fixedClient && !isLoading && available.length > 1 ? (
         <SectionCard title="Cliente" description="Selecione o brand book a visualizar.">
@@ -128,6 +138,7 @@ export function BrandbookPage({ fixedClient, initialBrandbookId }: BrandbookPage
       {!isLoading && active ? (
         <BrandbookViewer
           entry={active.brandbook}
+          mode={isClient ? "client" : "admin"}
           clientLabel={
             fixedClient?.nome ??
             (active.client && "nome_cliente" in active.client

@@ -37,5 +37,5 @@ function ClienteBrandbookScoped({ slug }: { slug: string }) {
     );
   }
 
-  return <BrandbookPage fixedClient={{ slug, nome: ref.nome }} />;
+  return <BrandbookPage fixedClient={{ slug, nome: ref.nome }} mode="client" />;
 }
