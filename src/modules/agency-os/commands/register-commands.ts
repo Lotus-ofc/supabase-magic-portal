@@ -17,7 +17,6 @@ import {
   updateClientOperationalSchema,
 } from "../validators";
 import { commandBus } from "@/modules/core/commands/command-bus";
-import { dispatchCommand } from "@/modules/core/server/dispatch-command.server";
 
 function supabaseFrom(ctx: CommandContext): SupabaseClient {
   const sb = ctx.services?.supabase as SupabaseClient | undefined;
@@ -235,25 +234,4 @@ export function registerAgencyOsCommands(): void {
       ];
     },
   });
-}
-
-/** Mapa legado command name → bus name para compatibilidade interna. */
-export const AGENCY_COMMANDS = {
-  moveProject: "MoveProject",
-  completeTask: "CompleteTask",
-  createNote: "CreateNote",
-  moveLead: "MoveLead",
-  convertLead: "ConvertLead",
-  createLead: "CreateLead",
-  createProject: "CreateProject",
-  createTask: "CreateTask",
-  updateClientOperational: "UpdateClientOperational",
-} as const;
-
-export async function dispatchAgencyCommand<T>(
-  name: keyof typeof AGENCY_COMMANDS,
-  ctx: CommandContext,
-  input: unknown,
-) {
-  return dispatchCommand<T>(AGENCY_COMMANDS[name], ctx, input, { module: "agency-os" });
 }
