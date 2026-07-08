@@ -20,7 +20,7 @@ import { buildAgencyIntelligence } from "./intelligence/builders/build-agency-in
 import { buildClientIntelligence } from "./intelligence/builders/build-client-intelligence";
 import { fetchClientPerformance } from "./intelligence/services/fetch-client-performance";
 import { searchAgencyOs } from "./intelligence/services/search-agency-os";
-import { AGENCY_COMMANDS, dispatchAgencyCommand } from "./commands/register-commands";
+import { AGENCY_COMMANDS, dispatchAgencyCommand } from "./commands/dispatch.server";
 import {
   addNoteSchema,
   agencyCentralFiltersSchema,
