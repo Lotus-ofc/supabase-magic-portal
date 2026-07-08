@@ -27,6 +27,7 @@ import {
   Building2,
   GraduationCap,
   BrainCircuit,
+  SwatchBook,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -119,6 +120,7 @@ function AuthenticatedLayout() {
         { to: "/admin", label: "Visão geral", icon: LayoutDashboard },
         { to: "/admin/relatorios", label: "Relatórios", icon: FileBarChart },
         { to: "/admin/aprovacoes", label: "Aprovações", icon: ClipboardCheck },
+        { to: "/admin/brandbook", label: "Brand book", icon: SwatchBook },
         { to: "/admin/plano-estrategico", label: "Plano Estratégico", icon: Compass },
         { to: "/admin/clientes", label: "Clientes", icon: Users },
         { to: "/admin/usuarios", label: "Usuários", icon: UserCircle2 },
@@ -159,6 +161,15 @@ function AuthenticatedLayout() {
           label: "Aprovações",
           icon: ClipboardCheck,
         },
+        ...(clienteSlug
+          ? [
+              {
+                to: `/cliente/${clienteSlug}/brandbook`,
+                label: "Brand book",
+                icon: SwatchBook,
+              },
+            ]
+          : []),
         { to: "/tutorial", label: "Tutorial", icon: GraduationCap },
       ],
     },

@@ -9,6 +9,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Palette,
+  SwatchBook,
   Users,
 } from "lucide-react";
 import { configRegistry } from "@/modules/core/registry/config-registry";
@@ -76,6 +77,14 @@ const NAVIGATION_ROUTES: ModuleRouteDef[] = [
     icon: ClipboardCheck,
     adminOnly: true,
     keywords: ["kanban", "conteúdo", "produção", "workflow", "calendário", "editorial"],
+  },
+  {
+    id: "brandbook",
+    label: "Brand book",
+    href: "/admin/brandbook",
+    icon: SwatchBook,
+    adminOnly: true,
+    keywords: ["marca", "identidade", "figma", "manual", "guia visual", "brandbook"],
   },
   {
     id: "plano-admin",
