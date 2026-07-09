@@ -26,16 +26,57 @@ import { KANBAN_COLUMN_META, formatCardSchedule } from "../kanban/kanban-meta";
 import { CardTimeline } from "../card/CardTimeline";
 import { SocialPreviewPanel } from "../preview/SocialPreviewPanel";
 import { buildPreviewContext } from "@/lib/media-preview";
-import { CheckCircle2, MessageSquare, RotateCcw } from "lucide-react";
+import { Check, CheckCircle2, Copy, MessageSquare, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ApprovalPanelSkeleton } from "../shared/ApprovalPanelSkeleton";
+import { PillarBadge } from "../shared/PillarBadge";
 
-function ReadField({ label, value }: { label: string; value: string | null | undefined }) {
+function ReadField({
+  label,
+  value,
+  copyable,
+}: {
+  label: string;
+  value: string | null | undefined;
+  copyable?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+
   if (!value?.trim()) return null;
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(value!);
+      setCopied(true);
+      toast.success("Copiado para a área de transferência.");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  }
+
   return (
-    <div className="space-y-1">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="whitespace-pre-wrap text-sm text-foreground">{value}</p>
+    <div className="space-y-2 py-4 first:pt-0 last:pb-0">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold uppercase tracking-wider text-foreground/80">{label}</p>
+        {copyable && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 shrink-0 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => void handleCopy()}
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-success" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            Copiar
+          </Button>
+        )}
+      </div>
+      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{value}</p>
     </div>
   );
 }
@@ -203,16 +244,17 @@ export function ClientCardDetailDrawer({
                       }}
                     />
                   )}
-                  <ReadField label="Rede social" value={card.plataforma} />
-                  <ReadField label="Formato" value={card.formato} />
-                  <ReadField label="Copy" value={card.copy_text} />
-                  <ReadField label="Legenda" value={card.legenda} />
-                  <ReadField label="Roteiro" value={card.roteiro} />
-                  <ReadField label="Direção de arte" value={card.direcao_arte} />
-                  <ReadField label="CTA" value={card.cta} />
+                  <div className="divide-y divide-border">
+                    <ReadField label="Rede social" value={card.plataforma} />
+                    <ReadField label="Formato" value={card.formato} />
+                    <ReadField label="Roteiro" value={card.copy_text || card.roteiro} copyable />
+                    <ReadField label="Legenda" value={card.legenda} copyable />
+                    <ReadField label="Direção de arte" value={card.direcao_arte} />
+                    <ReadField label="CTA" value={card.cta} />
+                  </div>
                   {card.checklist.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <div className="space-y-2 border-t border-border pt-4">
+                      <p className="text-sm font-semibold uppercase tracking-wider text-foreground/80">
                         Checklist
                       </p>
                       <ul className="space-y-1">

@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/lotus/PageHeader";
 import { AccessAuditTimeline } from "@/features/access/components/AccessAuditTimeline";
 import { LifecycleStatusBadge } from "@/features/access/components/LifecycleStatusBadge";
-import { RecoveryModePanel } from "@/modules/admin";
+import { RecoveryModePanel } from "@/modules/admin/components/RecoveryModePanel";
 import { UserAccessDiagnostics } from "@/features/access/components/UserAccessDiagnostics";
 import type { AccessAuditRow, UserAccessProfile } from "@/features/access/types";
 import {
