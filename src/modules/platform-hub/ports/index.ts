@@ -1,4 +1,5 @@
 export type * from "./types";
+export { asConnectionId } from "./types";
 
 export type { PluginAdapterPort } from "./plugin-adapter.port";
 export type { ProviderPort, CollectParamsV1 } from "./provider.port";
