@@ -28,6 +28,7 @@ import {
   GraduationCap,
   BrainCircuit,
   SwatchBook,
+  Plug,
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 
@@ -137,7 +138,10 @@ function AuthenticatedLayout() {
     },
     {
       label: "Plataforma",
-      items: [{ to: "/admin/branding", label: "Branding", icon: Palette }],
+      items: [
+        { to: "/admin/conexoes", label: "Conexões", icon: Plug, prefixMatch: false },
+        { to: "/admin/branding", label: "Branding", icon: Palette },
+      ],
     },
     {
       label: "Ajuda",

@@ -1,0 +1,22 @@
+{
+  "contracts": [
+    {
+      "name": "MetricBatch",
+      "version": "1.0.0",
+      "file": "metrics-timeseries.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["metric-pipeline", "base-metricas-writer", "sync-runtime"]
+    },
+    {
+      "name": "NormalizedMetricBatch",
+      "version": "1.0.0",
+      "file": "metrics-timeseries.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["metric-writer-port", "base-metricas-writer"]
+    }
+  ]
+}

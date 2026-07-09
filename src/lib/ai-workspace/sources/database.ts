@@ -2,6 +2,7 @@ import type { DocEntry } from "@/lib/knowledge-center/types";
 import type { DatabaseSnapshot } from "../types";
 import { mergeMigrationTables } from "../extractors/migration-parser";
 import { firstParagraphs } from "../extractors/markdown-sections";
+import { formatDataSourcesMarkdown } from "./data-sources";
 
 const migrationGlob = import.meta.glob("../../../../supabase/migrations-official/*.sql", {
   query: "?raw",
@@ -37,7 +38,7 @@ export async function buildDatabase(docs: Map<string, DocEntry>): Promise<Databa
   cachedTables = {
     tables,
     migrationFiles,
-    summaryMarkdown: summaryParts.join("\n\n").slice(0, 1500),
+    summaryMarkdown: [...summaryParts, formatDataSourcesMarkdown()].join("\n\n").slice(0, 1500),
   };
 
   return cachedTables;

@@ -1,0 +1,24 @@
+{
+  "pilot": {
+    "label": "Cliente Piloto — substituir",
+    "cadastroId": 123,
+    "canonicalClientName": "nome_exato_em_base_metricas",
+    "scopeRef": "cadastro:123"
+  },
+  "meta": {
+    "adAccountId": "act_XXXXXXXXX",
+    "businessId": "optional_business_id",
+    "pageId": "optional_page_id",
+    "instagramId": "optional_instagram_id"
+  },
+  "window": {
+    "from": "2026-07-01",
+    "to": "2026-07-07"
+  },
+  "comparison": {
+    "minCoverage": 0.99,
+    "tolerance": 0.0001
+  },
+  "outputDir": "scripts/generated/gate-a-reports",
+  "mode": "live"
+}

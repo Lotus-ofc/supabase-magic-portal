@@ -13,12 +13,12 @@ automaticamente derivado do repositório — o bootloader de IA do Lots BI.
 
 ## Diferença vs Knowledge Center
 
-| | Knowledge Center | AI Workspace |
-|---|---|---|
-| Audiência | Humanos (engenheiros) | IAs + onboarding rápido |
-| Conteúdo | Documentos completos | Síntese agregada |
-| Manutenção | Docs escritos por humanos | Zero escrita manual |
-| Output | Navegação por árvore | Prompt copiável |
+|            | Knowledge Center          | AI Workspace            |
+| ---------- | ------------------------- | ----------------------- |
+| Audiência  | Humanos (engenheiros)     | IAs + onboarding rápido |
+| Conteúdo   | Documentos completos      | Síntese agregada        |
+| Manutenção | Docs escritos por humanos | Zero escrita manual     |
+| Output     | Navegação por árvore      | Prompt copiável         |
 
 O Knowledge Center permanece a **única fonte de verdade** para documentação. O AI Workspace
 **consome** essas fontes via `src/lib/knowledge-center/registry.ts` sem duplicá-las.
@@ -78,17 +78,19 @@ src/routes/_authenticated/admin/ai-workspace.tsx  # guard owner-only
 
 ## Fontes automáticas por bloco
 
-| Bloco | Fontes |
-|-------|--------|
+| Bloco       | Fontes                                                            |
+| ----------- | ----------------------------------------------------------------- |
 | Visão Geral | `START_HERE`, `00-company/mission`, `01-product/product-overview` |
-| Arquitetura | `02-architecture/overview`, `current-state` |
-| Módulos | glob `src/modules/**`, `configRegistry` |
-| Fluxos | `auth-module-v3`, `content-workflow`, `data-flow` |
-| Banco | migrations SQL + `04-database/schema.md` |
-| ADRs | `docs/02-architecture/adr/*.md` |
-| Roadmap | `11-roadmap/roadmap.md` |
-| Changelog | `12-changelog/changelog.md` + git snapshot |
-| Convenções | `09-standards/*`, `.cursor/rules/*.mdc`, boundary scripts |
+| Arquitetura | `02-architecture/overview`, `current-state`                       |
+| Módulos     | glob `src/modules/**`, `configRegistry`                           |
+| Fluxos      | `auth-module-v3`, `content-workflow`, `data-flow`                 |
+| Banco       | migrations SQL + `04-database/schema.md`                          |
+| ADRs        | `docs/02-architecture/adr/*.md`                                   |
+| Roadmap     | `11-roadmap/roadmap.md`                                           |
+| Changelog   | `12-changelog/changelog.md` + git snapshot                        |
+| Convenções  | `09-standards/*`, `.cursor/rules/*.mdc`, boundary scripts         |
+| Platform Hub | `registry-report.json`, `sources/platform-hub.ts`, `docs/13-platform-hub/*` |
+| Data sources | `sources/data-sources.ts` — `ph_metricas_source`, Make vs Hub     |
 
 ## Prompt Generator — Contexto para Editor de Código
 
@@ -98,6 +100,7 @@ Card **"Contexto para Editor de Código"** — clique **Gerar Contexto** para mo
 - Módulos, fluxos, banco, ADRs
 - Roadmap (Concluído / Em andamento / Planejado)
 - Changelog, convenções, limitações
+- **Platform Hub** (RC1): plugins, rotas `/admin/conexoes`, comandos `hub:doctor`, links KC
 - Objetivo atual, últimas implementações, próximos passos
 
 Pronto para colar em Cursor, Copilot ou sessões de coding com IA. Export: `lots-bi-code-context.md`.

@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "key": "meta_ads",
+  "kind": "platform",
+  "label": "Meta",
+  "category": "ads",
+  "capabilities": ["meta:metrics:collect"],
+  "metrics": [
+    {
+      "key": "impressions",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "reach",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "clicks",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "spend",
+      "format": "currency_micros",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_meta",
+    "scopes": ["ads_read", "business_management", "pages_read_engagement", "instagram_basic"]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["business", "ad_account", "page", "instagram"],
+    "primary": "ad_account"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v22.0"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

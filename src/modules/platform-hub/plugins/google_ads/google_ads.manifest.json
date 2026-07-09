@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "key": "google_ads",
+  "kind": "platform",
+  "label": "Google Ads",
+  "category": "ads",
+  "capabilities": ["google_ads:metrics:collect"],
+  "metrics": [
+    {
+      "key": "impressions",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "clicks",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "spend",
+      "format": "currency_micros",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_google",
+    "scopes": ["https://www.googleapis.com/auth/adwords"]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["customer", "manager"],
+    "primary": "customer"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v19"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

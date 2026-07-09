@@ -14,6 +14,8 @@ import {
   buildPlatformTimeline,
   type ChatModuleProfile,
 } from "./sources/chat-enrichment";
+import { formatPlatformHubMarkdown } from "./sources/platform-hub";
+import { formatDataSourcesMarkdown } from "./sources/data-sources";
 
 function hr(): string {
   return "\n---\n";
@@ -346,6 +348,11 @@ export function generateChatContext({ snapshot, docs }: ChatContextInput): strin
     section("4. Arquitetura geral", buildArchitectureNarrative(snapshot)),
     hr(),
     section("5. Todos os módulos", moduleProfiles.map(formatModuleProfile).join("\n\n")),
+    hr(),
+    section(
+      "5b. Platform Hub",
+      [formatPlatformHubMarkdown(), "", formatDataSourcesMarkdown()].join("\n"),
+    ),
     hr(),
     section("6. Banco de dados", buildDatabaseNarrative(snapshot, docs)),
     hr(),

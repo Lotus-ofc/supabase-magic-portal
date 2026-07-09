@@ -9,12 +9,12 @@ Tudo na plataforma gira em torno do **cadastro de cliente**. Sem cliente + integ
 
 ## Lista de clientes (`/admin/clientes`)
 
-| Coluna / info | Significado |
-| ------------- | ----------- |
-| Nome | Razão social ou nome fantasia |
-| Slug | Identificador na URL (`/cliente/{slug}`) |
-| Status | Ativo, pausado, etc. |
-| Plataformas | Badges das integrações com dados |
+| Coluna / info | Significado                              |
+| ------------- | ---------------------------------------- |
+| Nome          | Razão social ou nome fantasia            |
+| Slug          | Identificador na URL (`/cliente/{slug}`) |
+| Status        | Ativo, pausado, etc.                     |
+| Plataformas   | Badges das integrações com dados         |
 
 **Ações:** clique na linha para editar ou use **Novo cliente**.
 
@@ -24,12 +24,12 @@ Preencha passo a passo:
 
 ### Dados básicos
 
-| Campo | Como preencher |
-| ----- | -------------- |
-| **Nome** | Nome exibido em toda a plataforma |
-| **Slug** | Automático a partir do nome; só letras minúsculas, hífens; **não mude** após go-live sem alinhar links |
-| **Status** | `ativo` para clientes em operação |
-| **CNPJ / contato** | Referência interna (conforme formulário) |
+| Campo              | Como preencher                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------ |
+| **Nome**           | Nome exibido em toda a plataforma                                                                      |
+| **Slug**           | Automático a partir do nome; só letras minúsculas, hífens; **não mude** após go-live sem alinhar links |
+| **Status**         | `ativo` para clientes em operação                                                                      |
+| **CNPJ / contato** | Referência interna (conforme formulário)                                                               |
 
 ### Serviços contratados
 
@@ -47,13 +47,13 @@ Atualize nome, status, observações. O sistema avisa se houver **alterações n
 
 O formulário usa o catálogo `INTEGRATIONS` — cada plataforma tem campos técnicos específicos.
 
-| Plataforma | Campos típicos | Status |
-| ---------- | -------------- | ------ |
-| **Meta Ads** | ID da conta de anúncios, token | configured / partial / off |
-| **Google Ads** | Customer ID, MCC | configured / partial / off |
-| **Google Analytics 4** | Property ID, credenciais | configured / partial / off |
-| **Instagram** | Conta business vinculada | configured / partial / off |
-| **Google Business** | Perfil/local | pre / off |
+| Plataforma             | Campos típicos                 | Status                     |
+| ---------------------- | ------------------------------ | -------------------------- |
+| **Meta Ads**           | ID da conta de anúncios, token | configured / partial / off |
+| **Google Ads**         | Customer ID, MCC               | configured / partial / off |
+| **Google Analytics 4** | Property ID, credenciais       | configured / partial / off |
+| **Instagram**          | Conta business vinculada       | configured / partial / off |
+| **Google Business**    | Perfil/local                   | pre / off                  |
 
 **Status explicado:**
 
@@ -86,6 +86,24 @@ O formulário usa o catálogo `INTEGRATIONS` — cada plataforma tem campos téc
 ### Instagram
 
 Vincule a conta business ao mesmo business do Meta Ads quando possível — alcance e engajamento alimentam o overview.
+
+## Platform Hub — Conexões (`/admin/conexoes`)
+
+> **Novo (RC1):** caminho proprietário para conectar APIs oficiais sem depender só do Make.
+
+| Ação | Onde |
+| ---- | ---- |
+| Ver todas as conexões | `/admin/conexoes` |
+| Nova conexão (wizard) | `/admin/conexoes/nova` |
+| Detalhe, OAuth, sync | `/admin/conexoes/{id}` |
+| Saúde global | `/admin/conexoes/health` |
+| Homologação dual-run | `/admin/conexoes/testing` |
+
+Na ficha do cliente (`/admin/clientes/{id}`), a seção **Conexões Platform Hub** lista conexões daquele cliente.
+
+**Fluxo resumido:** Cliente → Plataforma → Provider `official_api` → OAuth ou credenciais → Identidades → Teste + Sync.
+
+Documentação técnica: Knowledge Center → **Platform Hub** (`docs/13-platform-hub/`).
 
 ## Workspace Agency OS (`/admin/central/clientes/{id}`)
 

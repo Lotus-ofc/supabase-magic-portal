@@ -1,0 +1,13 @@
+{
+  "contracts": [
+    {
+      "name": "PlatformIdentity",
+      "version": "1.0.0",
+      "file": "platform-identity.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["provider", "connection-service", "sync-runtime"]
+    }
+  ]
+}

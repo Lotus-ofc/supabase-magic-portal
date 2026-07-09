@@ -1,0 +1,13 @@
+{
+  "contracts": [
+    {
+      "name": "IngestEnvelope",
+      "version": "1.0.0",
+      "file": "ingest-envelope.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["provider", "sync-runtime", "metric-pipeline"]
+    }
+  ]
+}

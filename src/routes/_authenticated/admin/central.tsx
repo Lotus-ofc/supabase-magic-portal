@@ -20,6 +20,7 @@ import { CreateProjectDialog } from "@/components/lotus/agency-os/CreateProjectD
 import { CreateTaskDialog } from "@/components/lotus/agency-os/CreateTaskDialog";
 import { UpdateClientOpsDialog } from "@/components/lotus/agency-os/UpdateClientOpsDialog";
 import { PrioritiesSection, prioritiesQuery } from "@/components/lotus/agency-os/PrioritiesSection";
+import { HubIntegrationsAlertCard } from "@/components/lotus/platform-hub/HubIntegrationsAlertCard";
 import {
   ProductionKanbanSection,
   productionKanbanQuery,
@@ -289,6 +290,8 @@ function CentralContent() {
       />
 
       <SmartBriefing briefing={briefing} />
+
+      <HubIntegrationsAlertCard />
 
       <section aria-label="Indicadores executivos">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">

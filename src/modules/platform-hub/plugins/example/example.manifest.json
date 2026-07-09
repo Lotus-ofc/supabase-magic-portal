@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "key": "example",
+  "kind": "platform",
+  "label": "Example",
+  "category": "demo",
+  "capabilities": ["example:metrics:collect"],
+  "metrics": [{ "key": "impressions", "format": "int", "official": true }],
+  "providers": { "default": "make_passive", "supported": ["make_passive", "official_api"] },
+  "publisher": { "supported": false },
+  "identity": { "types": ["ad_account"], "primary": "ad_account" },
+  "health": { "evaluators": ["generic-freshness"] },
+  "versions": [
+    { "provider": "make_passive", "apiVersion": "v1" },
+    { "provider": "official_api", "apiVersion": "v1" }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

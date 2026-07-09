@@ -195,8 +195,11 @@ Siga esta ordem:
 | 10 min | [Frontend](./05-frontend/overview.md) + [Dashboards](./06-dashboards/dashboards.md)            | Como a UI consome dados         |
 | 5 min  | [ADRs](./02-architecture/adr/README.md)                                                        | Decisões já tomadas             |
 | 5 min  | [Roadmap](./11-roadmap/roadmap.md) + [Auditoria](./AUDIT.md)                                   | Próximos passos e cobertura doc |
+| 10 min | [Platform Hub — Handoff RC1](./13-platform-hub/handoff-rc1.md)                                  | Hub de conexões (se trabalhar em integrações) |
 
 **Setup local:** [Onboarding](./10-onboarding/onboarding.md) — use `.env.example` na raiz do projeto.
+
+**Platform Hub (conexões):** índice em [13-platform-hub/](./13-platform-hub/README.md) · `npm run hub:doctor`
 
 ---
 

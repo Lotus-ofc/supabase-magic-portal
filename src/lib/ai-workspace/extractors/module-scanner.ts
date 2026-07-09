@@ -8,6 +8,8 @@ const MODULE_LABELS: Record<string, string> = {
   "agency-os": "Agency OS",
   client: "Client Portal",
   core: "OS Core",
+  "platform-hub": "Platform Hub",
+  "platform-hub-bridges": "Platform Hub Bridges",
 };
 
 const MODULE_OBJECTIVES: Record<string, string> = {
@@ -18,6 +20,9 @@ const MODULE_OBJECTIVES: Record<string, string> = {
   "agency-os": "Operações da agência — CRM, pipeline, inteligência, prioridades.",
   client: "Portal do cliente — escopo, dashboards e aprovações read-only.",
   core: "Operating System — command bus, event bus, registries, permissions.",
+  "platform-hub":
+    "Integração universal — Registry, Runtime, MetricPipeline, Health, Meta official.",
+  "platform-hub-bridges": "Bridges fora do kernel — legacy-cadastro, base_metricas writer/reader.",
 };
 
 const repoGlob = import.meta.glob("../../modules/**/*.repository.server.ts", {
@@ -80,6 +85,12 @@ function inferResponsibilities(id: string, repos: string[], servers: string[]): 
   if (id === "approval") items.push("Kanban, calendário, pilares, biblioteca, dashboard ops");
   if (id === "agency-os") items.push("Central da agência, pipeline, intelligence, commands");
   if (id === "core") items.push("Command bus, event bus, config registry, permissions");
+  if (id === "platform-hub") {
+    items.push("Registry, SyncRuntime, MetricPipeline, Health, Meta provider");
+  }
+  if (id === "platform-hub-bridges") {
+    items.push("legacy-cadastro, base-metricas writer, baseline reader");
+  }
   return items.slice(0, 5);
 }
 
@@ -92,6 +103,48 @@ function inferDependencies(id: string): string[] {
     "agency-os": ["core (command bus)", "Supabase"],
     client: ["access", "approval (read-only)"],
     core: ["Supabase (via commands)"],
+    "platform-hub": ["contracts/", "platform-hub-bridges"],
+    "platform-hub-bridges": ["platform-hub (ports)", "Supabase (somente bridges)"],
   };
   return deps[id] ?? ["Supabase"];
+}
+
+/** platform-hub não usa *.repository.server.ts — injeta entrada canônica no AI Workspace. */
+export function platformHubModuleInfos(): ModuleInfo[] {
+  return [
+    {
+      id: "platform-hub",
+      label: MODULE_LABELS["platform-hub"]!,
+      objective: MODULE_OBJECTIVES["platform-hub"]!,
+      responsibilities: [
+        "Hub Registry + PluginLoader",
+        "SyncRuntime + MetricPipeline",
+        "Health Engine + CredentialVault (in-memory)",
+        "OfficialMetaProvider (OAuth callback adiado)",
+      ],
+      mainFiles: [
+        "modules/platform-hub/bootstrap.ts",
+        "modules/platform-hub/public/index.ts",
+        "modules/platform-hub/registry/",
+        "modules/platform-hub/plugins/meta_ads/",
+      ],
+      dependencies: inferDependencies("platform-hub"),
+    },
+    {
+      id: "platform-hub-bridges",
+      label: MODULE_LABELS["platform-hub-bridges"]!,
+      objective: MODULE_OBJECTIVES["platform-hub-bridges"]!,
+      responsibilities: [
+        "legacy-cadastro bridge",
+        "base_metricas writer (feature-flagged)",
+        "baseline reader + comparison (paridade Make)",
+      ],
+      mainFiles: [
+        "modules/platform-hub-bridges/legacy-cadastro/",
+        "modules/platform-hub-bridges/base-metricas/",
+        "modules/platform-hub-bridges/base-metricas-reader/",
+      ],
+      dependencies: inferDependencies("platform-hub-bridges"),
+    },
+  ];
 }

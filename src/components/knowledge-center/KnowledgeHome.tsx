@@ -2,11 +2,26 @@ import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { BRAND_NAME } from "@/lib/brand";
-import { BookOpen, Clock, Star, Sparkles, Database, Wrench, Smartphone } from "lucide-react";
+import {
+  BookOpen,
+  Clock,
+  Star,
+  Sparkles,
+  Database,
+  Wrench,
+  Smartphone,
+  Plug,
+} from "lucide-react";
 import { kcDocsBySlugsQuery } from "@/lib/knowledge-center/registry";
 import { getFavorites, getRecent } from "@/lib/knowledge-center/storage";
 
 const HIGHLIGHTS = [
+  {
+    slug: "13-platform-hub/readme",
+    title: "Platform Hub (RC1)",
+    description: "Hub de conexões — handoff, homologação e próximos passos.",
+    icon: Plug,
+  },
   {
     slug: "12-changelog/changelog",
     title: "Changelog",

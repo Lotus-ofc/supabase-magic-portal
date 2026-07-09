@@ -1,0 +1,13 @@
+{
+  "contracts": [
+    {
+      "name": "ProviderPort",
+      "version": "1.0.0",
+      "file": "provider.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["plugin-adapter", "sync-runtime"]
+    }
+  ]
+}

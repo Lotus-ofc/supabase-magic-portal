@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/generate-ai-workspace-snapshot.mjs",
+    "prebuild": "npm run generate:registry-report && npm run generate:hub-kc-doc && node scripts/generate-ai-workspace-snapshot.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "node scripts/preview-production.mjs --port 4173",
@@ -19,7 +19,20 @@
     "validate:engineering": "node scripts/validate-engineering.mjs",
     "validate:auth-boundaries": "node scripts/validate-auth-boundaries.mjs",
     "validate:approval-boundaries": "node scripts/validate-approval-boundaries.mjs",
-    "check": "npm run validate:engineering && npm run validate:auth-boundaries && npm run validate:approval-boundaries && npm run lint && npm run test && npm run build"
+    "validate:contracts": "node scripts/architecture-validation/contract-compat.mjs",
+    "validate:plugin": "node scripts/architecture-validation/plugin-conventions.mjs",
+    "validate:architecture": "node scripts/architecture-validation/index.mjs",
+    "create:plugin": "node scripts/engineering/create-plugin.mjs",
+    "generate:plugin": "node scripts/engineering/generate-plugin.mjs",
+    "generate:routes": "node scripts/generate-routes.mjs",
+    "generate:registry-report": "node scripts/engineering/generate-registry-report.mjs",
+    "generate:hub-kc-doc": "node scripts/engineering/generate-hub-kc-doc.mjs",
+    "hub:doctor": "node scripts/engineering/doctor.mjs",
+    "hub:registry": "node scripts/engineering/generate-registry-report.mjs",
+    "gate-a:parity": "node scripts/rollout/gate-a/run-parity.mjs",
+    "gate-a:discover": "node scripts/rollout/gate-a/discover-pilots.mjs",
+    "gate-a:demo": "vitest run src/modules/platform-hub-bridges/gate-a-meta-staging/__tests__/gate-a-operational.test.ts",
+    "check": "npm run validate:engineering && npm run validate:auth-boundaries && npm run validate:approval-boundaries && npm run validate:contracts && npm run validate:architecture && npm run lint && npm run test && npm run build"
   },
   "engines": {
     "node": ">=22"

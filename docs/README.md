@@ -52,6 +52,7 @@ Ferramentas **transitórias**: Make (ingestão), Lovable (build/deploy). Ver
 | 10  | [Onboarding](./10-onboarding/onboarding.md)      | Setup local, primeiros passos                                                                                                                                                                               | Novos devs      |
 | 11  | [Roadmap](./11-roadmap/roadmap.md)               | Próximos passos e dívidas priorizadas                                                                                                                                                                       | Todos           |
 | 12  | [Changelog](./12-changelog/changelog.md)         | Histórico de mudanças relevantes                                                                                                                                                                            | Todos           |
+| 13  | [Platform Hub](./13-platform-hub/README.md)      | Hub de conexões RC1 — handoff, homologação, próximos passos, `hub:doctor`                                                                                                                                   | Eng, Ops        |
 | —   | [Auditoria de completude](./AUDIT.md)            | Cobertura CTO, lacunas, matriz código→doc                                                                                                                                                                   | Liderança, Eng  |
 
 ---

@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "key": "ga4",
+  "kind": "platform",
+  "label": "GA4",
+  "category": "ads",
+  "capabilities": ["ga4:metrics:collect"],
+  "metrics": [
+    {
+      "key": "users",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "sessions",
+      "format": "int",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_google",
+    "scopes": ["https://www.googleapis.com/auth/analytics.readonly"]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["property"],
+    "primary": "property"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v1beta"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

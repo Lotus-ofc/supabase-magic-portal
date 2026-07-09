@@ -21,6 +21,7 @@ flowchart TB
     A --> CW["/admin/aprovacoes\nContent Workflow"]
     A --> PE["/admin/plano-estrategico"]
     A --> C["/admin/clientes"]
+    A --> PH["/admin/conexoes\nPlatform Hub"]
     A --> U["/admin/usuarios"]
     A --> S["/admin/servicos"]
     A --> D["/admin/debug"]
@@ -64,14 +65,14 @@ Funcionalidades:
 
 ## Content Workflow — Aprovações (`/admin/aprovacoes`)
 
-| Item    | Detalhe                                              |
-| ------- | ---------------------------------------------------- |
-| Nome UI | **Aprovações**                                       |
-| Domínio | Content Workflow (substitui Calendário Editorial)    |
-| Módulo  | `src/modules/approval/`                              |
-| Backend | `cards/`, `events/`, `attachments/` server fns       |
+| Item    | Detalhe                                                                                                    |
+| ------- | ---------------------------------------------------------------------------------------------------------- |
+| Nome UI | **Aprovações**                                                                                             |
+| Domínio | Content Workflow (substitui Calendário Editorial)                                                          |
+| Módulo  | `src/modules/approval/`                                                                                    |
+| Backend | `cards/`, `events/`, `attachments/` server fns                                                             |
 | Tabelas | `content_cards`, `content_card_events`, `content_card_attachments`, `editorial_pillars`, `story_plan_rows` |
-| Docs    | [content-workflow.md](./content-workflow.md)         |
+| Docs    | [content-workflow.md](./content-workflow.md)                                                               |
 
 Workflow completo de produção de conteúdo. **Kanban** é a visualização default; também:
 Calendário, Pilares editoriais, Plano de Stories, Biblioteca, Dashboard operacional.
@@ -106,16 +107,16 @@ hipóteses, oportunidades, decisões, aprendizados, radar e integração editori
 
 ## Aprovações — Portal Cliente (`/aprovacoes`)
 
-| Item    | Detalhe                                     |
-| ------- | ------------------------------------------- |
-| Arquivo | `modules/client/components/ClientApprovalWorkspace.tsx` |
+| Item    | Detalhe                                                       |
+| ------- | ------------------------------------------------------------- |
+| Arquivo | `modules/client/components/ClientApprovalWorkspace.tsx`       |
 | Persona | **Cliente final** ou **admin em `/cliente/:slug/aprovacoes`** |
-| Backend | `modules/client/scoped-portal.functions.ts` → Approval |
+| Backend | `modules/client/scoped-portal.functions.ts` → Approval        |
 
-| Rota | Modo `ClientScope` |
-| ---- | ------------------ |
-| `/aprovacoes` | `client_access` |
-| `/cliente/:slug/aprovacoes` | `slug_context` |
+| Rota                        | Modo `ClientScope` |
+| --------------------------- | ------------------ |
+| `/aprovacoes`               | `client_access`    |
+| `/cliente/:slug/aprovacoes` | `slug_context`     |
 
 Portal read-only: Kanban, Calendário, Pilares, Stories, Biblioteca. Cliente comenta, aprova e reprova
 (no modo slug, visualização sem ações de aprovação).
@@ -138,6 +139,25 @@ Usa `INTEGRATIONS` de `integrations-catalog.ts` para renderizar campos técnicos
 ### `useDirtyBlocker`
 
 Hook em `clientes.$id.tsx` — bloqueia navegação com alterações não salvas.
+
+### Conexões Platform Hub (ficha do cliente)
+
+Seção `ClientHubConnectionsSection` — atalho para conexões do cliente em `/admin/conexoes/:id`.
+
+---
+
+## Platform Hub — Conexões (`/admin/conexoes`)
+
+| Item    | Detalhe                                                                 |
+| ------- | ----------------------------------------------------------------------- |
+| Módulos | `platform-hub/`, `platform-hub-admin/`, `platform-hub-bridges/`         |
+| UI      | `src/components/lotus/platform-hub/`                                    |
+| Rotas   | index, nova, `:connectionId`, health, migracao, testing, rollout        |
+| OAuth   | `/oauth/meta`, `/oauth/google`, `/oauth/tiktok` callbacks               |
+| Docs    | [platform-hub-admin.md](./platform-hub-admin.md) · [13-platform-hub/](../13-platform-hub/README.md) |
+| Validação | `npm run hub:doctor` (Gate H-02)                                      |
+
+Substituto proprietário do Make para APIs oficiais. RC1: homologação; dashboards ainda em `active_source=make`.
 
 ---
 
@@ -186,18 +206,18 @@ recentes, breadcrumb e TOC. Ver [knowledge-center.md](./knowledge-center.md).
 
 ## AI Workspace (`/admin/ai-workspace`)
 
-| Item   | Detalhe                                                         |
-| ------ | --------------------------------------------------------------- |
-| Rotas  | `admin/ai-workspace.tsx`                                        |
-| Código | `src/lib/ai-workspace/`, `src/components/ai-workspace/`         |
-| Fonte  | Agregação automática de docs, código, migrations, git snapshot  |
-| Acesso | **Somente Platform Owner** (`isPlatformOwnerEmail`)             |
+| Item   | Detalhe                                                        |
+| ------ | -------------------------------------------------------------- |
+| Rotas  | `admin/ai-workspace.tsx`                                       |
+| Código | `src/lib/ai-workspace/`, `src/components/ai-workspace/`        |
+| Fonte  | Agregação automática de docs, código, migrations, git snapshot |
+| Acesso | **Somente Platform Owner** (`isPlatformOwnerEmail`)            |
 
 Dois geradores em cards distintos (v1.2):
 
-| Gerador | Uso | Exportação |
-| ------- | --- | ---------- |
-| **Contexto para Editor de Código** | Cursor, Windsurf, Copilot | `lots-bi-code-context.*` |
+| Gerador                             | Uso                                 | Exportação               |
+| ----------------------------------- | ----------------------------------- | ------------------------ |
+| **Contexto para Editor de Código**  | Cursor, Windsurf, Copilot           | `lots-bi-code-context.*` |
 | **Contexto para IA Conversacional** | ChatGPT, Claude, Gemini, Perplexity | `lots-bi-chat-context.*` |
 
 Context Score, busca global, seções expansíveis. Não duplica o Knowledge Center.

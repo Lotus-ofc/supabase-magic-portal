@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "key": "youtube",
+  "kind": "platform",
+  "label": "YouTube",
+  "category": "ads",
+  "capabilities": ["youtube:metrics:collect"],
+  "metrics": [
+    {
+      "key": "views",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "impressions",
+      "format": "int",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_google",
+    "scopes": [
+      "https://www.googleapis.com/auth/yt-analytics.readonly",
+      "https://www.googleapis.com/auth/youtube.readonly"
+    ]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["channel"],
+    "primary": "channel"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v2"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

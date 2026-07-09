@@ -1,0 +1,13 @@
+{
+  "contracts": [
+    {
+      "name": "IntegrationEvents",
+      "version": "1.0.0",
+      "file": "integration-events.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["health-engine", "sync-runtime", "agency-os", "core-event-bus"]
+    }
+  ]
+}

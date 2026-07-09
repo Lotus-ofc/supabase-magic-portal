@@ -1,0 +1,22 @@
+{
+  "contracts": [
+    {
+      "name": "RegistryReport",
+      "version": "1.0.0",
+      "file": "registry-report.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["generate-registry-report", "hub-doctor", "ai-workspace"]
+    },
+    {
+      "name": "ConformanceSuites",
+      "version": "1.0.0",
+      "file": "conformance-suites.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["conformance-suites.mjs", "generate-plugin", "validate-plugin"]
+    }
+  ]
+}

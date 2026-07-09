@@ -1,0 +1,370 @@
+{
+  "generatedAt": "2026-07-08T21:41:33.080Z",
+  "contractBundleVersion": "1.0.0",
+  "files": [
+    {
+      "path": "contracts/connection/connection-id.v1.ts",
+      "hash": "d64835c336c9eb274d4fb1ead9ee21a9696e93c3b42f6896ddddf3305dae6c67"
+    },
+    {
+      "path": "contracts/connection/contract.meta.json",
+      "hash": "3baba4cbbba958ed83e5f865ed1599e4f5f771ced30b13e0d307b0dd787b5572"
+    },
+    {
+      "path": "contracts/connection/scope-ref.v1.ts",
+      "hash": "7f352c26595dbe5394643e15afbe09b0facde0168a0539229a8e9094440452f2"
+    },
+    {
+      "path": "contracts/credential/contract.meta.json",
+      "hash": "e7f4efb263888a5629aace4f31c859bc0cffdd6f3fe149765bc7019a3b66cd44"
+    },
+    {
+      "path": "contracts/credential/credential-vault.v1.ts",
+      "hash": "7b57eaab0d17c34612c5b3bf680a64214e24acaac66f8387c6a3f218334bc8cd"
+    },
+    {
+      "path": "contracts/events/contract.meta.json",
+      "hash": "1a63c594495e9978d54f981c74a7297332fedb6f0565e12f7faf10dd5a7c45d6"
+    },
+    {
+      "path": "contracts/events/integration-events.v1.ts",
+      "hash": "cb264b9a274b2ba951ea117fb13322d6a37d8a58d09d695b3b86f472c675fe68"
+    },
+    {
+      "path": "contracts/governance/conformance-suites.v1.ts",
+      "hash": "da903bf2cf67f4d4a51dd445eac75dda79eace27622229bf631d97435e61d0e0"
+    },
+    {
+      "path": "contracts/governance/contract.meta.json",
+      "hash": "c1f66c427d5ac02775052866a6c0774095b72208b7aaa51999de1351ceef87e0"
+    },
+    {
+      "path": "contracts/governance/registry-report.v1.ts",
+      "hash": "5a6455e4a474c81e32c313cb10ccb4986aa3dac4590138b8ef8e7e2bed1f245d"
+    },
+    {
+      "path": "contracts/health/contract.meta.json",
+      "hash": "7f35191957f1c5871d67be3bdc209c5c333ab94af6c0df414617f6ddfe1ef734"
+    },
+    {
+      "path": "contracts/health/health-signal.v1.ts",
+      "hash": "a0d74ee542fa512ad14558ab33d33798743efd335f18f14efa3b7046fdd0db76"
+    },
+    {
+      "path": "contracts/health/health-snapshot.v1.ts",
+      "hash": "0310f278ddfc38ea3bfd27a3c20ac7d81d2272b46b45a5ae4d1571c57de1fe53"
+    },
+    {
+      "path": "contracts/health/reconciliation.v1.ts",
+      "hash": "fc3b5d4c5149a0a4af0a1cacb0f36e5950f9646940db61827e8abe136687657a"
+    },
+    {
+      "path": "contracts/identity/contract.meta.json",
+      "hash": "de17f4d98e9aa3aed266cf8dd1ccac2b0a82c24a7de953afcc2bdeba926d0208"
+    },
+    {
+      "path": "contracts/identity/platform-identity.v1.ts",
+      "hash": "fd609d2daa4ef001512846e9bf046e3fbad48e54377e3712573a45302df7569f"
+    },
+    {
+      "path": "contracts/index.ts",
+      "hash": "f8cb2b37fba88e97d3527efca5097ea12ee23c294ab5bf5cbdb37f5f67b46fde"
+    },
+    {
+      "path": "contracts/ingest/contract.meta.json",
+      "hash": "f5bfbfa3f24ac08732720de2c045198c65adb8703ff50fa3acfe1fbbc6f8b6c7"
+    },
+    {
+      "path": "contracts/ingest/ingest-envelope.v1.ts",
+      "hash": "578bb15a9afe657b46e71373286b4ee3b0919aa72130301e5eb3d77d1fe612a9"
+    },
+    {
+      "path": "contracts/ingest/profiles/contract.meta.json",
+      "hash": "542b4f132599b89f6e78e3dca3174864a86242a889ec14e3addf3a6a4c022448"
+    },
+    {
+      "path": "contracts/ingest/profiles/metrics-timeseries.v1.ts",
+      "hash": "c443fb102a7b7701b1ef1eba6dd3d14a23c6b75b16fee6cdcb58fc760fa56775"
+    },
+    {
+      "path": "contracts/plugin/capability.v1.ts",
+      "hash": "dd78fb97d15fb2369a52bb7f9292efdf2dfc049b0320e461071524882af4d0a2"
+    },
+    {
+      "path": "contracts/plugin/contract.meta.json",
+      "hash": "3d3d206a037a0f14baadc5519f74bc1a8443a6f0f884ac127f8068f84e6407e2"
+    },
+    {
+      "path": "contracts/plugin/plugin-manifest.v1.ts",
+      "hash": "48bcc70cc98b4f2342b4def7e9ba5f77e76a4a0806142043b5fec723d9aab88c"
+    },
+    {
+      "path": "contracts/provider/contract.meta.json",
+      "hash": "3a61da4cb95fc94cad8373432001c9abd2797cdfaae2c0beada73294bbc8f42e"
+    },
+    {
+      "path": "contracts/provider/provider.v1.ts",
+      "hash": "9a54d92a9f13f45cc24ac6d25f0d3ce2158c1f1ae74d5597f89e1e324e348e5c"
+    },
+    {
+      "path": "contracts/runtime/contract.meta.json",
+      "hash": "a552cde501b15aa55f518436725d7ca62e7edf774d00cce768d6f78e252fd731"
+    },
+    {
+      "path": "contracts/runtime/execution-context.v1.ts",
+      "hash": "fad078abba5d67d24b813699634b50baf3b54c84c947aeb8a38f2b5b346bfafe"
+    },
+    {
+      "path": "contracts/runtime/execution-result.v1.ts",
+      "hash": "ff2a11add758c29aa0443e6e6dd44dc6fa8a0b954d0f9c82a2437eab2ddf600d"
+    },
+    {
+      "path": "contracts/runtime/sync-runtime.v1.ts",
+      "hash": "7c09b79d6ae8856d070d295f4eda8f427db2fe125dbfeb1945cc98afa0479da5"
+    }
+  ],
+  "meta": {
+    "contracts/connection/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "ConnectionId",
+          "version": "1.0.0",
+          "file": "connection-id.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": [
+            "sync-runtime",
+            "metric-pipeline",
+            "health-engine",
+            "provider",
+            "publisher-runtime"
+          ]
+        },
+        {
+          "name": "ScopeRef",
+          "version": "1.0.0",
+          "file": "scope-ref.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["connection-resolver", "legacy-cadastro-bridge"]
+        }
+      ]
+    },
+    "contracts/credential/contract.meta.json": {
+      "name": "CredentialVault",
+      "version": "1.0.0",
+      "file": "credential-vault.v1.ts",
+      "deprecated": false,
+      "consumers": ["platform-hub/connections"]
+    },
+    "contracts/events/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "IntegrationEvents",
+          "version": "1.0.0",
+          "file": "integration-events.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["health-engine", "sync-runtime", "agency-os", "core-event-bus"]
+        }
+      ]
+    },
+    "contracts/governance/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "RegistryReport",
+          "version": "1.0.0",
+          "file": "registry-report.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["generate-registry-report", "hub-doctor", "ai-workspace"]
+        },
+        {
+          "name": "ConformanceSuites",
+          "version": "1.0.0",
+          "file": "conformance-suites.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["conformance-suites.mjs", "generate-plugin", "validate-plugin"]
+        }
+      ]
+    },
+    "contracts/health/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "HealthReconciliation",
+          "version": "1.0.0",
+          "file": "reconciliation.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["health-engine"]
+        },
+        {
+          "name": "HealthSnapshot",
+          "version": "1.0.0",
+          "file": "health-snapshot.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["health-engine"]
+        },
+        {
+          "name": "HealthSignal",
+          "version": "1.0.0",
+          "file": "health-signal.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["health-engine", "runtime"]
+        }
+      ]
+    },
+    "contracts/identity/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "PlatformIdentity",
+          "version": "1.0.0",
+          "file": "platform-identity.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["provider", "connection-service", "sync-runtime"]
+        }
+      ]
+    },
+    "contracts/ingest/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "IngestEnvelope",
+          "version": "1.0.0",
+          "file": "ingest-envelope.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["provider", "sync-runtime", "metric-pipeline"]
+        }
+      ]
+    },
+    "contracts/ingest/profiles/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "MetricBatch",
+          "version": "1.0.0",
+          "file": "metrics-timeseries.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["metric-pipeline", "base-metricas-writer", "sync-runtime"]
+        },
+        {
+          "name": "NormalizedMetricBatch",
+          "version": "1.0.0",
+          "file": "metrics-timeseries.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["metric-writer-port", "base-metricas-writer"]
+        }
+      ]
+    },
+    "contracts/plugin/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "PluginManifest",
+          "version": "1.0.0",
+          "file": "plugin-manifest.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["hub-registry", "plugin-loader", "generate-plugin", "registry-report"]
+        },
+        {
+          "name": "Capability",
+          "version": "1.0.0",
+          "file": "capability.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["hub-registry", "sync-runtime", "publisher-runtime"]
+        }
+      ]
+    },
+    "contracts/provider/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "ProviderPort",
+          "version": "1.0.0",
+          "file": "provider.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["plugin-adapter", "sync-runtime"]
+        }
+      ]
+    },
+    "contracts/runtime/contract.meta.json": {
+      "contracts": [
+        {
+          "name": "SyncRuntime",
+          "version": "1.0.0",
+          "file": "sync-runtime.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["sync-orchestrator", "health-engine"]
+        },
+        {
+          "name": "PluginLoader",
+          "version": "1.0.0",
+          "file": "sync-runtime.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["hub-registry", "bootstrap"]
+        },
+        {
+          "name": "MetricWriterPort",
+          "version": "1.0.0",
+          "file": "sync-runtime.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["metric-pipeline", "base-metricas-writer"]
+        },
+        {
+          "name": "MetricPipeline",
+          "version": "1.0.0",
+          "file": "sync-runtime.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["sync-runtime", "replay-service"]
+        },
+        {
+          "name": "ExecutionContext",
+          "version": "1.0.0",
+          "file": "execution-context.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["sync-runtime", "sync-orchestrator"]
+        },
+        {
+          "name": "ExecutionResult",
+          "version": "1.0.0",
+          "file": "execution-result.v1.ts",
+          "deprecated": false,
+          "breakingChanges": [],
+          "migrationGuide": null,
+          "consumers": ["sync-runtime", "runtime-repository"]
+        }
+      ]
+    }
+  }
+}

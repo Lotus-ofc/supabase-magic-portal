@@ -1,4 +1,6 @@
 import type { AiWorkspaceSnapshot } from "./types";
+import { formatPlatformHubMarkdown } from "./sources/platform-hub";
+import { formatDataSourcesMarkdown } from "./sources/data-sources";
 
 function section(title: string, body: string): string {
   if (!body.trim()) return "";
@@ -191,6 +193,9 @@ export function generateContextPrompt(snapshot: AiWorkspaceSnapshot): string {
         .join("\n"),
     ),
   );
+
+  lines.push(section("Platform Hub", formatPlatformHubMarkdown()));
+  lines.push(section("Current Data Sources", formatDataSourcesMarkdown()));
 
   lines.push(
     section(

@@ -21,6 +21,9 @@ import { Route as AuthenticatedTutorialRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedTutorialIndexRouteImport } from './routes/_authenticated/tutorial/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as OauthTiktokCallbackRouteImport } from './routes/oauth/tiktok/callback'
+import { Route as OauthMetaCallbackRouteImport } from './routes/oauth/meta/callback'
+import { Route as OauthGoogleCallbackRouteImport } from './routes/oauth/google/callback'
 import { Route as AuthenticatedTutorialSplatRouteImport } from './routes/_authenticated/tutorial/$'
 import { Route as AuthenticatedClienteClienteRouteImport } from './routes/_authenticated/cliente.$cliente'
 import { Route as AuthenticatedAdminServicosRouteImport } from './routes/_authenticated/admin/servicos'
@@ -41,6 +44,7 @@ import { Route as AuthenticatedAdminUsuariosIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminTutorialIndexRouteImport } from './routes/_authenticated/admin/tutorial/index'
 import { Route as AuthenticatedAdminKnowledgeIndexRouteImport } from './routes/_authenticated/admin/knowledge/index'
 import { Route as AuthenticatedAdminDebugIndexRouteImport } from './routes/_authenticated/admin/debug.index'
+import { Route as AuthenticatedAdminConexoesIndexRouteImport } from './routes/_authenticated/admin/conexoes.index'
 import { Route as AuthenticatedAdminClientesIndexRouteImport } from './routes/_authenticated/admin/clientes.index'
 import { Route as AuthenticatedClienteClienteTiktokRouteImport } from './routes/_authenticated/cliente.$cliente.tiktok'
 import { Route as AuthenticatedClienteClientePlanoEstrategicoRouteImport } from './routes/_authenticated/cliente.$cliente.plano-estrategico'
@@ -56,6 +60,12 @@ import { Route as AuthenticatedAdminUsuariosUserIdRouteImport } from './routes/_
 import { Route as AuthenticatedAdminTutorialSplatRouteImport } from './routes/_authenticated/admin/tutorial/$'
 import { Route as AuthenticatedAdminKnowledgeSplatRouteImport } from './routes/_authenticated/admin/knowledge/$'
 import { Route as AuthenticatedAdminDebugViewsRouteImport } from './routes/_authenticated/admin/debug.views'
+import { Route as AuthenticatedAdminConexoesTestingRouteImport } from './routes/_authenticated/admin/conexoes.testing'
+import { Route as AuthenticatedAdminConexoesRolloutRouteImport } from './routes/_authenticated/admin/conexoes.rollout'
+import { Route as AuthenticatedAdminConexoesNovaRouteImport } from './routes/_authenticated/admin/conexoes.nova'
+import { Route as AuthenticatedAdminConexoesMigracaoRouteImport } from './routes/_authenticated/admin/conexoes.migracao'
+import { Route as AuthenticatedAdminConexoesHealthRouteImport } from './routes/_authenticated/admin/conexoes.health'
+import { Route as AuthenticatedAdminConexoesConnectionIdRouteImport } from './routes/_authenticated/admin/conexoes.$connectionId'
 import { Route as AuthenticatedAdminClientesNovoRouteImport } from './routes/_authenticated/admin/clientes.novo'
 import { Route as AuthenticatedAdminClientesIdRouteImport } from './routes/_authenticated/admin/clientes.$id'
 import { Route as AuthenticatedAdminAprovacoesDashboardRouteImport } from './routes/_authenticated/admin/aprovacoes.dashboard'
@@ -124,6 +134,21 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const OauthTiktokCallbackRoute = OauthTiktokCallbackRouteImport.update({
+  id: '/oauth/tiktok/callback',
+  path: '/oauth/tiktok/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthMetaCallbackRoute = OauthMetaCallbackRouteImport.update({
+  id: '/oauth/meta/callback',
+  path: '/oauth/meta/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthGoogleCallbackRoute = OauthGoogleCallbackRouteImport.update({
+  id: '/oauth/google/callback',
+  path: '/oauth/google/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTutorialSplatRoute =
   AuthenticatedTutorialSplatRouteImport.update({
@@ -244,6 +269,12 @@ const AuthenticatedAdminDebugIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminDebugRoute,
   } as any)
+const AuthenticatedAdminConexoesIndexRoute =
+  AuthenticatedAdminConexoesIndexRouteImport.update({
+    id: '/conexoes/',
+    path: '/conexoes/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminClientesIndexRoute =
   AuthenticatedAdminClientesIndexRouteImport.update({
     id: '/clientes/',
@@ -334,6 +365,42 @@ const AuthenticatedAdminDebugViewsRoute =
     path: '/views',
     getParentRoute: () => AuthenticatedAdminDebugRoute,
   } as any)
+const AuthenticatedAdminConexoesTestingRoute =
+  AuthenticatedAdminConexoesTestingRouteImport.update({
+    id: '/conexoes/testing',
+    path: '/conexoes/testing',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConexoesRolloutRoute =
+  AuthenticatedAdminConexoesRolloutRouteImport.update({
+    id: '/conexoes/rollout',
+    path: '/conexoes/rollout',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConexoesNovaRoute =
+  AuthenticatedAdminConexoesNovaRouteImport.update({
+    id: '/conexoes/nova',
+    path: '/conexoes/nova',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConexoesMigracaoRoute =
+  AuthenticatedAdminConexoesMigracaoRouteImport.update({
+    id: '/conexoes/migracao',
+    path: '/conexoes/migracao',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConexoesHealthRoute =
+  AuthenticatedAdminConexoesHealthRouteImport.update({
+    id: '/conexoes/health',
+    path: '/conexoes/health',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminConexoesConnectionIdRoute =
+  AuthenticatedAdminConexoesConnectionIdRouteImport.update({
+    id: '/conexoes/$connectionId',
+    path: '/conexoes/$connectionId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminClientesNovoRoute =
   AuthenticatedAdminClientesNovoRouteImport.update({
     id: '/clientes/novo',
@@ -396,11 +463,20 @@ export interface FileRoutesByFullPath {
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/tutorial/$': typeof AuthenticatedTutorialSplatRoute
+  '/oauth/google/callback': typeof OauthGoogleCallbackRoute
+  '/oauth/meta/callback': typeof OauthMetaCallbackRoute
+  '/oauth/tiktok/callback': typeof OauthTiktokCallbackRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/tutorial/': typeof AuthenticatedTutorialIndexRoute
   '/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/admin/conexoes/$connectionId': typeof AuthenticatedAdminConexoesConnectionIdRoute
+  '/admin/conexoes/health': typeof AuthenticatedAdminConexoesHealthRoute
+  '/admin/conexoes/migracao': typeof AuthenticatedAdminConexoesMigracaoRoute
+  '/admin/conexoes/nova': typeof AuthenticatedAdminConexoesNovaRoute
+  '/admin/conexoes/rollout': typeof AuthenticatedAdminConexoesRolloutRoute
+  '/admin/conexoes/testing': typeof AuthenticatedAdminConexoesTestingRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/admin/tutorial/$': typeof AuthenticatedAdminTutorialSplatRoute
@@ -416,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/cliente/$cliente/plano-estrategico': typeof AuthenticatedClienteClientePlanoEstrategicoRouteWithChildren
   '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/admin/conexoes/': typeof AuthenticatedAdminConexoesIndexRoute
   '/admin/debug/': typeof AuthenticatedAdminDebugIndexRoute
   '/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/admin/tutorial/': typeof AuthenticatedAdminTutorialIndexRoute
@@ -443,11 +520,20 @@ export interface FileRoutesByTo {
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/tutorial/$': typeof AuthenticatedTutorialSplatRoute
+  '/oauth/google/callback': typeof OauthGoogleCallbackRoute
+  '/oauth/meta/callback': typeof OauthMetaCallbackRoute
+  '/oauth/tiktok/callback': typeof OauthTiktokCallbackRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/tutorial': typeof AuthenticatedTutorialIndexRoute
   '/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/admin/conexoes/$connectionId': typeof AuthenticatedAdminConexoesConnectionIdRoute
+  '/admin/conexoes/health': typeof AuthenticatedAdminConexoesHealthRoute
+  '/admin/conexoes/migracao': typeof AuthenticatedAdminConexoesMigracaoRoute
+  '/admin/conexoes/nova': typeof AuthenticatedAdminConexoesNovaRoute
+  '/admin/conexoes/rollout': typeof AuthenticatedAdminConexoesRolloutRoute
+  '/admin/conexoes/testing': typeof AuthenticatedAdminConexoesTestingRoute
   '/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/admin/tutorial/$': typeof AuthenticatedAdminTutorialSplatRoute
@@ -462,6 +548,7 @@ export interface FileRoutesByTo {
   '/cliente/$cliente/meta-ads': typeof AuthenticatedClienteClienteMetaAdsRoute
   '/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesIndexRoute
+  '/admin/conexoes': typeof AuthenticatedAdminConexoesIndexRoute
   '/admin/debug': typeof AuthenticatedAdminDebugIndexRoute
   '/admin/knowledge': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/admin/tutorial': typeof AuthenticatedAdminTutorialIndexRoute
@@ -498,11 +585,20 @@ export interface FileRoutesById {
   '/_authenticated/admin/servicos': typeof AuthenticatedAdminServicosRoute
   '/_authenticated/cliente/$cliente': typeof AuthenticatedClienteClienteRouteWithChildren
   '/_authenticated/tutorial/$': typeof AuthenticatedTutorialSplatRoute
+  '/oauth/google/callback': typeof OauthGoogleCallbackRoute
+  '/oauth/meta/callback': typeof OauthMetaCallbackRoute
+  '/oauth/tiktok/callback': typeof OauthTiktokCallbackRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/tutorial/': typeof AuthenticatedTutorialIndexRoute
   '/_authenticated/admin/aprovacoes/dashboard': typeof AuthenticatedAdminAprovacoesDashboardRoute
   '/_authenticated/admin/clientes/$id': typeof AuthenticatedAdminClientesIdRoute
   '/_authenticated/admin/clientes/novo': typeof AuthenticatedAdminClientesNovoRoute
+  '/_authenticated/admin/conexoes/$connectionId': typeof AuthenticatedAdminConexoesConnectionIdRoute
+  '/_authenticated/admin/conexoes/health': typeof AuthenticatedAdminConexoesHealthRoute
+  '/_authenticated/admin/conexoes/migracao': typeof AuthenticatedAdminConexoesMigracaoRoute
+  '/_authenticated/admin/conexoes/nova': typeof AuthenticatedAdminConexoesNovaRoute
+  '/_authenticated/admin/conexoes/rollout': typeof AuthenticatedAdminConexoesRolloutRoute
+  '/_authenticated/admin/conexoes/testing': typeof AuthenticatedAdminConexoesTestingRoute
   '/_authenticated/admin/debug/views': typeof AuthenticatedAdminDebugViewsRoute
   '/_authenticated/admin/knowledge/$': typeof AuthenticatedAdminKnowledgeSplatRoute
   '/_authenticated/admin/tutorial/$': typeof AuthenticatedAdminTutorialSplatRoute
@@ -518,6 +614,7 @@ export interface FileRoutesById {
   '/_authenticated/cliente/$cliente/plano-estrategico': typeof AuthenticatedClienteClientePlanoEstrategicoRouteWithChildren
   '/_authenticated/cliente/$cliente/tiktok': typeof AuthenticatedClienteClienteTiktokRoute
   '/_authenticated/admin/clientes/': typeof AuthenticatedAdminClientesIndexRoute
+  '/_authenticated/admin/conexoes/': typeof AuthenticatedAdminConexoesIndexRoute
   '/_authenticated/admin/debug/': typeof AuthenticatedAdminDebugIndexRoute
   '/_authenticated/admin/knowledge/': typeof AuthenticatedAdminKnowledgeIndexRoute
   '/_authenticated/admin/tutorial/': typeof AuthenticatedAdminTutorialIndexRoute
@@ -554,11 +651,20 @@ export interface FileRouteTypes {
     | '/admin/servicos'
     | '/cliente/$cliente'
     | '/tutorial/$'
+    | '/oauth/google/callback'
+    | '/oauth/meta/callback'
+    | '/oauth/tiktok/callback'
     | '/admin/'
     | '/tutorial/'
     | '/admin/aprovacoes/dashboard'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
+    | '/admin/conexoes/$connectionId'
+    | '/admin/conexoes/health'
+    | '/admin/conexoes/migracao'
+    | '/admin/conexoes/nova'
+    | '/admin/conexoes/rollout'
+    | '/admin/conexoes/testing'
     | '/admin/debug/views'
     | '/admin/knowledge/$'
     | '/admin/tutorial/$'
@@ -574,6 +680,7 @@ export interface FileRouteTypes {
     | '/cliente/$cliente/plano-estrategico'
     | '/cliente/$cliente/tiktok'
     | '/admin/clientes/'
+    | '/admin/conexoes/'
     | '/admin/debug/'
     | '/admin/knowledge/'
     | '/admin/tutorial/'
@@ -601,11 +708,20 @@ export interface FileRouteTypes {
     | '/admin/relatorios'
     | '/admin/servicos'
     | '/tutorial/$'
+    | '/oauth/google/callback'
+    | '/oauth/meta/callback'
+    | '/oauth/tiktok/callback'
     | '/admin'
     | '/tutorial'
     | '/admin/aprovacoes/dashboard'
     | '/admin/clientes/$id'
     | '/admin/clientes/novo'
+    | '/admin/conexoes/$connectionId'
+    | '/admin/conexoes/health'
+    | '/admin/conexoes/migracao'
+    | '/admin/conexoes/nova'
+    | '/admin/conexoes/rollout'
+    | '/admin/conexoes/testing'
     | '/admin/debug/views'
     | '/admin/knowledge/$'
     | '/admin/tutorial/$'
@@ -620,6 +736,7 @@ export interface FileRouteTypes {
     | '/cliente/$cliente/meta-ads'
     | '/cliente/$cliente/tiktok'
     | '/admin/clientes'
+    | '/admin/conexoes'
     | '/admin/debug'
     | '/admin/knowledge'
     | '/admin/tutorial'
@@ -655,11 +772,20 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/servicos'
     | '/_authenticated/cliente/$cliente'
     | '/_authenticated/tutorial/$'
+    | '/oauth/google/callback'
+    | '/oauth/meta/callback'
+    | '/oauth/tiktok/callback'
     | '/_authenticated/admin/'
     | '/_authenticated/tutorial/'
     | '/_authenticated/admin/aprovacoes/dashboard'
     | '/_authenticated/admin/clientes/$id'
     | '/_authenticated/admin/clientes/novo'
+    | '/_authenticated/admin/conexoes/$connectionId'
+    | '/_authenticated/admin/conexoes/health'
+    | '/_authenticated/admin/conexoes/migracao'
+    | '/_authenticated/admin/conexoes/nova'
+    | '/_authenticated/admin/conexoes/rollout'
+    | '/_authenticated/admin/conexoes/testing'
     | '/_authenticated/admin/debug/views'
     | '/_authenticated/admin/knowledge/$'
     | '/_authenticated/admin/tutorial/$'
@@ -675,6 +801,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cliente/$cliente/plano-estrategico'
     | '/_authenticated/cliente/$cliente/tiktok'
     | '/_authenticated/admin/clientes/'
+    | '/_authenticated/admin/conexoes/'
     | '/_authenticated/admin/debug/'
     | '/_authenticated/admin/knowledge/'
     | '/_authenticated/admin/tutorial/'
@@ -689,6 +816,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  OauthGoogleCallbackRoute: typeof OauthGoogleCallbackRoute
+  OauthMetaCallbackRoute: typeof OauthMetaCallbackRoute
+  OauthTiktokCallbackRoute: typeof OauthTiktokCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -776,6 +906,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/oauth/tiktok/callback': {
+      id: '/oauth/tiktok/callback'
+      path: '/oauth/tiktok/callback'
+      fullPath: '/oauth/tiktok/callback'
+      preLoaderRoute: typeof OauthTiktokCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/meta/callback': {
+      id: '/oauth/meta/callback'
+      path: '/oauth/meta/callback'
+      fullPath: '/oauth/meta/callback'
+      preLoaderRoute: typeof OauthMetaCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/google/callback': {
+      id: '/oauth/google/callback'
+      path: '/oauth/google/callback'
+      fullPath: '/oauth/google/callback'
+      preLoaderRoute: typeof OauthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tutorial/$': {
       id: '/_authenticated/tutorial/$'
@@ -917,6 +1068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDebugIndexRouteImport
       parentRoute: typeof AuthenticatedAdminDebugRoute
     }
+    '/_authenticated/admin/conexoes/': {
+      id: '/_authenticated/admin/conexoes/'
+      path: '/conexoes'
+      fullPath: '/admin/conexoes/'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/clientes/': {
       id: '/_authenticated/admin/clientes/'
       path: '/clientes'
@@ -1021,6 +1179,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/debug/views'
       preLoaderRoute: typeof AuthenticatedAdminDebugViewsRouteImport
       parentRoute: typeof AuthenticatedAdminDebugRoute
+    }
+    '/_authenticated/admin/conexoes/testing': {
+      id: '/_authenticated/admin/conexoes/testing'
+      path: '/conexoes/testing'
+      fullPath: '/admin/conexoes/testing'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesTestingRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/conexoes/rollout': {
+      id: '/_authenticated/admin/conexoes/rollout'
+      path: '/conexoes/rollout'
+      fullPath: '/admin/conexoes/rollout'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesRolloutRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/conexoes/nova': {
+      id: '/_authenticated/admin/conexoes/nova'
+      path: '/conexoes/nova'
+      fullPath: '/admin/conexoes/nova'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesNovaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/conexoes/migracao': {
+      id: '/_authenticated/admin/conexoes/migracao'
+      path: '/conexoes/migracao'
+      fullPath: '/admin/conexoes/migracao'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesMigracaoRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/conexoes/health': {
+      id: '/_authenticated/admin/conexoes/health'
+      path: '/conexoes/health'
+      fullPath: '/admin/conexoes/health'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesHealthRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/conexoes/$connectionId': {
+      id: '/_authenticated/admin/conexoes/$connectionId'
+      path: '/conexoes/$connectionId'
+      fullPath: '/admin/conexoes/$connectionId'
+      preLoaderRoute: typeof AuthenticatedAdminConexoesConnectionIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/clientes/novo': {
       id: '/_authenticated/admin/clientes/novo'
@@ -1163,9 +1363,16 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminClientesIdRoute: typeof AuthenticatedAdminClientesIdRoute
   AuthenticatedAdminClientesNovoRoute: typeof AuthenticatedAdminClientesNovoRoute
+  AuthenticatedAdminConexoesConnectionIdRoute: typeof AuthenticatedAdminConexoesConnectionIdRoute
+  AuthenticatedAdminConexoesHealthRoute: typeof AuthenticatedAdminConexoesHealthRoute
+  AuthenticatedAdminConexoesMigracaoRoute: typeof AuthenticatedAdminConexoesMigracaoRoute
+  AuthenticatedAdminConexoesNovaRoute: typeof AuthenticatedAdminConexoesNovaRoute
+  AuthenticatedAdminConexoesRolloutRoute: typeof AuthenticatedAdminConexoesRolloutRoute
+  AuthenticatedAdminConexoesTestingRoute: typeof AuthenticatedAdminConexoesTestingRoute
   AuthenticatedAdminUsuariosUserIdRoute: typeof AuthenticatedAdminUsuariosUserIdRoute
   AuthenticatedAdminUsuariosNovoRoute: typeof AuthenticatedAdminUsuariosNovoRoute
   AuthenticatedAdminClientesIndexRoute: typeof AuthenticatedAdminClientesIndexRoute
+  AuthenticatedAdminConexoesIndexRoute: typeof AuthenticatedAdminConexoesIndexRoute
   AuthenticatedAdminUsuariosIndexRoute: typeof AuthenticatedAdminUsuariosIndexRoute
 }
 
@@ -1190,10 +1397,22 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminClientesIdRoute: AuthenticatedAdminClientesIdRoute,
     AuthenticatedAdminClientesNovoRoute: AuthenticatedAdminClientesNovoRoute,
+    AuthenticatedAdminConexoesConnectionIdRoute:
+      AuthenticatedAdminConexoesConnectionIdRoute,
+    AuthenticatedAdminConexoesHealthRoute:
+      AuthenticatedAdminConexoesHealthRoute,
+    AuthenticatedAdminConexoesMigracaoRoute:
+      AuthenticatedAdminConexoesMigracaoRoute,
+    AuthenticatedAdminConexoesNovaRoute: AuthenticatedAdminConexoesNovaRoute,
+    AuthenticatedAdminConexoesRolloutRoute:
+      AuthenticatedAdminConexoesRolloutRoute,
+    AuthenticatedAdminConexoesTestingRoute:
+      AuthenticatedAdminConexoesTestingRoute,
     AuthenticatedAdminUsuariosUserIdRoute:
       AuthenticatedAdminUsuariosUserIdRoute,
     AuthenticatedAdminUsuariosNovoRoute: AuthenticatedAdminUsuariosNovoRoute,
     AuthenticatedAdminClientesIndexRoute: AuthenticatedAdminClientesIndexRoute,
+    AuthenticatedAdminConexoesIndexRoute: AuthenticatedAdminConexoesIndexRoute,
     AuthenticatedAdminUsuariosIndexRoute: AuthenticatedAdminUsuariosIndexRoute,
   }
 
@@ -1319,7 +1538,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  OauthGoogleCallbackRoute: OauthGoogleCallbackRoute,
+  OauthMetaCallbackRoute: OauthMetaCallbackRoute,
+  OauthTiktokCallbackRoute: OauthTiktokCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

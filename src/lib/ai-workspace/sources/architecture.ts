@@ -42,7 +42,12 @@ export function buildArchitecture(docs: Map<string, DocEntry>): ArchitectureSnap
     {
       name: "Modules",
       description:
-        "Domínios em src/modules/ — auth, access, admin, approval, agency-os, client, core",
+        "Domínios em src/modules/ — auth, access, admin, approval, agency-os, client, core, platform-hub (+ bridges)",
+    },
+    {
+      name: "Platform Hub",
+      description:
+        "Integração universal (Architecture Frozen v3.3): Registry, Runtime, MetricPipeline, Health, Meta official; Make intocado em produção",
     },
     {
       name: "Repositories",

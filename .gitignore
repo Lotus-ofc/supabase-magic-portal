@@ -25,7 +25,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
-# Editor directories and files
+# Gate A generated reports (local validation artifacts)
+scripts/generated/gate-a-reports/
+
 .vscode/*
 !.vscode/extensions.json
 .idea

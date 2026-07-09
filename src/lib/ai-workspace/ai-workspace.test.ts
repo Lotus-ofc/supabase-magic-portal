@@ -264,6 +264,7 @@ describe("chat-context-generator", () => {
     expect(chat).toContain("## 3. História da plataforma");
     expect(chat).toContain("## 4. Arquitetura geral");
     expect(chat).toContain("## 5. Todos os módulos");
+    expect(chat).toContain("## 5b. Platform Hub");
     expect(chat).toContain("## 6. Banco de dados");
     expect(chat).toContain("## 7. Tecnologias");
     expect(chat).toContain("## 8. Funcionalidades prontas");

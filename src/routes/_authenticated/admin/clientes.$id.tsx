@@ -35,6 +35,7 @@ import { Switch } from "@/components/ui/switch";
 import { useDirtyBlocker } from "@/hooks/use-dirty-blocker";
 import { INTEGRATIONS, getIntegrationStatus } from "@/lib/integrations-catalog";
 import { IntegrationCard } from "@/components/lotus/IntegrationCard";
+import { ClientHubConnectionsSection } from "@/components/lotus/platform-hub/ClientHubConnectionsSection";
 
 const detailQuery = (id: number) => ({
   queryKey: ["admin", "cliente", id],
@@ -544,6 +545,11 @@ function ClienteEdit() {
           ))}
         </div>
       </CollapsibleSection>
+
+      <ClientHubConnectionsSection
+        cadastroId={id}
+        clienteNome={form.nome_cliente || c?.nome_cliente || "Cliente"}
+      />
 
       {/* SERVIÇOS */}
       <CollapsibleSection

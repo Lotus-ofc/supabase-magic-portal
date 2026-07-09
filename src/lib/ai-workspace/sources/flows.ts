@@ -39,7 +39,7 @@ const FLOW_DEFINITIONS: Array<{
   },
   {
     id: "data-pipeline",
-    name: "Pipeline de métricas",
+    name: "Pipeline de métricas (Make — produção)",
     sourceSlug: "02-architecture/data-flow",
     fallbackSteps: [
       "APIs de Marketing",
@@ -48,6 +48,19 @@ const FLOW_DEFINITIONS: Array<{
       "Views SQL",
       "Engine TypeScript",
       "Dashboard",
+    ],
+  },
+  {
+    id: "platform-hub-metrics",
+    name: "Pipeline de métricas (Platform Hub)",
+    sourceSlug: "02-architecture/engineering-contracts",
+    fallbackSteps: [
+      "Provider (OfficialMeta / MakePassive)",
+      "IngestEnvelope metrics-timeseries",
+      "MetricPipeline + normalizers",
+      "MetricWriterPort (memory / supabase flag)",
+      "Baseline Reader vs Make (paridade)",
+      "Health via integration.* events",
     ],
   },
 ];

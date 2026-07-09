@@ -14,6 +14,7 @@ export const FOLDER_LABELS: Record<string, { label: string; order: number }> = {
   "10-onboarding": { label: "Onboarding", order: 80 },
   "11-roadmap": { label: "Roadmap", order: 15 },
   "12-changelog": { label: "Changelog", order: 16 },
+  "13-platform-hub": { label: "Platform Hub", order: 42 },
 };
 
 export const ROOT_DOC_LABELS: Record<string, { label: string; order: number }> = {

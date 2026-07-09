@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "key": "google_business",
+  "kind": "platform",
+  "label": "Google Business",
+  "category": "ads",
+  "capabilities": ["gbp:metrics:collect"],
+  "metrics": [
+    {
+      "key": "impressions",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "clicks",
+      "format": "int",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_google",
+    "scopes": ["https://www.googleapis.com/auth/business.manage"]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["location"],
+    "primary": "location"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v1"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

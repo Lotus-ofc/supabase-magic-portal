@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "key": "tiktok",
+  "kind": "platform",
+  "label": "TikTok",
+  "category": "ads",
+  "capabilities": ["tiktok:metrics:collect"],
+  "metrics": [
+    {
+      "key": "impressions",
+      "format": "int",
+      "official": true
+    },
+    {
+      "key": "spend",
+      "format": "currency_micros",
+      "official": true
+    }
+  ],
+  "oauth": {
+    "type": "oauth2_tiktok",
+    "scopes": ["ads.read"]
+  },
+  "providers": {
+    "default": "make_passive",
+    "supported": ["make_passive", "official_api"]
+  },
+  "publisher": {
+    "supported": false
+  },
+  "identity": {
+    "types": ["business", "ad_account"],
+    "primary": "ad_account"
+  },
+  "health": {
+    "evaluators": ["generic-freshness"]
+  },
+  "versions": [
+    {
+      "provider": "make_passive",
+      "apiVersion": "v1"
+    },
+    {
+      "provider": "official_api",
+      "apiVersion": "v1.3"
+    }
+  ],
+  "ingestProfiles": ["metrics-timeseries"]
+}

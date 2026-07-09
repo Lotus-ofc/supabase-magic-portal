@@ -1,0 +1,31 @@
+{
+  "contracts": [
+    {
+      "name": "HealthReconciliation",
+      "version": "1.0.0",
+      "file": "reconciliation.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["health-engine"]
+    },
+    {
+      "name": "HealthSnapshot",
+      "version": "1.0.0",
+      "file": "health-snapshot.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["health-engine"]
+    },
+    {
+      "name": "HealthSignal",
+      "version": "1.0.0",
+      "file": "health-signal.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["health-engine", "runtime"]
+    }
+  ]
+}

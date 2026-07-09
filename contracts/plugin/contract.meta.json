@@ -1,0 +1,22 @@
+{
+  "contracts": [
+    {
+      "name": "PluginManifest",
+      "version": "1.0.0",
+      "file": "plugin-manifest.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["hub-registry", "plugin-loader", "generate-plugin", "registry-report"]
+    },
+    {
+      "name": "Capability",
+      "version": "1.0.0",
+      "file": "capability.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["hub-registry", "sync-runtime", "publisher-runtime"]
+    }
+  ]
+}

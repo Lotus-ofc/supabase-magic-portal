@@ -1,0 +1,324 @@
+{
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-07-09T16:46:41.549Z",
+  "plugins": [
+    {
+      "key": "example",
+      "capabilities": [
+        "example:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "ga4",
+      "capabilities": [
+        "ga4:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "google_ads",
+      "capabilities": [
+        "google_ads:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "google_business",
+      "capabilities": [
+        "gbp:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "meta_ads",
+      "capabilities": [
+        "meta:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "tiktok",
+      "capabilities": [
+        "tiktok:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    },
+    {
+      "key": "youtube",
+      "capabilities": [
+        "youtube:metrics:collect"
+      ],
+      "providers": [
+        "make_passive",
+        "official_api"
+      ],
+      "ingestProfiles": [
+        "metrics-timeseries"
+      ]
+    }
+  ],
+  "capabilities": [
+    "example:metrics:collect",
+    "ga4:metrics:collect",
+    "gbp:metrics:collect",
+    "google_ads:metrics:collect",
+    "meta:metrics:collect",
+    "tiktok:metrics:collect",
+    "youtube:metrics:collect"
+  ],
+  "providers": [
+    "make_passive",
+    "official_api"
+  ],
+  "metricDefinitions": [
+    {
+      "plugin": "example",
+      "key": "impressions",
+      "format": "int"
+    },
+    {
+      "plugin": "ga4",
+      "key": "users",
+      "format": "int"
+    },
+    {
+      "plugin": "ga4",
+      "key": "sessions",
+      "format": "int"
+    },
+    {
+      "plugin": "google_ads",
+      "key": "impressions",
+      "format": "int"
+    },
+    {
+      "plugin": "google_ads",
+      "key": "clicks",
+      "format": "int"
+    },
+    {
+      "plugin": "google_ads",
+      "key": "spend",
+      "format": "currency_micros"
+    },
+    {
+      "plugin": "google_business",
+      "key": "impressions",
+      "format": "int"
+    },
+    {
+      "plugin": "google_business",
+      "key": "clicks",
+      "format": "int"
+    },
+    {
+      "plugin": "meta_ads",
+      "key": "impressions",
+      "format": "int"
+    },
+    {
+      "plugin": "meta_ads",
+      "key": "reach",
+      "format": "int"
+    },
+    {
+      "plugin": "meta_ads",
+      "key": "clicks",
+      "format": "int"
+    },
+    {
+      "plugin": "meta_ads",
+      "key": "spend",
+      "format": "currency_micros"
+    },
+    {
+      "plugin": "tiktok",
+      "key": "impressions",
+      "format": "int"
+    },
+    {
+      "plugin": "tiktok",
+      "key": "spend",
+      "format": "currency_micros"
+    },
+    {
+      "plugin": "youtube",
+      "key": "views",
+      "format": "int"
+    },
+    {
+      "plugin": "youtube",
+      "key": "impressions",
+      "format": "int"
+    }
+  ],
+  "apiVersions": [
+    {
+      "plugin": "example",
+      "version": "v1"
+    },
+    {
+      "plugin": "example",
+      "version": "v1"
+    },
+    {
+      "plugin": "ga4",
+      "version": "v1"
+    },
+    {
+      "plugin": "ga4",
+      "version": "v1beta"
+    },
+    {
+      "plugin": "google_ads",
+      "version": "v1"
+    },
+    {
+      "plugin": "google_ads",
+      "version": "v19"
+    },
+    {
+      "plugin": "google_business",
+      "version": "v1"
+    },
+    {
+      "plugin": "google_business",
+      "version": "v1"
+    },
+    {
+      "plugin": "meta_ads",
+      "version": "v1"
+    },
+    {
+      "plugin": "meta_ads",
+      "version": "v22.0"
+    },
+    {
+      "plugin": "tiktok",
+      "version": "v1"
+    },
+    {
+      "plugin": "tiktok",
+      "version": "v1.3"
+    },
+    {
+      "plugin": "youtube",
+      "version": "v1"
+    },
+    {
+      "plugin": "youtube",
+      "version": "v2"
+    }
+  ],
+  "healthEvaluators": [
+    {
+      "plugin": "example",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "ga4",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "google_ads",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "google_business",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "meta_ads",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "tiktok",
+      "key": "generic-freshness"
+    },
+    {
+      "plugin": "youtube",
+      "key": "generic-freshness"
+    }
+  ],
+  "publishers": [
+    {
+      "plugin": "example",
+      "supported": false
+    },
+    {
+      "plugin": "ga4",
+      "supported": false
+    },
+    {
+      "plugin": "google_ads",
+      "supported": false
+    },
+    {
+      "plugin": "google_business",
+      "supported": false
+    },
+    {
+      "plugin": "meta_ads",
+      "supported": false
+    },
+    {
+      "plugin": "tiktok",
+      "supported": false
+    },
+    {
+      "plugin": "youtube",
+      "supported": false
+    }
+  ],
+  "oauthTypes": [
+    "oauth2_google",
+    "oauth2_meta",
+    "oauth2_tiktok"
+  ],
+  "writers": [
+    "base_metricas"
+  ],
+  "orphans": {
+    "plugins": [],
+    "capabilities": [],
+    "metrics": []
+  },
+  "validationErrors": []
+}

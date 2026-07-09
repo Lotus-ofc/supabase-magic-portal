@@ -1,0 +1,28 @@
+{
+  "contracts": [
+    {
+      "name": "ConnectionId",
+      "version": "1.0.0",
+      "file": "connection-id.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": [
+        "sync-runtime",
+        "metric-pipeline",
+        "health-engine",
+        "provider",
+        "publisher-runtime"
+      ]
+    },
+    {
+      "name": "ScopeRef",
+      "version": "1.0.0",
+      "file": "scope-ref.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["connection-resolver", "legacy-cadastro-bridge"]
+    }
+  ]
+}

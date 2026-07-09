@@ -1,0 +1,58 @@
+{
+  "contracts": [
+    {
+      "name": "SyncRuntime",
+      "version": "1.0.0",
+      "file": "sync-runtime.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["sync-orchestrator", "health-engine"]
+    },
+    {
+      "name": "PluginLoader",
+      "version": "1.0.0",
+      "file": "sync-runtime.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["hub-registry", "bootstrap"]
+    },
+    {
+      "name": "MetricWriterPort",
+      "version": "1.0.0",
+      "file": "sync-runtime.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["metric-pipeline", "base-metricas-writer"]
+    },
+    {
+      "name": "MetricPipeline",
+      "version": "1.0.0",
+      "file": "sync-runtime.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["sync-runtime", "replay-service"]
+    },
+    {
+      "name": "ExecutionContext",
+      "version": "1.0.0",
+      "file": "execution-context.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["sync-runtime", "sync-orchestrator"]
+    },
+    {
+      "name": "ExecutionResult",
+      "version": "1.0.0",
+      "file": "execution-result.v1.ts",
+      "deprecated": false,
+      "breakingChanges": [],
+      "migrationGuide": null,
+      "consumers": ["sync-runtime", "runtime-repository"]
+    }
+  ]
+}
