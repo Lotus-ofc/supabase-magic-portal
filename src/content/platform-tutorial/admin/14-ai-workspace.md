@@ -17,10 +17,10 @@ O **AI Workspace** gera automaticamente o contexto da plataforma Lots BI para di
 
 ## Dois geradores — qual usar?
 
-| Gerador | Ideal para | Quando usar |
-| ------- | ---------- | ----------- |
-| **Contexto para Editor de Código** | Cursor, Windsurf, Copilot | A IA vai escrever código, criar arquivos, implementar features |
-| **Contexto para IA Conversacional** | ChatGPT, Claude, Gemini, Perplexity | Discutir ideias, auditar arquitetura, planejar, revisar |
+| Gerador                             | Ideal para                          | Quando usar                                                    |
+| ----------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
+| **Contexto para Editor de Código**  | Cursor, Windsurf, Copilot           | A IA vai escrever código, criar arquivos, implementar features |
+| **Contexto para IA Conversacional** | ChatGPT, Claude, Gemini, Perplexity | Discutir ideias, auditar arquitetura, planejar, revisar        |
 
 Na tela você verá **dois cards lado a lado** com “Ideal para” e “Use quando” em cada um.
 
@@ -51,11 +51,11 @@ Cole no início da sessão do seu editor de código com IA.
 
 ## Exportação
 
-| Formato | Arquivo típico |
-| ------- | -------------- |
-| Markdown | `lots-bi-code-context.md` ou `lots-bi-chat-context.md` |
-| JSON | `lots-bi-code-context.json` ou `lots-bi-chat-context.json` |
-| Texto | `lots-bi-chat-context.txt` |
+| Formato  | Arquivo típico                                             |
+| -------- | ---------------------------------------------------------- |
+| Markdown | `lots-bi-code-context.md` ou `lots-bi-chat-context.md`     |
+| JSON     | `lots-bi-code-context.json` ou `lots-bi-chat-context.json` |
+| Texto    | `lots-bi-chat-context.txt`                                 |
 
 ## Documentação técnica
 

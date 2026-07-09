@@ -35,21 +35,21 @@ Sua conta mostra **apenas as marcas** vinculadas a você. Se enxergar dados de o
 
 ## Quando pedir ajuda à agência
 
-| Situação | O que informar |
-| -------- | -------------- |
-| Dashboard zerado | Marca, período, print da tela |
-| Não recebeu convite | E-mail correto desejado |
-| Erro ao aprovar post | Nome do card + print |
-| Número “estranho” | Data, plataforma, KPI em dúvida |
+| Situação             | O que informar                  |
+| -------------------- | ------------------------------- |
+| Dashboard zerado     | Marca, período, print da tela   |
+| Não recebeu convite  | E-mail correto desejado         |
+| Erro ao aprovar post | Nome do card + print            |
+| Número “estranho”    | Data, plataforma, KPI em dúvida |
 
 ## Atalhos úteis (resumo)
 
-| Ação | Como |
-| ---- | ---- |
-| Busca | `Ctrl+K` (Windows) ou `⌘K` (Mac) |
-| Tutorial | Menu → **Tutorial** |
+| Ação                | Como                                      |
+| ------------------- | ----------------------------------------- |
+| Busca               | `Ctrl+K` (Windows) ou `⌘K` (Mac)          |
+| Tutorial            | Menu → **Tutorial**                       |
 | Aprovações urgentes | Menu → **Aprovações** → coluna aguardando |
-| Visão rápida | Menu → **Visão geral** |
+| Visão rápida        | Menu → **Visão geral**                    |
 
 ## Fim do tutorial cliente
 

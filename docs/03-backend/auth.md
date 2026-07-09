@@ -76,14 +76,14 @@ sequenceDiagram
 
 ## Login e sessão (módulo Auth + Access)
 
-| Item               | Detalhe                                                                 |
-| ------------------ | ----------------------------------------------------------------------- |
-| Rotas públicas     | `/auth` (multi-view) + `/auth/callback`                                 |
-| Views em `/auth`   | `login`, `set-password`, `forgot-password`, `link-error`                |
-| Callback           | `verifyOtp` / `exchangeCodeForSession` → orchestrator → redirect        |
-| Segurança conta    | `/account/security` (alterar senha com reautenticação)                  |
-| Storage            | `localStorage` key `sb-{projectId}-auth-token`                          |
-| Redirect pós-login | `resolvePostAuthDestination()` → `/admin` ou `/dashboard` (Access)        |
+| Item               | Detalhe                                                            |
+| ------------------ | ------------------------------------------------------------------ |
+| Rotas públicas     | `/auth` (multi-view) + `/auth/callback`                            |
+| Views em `/auth`   | `login`, `set-password`, `forgot-password`, `link-error`           |
+| Callback           | `verifyOtp` / `exchangeCodeForSession` → orchestrator → redirect   |
+| Segurança conta    | `/account/security` (alterar senha com reautenticação)             |
+| Storage            | `localStorage` key `sb-{projectId}-auth-token`                     |
+| Redirect pós-login | `resolvePostAuthDestination()` → `/admin` ou `/dashboard` (Access) |
 
 ### Princípios arquiteturais
 
@@ -101,13 +101,13 @@ Código: `src/modules/auth/`, `src/modules/access/`, `src/modules/admin/`, `src/
 invite_pending → awaiting_password → active → disabled / revoked
 ```
 
-| Estado | Significado |
-|--------|-------------|
-| `invite_pending` | Convite enviado, senha não definida |
+| Estado              | Significado                                           |
+| ------------------- | ----------------------------------------------------- |
+| `invite_pending`    | Convite enviado, senha não definida                   |
 | `awaiting_password` | Senha definida via convite, aguardando primeiro login |
-| `active` | Usuário operacional |
-| `disabled` | Soft ban de negócio |
-| `revoked` | Ban Auth + lifecycle revogado |
+| `active`            | Usuário operacional                                   |
+| `disabled`          | Soft ban de negócio                                   |
+| `revoked`           | Ban Auth + lifecycle revogado                         |
 
 Legado `invite_expired` migrado para `invite_pending` (migration `16_lifecycle_invite_expired_removal.sql`).
 
@@ -137,11 +137,11 @@ Links de convite/recovery usam `redirectTo` = `{APP_URL}/auth/callback`.
 
 ## Gestão de acessos (admin)
 
-| Recurso | Rota / API |
-| ------- | ---------- |
-| Lista paginada | `/admin/usuarios` → `listUserAccessProfiles` |
+| Recurso                 | Rota / API                                          |
+| ----------------------- | --------------------------------------------------- |
+| Lista paginada          | `/admin/usuarios` → `listUserAccessProfiles`        |
 | Detalhe + Recovery Mode | `/admin/usuarios/$userId` → `performAccessRecovery` |
-| Auditoria | `access_audit_log` (append-only) |
+| Auditoria               | `access_audit_log` (append-only)                    |
 
 Recovery Mode (3 ações operacionais): reenviar convite, enviar redefinição de senha, excluir usuário.
 
@@ -152,12 +152,12 @@ Código: `src/modules/admin/`, `src/modules/access/`, `src/lib/access.functions.
 
 ### Migrations obrigatórias (produção)
 
-| Migration | Propósito |
-|-----------|-----------|
-| `13_access_management.sql` | Tabelas `access_accounts`, audit |
-| `14_access_lifecycle_fix.sql` | Backfill lifecycle pós-migration 13 |
-| `15_auth_invalidate_sessions.sql` | RPC `access_invalidate_auth_sessions` (Recovery Mode) |
-| `16_lifecycle_invite_expired_removal.sql` | Dados legados `invite_expired` → `invite_pending` |
+| Migration                                  | Propósito                                                         |
+| ------------------------------------------ | ----------------------------------------------------------------- |
+| `13_access_management.sql`                 | Tabelas `access_accounts`, audit                                  |
+| `14_access_lifecycle_fix.sql`              | Backfill lifecycle pós-migration 13                               |
+| `15_auth_invalidate_sessions.sql`          | RPC `access_invalidate_auth_sessions` (Recovery Mode)             |
+| `16_lifecycle_invite_expired_removal.sql`  | Dados legados `invite_expired` → `invite_pending`                 |
 | `17_fix_invalidate_sessions_uuid_cast.sql` | Corrige cast `varchar` vs `uuid` na RPC de invalidação de sessões |
 
 Aplicar via Supabase CLI ou SQL Editor antes de usar Recovery Mode e gate de lifecycle.
@@ -167,10 +167,10 @@ Ver [Migrations](../04-database/migrations.md).
 
 ## Login e sessão (legado — substituído)
 
-| Item               | Detalhe                                        |
-| ------------------ | ---------------------------------------------- |
-| Rota (antiga)      | `src/routes/auth.tsx` (monolito — removido)    |
-| Redirect convites  | Agora `/auth/callback` (`buildAuthCallbackUrl`) |
+| Item              | Detalhe                                         |
+| ----------------- | ----------------------------------------------- |
+| Rota (antiga)     | `src/routes/auth.tsx` (monolito — removido)     |
+| Redirect convites | Agora `/auth/callback` (`buildAuthCallbackUrl`) |
 
 ---
 
@@ -187,10 +187,10 @@ Verificação: RPC `has_role(user_id, role)` (migration `01_auth_roles_access.sq
 
 ## Guards de rota (frontend)
 
-| Guard       | Arquivo                    | Comportamento                                              |
-| ----------- | -------------------------- | ---------------------------------------------------------- |
+| Guard       | Arquivo                    | Comportamento                                                 |
+| ----------- | -------------------------- | ------------------------------------------------------------- |
 | Autenticado | `_authenticated/route.tsx` | Sem user → `/auth`; `assertAccessActive()` bloqueia lifecycle |
-| Admin       | `admin/route.tsx`          | `checkIsAdmin()` false → `/dashboard`                      |
+| Admin       | `admin/route.tsx`          | `checkIsAdmin()` false → `/dashboard`                         |
 
 > Guards de rota são **UX**, não segurança. A barreira real é RLS + `assertAdmin` nas server functions.
 

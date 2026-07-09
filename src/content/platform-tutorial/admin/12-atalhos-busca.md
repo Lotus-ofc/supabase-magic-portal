@@ -15,12 +15,12 @@ A **busca global** é o atalho mais poderoso do painel admin. Abre uma paleta de
 
 ## O que você pode encontrar
 
-| Categoria | Exemplos |
-| --------- | -------- |
-| **Rotas** | “Central”, “Aprovações”, “Clientes” |
-| **Clientes** | Digite o nome → abre workspace ou painel |
-| **Agency OS** | Comandos registrados no OS Core |
-| **Glossário** | Definições de métricas (CTR, CPA…) |
+| Categoria     | Exemplos                                 |
+| ------------- | ---------------------------------------- |
+| **Rotas**     | “Central”, “Aprovações”, “Clientes”      |
+| **Clientes**  | Digite o nome → abre workspace ou painel |
+| **Agency OS** | Comandos registrados no OS Core          |
+| **Glossário** | Definições de métricas (CTR, CPA…)       |
 
 ## Passo a passo: ir ao cliente em 3 segundos
 
@@ -31,14 +31,14 @@ A **busca global** é o atalho mais poderoso do painel admin. Abre uma paleta de
 
 ## Passo a passo: criar fluxo operacional
 
-| Tarefa | Atalho de busca |
-| ------ | --------------- |
-| Novo cliente | “novo cliente” → `/admin/clientes/novo` |
-| Aprovações | “aprovações” |
-| Debug ingestão | “debug” ou “painel operacional” |
-| Tutorial | “tutorial” |
-| Knowledge Center | “knowledge” ou “ADR” |
-| AI Workspace | “ai workspace” (somente Platform Owner) |
+| Tarefa           | Atalho de busca                         |
+| ---------------- | --------------------------------------- |
+| Novo cliente     | “novo cliente” → `/admin/clientes/novo` |
+| Aprovações       | “aprovações”                            |
+| Debug ingestão   | “debug” ou “painel operacional”         |
+| Tutorial         | “tutorial”                              |
+| Knowledge Center | “knowledge” ou “ADR”                    |
+| AI Workspace     | “ai workspace” (somente Platform Owner) |
 
 ## Estados de carregamento e vazio (Aprovações)
 
@@ -86,11 +86,11 @@ Memorize a ordem do menu **Operações**:
 
 ## Knowledge Center vs Tutorial vs AI Workspace
 
-| Recurso | Público | Conteúdo |
-| ------- | ------- | -------- |
-| **Tutorial** (`/admin/tutorial`) | Operação e clientes | Passo a passo de uso |
-| **Knowledge Center** | Engenharia / produto | ADRs, APIs, arquitetura — fonte única em `docs/` |
-| **AI Workspace** | Platform Owner | Síntese automática para IAs (código + conversacional) |
+| Recurso                          | Público              | Conteúdo                                              |
+| -------------------------------- | -------------------- | ----------------------------------------------------- |
+| **Tutorial** (`/admin/tutorial`) | Operação e clientes  | Passo a passo de uso                                  |
+| **Knowledge Center**             | Engenharia / produto | ADRs, APIs, arquitetura — fonte única em `docs/`      |
+| **AI Workspace**                 | Platform Owner       | Síntese automática para IAs (código + conversacional) |
 
 Use o **Knowledge Center** para detalhe técnico e migrations. Use o **Tutorial** para treinar equipe e clientes. Use o **AI Workspace** para colar contexto em chats ou editores de código.
 

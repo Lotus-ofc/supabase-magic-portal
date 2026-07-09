@@ -23,22 +23,22 @@ last_review: 2026-07-06
 
 ### Tabelas novas
 
-| Tabela | FK principal |
-| ------ | ------------ |
-| `content_cards` | `cadastro_clientes`, `editorial_pillars`, `plano_estrategias` |
-| `content_card_events` | `content_cards` ON DELETE RESTRICT |
-| `content_card_attachments` | `content_cards` ON DELETE RESTRICT |
-| `editorial_pillars` | `cadastro_clientes` |
-| `story_plan_rows` | `cadastro_clientes`, `content_cards` (opcional) |
+| Tabela                     | FK principal                                                  |
+| -------------------------- | ------------------------------------------------------------- |
+| `content_cards`            | `cadastro_clientes`, `editorial_pillars`, `plano_estrategias` |
+| `content_card_events`      | `content_cards` ON DELETE RESTRICT                            |
+| `content_card_attachments` | `content_cards` ON DELETE RESTRICT                            |
+| `editorial_pillars`        | `cadastro_clientes`                                           |
+| `story_plan_rows`          | `cadastro_clientes`, `content_cards` (opcional)               |
 
 ### Triggers
 
-| Trigger | Função |
-| ------- | ------ |
-| `content_cards_touch` | `updated_at` |
-| `content_cards_client_guard` | cliente só altera status (workflow) |
+| Trigger                             | Função                              |
+| ----------------------------------- | ----------------------------------- |
+| `content_cards_touch`               | `updated_at`                        |
+| `content_cards_client_guard`        | cliente só altera status (workflow) |
 | `content_cards_prevent_hard_delete` | bloqueia DELETE publicado/arquivado |
-| `content_card_events_immutable_*` | bloqueia UPDATE/DELETE |
+| `content_card_events_immutable_*`   | bloqueia UPDATE/DELETE              |
 
 ### Backfill (sem lógica app)
 

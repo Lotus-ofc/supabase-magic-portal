@@ -52,16 +52,16 @@ last_review: 2026-07-05
 
 Seções:
 
-| Seção | Campos / ações |
-| ----- | -------------- |
-| Meta | título, cliente, responsável, rede, formato, data, hora, status, pilar |
-| Conteúdo | copy, legenda, roteiro, direção de arte, CTA, observações |
-| Checklist | inline editável (admin/SM) |
-| Preview | `SocialPreviewPanel` → `MediaPreview` |
-| Timeline | `CardTimeline` — eventos cronológicos automáticos |
-| Comentários | input + thread (eventos `commented`) |
-| Anexos | upload na criação + gestão posterior |
-| Histórico | snapshots legados + diff |
+| Seção       | Campos / ações                                                         |
+| ----------- | ---------------------------------------------------------------------- |
+| Meta        | título, cliente, responsável, rede, formato, data, hora, status, pilar |
+| Conteúdo    | copy, legenda, roteiro, direção de arte, CTA, observações              |
+| Checklist   | inline editável (admin/SM)                                             |
+| Preview     | `SocialPreviewPanel` → `MediaPreview`                                  |
+| Timeline    | `CardTimeline` — eventos cronológicos automáticos                      |
+| Comentários | input + thread (eventos `commented`)                                   |
+| Anexos      | upload na criação + gestão posterior                                   |
+| Histórico   | snapshots legados + diff                                               |
 
 ### Preview social
 

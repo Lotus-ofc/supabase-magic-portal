@@ -7,9 +7,9 @@ import {
 
 describe("brandbook registry", () => {
   it("resolve Cláudia por slug ou nome", () => {
-    expect(resolveBrandbookForClient({ slug: "claudia-tambelini", nome_cliente: "Outro" })?.id).toBe(
-      "claudia",
-    );
+    expect(
+      resolveBrandbookForClient({ slug: "claudia-tambelini", nome_cliente: "Outro" })?.id,
+    ).toBe("claudia");
     expect(resolveBrandbookForClient({ slug: "x", nome_cliente: "Cláudia Tambelini" })?.id).toBe(
       "claudia",
     );

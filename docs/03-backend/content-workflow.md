@@ -34,20 +34,20 @@ UI → Server Function → Module Service → Repository → Supabase
 
 ## Subdomínios
 
-| Submódulo | Responsabilidade | Repository |
-| --------- | ---------------- | ---------- |
-| `cards/` | CRUD, move, lifecycle | `cards/repository.server.ts` |
-| `events/` | Timeline append-only | `events/repository.server.ts` |
-| `comments/` | Wrapper → event `commented` | via `events/` |
-| `attachments/` | Upload, list, delete | `attachments/repository.server.ts` |
-| `pillars/` | CRUD pilares | `pillars/repository.server.ts` |
-| `stories/` | CRUD planilha | `stories/repository.server.ts` |
-| `calendar/` | Projeção mensal | `calendar/repository.server.ts` |
-| `library/` | Repositório publicados | `library/repository.server.ts` |
-| `dashboard/` | Agregações ops | `dashboard/repository.server.ts` |
-| `workflow/` | Status machine (puro) | — |
-| `permissions/` | Matriz + resolve (puro) | — |
-| `integrations/` | Ports (stubs) | — |
+| Submódulo       | Responsabilidade            | Repository                         |
+| --------------- | --------------------------- | ---------------------------------- |
+| `cards/`        | CRUD, move, lifecycle       | `cards/repository.server.ts`       |
+| `events/`       | Timeline append-only        | `events/repository.server.ts`      |
+| `comments/`     | Wrapper → event `commented` | via `events/`                      |
+| `attachments/`  | Upload, list, delete        | `attachments/repository.server.ts` |
+| `pillars/`      | CRUD pilares                | `pillars/repository.server.ts`     |
+| `stories/`      | CRUD planilha               | `stories/repository.server.ts`     |
+| `calendar/`     | Projeção mensal             | `calendar/repository.server.ts`    |
+| `library/`      | Repositório publicados      | `library/repository.server.ts`     |
+| `dashboard/`    | Agregações ops              | `dashboard/repository.server.ts`   |
+| `workflow/`     | Status machine (puro)       | —                                  |
+| `permissions/`  | Matriz + resolve (puro)     | —                                  |
+| `integrations/` | Ports (stubs)               | —                                  |
 
 ---
 
@@ -55,17 +55,17 @@ UI → Server Function → Module Service → Repository → Supabase
 
 Toda mutação relevante chama `events/repository.append()`:
 
-| Ação | `event_type` |
-| ---- | ------------ |
-| Criar card | `created` |
-| Editar campos | `updated` |
-| Mover Kanban | `moved` |
-| Comentar | `commented` |
+| Ação             | `event_type`         |
+| ---------------- | -------------------- |
+| Criar card       | `created`            |
+| Editar campos    | `updated`            |
+| Mover Kanban     | `moved`              |
+| Comentar         | `commented`          |
 | Enviar aprovação | `approval_requested` |
-| Aprovar | `approved` |
-| Reprovar | `rejected` |
-| Publicar | `published` |
-| Arquivar | `archived` |
+| Aprovar          | `approved`           |
+| Reprovar         | `rejected`           |
+| Publicar         | `published`          |
+| Arquivar         | `archived`           |
 
 ---
 
@@ -88,12 +88,12 @@ Make · n8n (futuro)
 
 ## Fase 0 vs Fase 1
 
-| Fase 0 | Fase 1+ |
-| ------ | ------- |
-| Types, validation, repositories, services, ports | Server fns wired às rotas |
-| Migration 18 | Migration 19 (social_media) |
-| Testes puros | Kanban UI |
-| Boundaries CI | Deprecar editorial.functions |
+| Fase 0                                           | Fase 1+                      |
+| ------------------------------------------------ | ---------------------------- |
+| Types, validation, repositories, services, ports | Server fns wired às rotas    |
+| Migration 18                                     | Migration 19 (social_media)  |
+| Testes puros                                     | Kanban UI                    |
+| Boundaries CI                                    | Deprecar editorial.functions |
 
 ---
 

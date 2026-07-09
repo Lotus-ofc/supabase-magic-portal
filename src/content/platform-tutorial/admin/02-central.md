@@ -24,13 +24,13 @@ A **Central** é o cockpit operacional da agência (Agency OS). Reúne em uma ú
 
 No topo, refine a lista de clientes e KPIs:
 
-| Filtro | Valores | Efeito |
-| ------ | ------- | ------ |
-| **Status** | ativo, implantação, negociação, pausado, atenção | Mostra só clientes naquele estágio |
-| **Prioridade** | A, B, C, D | Classificação operacional da carteira |
-| **Health** | excellent, good, attention, critical | Saúde calculada (métricas + operação) |
-| **Serviço** | itens do catálogo | Clientes com aquele serviço contratado |
-| **Busca** | texto livre | Nome ou slug do cliente |
+| Filtro         | Valores                                          | Efeito                                 |
+| -------------- | ------------------------------------------------ | -------------------------------------- |
+| **Status**     | ativo, implantação, negociação, pausado, atenção | Mostra só clientes naquele estágio     |
+| **Prioridade** | A, B, C, D                                       | Classificação operacional da carteira  |
+| **Health**     | excellent, good, attention, critical             | Saúde calculada (métricas + operação)  |
+| **Serviço**    | itens do catálogo                                | Clientes com aquele serviço contratado |
+| **Busca**      | texto livre                                      | Nome ou slug do cliente                |
 
 **Como usar:** selecione um filtro → a URL atualiza (`?status=ativo&health=attention`) → você pode compartilhar o link com o time.
 
@@ -83,11 +83,11 @@ Grade com um card por cliente filtrado. Em cada card você vê:
 
 Na barra superior da Central você encontra:
 
-| Botão | O que cria |
-| ----- | ---------- |
-| **Novo lead** | Card no pipeline (coluna Lead) |
-| **Novo projeto** | Card no kanban de Produção |
-| **Nova tarefa** | Item nas prioridades do dia |
+| Botão            | O que cria                     |
+| ---------------- | ------------------------------ |
+| **Novo lead**    | Card no pipeline (coluna Lead) |
+| **Novo projeto** | Card no kanban de Produção     |
+| **Nova tarefa**  | Item nas prioridades do dia    |
 
 Os mesmos botões aparecem nas seções **Pipeline** e **Produção**. Nos cards de cliente use **lápis** para editar status/prioridade/próxima ação.
 
@@ -107,12 +107,12 @@ Ao clicar em um cliente na Central:
 
 ## Integrações com outras abas
 
-| Ação na Central | Vai para |
-| ----------------- | -------- |
-| Configurar ingestão de dados | **Clientes** → aba Integrações |
-| Aprovar conteúdo pendente | **Aprovações** (filtre o cliente) |
-| Ver KPIs de mídia | **Visão geral** ou painel `/cliente/{slug}` |
-| Estratégia de longo prazo | **Plano Estratégico** |
+| Ação na Central              | Vai para                                    |
+| ---------------------------- | ------------------------------------------- |
+| Configurar ingestão de dados | **Clientes** → aba Integrações              |
+| Aprovar conteúdo pendente    | **Aprovações** (filtre o cliente)           |
+| Ver KPIs de mídia            | **Visão geral** ou painel `/cliente/{slug}` |
+| Estratégia de longo prazo    | **Plano Estratégico**                       |
 
 ## Dicas operacionais
 

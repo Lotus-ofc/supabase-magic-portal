@@ -11,15 +11,15 @@ Documento vivo do **planejamento** da sua marca com a agência: para onde vamos,
 
 Dependendo do que a agência publicou, as seções incluem:
 
-| Seção | O que é |
-| ----- | ------- |
-| **Diagnóstico** | Situação atual do mercado e da marca |
-| **Objetivos** | Metas com prazo (ex.: +20% leads) |
-| **Estratégias** | Linhas de ação com peso/prioridade |
-| **Hipóteses** | Testes em andamento (“UGC reduz CPA”) |
-| **Decisões** | Registro do que foi acordado em reunião |
+| Seção            | O que é                                      |
+| ---------------- | -------------------------------------------- |
+| **Diagnóstico**  | Situação atual do mercado e da marca         |
+| **Objetivos**    | Metas com prazo (ex.: +20% leads)            |
+| **Estratégias**  | Linhas de ação com peso/prioridade           |
+| **Hipóteses**    | Testes em andamento (“UGC reduz CPA”)        |
+| **Decisões**     | Registro do que foi acordado em reunião      |
 | **Aprendizados** | O que funcionou ou não em campanhas passadas |
-| **Radar** | Visão gráfica do progresso |
+| **Radar**        | Visão gráfica do progresso                   |
 
 ## Passo a passo: usar em reunião mensal
 

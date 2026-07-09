@@ -9,12 +9,12 @@ Cada plataforma de anúncios ou analytics tem uma **tela dedicada** com KPIs, gr
 
 ## Plataformas disponíveis
 
-| Rota típica | Plataforma |
-| ----------- | ---------- |
-| `.../google-ads` | Google Ads |
-| `.../meta-ads` | Meta Ads (Facebook/Instagram ads) |
-| `.../instagram` | Orgânico Instagram |
-| `.../ga4` | Google Analytics 4 (site) |
+| Rota típica      | Plataforma                        |
+| ---------------- | --------------------------------- |
+| `.../google-ads` | Google Ads                        |
+| `.../meta-ads`   | Meta Ads (Facebook/Instagram ads) |
+| `.../instagram`  | Orgânico Instagram                |
+| `.../ga4`        | Google Analytics 4 (site)         |
 
 Se uma aba não aparece, a agência ainda não conectou ou não há dados no período.
 
@@ -50,23 +50,23 @@ Frases sobre variações > limiar — “CTR subiu 15%”.
 
 ## Google Ads — o que olhar
 
-| KPI | Bom sinal | Conversar com agência se… |
-| --- | --------- | ------------------------- |
-| Investimento | Estável vs plano | Estourou budget sem aviso |
-| Conversões | Subindo | Caiu 2 semanas seguidas |
-| CPA | Caindo | Subiu muito com mesmo spend |
-| CTR | Saudável no setor | Muito baixo (< 1% em search) |
+| KPI          | Bom sinal         | Conversar com agência se…    |
+| ------------ | ----------------- | ---------------------------- |
+| Investimento | Estável vs plano  | Estourou budget sem aviso    |
+| Conversões   | Subindo           | Caiu 2 semanas seguidas      |
+| CPA          | Caindo            | Subiu muito com mesmo spend  |
+| CTR          | Saudável no setor | Muito baixo (< 1% em search) |
 
 **Passo a passo:** período 30d → hero → ranking campanhas → anote campanha com pior CPA.
 
 ## Meta Ads — o que olhar
 
-| KPI | Observação |
-| --- | ---------- |
-| Investimento | Inclui Facebook + Instagram ads |
+| KPI                  | Observação                                    |
+| -------------------- | --------------------------------------------- |
+| Investimento         | Inclui Facebook + Instagram ads               |
 | Alcance / impressões | Frequência alta = possível fadiga de criativo |
-| Conversões | Verifique tipo (lead, purchase, mensagem) |
-| CPC / CPM | Subida pode indicar leilão mais caro |
+| Conversões           | Verifique tipo (lead, purchase, mensagem)     |
+| CPC / CPM            | Subida pode indicar leilão mais caro          |
 
 **Passo a passo:** compare donut de posicionamento (se houver) → identifique criativo vencedor no ranking.
 
@@ -79,23 +79,23 @@ Foco em **alcance, engajamento, interações** — não confunda com Meta Ads.
 
 ## GA4 — site
 
-| KPI | Significado |
-| --- | ----------- |
-| Sessões | Visitas ao site |
-| Usuários | Pessoas únicas |
-| Conversões | Metas configuradas (formulário, compra) |
-| Taxa de conversão | % de sessões que converteram |
+| KPI               | Significado                             |
+| ----------------- | --------------------------------------- |
+| Sessões           | Visitas ao site                         |
+| Usuários          | Pessoas únicas                          |
+| Conversões        | Metas configuradas (formulário, compra) |
+| Taxa de conversão | % de sessões que converteram            |
 
 **Passo a passo:** período 30d → sessões vs conversões → taxa caiu? pode ser tráfego frio ou página lenta.
 
 ## Fórmulas que aparecem (resumo)
 
-| Sigla | Significado rápido |
-| ----- | ------------------ |
-| CTR | % de quem viu e clicou |
-| CPC | Custo por clique |
-| CPA | Custo por conversão |
-| CPM | Custo por mil impressões |
+| Sigla | Significado rápido       |
+| ----- | ------------------------ |
+| CTR   | % de quem viu e clicou   |
+| CPC   | Custo por clique         |
+| CPA   | Custo por conversão      |
+| CPM   | Custo por mil impressões |
 
 Use o ℹ ao lado de cada métrica para definição oficial.
 

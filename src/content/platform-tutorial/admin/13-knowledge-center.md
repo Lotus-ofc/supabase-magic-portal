@@ -9,11 +9,11 @@ O **Knowledge Center** é a biblioteca técnica da plataforma — ADRs, arquitet
 
 ## Para quem é
 
-| Público | Use quando |
-| ------- | ---------- |
-| Engenheiros e produto | Entender decisões, contratos, schema, deploy |
-| Administradores curiosos | Consultar glossário e visão de produto |
-| Clientes finais | **Não** — use o **Tutorial** (`/tutorial`) |
+| Público                  | Use quando                                   |
+| ------------------------ | -------------------------------------------- |
+| Engenheiros e produto    | Entender decisões, contratos, schema, deploy |
+| Administradores curiosos | Consultar glossário e visão de produto       |
+| Clientes finais          | **Não** — use o **Tutorial** (`/tutorial`)   |
 
 ## Como acessar
 
@@ -32,11 +32,11 @@ O **Knowledge Center** é a biblioteca técnica da plataforma — ADRs, arquitet
 
 ## Knowledge Center vs Tutorial vs AI Workspace
 
-| Recurso | Rota | Conteúdo | Quem mantém |
-| ------- | ---- | -------- | ----------- |
-| **Tutorial** | `/admin/tutorial` | Passo a passo de uso (operação) | Produto / engenharia |
-| **Knowledge Center** | `/admin/knowledge` | Documentação completa | Engenharia (docs/) |
-| **AI Workspace** | `/admin/ai-workspace` | Context Pack para IAs (síntese) | Automático — **somente Platform Owner** |
+| Recurso              | Rota                  | Conteúdo                        | Quem mantém                             |
+| -------------------- | --------------------- | ------------------------------- | --------------------------------------- |
+| **Tutorial**         | `/admin/tutorial`     | Passo a passo de uso (operação) | Produto / engenharia                    |
+| **Knowledge Center** | `/admin/knowledge`    | Documentação completa           | Engenharia (docs/)                      |
+| **AI Workspace**     | `/admin/ai-workspace` | Context Pack para IAs (síntese) | Automático — **somente Platform Owner** |
 
 O KC é a **fonte única de verdade**. O AI Workspace **lê** o KC e sintetiza — nunca substitui.
 

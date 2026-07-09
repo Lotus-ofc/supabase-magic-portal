@@ -29,12 +29,12 @@ Todo `ContentCard` nasce com **pilar obrigatório** (`pilar_id`). Kanban e Calen
 
 ## Server functions
 
-| Arquivo | Funções |
-| ------- | ------- |
-| `planning/pillars.server.ts` | CRUD pilares, reordenar, arquivar |
-| `planning/calendar.server.ts` | `getCalendarCards` (mês/semana/dia, lazy por range) |
-| `planning/stories.server.ts` | CRUD `story_plan_rows` |
-| `planning/client-planning.server.ts` | leitura cliente (pilares, calendário, stories) |
+| Arquivo                              | Funções                                             |
+| ------------------------------------ | --------------------------------------------------- |
+| `planning/pillars.server.ts`         | CRUD pilares, reordenar, arquivar                   |
+| `planning/calendar.server.ts`        | `getCalendarCards` (mês/semana/dia, lazy por range) |
+| `planning/stories.server.ts`         | CRUD `story_plan_rows`                              |
+| `planning/client-planning.server.ts` | leitura cliente (pilares, calendário, stories)      |
 
 Lifecycle: `internal/pillar-lifecycle.server.ts`, `internal/story-lifecycle.server.ts`.
 

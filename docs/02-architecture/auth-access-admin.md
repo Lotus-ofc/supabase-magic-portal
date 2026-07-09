@@ -23,9 +23,9 @@ Admin  → gerencia usuários (dispara operações; orquestra Auth + Access)
 Cliente → domínio de empresas, dados e dashboards (Auth nunca conhece)
 ```
 
-**Auth responde apenas:** *"Existe uma sessão autenticada válida?"*
+**Auth responde apenas:** _"Existe uma sessão autenticada válida?"_
 
-**Access responde:** *"Este usuário pode usar a plataforma e para onde vai?"*
+**Access responde:** _"Este usuário pode usar a plataforma e para onde vai?"_
 
 ---
 
@@ -33,15 +33,15 @@ Cliente → domínio de empresas, dados e dashboards (Auth nunca conhece)
 
 ### Responsável por
 
-| Área | Detalhe |
-| ---- | ------- |
-| Login | `signInWithPassword` em `/auth` |
-| Logout | `signOut` via `useSignOut` |
-| Sessão | JWT no browser; `onAuthStateChange` |
-| Callback | `/auth/callback` — `verifyOtp`, `exchangeCodeForSession` |
-| Convite (UI) | Link → callback → `set-password` → `updateUser` → `signOut` |
-| Recuperação (UI) | `resetPasswordForEmail` → callback → nova senha → `signOut` |
-| Alteração da própria senha | `/account/security` — reauth + `updateUser` |
+| Área                       | Detalhe                                                     |
+| -------------------------- | ----------------------------------------------------------- |
+| Login                      | `signInWithPassword` em `/auth`                             |
+| Logout                     | `signOut` via `useSignOut`                                  |
+| Sessão                     | JWT no browser; `onAuthStateChange`                         |
+| Callback                   | `/auth/callback` — `verifyOtp`, `exchangeCodeForSession`    |
+| Convite (UI)               | Link → callback → `set-password` → `updateUser` → `signOut` |
+| Recuperação (UI)           | `resetPasswordForEmail` → callback → nova senha → `signOut` |
+| Alteração da própria senha | `/account/security` — reauth + `updateUser`                 |
 
 ### Não conhece
 
@@ -74,28 +74,28 @@ src/routes/auth/
 
 ### Responsável por
 
-| Área | Detalhe |
-| ---- | ------- |
-| Lifecycle | 6 estados: `invite_pending` → `awaiting_password` → `active` → `disabled` / `revoked` |
-| Permissões | Composição com `user_roles`, `client_access`, RLS |
-| Papéis | Resolução admin vs cliente (`resolveUserIsAdmin`) |
-| Bloqueios | `resolveBlockedRedirect`, `assertAccessActive` |
-| Destino pós-login | `resolvePostAuthDestination` → `/admin` ou `/dashboard` |
-| Autorização | Gate no login e no layout autenticado |
-| Recovery Mode (server) | `performAccessRecovery` — lifecycle + audit + ban/sessões |
-| Orchestrator | Ponte oficial Auth → Access |
+| Área                   | Detalhe                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| Lifecycle              | 6 estados: `invite_pending` → `awaiting_password` → `active` → `disabled` / `revoked` |
+| Permissões             | Composição com `user_roles`, `client_access`, RLS                                     |
+| Papéis                 | Resolução admin vs cliente (`resolveUserIsAdmin`)                                     |
+| Bloqueios              | `resolveBlockedRedirect`, `assertAccessActive`                                        |
+| Destino pós-login      | `resolvePostAuthDestination` → `/admin` ou `/dashboard`                               |
+| Autorização            | Gate no login e no layout autenticado                                                 |
+| Recovery Mode (server) | `performAccessRecovery` — lifecycle + audit + ban/sessões                             |
+| Orchestrator           | Ponte oficial Auth → Access                                                           |
 
 ### Orchestrator (Regra de Ouro)
 
 Arquivo: `src/modules/access/post-auth-orchestrator.server.ts`
 
-| Função | Quando |
-| ------ | ------ |
-| `postAuthOnLoginSuccess` | Após login — gate + destino |
-| `postAuthOnInvitePasswordSet` | Após senha inicial do convite |
-| `postAuthOnRecoveryCompleted` | Após senha via recovery |
-| `postAuthOnPasswordChangedByUser` | Após alteração em Minha Conta |
-| `postAuthOnCallbackCompleted` | Audit `invite_accepted` no callback |
+| Função                            | Quando                              |
+| --------------------------------- | ----------------------------------- |
+| `postAuthOnLoginSuccess`          | Após login — gate + destino         |
+| `postAuthOnInvitePasswordSet`     | Após senha inicial do convite       |
+| `postAuthOnRecoveryCompleted`     | Após senha via recovery             |
+| `postAuthOnPasswordChangedByUser` | Após alteração em Minha Conta       |
+| `postAuthOnCallbackCompleted`     | Audit `invite_accepted` no callback |
 
 Rotas Auth importam **somente** o orchestrator — nunca o barrel `@/modules/access`.
 
@@ -125,14 +125,14 @@ src/lib/access.functions.server.ts   # barrel de compatibilidade
 
 ### Responsável por
 
-| Operação | API / rota |
-| -------- | ----------- |
-| Criar usuário | `createUserAccount` → `inviteUserByEmail` |
-| Excluir usuário | Recovery Mode → `delete_user` |
-| Reenviar convite | Recovery Mode → `resend_invite` |
-| Enviar redefinição de senha | Recovery Mode → `force_password_reset` |
-| Recovery Mode (UI) | `/admin/usuarios/$userId` — 3 ações operacionais |
-| Auditoria | `access_audit_log` |
+| Operação                    | API / rota                                       |
+| --------------------------- | ------------------------------------------------ |
+| Criar usuário               | `createUserAccount` → `inviteUserByEmail`        |
+| Excluir usuário             | Recovery Mode → `delete_user`                    |
+| Reenviar convite            | Recovery Mode → `resend_invite`                  |
+| Enviar redefinição de senha | Recovery Mode → `force_password_reset`           |
+| Recovery Mode (UI)          | `/admin/usuarios/$userId` — 3 ações operacionais |
+| Auditoria                   | `access_audit_log`                               |
 
 Admin **dispara** operações Supabase Auth e **delega** lifecycle/audit ao Access.
 Admin **não** implementa callback, sessão ou login.
@@ -161,11 +161,11 @@ por Access (`client_access`, `current_user_clientes`, RLS) — não pelo módulo
 
 > Nenhuma tela co-importa `@/modules/auth` e barrel `@/modules/access`.
 
-| Permitido | Proibido |
-| --------- | -------- |
-| Tela importa `modules/auth` apenas | Tela importa auth + access barrel |
+| Permitido                                          | Proibido                                      |
+| -------------------------------------------------- | --------------------------------------------- |
+| Tela importa `modules/auth` apenas                 | Tela importa auth + access barrel             |
 | Tela importa orchestrator + auth (rotas `/auth/*`) | `modules/auth/**` importa `modules/access/**` |
-| Shell autenticado (allowlist) | Decisão de lifecycle dentro do Auth |
+| Shell autenticado (allowlist)                      | Decisão de lifecycle dentro do Auth           |
 
 **Enforcement:** ESLint `no-restricted-imports` + `scripts/validate-auth-boundaries.mjs` no `npm run check`.
 
@@ -220,15 +220,15 @@ Limitação operacional conhecida e workaround oficial documentados em
 
 ## Estrutura de diretórios (resumo)
 
-| Caminho | Módulo |
-| ------- | ------ |
-| `src/modules/auth/` | Auth |
-| `src/modules/access/` | Access |
-| `src/modules/admin/` | Admin (usuários) |
-| `src/features/auth/` | Stubs deprecated — migrar imports para `modules/auth` |
-| `src/features/access/` | Domínio Access legado (em migração para `modules/access`) |
-| `src/routes/auth/` | Adapters finos |
-| `src/routes/_authenticated/admin/usuarios*` | UI Admin usuários |
+| Caminho                                     | Módulo                                                    |
+| ------------------------------------------- | --------------------------------------------------------- |
+| `src/modules/auth/`                         | Auth                                                      |
+| `src/modules/access/`                       | Access                                                    |
+| `src/modules/admin/`                        | Admin (usuários)                                          |
+| `src/features/auth/`                        | Stubs deprecated — migrar imports para `modules/auth`     |
+| `src/features/access/`                      | Domínio Access legado (em migração para `modules/access`) |
+| `src/routes/auth/`                          | Adapters finos                                            |
+| `src/routes/_authenticated/admin/usuarios*` | UI Admin usuários                                         |
 
 ---
 

@@ -9,9 +9,9 @@ Gerencia **quem entra** na plataforma, com qual **papel** e a qual **cliente** e
 
 ## Papéis disponíveis
 
-| Papel | Acesso |
-| ----- | ------ |
-| **admin** | Todo o painel `/admin/*`, todos os clientes |
+| Papel       | Acesso                                                                                |
+| ----------- | ------------------------------------------------------------------------------------- |
+| **admin**   | Todo o painel `/admin/*`, todos os clientes                                           |
 | **cliente** | Apenas `/dashboard`, `/plano-estrategico`, `/aprovacoes` e painéis da marca vinculada |
 
 O e-mail do **dono da plataforma** (platform owner) tem admin implícito.
@@ -63,12 +63,12 @@ Na barra superior (painel admin), menu **Impersonar**:
 
 ## Relação com outras abas
 
-| Necessidade | Onde configurar |
-| ----------- | --------------- |
-| Cliente existe | **Clientes** |
-| Serviços do contrato | **Clientes** + **Serviços** |
-| Aprovar conteúdo | Usuário cliente em **Aprovações** |
-| Ver métricas | `client_access` + integrações em **Clientes** |
+| Necessidade          | Onde configurar                               |
+| -------------------- | --------------------------------------------- |
+| Cliente existe       | **Clientes**                                  |
+| Serviços do contrato | **Clientes** + **Serviços**                   |
+| Aprovar conteúdo     | Usuário cliente em **Aprovações**             |
+| Ver métricas         | `client_access` + integrações em **Clientes** |
 
 ## Próximo capítulo
 

@@ -26,16 +26,16 @@ O **Kanban é uma visualização**. O aggregate root oficial é **`ContentCard`*
 
 ## 2. Decisões arquiteturais v3 (definitivas)
 
-| Decisão | Detalhe |
-| ------- | ------- |
-| Aggregate root | **`content_cards`** (domínio oficial) |
-| Legado | `posts_editorial` — backfill source; deprecado na app layer |
-| Fluxo | UI → Server Fn → Module → **Repository** → Supabase |
-| Timeline | `content_card_events` append-only (trigger anti UPDATE/DELETE) |
-| Anexos | `content_card_attachments` (backfill de `post_media`) |
-| Biblioteca | **Submódulo `library/`** — repositório oficial; sem hard delete |
-| IA / Publishers | Ports only — sem implementação Fase 0 |
-| Boundaries | `validate-approval-boundaries.mjs` no `npm run check` |
+| Decisão         | Detalhe                                                         |
+| --------------- | --------------------------------------------------------------- |
+| Aggregate root  | **`content_cards`** (domínio oficial)                           |
+| Legado          | `posts_editorial` — backfill source; deprecado na app layer     |
+| Fluxo           | UI → Server Fn → Module → **Repository** → Supabase             |
+| Timeline        | `content_card_events` append-only (trigger anti UPDATE/DELETE)  |
+| Anexos          | `content_card_attachments` (backfill de `post_media`)           |
+| Biblioteca      | **Submódulo `library/`** — repositório oficial; sem hard delete |
+| IA / Publishers | Ports only — sem implementação Fase 0                           |
+| Boundaries      | `validate-approval-boundaries.mjs` no `npm run check`           |
 
 ---
 
@@ -89,12 +89,12 @@ Cada subdomínio: `types` · `validation` · `services` · `repository.server.ts
 
 ## 4. Migrations
 
-| # | Arquivo | Fase | Escopo |
-| - | ------- | ---- | ------ |
-| **18** | `18_content_workflow_foundation.sql` | **0** | `content_cards`, events, attachments, pillars, stories, RLS, triggers, backfill |
-| 19 | `19_content_workflow_client_phase2.sql` | 2 | `changes_requested`, RLS cliente |
-| **20** | `20_content_workflow_editorial_planning.sql` | **3** | triggers `updated_at` pilares/stories |
-| 21 | `21_content_workflow_ops_views.sql` | 4 | views ops, índices adicionais |
+| #      | Arquivo                                      | Fase  | Escopo                                                                          |
+| ------ | -------------------------------------------- | ----- | ------------------------------------------------------------------------------- |
+| **18** | `18_content_workflow_foundation.sql`         | **0** | `content_cards`, events, attachments, pillars, stories, RLS, triggers, backfill |
+| 19     | `19_content_workflow_client_phase2.sql`      | 2     | `changes_requested`, RLS cliente                                                |
+| **20** | `20_content_workflow_editorial_planning.sql` | **3** | triggers `updated_at` pilares/stories                                           |
+| 21     | `21_content_workflow_ops_views.sql`          | 4     | views ops, índices adicionais                                                   |
 
 ---
 

@@ -15,8 +15,8 @@ last_review: 2026-07-06
 
 ## Rota
 
-| URL | Arquivo |
-| --- | ------- |
+| URL                 | Arquivo                                          |
+| ------------------- | ------------------------------------------------ |
 | `/admin/aprovacoes` | `src/routes/_authenticated/admin/aprovacoes.tsx` |
 
 Nav admin + GlobalSearch (`Ctrl+K`). Legado `/admin/editorial` e `/aprovacoes` **inalterados**.
@@ -25,17 +25,17 @@ Nav admin + GlobalSearch (`Ctrl+K`). Legado `/admin/editorial` e `/aprovacoes` *
 
 ## Server functions (`cards/cards.server.ts`)
 
-| Função | Descrição |
-| ------ | --------- |
-| `getKanbanBoard` | Board por `cadastro_cliente_id` |
-| `getContentCard` | Detalhe + timeline + anexos |
-| `createCard` / `updateCard` | CRUD |
-| `moveCard` | Status machine + evento |
-| `archiveCard` / `duplicateCard` | Lifecycle |
-| `commentCard` | Evento `commented` |
-| `uploadCardMedia` / `deleteCardMedia` / `listCardMedia` | Anexos |
-| `listEditorialPillars` | Pilares do cliente |
-| `checkIsStaff` | Gate admin / social_media |
+| Função                                                  | Descrição                       |
+| ------------------------------------------------------- | ------------------------------- |
+| `getKanbanBoard`                                        | Board por `cadastro_cliente_id` |
+| `getContentCard`                                        | Detalhe + timeline + anexos     |
+| `createCard` / `updateCard`                             | CRUD                            |
+| `moveCard`                                              | Status machine + evento         |
+| `archiveCard` / `duplicateCard`                         | Lifecycle                       |
+| `commentCard`                                           | Evento `commented`              |
+| `uploadCardMedia` / `deleteCardMedia` / `listCardMedia` | Anexos                          |
+| `listEditorialPillars`                                  | Pilares do cliente              |
+| `checkIsStaff`                                          | Gate admin / social_media       |
 
 Fluxo: **UI → Server Fn → `internal/*` → Repository → Supabase**
 
@@ -56,11 +56,11 @@ card/     CardDetailDrawer, CardCreateSheet, CardTimeline, CardMediaUpload
 
 ## Permissões (Fase 1)
 
-| Papel | Acesso |
-| ----- | ------ |
-| Admin | Total |
+| Papel        | Acesso                                       |
+| ------------ | -------------------------------------------- |
+| Admin        | Total                                        |
 | Social Media | Total (app layer; RLS migration 19 pendente) |
-| Cliente | Nenhum nesta fase |
+| Cliente      | Nenhum nesta fase                            |
 
 ---
 

@@ -38,8 +38,13 @@ Crie um ADR quando a decisão:
 | [0011](./0011-engineering-system-foundation.md)           | Fundação do Sistema de Engenharia              | Aceito              |
 | [0012](./0012-internal-infrastructure-transition.md)      | Transição para infraestrutura interna Lotus    | Aceito              |
 | [0013](./0013-plano-estrategico-centro-estrategico.md)    | Plano Estratégico — Centro de Inteligência     | Aceito              |
-| [0014](./0014-auth-module-v3-architecture.md)              | Auth Module v3 — Auth, Access e Admin          | Aceito              |
-| [0018](./0018-content-workflow-module-v1.md)             | Content Workflow Module v1 (Aprovações)        | Aceito              |
+| [0014](./0014-auth-module-v3-architecture.md)             | Auth Module v3 — Auth, Access e Admin          | Aceito              |
+| [0018](./0018-content-workflow-module-v1.md)              | Content Workflow Module v1 (Aprovações)        | Aceito              |
+| [0019](./0019-os-core-layer.md)                           | OS Core Layer                                  | Aceito              |
+| [0020](./0020-engineering-contracts-platform-hub.md)      | Engineering Contracts — Platform Hub v3.3      | Aceito              |
+| [0021](./0021-platform-hub-ports-fase-0.md)               | Platform Hub ports (Fase 0)                    | Aceito              |
+| [0022](./0022-hub-registry-fase-1.md)                     | Implementação Hub Registry (Fase 1)            | Aceito              |
+| [0023](./0023-modulo-estrutura-fase-2.md)                 | Estrutura do módulo sem runtime (Fase 2)       | Aceito              |
 
 ## Template
 

@@ -20,14 +20,14 @@ A aba **Aprovações** é o **Content Workflow** — sistema de produção, revi
 producao → edicao → aguardando_aprovacao → aprovado → publicado → arquivado
 ```
 
-| Status | Quem age | O que fazer |
-| ------ | -------- | ----------- |
-| producao | Time de criação | Produzir arte/copy |
-| edicao | Editor | Refinar antes de enviar ao cliente |
-| aguardando_aprovacao | Cliente ou admin | Aguardar OK do cliente |
-| aprovado | Publicação | Agendar ou publicar |
-| publicado | — | Conteúdo no ar |
-| arquivado | — | Histórico, fora do fluxo ativo |
+| Status               | Quem age         | O que fazer                        |
+| -------------------- | ---------------- | ---------------------------------- |
+| producao             | Time de criação  | Produzir arte/copy                 |
+| edicao               | Editor           | Refinar antes de enviar ao cliente |
+| aguardando_aprovacao | Cliente ou admin | Aguardar OK do cliente             |
+| aprovado             | Publicação       | Agendar ou publicar                |
+| publicado            | —                | Conteúdo no ar                     |
+| arquivado            | —                | Histórico, fora do fluxo ativo     |
 
 ## Passo 1 — Selecionar o cliente
 
@@ -37,13 +37,13 @@ producao → edicao → aguardando_aprovacao → aprovado → publicado → arqu
 
 ## Passo 2 — Escolher a visualização (abas internas)
 
-| Aba | URL (`?tab=`) | Função |
-| --- | ------------- | ------ |
-| **Kanban** | `kanban` (padrão) | Colunas por status; arrastar cards |
-| **Calendário** | `calendar` | Visão por data de publicação |
-| **Pilares** | `pillars` | Pilares editoriais estratégicos |
-| **Stories** | `stories` | Plano de stories Instagram |
-| **Biblioteca** | `library` | Repositório de assets aprovados |
+| Aba            | URL (`?tab=`)     | Função                             |
+| -------------- | ----------------- | ---------------------------------- |
+| **Kanban**     | `kanban` (padrão) | Colunas por status; arrastar cards |
+| **Calendário** | `calendar`        | Visão por data de publicação       |
+| **Pilares**    | `pillars`         | Pilares editoriais estratégicos    |
+| **Stories**    | `stories`         | Plano de stories Instagram         |
+| **Biblioteca** | `library`         | Repositório de assets aprovados    |
 
 A URL guarda a aba — você pode compartilhar `?tab=calendar` com o time.
 

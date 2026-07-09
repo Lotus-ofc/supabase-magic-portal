@@ -56,11 +56,11 @@ Validar que as **views SQL** (`vw_overview_cliente`, `vw_clientes_ativos`, etc.)
 
 ## Relação com outras abas
 
-| Sintoma | Ferramenta | Correção |
-| ------- | ---------- | -------- |
-| KPI zerado | Painel operacional | Integrações em Clientes |
-| Cliente vê menos que admin | Auditoria views | RLS / client_access |
-| Dado antigo | Painel operacional | Re-sync pipeline |
+| Sintoma                    | Ferramenta         | Correção                |
+| -------------------------- | ------------------ | ----------------------- |
+| KPI zerado                 | Painel operacional | Integrações em Clientes |
+| Cliente vê menos que admin | Auditoria views    | RLS / client_access     |
+| Dado antigo                | Painel operacional | Re-sync pipeline        |
 
 ## Próximo capítulo
 

@@ -9,12 +9,12 @@ Personalize a **identidade visual** do portal Lotus para a agência ou white-lab
 
 ## O que pode ser alterado
 
-| Item | Efeito |
-| ---- | ------ |
-| **Nome da marca** | Títulos de página, menu, e-mails |
-| **Cores primárias** | Botões, destaques, gráficos |
-| **Logo** | Cabeçalho e favicon (conforme implementação) |
-| **Tom visual** | Variáveis CSS do design system Lotus |
+| Item                | Efeito                                       |
+| ------------------- | -------------------------------------------- |
+| **Nome da marca**   | Títulos de página, menu, e-mails             |
+| **Cores primárias** | Botões, destaques, gráficos                  |
+| **Logo**            | Cabeçalho e favicon (conforme implementação) |
+| **Tom visual**      | Variáveis CSS do design system Lotus         |
 
 ## Passo a passo
 

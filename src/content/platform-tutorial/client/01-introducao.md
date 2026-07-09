@@ -23,12 +23,12 @@ Se você é da **equipe interna da agência**, use o tutorial em `/admin/tutoria
 
 ## O que você vê no menu
 
-| Aba | Rota | Função |
-| --- | ---- | ------ |
-| **Visão geral** | `/dashboard` | Resumo de investimento, conversões e performance |
-| **Plano Estratégico** | `/plano-estrategico` | Objetivos e estratégias acordados com a agência |
-| **Aprovações** | `/aprovacoes` ou `/cliente/{sua-marca}/aprovacoes` | Revisar e aprovar conteúdos |
-| **Tutorial** | `/tutorial` | Este guia |
+| Aba                   | Rota                                               | Função                                           |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------ |
+| **Visão geral**       | `/dashboard`                                       | Resumo de investimento, conversões e performance |
+| **Plano Estratégico** | `/plano-estrategico`                               | Objetivos e estratégias acordados com a agência  |
+| **Aprovações**        | `/aprovacoes` ou `/cliente/{sua-marca}/aprovacoes` | Revisar e aprovar conteúdos                      |
+| **Tutorial**          | `/tutorial`                                        | Este guia                                        |
 
 Se você tem mais de uma marca, a agência configura o acesso — você só vê os dados autorizados.
 

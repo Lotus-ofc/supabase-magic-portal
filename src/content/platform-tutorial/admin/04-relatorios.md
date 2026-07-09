@@ -13,10 +13,10 @@ A **Central de Relatórios** organiza o acesso aos números sem duplicar os dash
 
 Dois cards grandes:
 
-| Atalho | Destino | Quando usar |
-| ------ | ------- | ----------- |
-| Relatório executivo da agência | `/admin` | Visão consolidada com gráficos |
-| Sua conta (visão cliente) | `/dashboard` | Ver exatamente o que o cliente vê |
+| Atalho                         | Destino      | Quando usar                       |
+| ------------------------------ | ------------ | --------------------------------- |
+| Relatório executivo da agência | `/admin`     | Visão consolidada com gráficos    |
+| Sua conta (visão cliente)      | `/dashboard` | Ver exatamente o que o cliente vê |
 
 ### 2. Seletor de período
 
@@ -55,12 +55,12 @@ Campo de busca filtra por nome do cliente em tempo real — útil com dezenas de
 
 ## Diferença vs Visão geral
 
-| Aspecto | Visão geral | Relatórios |
-| ------- | ----------- | ---------- |
-| Gráficos temporais | Sim | Não (hub) |
-| Lista por cliente | Secundária | **Foco principal** |
-| Busca por nome | Não | Sim |
-| Link direto ao painel cliente | Parcial | **Sim, em cada linha** |
+| Aspecto                       | Visão geral | Relatórios             |
+| ----------------------------- | ----------- | ---------------------- |
+| Gráficos temporais            | Sim         | Não (hub)              |
+| Lista por cliente             | Secundária  | **Foco principal**     |
+| Busca por nome                | Não         | Sim                    |
+| Link direto ao painel cliente | Parcial     | **Sim, em cada linha** |
 
 ## Próximo capítulo
 

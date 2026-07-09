@@ -31,34 +31,34 @@ flowchart TB
     CORE -.->|nunca| UI
 ```
 
-| Camada | Responsabilidade |
-|--------|------------------|
-| **UI** | Renderização, TanStack Query, composição |
-| **Módulo** | Regras de negócio, builders, validators |
-| **Core** | Event bus, command bus, registry, permissions, flags |
-| **Repository** | Acesso a dados tipado |
-| **Database** | Postgres, views, RLS |
+| Camada         | Responsabilidade                                     |
+| -------------- | ---------------------------------------------------- |
+| **UI**         | Renderização, TanStack Query, composição             |
+| **Módulo**     | Regras de negócio, builders, validators              |
+| **Core**       | Event bus, command bus, registry, permissions, flags |
+| **Repository** | Acesso a dados tipado                                |
+| **Database**   | Postgres, views, RLS                                 |
 
 ---
 
 ## Componentes do Core
 
-| Serviço | Arquivo | Função |
-|---------|---------|--------|
-| Event Bus | `event-bus/event-bus.ts` | Pub/sub tipado in-process |
-| Command Bus | `commands/command-bus.ts` | Validação + execução + eventos |
-| Cache Manager | `cache/cache-manager.ts` | TTL in-memory |
-| Realtime Manager | `realtime/realtime-manager.ts` | Abstração Supabase Realtime |
-| Notification Dispatcher | `notifications/notification-dispatcher.ts` | Multi-canal (in-app ativo) |
-| Permission Engine | `permissions/permission-engine.ts` | RBAC preparado |
-| Feature Flags | `feature-flags/feature-flag-service.ts` | on/off/beta/experimental |
-| Audit Logger | `audit/audit-logger.ts` | Sinks + `core_audit_log` |
-| Background Jobs | `jobs/background-job-runner.ts` | Fila in-process |
-| Snapshot Builder | `snapshot/snapshot-builder.ts` | Compositor read-model |
-| Config Registry | `registry/config-registry.ts` | Registro central de módulos |
-| Widget Registry | `registry/widget-registry.ts` | Widgets lazy + permissions |
-| Search Engine | `search/search-engine.ts` | Providers por módulo |
-| Dashboard Engine | `dashboard/dashboard-engine.tsx` | Monta UI a partir do registry |
+| Serviço                 | Arquivo                                    | Função                         |
+| ----------------------- | ------------------------------------------ | ------------------------------ |
+| Event Bus               | `event-bus/event-bus.ts`                   | Pub/sub tipado in-process      |
+| Command Bus             | `commands/command-bus.ts`                  | Validação + execução + eventos |
+| Cache Manager           | `cache/cache-manager.ts`                   | TTL in-memory                  |
+| Realtime Manager        | `realtime/realtime-manager.ts`             | Abstração Supabase Realtime    |
+| Notification Dispatcher | `notifications/notification-dispatcher.ts` | Multi-canal (in-app ativo)     |
+| Permission Engine       | `permissions/permission-engine.ts`         | RBAC preparado                 |
+| Feature Flags           | `feature-flags/feature-flag-service.ts`    | on/off/beta/experimental       |
+| Audit Logger            | `audit/audit-logger.ts`                    | Sinks + `core_audit_log`       |
+| Background Jobs         | `jobs/background-job-runner.ts`            | Fila in-process                |
+| Snapshot Builder        | `snapshot/snapshot-builder.ts`             | Compositor read-model          |
+| Config Registry         | `registry/config-registry.ts`              | Registro central de módulos    |
+| Widget Registry         | `registry/widget-registry.ts`              | Widgets lazy + permissions     |
+| Search Engine           | `search/search-engine.ts`                  | Providers por módulo           |
+| Dashboard Engine        | `dashboard/dashboard-engine.tsx`           | Monta UI a partir do registry  |
 
 ---
 
@@ -159,11 +159,11 @@ Exemplo: `agency-os.client-workspace` no workspace de cliente.
 
 ## Search Engine (Ctrl+K)
 
-| Provider | Escopo | Onde roda |
-|----------|--------|-----------|
-| `navigation-routes` | Rotas estáticas | Client |
-| `agency-os` (server) | Comandos + busca operacional | Server (`searchOs`) |
-| Portal clientes | `vw_clientes_ativos` | Client (GlobalSearch) |
+| Provider             | Escopo                       | Onde roda             |
+| -------------------- | ---------------------------- | --------------------- |
+| `navigation-routes`  | Rotas estáticas              | Client                |
+| `agency-os` (server) | Comandos + busca operacional | Server (`searchOs`)   |
+| Portal clientes      | `vw_clientes_ativos`         | Client (GlobalSearch) |
 
 ---
 

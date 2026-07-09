@@ -14,24 +14,24 @@ description: Kanban, calendário, comentários, aprovar e reprovar posts.
 
 ## Abas internas
 
-| Aba | Uso para você |
-| --- | ------------- |
-| **Kanban** | Ver status de cada peça (produção → aguardando você → publicado) |
-| **Calendário** | Ver **quando** cada post sai |
-| **Pilares** | Temas editoriais (educação, produto, institucional…) |
-| **Stories** | Grade de stories da semana |
-| **Biblioteca** | Conteúdos já publicados / arquivo |
+| Aba            | Uso para você                                                    |
+| -------------- | ---------------------------------------------------------------- |
+| **Kanban**     | Ver status de cada peça (produção → aguardando você → publicado) |
+| **Calendário** | Ver **quando** cada post sai                                     |
+| **Pilares**    | Temas editoriais (educação, produto, institucional…)             |
+| **Stories**    | Grade de stories da semana                                       |
+| **Biblioteca** | Conteúdos já publicados / arquivo                                |
 
 Comece pelo **Kanban** ou **Calendário**.
 
 ## Status que importam para você
 
-| Status | Sua ação |
-| ------ | -------- |
-| aguardando_aprovacao | **Revise agora** |
-| aprovado | Agência vai publicar na data |
-| publicado | Já foi ao ar |
-| producao / edicao | Ainda não chegou na sua fila — aguarde |
+| Status               | Sua ação                               |
+| -------------------- | -------------------------------------- |
+| aguardando_aprovacao | **Revise agora**                       |
+| aprovado             | Agência vai publicar na data           |
+| publicado            | Já foi ao ar                           |
+| producao / edicao    | Ainda não chegou na sua fila — aguarde |
 
 ## Passo a passo: aprovar um post
 

@@ -36,29 +36,29 @@ Precedentes arquiteturais:
 
 A tabela **`content_cards`** é o aggregate root persistente do módulo.
 
-| Tabela | Papel |
-| ------ | ----- |
-| **`content_cards`** | Domínio oficial — aggregate root |
-| `content_card_events` | Timeline append-only (event sourcing lite) |
-| `content_card_attachments` | Mídias e anexos do card |
-| `editorial_pillars` | Pilares editoriais por cliente |
-| `story_plan_rows` | Plano de stories (planilha) |
-| `posts_editorial` | **Legado** — fonte de backfill; código MVP ainda referencia até Fase 1 |
-| `post_media` | **Legado** — backfill → `content_card_attachments` |
-| `post_revisions` | **Legado** — backfill → `content_card_events`; escrita descontinuada na Fase 1 |
+| Tabela                     | Papel                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| **`content_cards`**        | Domínio oficial — aggregate root                                               |
+| `content_card_events`      | Timeline append-only (event sourcing lite)                                     |
+| `content_card_attachments` | Mídias e anexos do card                                                        |
+| `editorial_pillars`        | Pilares editoriais por cliente                                                 |
+| `story_plan_rows`          | Plano de stories (planilha)                                                    |
+| `posts_editorial`          | **Legado** — fonte de backfill; código MVP ainda referencia até Fase 1         |
+| `post_media`               | **Legado** — backfill → `content_card_attachments`                             |
+| `post_revisions`           | **Legado** — backfill → `content_card_events`; escrita descontinuada na Fase 1 |
 
 Nada existe desacoplado do Card:
 
-| Filho / extensão | Tabela / mecanismo |
-| ---------------- | ------------------ |
-| Events / Timeline | `content_card_events` |
-| Attachments | `content_card_attachments` |
-| Checklist | `content_cards.checklist` (JSONB) |
-| Editorial Pillar | FK `pilar_id` → `editorial_pillars` |
-| Story Plan | `story_plan_rows.card_id` (opcional) |
-| AI Metadata | `content_cards.ai_metadata` |
-| Integration Metadata | `content_cards.integration_metadata` |
-| Biblioteca | submódulo `library/` — query sobre cards `publicado` \| `arquivado` |
+| Filho / extensão     | Tabela / mecanismo                                                  |
+| -------------------- | ------------------------------------------------------------------- |
+| Events / Timeline    | `content_card_events`                                               |
+| Attachments          | `content_card_attachments`                                          |
+| Checklist            | `content_cards.checklist` (JSONB)                                   |
+| Editorial Pillar     | FK `pilar_id` → `editorial_pillars`                                 |
+| Story Plan           | `story_plan_rows.card_id` (opcional)                                |
+| AI Metadata          | `content_cards.ai_metadata`                                         |
+| Integration Metadata | `content_cards.integration_metadata`                                |
+| Biblioteca           | submódulo `library/` — query sobre cards `publicado` \| `arquivado` |
 
 ### 2. Fluxo de camadas obrigatório
 
@@ -78,14 +78,14 @@ Supabase (RLS)
 
 Cada subdomínio em `src/modules/approval/` possui:
 
-| Camada | Arquivo(s) |
-| ------ | ------------ |
-| `types.ts` | Contratos do subdomínio |
-| `validation.ts` | Schemas Zod |
-| `services/` | Lógica pura (sem Supabase) |
-| `repository.server.ts` | **Único** ponto de acesso Postgres do subdomínio |
-| `*.server.ts` | Server functions (orquestram service + repository) |
-| `index.ts` | Barrel público |
+| Camada                 | Arquivo(s)                                         |
+| ---------------------- | -------------------------------------------------- |
+| `types.ts`             | Contratos do subdomínio                            |
+| `validation.ts`        | Schemas Zod                                        |
+| `services/`            | Lógica pura (sem Supabase)                         |
+| `repository.server.ts` | **Único** ponto de acesso Postgres do subdomínio   |
+| `*.server.ts`          | Server functions (orquestram service + repository) |
+| `index.ts`             | Barrel público                                     |
 
 ### 3. Event sourcing lite — `content_card_events`
 
@@ -120,25 +120,25 @@ A Biblioteca **não é um filtro SQL solto**. É o submódulo `library/` com:
 
 ### 5. Visualizações — uma fonte (`content_cards`)
 
-| Visualização | Submódulo | Projeção |
-| ------------ | --------- | -------- |
-| Kanban (default) | `cards/` + `workflow/` | por `status` + `kanban_ordem` |
-| Calendário | `calendar/` | por `data_publicacao` |
-| Pilares | `pillars/` | `editorial_pillars` |
-| Stories | `stories/` | `story_plan_rows` |
-| Biblioteca | `library/` | `status IN (publicado, arquivado)` |
-| Dashboard ops | `dashboard/` | agregações cards + events |
+| Visualização     | Submódulo              | Projeção                           |
+| ---------------- | ---------------------- | ---------------------------------- |
+| Kanban (default) | `cards/` + `workflow/` | por `status` + `kanban_ordem`      |
+| Calendário       | `calendar/`            | por `data_publicacao`              |
+| Pilares          | `pillars/`             | `editorial_pillars`                |
+| Stories          | `stories/`             | `story_plan_rows`                  |
+| Biblioteca       | `library/`             | `status IN (publicado, arquivado)` |
+| Dashboard ops    | `dashboard/`           | agregações cards + events          |
 
 ### 6. Status do workflow (`content_card_status`)
 
-| Coluna Kanban | Status DB | Cor token |
-| ------------- | --------- | --------- |
-| Produção | `producao` | vermelho |
-| Edição | `edicao` | amarelo |
-| Aguardando Aprovação | `aguardando_aprovacao` | azul |
-| Aprovado | `aprovado` | verde |
-| Publicado | `publicado` | cinza |
-| Biblioteca | `arquivado` | neutro |
+| Coluna Kanban        | Status DB              | Cor token |
+| -------------------- | ---------------------- | --------- |
+| Produção             | `producao`             | vermelho  |
+| Edição               | `edicao`               | amarelo   |
+| Aguardando Aprovação | `aguardando_aprovacao` | azul      |
+| Aprovado             | `aprovado`             | verde     |
+| Publicado            | `publicado`            | cinza     |
+| Biblioteca           | `arquivado`            | neutro    |
 
 Backfill legado: `post_status.rascunho` / `em_producao` → `producao`.
 
@@ -174,11 +174,11 @@ Boundary validation: `scripts/validate-approval-boundaries.mjs` no `npm run chec
 
 ### 8. Separação de responsabilidades
 
-| Persona | Pode | Não pode |
-| ------- | ---- | -------- |
-| **Admin** | CRUD completo, mover, arquivar | — |
-| **Social Media** | CRUD + mover no escopo | aprovar, arquivar, hard delete |
-| **Cliente** | visualizar, comentar, aprovar/reprovar | editar estrutura, mover |
+| Persona          | Pode                                   | Não pode                       |
+| ---------------- | -------------------------------------- | ------------------------------ |
+| **Admin**        | CRUD completo, mover, arquivar         | —                              |
+| **Social Media** | CRUD + mover no escopo                 | aprovar, arquivar, hard delete |
+| **Cliente**      | visualizar, comentar, aprovar/reprovar | editar estrutura, mover        |
 
 ### 9. Ports futuros (sem implementação na Fase 0–1)
 
@@ -202,13 +202,13 @@ Métricas sobre `content_cards` + `content_card_events`:
 
 ### 11. Nomenclatura
 
-| Contexto | Termo |
-| -------- | ----- |
-| UI | **Aprovações** |
-| Domínio / docs | **Content Workflow** |
-| Código | `approval`, `ContentCard`, `content_cards` |
+| Contexto           | Termo                                             |
+| ------------------ | ------------------------------------------------- |
+| UI                 | **Aprovações**                                    |
+| Domínio / docs     | **Content Workflow**                              |
+| Código             | `approval`, `ContentCard`, `content_cards`        |
 | Legado (transição) | `posts_editorial`, `post_media`, `post_revisions` |
-| Deprecado | Calendário Editorial como nome de módulo |
+| Deprecado          | Calendário Editorial como nome de módulo          |
 
 ## Alternativas consideradas
 

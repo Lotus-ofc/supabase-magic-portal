@@ -16,15 +16,15 @@ Visão para **gestor da agência**. Uma fonte de dados — cards + events.
 
 ### KPIs principais
 
-| Métrica | Fonte | Descrição |
-| ------- | ----- | --------- |
-| Por status | `posts_editorial` GROUP BY status | Produção, Edição, Aguardando, Aprovado, Publicado |
-| Por cliente | JOIN `cadastro_clientes` | Volume por conta |
-| Por social media | `responsavel_user_id` | Carga por responsável |
-| Tempo médio por etapa | `compute-stage-durations(events)` | Ex.: média Produção→Edição |
-| Conteúdos atrasados | `data_publicacao < today` AND status ativo | Alerta operacional |
-| Publicações da semana | `published_at` na semana corrente | |
-| Aguardando aprovação | `status = aguardando_aprovacao` | Count + lista rápida |
+| Métrica               | Fonte                                      | Descrição                                         |
+| --------------------- | ------------------------------------------ | ------------------------------------------------- |
+| Por status            | `posts_editorial` GROUP BY status          | Produção, Edição, Aguardando, Aprovado, Publicado |
+| Por cliente           | JOIN `cadastro_clientes`                   | Volume por conta                                  |
+| Por social media      | `responsavel_user_id`                      | Carga por responsável                             |
+| Tempo médio por etapa | `compute-stage-durations(events)`          | Ex.: média Produção→Edição                        |
+| Conteúdos atrasados   | `data_publicacao < today` AND status ativo | Alerta operacional                                |
+| Publicações da semana | `published_at` na semana corrente          |                                                   |
+| Aguardando aprovação  | `status = aguardando_aprovacao`            | Count + lista rápida                              |
 
 ### Implementação
 
@@ -73,11 +73,11 @@ Tabs: Kanban (read-only) | Pilares | Stories | Biblioteca
 
 ## Deprecação
 
-| Antigo | Novo |
-| ------ | ---- |
-| Calendário Editorial (nome módulo) | Content Workflow / Aprovações |
-| `/admin/editorial` | `/admin/aprovacoes` (+ redirect) |
-| Lista `/aprovacoes` only | Portal completo com tabs |
+| Antigo                             | Novo                             |
+| ---------------------------------- | -------------------------------- |
+| Calendário Editorial (nome módulo) | Content Workflow / Aprovações    |
+| `/admin/editorial`                 | `/admin/aprovacoes` (+ redirect) |
+| Lista `/aprovacoes` only           | Portal completo com tabs         |
 
 ---
 

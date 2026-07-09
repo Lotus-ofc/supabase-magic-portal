@@ -67,11 +67,11 @@ Detalhes: [Roteamento](./routing.md)
 
 ## `src/modules/` — Auth Module v3
 
-| Módulo   | Responsabilidade                                      |
-| -------- | ----------------------------------------------------- |
-| `auth/`  | Login, logout, sessão, callback, set-password UI      |
-| `access/`| Lifecycle, bloqueios, orchestrator, Recovery server   |
-| `admin/` | Convites, Recovery Mode UI, operações de usuário      |
+| Módulo    | Responsabilidade                                    |
+| --------- | --------------------------------------------------- |
+| `auth/`   | Login, logout, sessão, callback, set-password UI    |
+| `access/` | Lifecycle, bloqueios, orchestrator, Recovery server |
+| `admin/`  | Convites, Recovery Mode UI, operações de usuário    |
 
 Detalhes: [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admin.md).
 
@@ -79,19 +79,19 @@ Detalhes: [Arquitetura Auth, Access e Admin](../02-architecture/auth-access-admi
 
 ## `src/lib/` — lógica de negócio
 
-| Módulo                       | Responsabilidade                           |
-| ---------------------------- | ------------------------------------------ |
-| `platforms/*`                | Engine declarativo, fórmulas, PlatformDefs |
-| `metrics.ts`                 | Agregação overview cross-platform          |
-| `period.ts`                  | Datas BRT, presets de período              |
-| `admin.functions.ts`         | Server functions administrativas           |
+| Módulo                       | Responsabilidade                                   |
+| ---------------------------- | -------------------------------------------------- |
+| `platforms/*`                | Engine declarativo, fórmulas, PlatformDefs         |
+| `metrics.ts`                 | Agregação overview cross-platform                  |
+| `period.ts`                  | Datas BRT, presets de período                      |
+| `admin.functions.ts`         | Server functions administrativas                   |
 | `access.functions.server.ts` | Barrel Access (compat — preferir `modules/access`) |
-| `editorial.functions.ts`     | Server functions editorial                 |
-| `integrations-catalog.ts`    | Catálogo de integrações (formulário admin) |
-| `error-capture.ts`           | Recuperação de erros SSR (h3)              |
-| `error-page.ts`              | HTML de erro 500                           |
-| `lovable-error-reporting.ts` | Report client → Lovable (transitório)      |
-| `utils.ts`                   | `cn()` — merge de classes Tailwind         |
+| `editorial.functions.ts`     | Server functions editorial                         |
+| `integrations-catalog.ts`    | Catálogo de integrações (formulário admin)         |
+| `error-capture.ts`           | Recuperação de erros SSR (h3)                      |
+| `error-page.ts`              | HTML de erro 500                                   |
+| `lovable-error-reporting.ts` | Report client → Lovable (transitório)              |
+| `utils.ts`                   | `cn()` — merge de classes Tailwind                 |
 
 **Regra:** componentes React **não** contêm cálculos de KPI.
 
@@ -121,22 +121,22 @@ Catálogo: [Design System](./component-system.md)
 
 Migrations numeradas, aditivas, idempotentes. Ordem:
 
-| #   | Arquivo                          | Tema                                 |
-| --- | -------------------------------- | ------------------------------------ |
-| 01  | `auth_roles_access.sql`          | Auth, roles, `current_user_clientes` |
-| 02  | `views_metricas.sql`             | Views analíticas iniciais            |
-| 03  | `cadastro_clientes_extensao.sql` | Clientes, serviços, RLS              |
-| 05  | `cadastro_clientes_make_ids.sql` | IDs técnicos Make                    |
-| 06  | `editorial.sql`                  | Posts, revisões                      |
-| 07  | `views_fix_security_invoker.sql` | SECURITY DEFINER                     |
-| 08  | `aliases_e_null_guard.sql`       | Aliases + NULL guard                 |
-| 09  | `owner_admin_guard.sql`          | Admin permanente do dono             |
-| 10  | `editorial_media.sql`            | Mídia editorial                      |
-| 11  | `plano_estrategico.sql`          | Plano Estratégico                    |
-| 12  | `plano_objetivo_scope.sql`       | Escopo por objetivo no plano         |
-| 13  | `access_management.sql`          | Lifecycle, audit, access_accounts         |
-| 14  | `access_lifecycle_fix.sql`       | Backfill lifecycle                        |
-| 15  | `auth_invalidate_sessions.sql`   | RPC invalidação de sessões                |
+| #   | Arquivo                                | Tema                                  |
+| --- | -------------------------------------- | ------------------------------------- |
+| 01  | `auth_roles_access.sql`                | Auth, roles, `current_user_clientes`  |
+| 02  | `views_metricas.sql`                   | Views analíticas iniciais             |
+| 03  | `cadastro_clientes_extensao.sql`       | Clientes, serviços, RLS               |
+| 05  | `cadastro_clientes_make_ids.sql`       | IDs técnicos Make                     |
+| 06  | `editorial.sql`                        | Posts, revisões                       |
+| 07  | `views_fix_security_invoker.sql`       | SECURITY DEFINER                      |
+| 08  | `aliases_e_null_guard.sql`             | Aliases + NULL guard                  |
+| 09  | `owner_admin_guard.sql`                | Admin permanente do dono              |
+| 10  | `editorial_media.sql`                  | Mídia editorial                       |
+| 11  | `plano_estrategico.sql`                | Plano Estratégico                     |
+| 12  | `plano_objetivo_scope.sql`             | Escopo por objetivo no plano          |
+| 13  | `access_management.sql`                | Lifecycle, audit, access_accounts     |
+| 14  | `access_lifecycle_fix.sql`             | Backfill lifecycle                    |
+| 15  | `auth_invalidate_sessions.sql`         | RPC invalidação de sessões            |
 | 16  | `lifecycle_invite_expired_removal.sql` | Dados invite_expired → invite_pending |
 
 > Não existe migration `04` (deprecada).
@@ -151,13 +151,13 @@ Migrations numeradas, aditivas, idempotentes. Ordem:
 
 ## O que NÃO está no repositório
 
-| Item                        | Status           |
-| --------------------------- | ---------------- |
-| Cenários Make               | Externo          |
-| CI/CD (`.github/workflows`) | Não implementado |
+| Item                        | Status                            |
+| --------------------------- | --------------------------------- |
+| Cenários Make               | Externo                           |
+| CI/CD (`.github/workflows`) | Não implementado                  |
 | Testes (`*.test.ts`)        | Implementado (Vitest, 88+ testes) |
-| `supabase/config.toml`      | Não presente     |
-| Schema DDL `base_metricas`  | Não versionado   |
+| `supabase/config.toml`      | Não presente                      |
+| Schema DDL `base_metricas`  | Não versionado                    |
 
 ---
 

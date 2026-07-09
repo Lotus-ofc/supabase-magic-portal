@@ -40,12 +40,12 @@ Adotar **Auth Module v3** com três módulos e um orchestrator:
 
 ## Alternativas consideradas
 
-| Alternativa | Por que não |
-| ----------- | ----------- |
-| Manter rota `/auth` monolítica | Regressão de acoplamento garantida |
-| Auth consultar `access_accounts` diretamente | Viola fronteira Supabase × Lots BI |
-| Middleware global único para tudo | Opaco; dificulta testes e manutenção |
-| Login automático pós-convite | UX inconsistente; bypass de gate |
+| Alternativa                                  | Por que não                          |
+| -------------------------------------------- | ------------------------------------ |
+| Manter rota `/auth` monolítica               | Regressão de acoplamento garantida   |
+| Auth consultar `access_accounts` diretamente | Viola fronteira Supabase × Lots BI   |
+| Middleware global único para tudo            | Opaco; dificulta testes e manutenção |
+| Login automático pós-convite                 | UX inconsistente; bypass de gate     |
 
 ## Consequências
 

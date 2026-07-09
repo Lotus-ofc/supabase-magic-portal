@@ -18,15 +18,15 @@ Aggregate root: `content_cards`. Eventos em `content_card_events`. Anexos em `co
 
 ## Onde alterar o quê
 
-| Necessidade | Local |
-|-------------|-------|
-| Nova coluna Kanban / transição de status | `workflow/status-machine.ts`, `workflow/column-config.ts` |
-| Permissão cliente vs staff | `permissions/matrix.ts`, RLS migrations |
-| Novo tipo de evento na timeline | enum `content_card_event_type` + migration + `event-type-for-transition.ts` |
-| Filtro de biblioteca | `library/repositories/library.repository.server.ts` |
-| Métricas do dashboard ops | `dashboard/services/build-ops-dashboard.ts` |
-| Nova aba no workspace | `ApprovalWorkspaceTabs.tsx` + rota `aprovacoes.tsx` |
-| Componente visual | `components/lotus/approval/**` |
+| Necessidade                              | Local                                                                       |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| Nova coluna Kanban / transição de status | `workflow/status-machine.ts`, `workflow/column-config.ts`                   |
+| Permissão cliente vs staff               | `permissions/matrix.ts`, RLS migrations                                     |
+| Novo tipo de evento na timeline          | enum `content_card_event_type` + migration + `event-type-for-transition.ts` |
+| Filtro de biblioteca                     | `library/repositories/library.repository.server.ts`                         |
+| Métricas do dashboard ops                | `dashboard/services/build-ops-dashboard.ts`                                 |
+| Nova aba no workspace                    | `ApprovalWorkspaceTabs.tsx` + rota `aprovacoes.tsx`                         |
+| Componente visual                        | `components/lotus/approval/**`                                              |
 
 **Nunca:** importar `@/integrations/supabase` fora de `*.repository.server.ts` no módulo approval.
 

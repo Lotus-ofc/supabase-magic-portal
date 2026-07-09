@@ -15,21 +15,21 @@ last_review: 2026-07-06
 
 ## Legado removido
 
-| Item | Ação |
-|------|------|
-| `src/lib/editorial.functions.ts` | Removido |
-| `src/routes/_authenticated/admin/editorial.tsx` (MVP) | Substituído por redirect permanente |
-| `posts_editorial`, `post_media`, `post_revisions`, `post_snapshots` | Drop migration 22 |
-| Componentes órfãos (`ApprovalWorkflowCard`, `EditorialMediaUpload`, etc.) | Removidos |
-| `migration-helpers.ts` (mapeamentos legado) | Substituído por `workflow-rules.ts` |
+| Item                                                                      | Ação                                |
+| ------------------------------------------------------------------------- | ----------------------------------- |
+| `src/lib/editorial.functions.ts`                                          | Removido                            |
+| `src/routes/_authenticated/admin/editorial.tsx` (MVP)                     | Substituído por redirect permanente |
+| `posts_editorial`, `post_media`, `post_revisions`, `post_snapshots`       | Drop migration 22                   |
+| Componentes órfãos (`ApprovalWorkflowCard`, `EditorialMediaUpload`, etc.) | Removidos                           |
+| `migration-helpers.ts` (mapeamentos legado)                               | Substituído por `workflow-rules.ts` |
 
 ---
 
 ## Redirects
 
-| De | Para |
-|----|------|
-| `/admin/editorial` | `/admin/aprovacoes?tab=calendar` |
+| De                                   | Para                                               |
+| ------------------------------------ | -------------------------------------------------- |
+| `/admin/editorial`                   | `/admin/aprovacoes?tab=calendar`                   |
 | `/admin/editorial?estrategia=<uuid>` | `/admin/aprovacoes?tab=calendar&estrategia=<uuid>` |
 
 Nav admin: item "Calendário Editorial" removido — único entry point: **Aprovações**.
@@ -50,11 +50,11 @@ Nav admin: item "Calendário Editorial" removido — único entry point: **Aprov
 
 Componentes compartilhados em `components/lotus/approval/shared/`:
 
-| Componente | Uso |
-|------------|-----|
-| `ApprovalEmptyState` | Estados vazios (Kanban workspace, pilares, biblioteca) |
-| `ApprovalPanelSkeleton` | Loading de painéis |
-| `ApprovalConfirmDialog` | Confirmações destrutivas (arquivar card) |
+| Componente              | Uso                                                    |
+| ----------------------- | ------------------------------------------------------ |
+| `ApprovalEmptyState`    | Estados vazios (Kanban workspace, pilares, biblioteca) |
+| `ApprovalPanelSkeleton` | Loading de painéis                                     |
+| `ApprovalConfirmDialog` | Confirmações destrutivas (arquivar card)               |
 
 Melhorias transversais:
 

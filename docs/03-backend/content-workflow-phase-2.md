@@ -15,8 +15,8 @@ last_review: 2026-07-06
 
 ## Rota
 
-| URL | Arquivo |
-| --- | ------- |
+| URL           | Arquivo                                    |
+| ------------- | ------------------------------------------ |
 | `/aprovacoes` | `src/routes/_authenticated/aprovacoes.tsx` |
 
 Staff sem `client_access` é direcionado para `/admin/aprovacoes`.
@@ -34,14 +34,14 @@ Staff sem `client_access` é direcionado para `/admin/aprovacoes`.
 
 ## Server functions (`cards/client-cards.server.ts`)
 
-| Função | Descrição |
-| ------ | --------- |
-| `getClientKanbanBoardFn` | Kanban read-only via `client_access` |
-| `getClientContentCard` | Detalhe + timeline + anexos |
-| `clientCommentCardFn` | Evento `commented` |
-| `clientApproveCardFn` | Evento `approved` (sem alterar status) |
-| `clientRequestChangesFn` | Evento `changes_requested` |
-| `checkClientPortalAccess` | Gate portal cliente |
+| Função                    | Descrição                              |
+| ------------------------- | -------------------------------------- |
+| `getClientKanbanBoardFn`  | Kanban read-only via `client_access`   |
+| `getClientContentCard`    | Detalhe + timeline + anexos            |
+| `clientCommentCardFn`     | Evento `commented`                     |
+| `clientApproveCardFn`     | Evento `approved` (sem alterar status) |
+| `clientRequestChangesFn`  | Evento `changes_requested`             |
+| `checkClientPortalAccess` | Gate portal cliente                    |
 
 Filtro de segurança: `client_access` no repository (`listForClientNames`).
 

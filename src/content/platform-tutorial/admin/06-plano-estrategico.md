@@ -23,12 +23,12 @@ O **Plano Estratégico** centraliza o raciocínio de longo prazo por cliente: di
 
 Preencha a visão atual:
 
-| Campo | O que escrever |
-| ----- | -------------- |
-| Contexto de mercado | Concorrência, sazonalidade, macro |
-| Situação atual | Números e fatos (puxe de Relatórios) |
-| Dores / desafios | Problemas a resolver |
-| Posicionamento | Como a marca quer ser percebida |
+| Campo               | O que escrever                       |
+| ------------------- | ------------------------------------ |
+| Contexto de mercado | Concorrência, sazonalidade, macro    |
+| Situação atual      | Números e fatos (puxe de Relatórios) |
+| Dores / desafios    | Problemas a resolver                 |
+| Posicionamento      | Como a marca quer ser percebida      |
 
 O sistema pode sugerir diagnóstico automático com base em métricas — **revise sempre** antes de apresentar ao cliente.
 
@@ -67,10 +67,10 @@ Use a seção de **oportunidades** para ideias ainda não priorizadas (novo cana
 
 ## Passo 7 — Decisões e aprendizados
 
-| Seção | Uso |
-| ----- | --- |
-| **Decisões** | “Decidimos pausar TikTok em março” — data e responsável |
-| **Aprendizados** | Post-mortem de campanhas — o que repetir ou evitar |
+| Seção            | Uso                                                     |
+| ---------------- | ------------------------------------------------------- |
+| **Decisões**     | “Decidimos pausar TikTok em março” — data e responsável |
+| **Aprendizados** | Post-mortem de campanhas — o que repetir ou evitar      |
 
 ## Passo 8 — Radar estratégico
 

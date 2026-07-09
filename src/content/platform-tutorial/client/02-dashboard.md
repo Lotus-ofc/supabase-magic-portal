@@ -16,12 +16,12 @@ description: KPIs, gráficos, insights e contas vinculadas na tela inicial.
 
 ### Hero — principais números
 
-| KPI | O que significa |
-| --- | --------------- |
-| **Investimento** | Quanto foi gasto em mídia (Google + Meta) |
-| **Conversões** | Resultados principais (leads, compras — conforme configurado) |
-| **Sessões** | Visitas ao site (Google Analytics) |
-| **Cliques** | Cliques nos anúncios |
+| KPI              | O que significa                                               |
+| ---------------- | ------------------------------------------------------------- |
+| **Investimento** | Quanto foi gasto em mídia (Google + Meta)                     |
+| **Conversões**   | Resultados principais (leads, compras — conforme configurado) |
+| **Sessões**      | Visitas ao site (Google Analytics)                            |
+| **Cliques**      | Cliques nos anúncios                                          |
 
 Cada card mostra variação vs período anterior.
 

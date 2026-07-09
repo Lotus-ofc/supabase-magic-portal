@@ -36,26 +36,26 @@ last_review: 2026-07-01
 
 ## Escopo entregue
 
-| Fase | Entrega |
-| ---- | ------- |
-| 0 | ESLint boundaries, script de validação, docs, migration 15 |
-| 1 | Redirects/bloqueios em `modules/access/services/*` |
-| 2 | Post-auth orchestrator; convite/recovery sem auto-login |
-| 3 | `modules/auth` definitivo; Minha Conta |
-| 4 | Split `access.functions.server`; lifecycle 6 estados |
-| 5 | `modules/admin`; Recovery Mode 3 ações operacionais |
-| 6 | Cleanup, re-exports deprecated, docs finais |
+| Fase | Entrega                                                    |
+| ---- | ---------------------------------------------------------- |
+| 0    | ESLint boundaries, script de validação, docs, migration 15 |
+| 1    | Redirects/bloqueios em `modules/access/services/*`         |
+| 2    | Post-auth orchestrator; convite/recovery sem auto-login    |
+| 3    | `modules/auth` definitivo; Minha Conta                     |
+| 4    | Split `access.functions.server`; lifecycle 6 estados       |
+| 5    | `modules/admin`; Recovery Mode 3 ações operacionais        |
+| 6    | Cleanup, re-exports deprecated, docs finais                |
 
 ---
 
 ## Migrations obrigatórias (produção)
 
-| Migration | Propósito |
-| --------- | --------- |
-| `13_access_management.sql` | `access_accounts`, audit, lifecycle |
-| `14_access_lifecycle_fix.sql` | Backfill lifecycle pós-migration 13 |
-| `15_auth_invalidate_sessions.sql` | RPC `access_invalidate_auth_sessions` |
-| `16_lifecycle_invite_expired_removal.sql` | Dados `invite_expired` → `invite_pending` |
+| Migration                                  | Propósito                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| `13_access_management.sql`                 | `access_accounts`, audit, lifecycle                                       |
+| `14_access_lifecycle_fix.sql`              | Backfill lifecycle pós-migration 13                                       |
+| `15_auth_invalidate_sessions.sql`          | RPC `access_invalidate_auth_sessions`                                     |
+| `16_lifecycle_invite_expired_removal.sql`  | Dados `invite_expired` → `invite_pending`                                 |
 | `17_fix_invalidate_sessions_uuid_cast.sql` | Corrige cast `varchar` vs `uuid` em `auth.refresh_tokens` (Recovery Mode) |
 
 Ver [Migrations](../04-database/migrations.md).
@@ -64,13 +64,13 @@ Ver [Migrations](../04-database/migrations.md).
 
 ## Validação de encerramento
 
-| Gate | Resultado |
-| ---- | --------- |
-| `npm run check` | ✅ Verde (validate + lint + 88 testes + build) |
-| Lint | ✅ |
-| Build | ✅ |
-| Arquivos temporários | ✅ Nenhum pendente |
-| Git | ✅ Sincronizado com `origin/main` |
+| Gate                 | Resultado                                      |
+| -------------------- | ---------------------------------------------- |
+| `npm run check`      | ✅ Verde (validate + lint + 88 testes + build) |
+| Lint                 | ✅                                             |
+| Build                | ✅                                             |
+| Arquivos temporários | ✅ Nenhum pendente                             |
+| Git                  | ✅ Sincronizado com `origin/main`              |
 
 ---
 

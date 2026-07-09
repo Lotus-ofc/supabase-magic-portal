@@ -12,13 +12,13 @@ Contexto gerado automaticamente para **modelos conversacionais** (ChatGPT, Claud
 
 ## Diferença vs Prompt Generator
 
-| | Prompt Generator | AI Chat Context |
-|---|---|---|
-| **Audiência** | Editores de código (Cursor, Copilot) | Chats conversacionais |
-| **Tom** | Técnico, denso, referências a arquivos | Linguagem natural, narrativa |
-| **Foco** | Estrutura, migrations, repos, stack | Produto, filosofia, história, decisões |
-| **Uso** | Colar no início de sessão de coding | Colar no início de chat novo |
-| **Gerador** | `prompt-generator.ts` | `chat-context-generator.ts` |
+|               | Prompt Generator                       | AI Chat Context                        |
+| ------------- | -------------------------------------- | -------------------------------------- |
+| **Audiência** | Editores de código (Cursor, Copilot)   | Chats conversacionais                  |
+| **Tom**       | Técnico, denso, referências a arquivos | Linguagem natural, narrativa           |
+| **Foco**      | Estrutura, migrations, repos, stack    | Produto, filosofia, história, decisões |
+| **Uso**       | Colar no início de sessão de coding    | Colar no início de chat novo           |
+| **Gerador**   | `prompt-generator.ts`                  | `chat-context-generator.ts`            |
 
 Ambos consomem as **mesmas fontes** (Knowledge Center, ADRs, roadmap, changelog, módulos) sem duplicar documentação.
 

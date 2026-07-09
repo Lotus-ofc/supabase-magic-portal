@@ -17,13 +17,13 @@ last_review: 2026-07-06
 
 Submódulo: `src/modules/approval/library/`
 
-| Camada | Arquivos |
-| ------ | -------- |
-| Types / validators | `library/types/`, `library/validators/` |
-| Repository | `repositories/library.repository.server.ts` — busca server-side paginada |
-| Query / lifecycle | `internal/library-query.server.ts`, `internal/library-lifecycle.server.ts` |
-| Server fns | `library.server.ts`, `client-library.server.ts` |
-| UI | `components/lotus/approval/library/*` |
+| Camada             | Arquivos                                                                   |
+| ------------------ | -------------------------------------------------------------------------- |
+| Types / validators | `library/types/`, `library/validators/`                                    |
+| Repository         | `repositories/library.repository.server.ts` — busca server-side paginada   |
+| Query / lifecycle  | `internal/library-query.server.ts`, `internal/library-lifecycle.server.ts` |
+| Server fns         | `library.server.ts`, `client-library.server.ts`                            |
+| UI                 | `components/lotus/approval/library/*`                                      |
 
 ### Regras
 
@@ -43,13 +43,13 @@ Submódulo: `src/modules/approval/library/`
 
 Submódulo: `src/modules/approval/dashboard/`
 
-| Camada | Arquivos |
-| ------ | -------- |
-| Types | `dashboard/types/dashboard.ts` |
-| Service | `dashboard/services/build-ops-dashboard.ts` — `aggregateStageAverages`, `computeStageDurations` |
-| Query | `internal/dashboard-query.server.ts` |
-| Server fn | `dashboard.server.ts` → `getApprovalOpsDashboard` |
-| UI | `/admin/aprovacoes/dashboard`, `OpsDashboardPanel.tsx` |
+| Camada    | Arquivos                                                                                        |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| Types     | `dashboard/types/dashboard.ts`                                                                  |
+| Service   | `dashboard/services/build-ops-dashboard.ts` — `aggregateStageAverages`, `computeStageDurations` |
+| Query     | `internal/dashboard-query.server.ts`                                                            |
+| Server fn | `dashboard.server.ts` → `getApprovalOpsDashboard`                                               |
+| UI        | `/admin/aprovacoes/dashboard`, `OpsDashboardPanel.tsx`                                          |
 
 Métricas derivadas de `content_card_events` via `computeStageDurations()`.
 

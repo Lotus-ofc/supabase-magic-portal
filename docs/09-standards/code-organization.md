@@ -15,21 +15,21 @@ Complementa [Padrões de desenvolvimento](./development.md) e
 
 ## Onde colocar código novo
 
-| Se você está…                        | Coloque em…                                    |
-| ------------------------------------ | ---------------------------------------------- |
-| Adicionando rota/tela                | `src/routes/`                                  |
-| Código de **autenticação** (sessão)  | `src/modules/auth/` — **nunca** Access/Postgres |
-| Código de **autorização** (lifecycle)| `src/modules/access/`                          |
-| Gestão de **usuários** (admin)       | `src/modules/admin/`                           |
-| Adicionando componente de produto    | `src/components/lotus/`                        |
-| Adicionando primitivo UI genérico    | `src/components/ui/`                           |
-| Adicionando cálculo/KPI              | `src/lib/platforms/formulas.ts` ou `engine.ts` |
-| Adicionando plataforma               | `src/lib/platforms/{nome}.ts` + `registry.ts`  |
-| Adicionando server function Access   | `src/modules/access/*.server.ts`               |
-| Adicionando server function admin    | `src/lib/admin.functions.ts` ou `modules/admin/` |
-| Adicionando hook reutilizável        | `src/hooks/`                                   |
-| Adicionando integração (campo admin) | `integrations-catalog.ts` + migration          |
-| Adicionando tabela/view              | `supabase/migrations-official/`                |
+| Se você está…                         | Coloque em…                                      |
+| ------------------------------------- | ------------------------------------------------ |
+| Adicionando rota/tela                 | `src/routes/`                                    |
+| Código de **autenticação** (sessão)   | `src/modules/auth/` — **nunca** Access/Postgres  |
+| Código de **autorização** (lifecycle) | `src/modules/access/`                            |
+| Gestão de **usuários** (admin)        | `src/modules/admin/`                             |
+| Adicionando componente de produto     | `src/components/lotus/`                          |
+| Adicionando primitivo UI genérico     | `src/components/ui/`                             |
+| Adicionando cálculo/KPI               | `src/lib/platforms/formulas.ts` ou `engine.ts`   |
+| Adicionando plataforma                | `src/lib/platforms/{nome}.ts` + `registry.ts`    |
+| Adicionando server function Access    | `src/modules/access/*.server.ts`                 |
+| Adicionando server function admin     | `src/lib/admin.functions.ts` ou `modules/admin/` |
+| Adicionando hook reutilizável         | `src/hooks/`                                     |
+| Adicionando integração (campo admin)  | `integrations-catalog.ts` + migration            |
+| Adicionando tabela/view               | `supabase/migrations-official/`                  |
 
 ---
 

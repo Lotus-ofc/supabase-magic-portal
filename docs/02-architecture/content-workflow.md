@@ -60,14 +60,14 @@ flowchart TB
 
 ## Superfícies
 
-| View | Submódulo | Default |
-| ---- | --------- | ------- |
-| Kanban | `cards/` + `workflow/` | Sim |
-| Calendário | `calendar/` | Admin |
-| Pilares | `pillars/` | Tab |
-| Stories | `stories/` | Tab |
-| Biblioteca | `library/` | Tab |
-| Dashboard ops | `dashboard/` | Admin |
+| View          | Submódulo              | Default |
+| ------------- | ---------------------- | ------- |
+| Kanban        | `cards/` + `workflow/` | Sim     |
+| Calendário    | `calendar/`            | Admin   |
+| Pilares       | `pillars/`             | Tab     |
+| Stories       | `stories/`             | Tab     |
+| Biblioteca    | `library/`             | Tab     |
+| Dashboard ops | `dashboard/`           | Admin   |
 
 Todas leem **`content_cards`** — zero duplicação.
 

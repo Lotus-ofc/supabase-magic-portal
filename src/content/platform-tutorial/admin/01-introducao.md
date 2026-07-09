@@ -22,22 +22,22 @@ Se você é **cliente final** (marca contratante), use o tutorial em **Tutorial*
 
 ## Mapa completo das abas (menu lateral)
 
-| Grupo | Aba | Rota | O que faz |
-| ----- | --- | ---- | --------- |
-| Operações | **Central** | `/admin/central` | Cockpit operacional Agency OS: briefing, feed, prioridades, kanbans |
-| Operações | **Visão geral** | `/admin` | Dashboard executivo — KPIs do portfólio inteiro |
-| Operações | **Relatórios** | `/admin/relatorios` | Hub para relatório executivo e relatórios por cliente |
-| Operações | **Aprovações** | `/admin/aprovacoes` | Content Workflow — produção e aprovação de conteúdo |
-| Operações | **Plano Estratégico** | `/admin/plano-estrategico` | Centro de inteligência estratégica por cliente |
-| Operações | **Clientes** | `/admin/clientes` | Cadastro, integrações e workspace do cliente |
-| Operações | **Usuários** | `/admin/usuarios` | Contas, papéis e acessos vinculados |
-| Operações | **Serviços** | `/admin/servicos` | Catálogo de serviços contratados |
-| Diagnóstico | **Painel operacional** | `/admin/debug` | Amostra de ingestão e saúde técnica |
-| Diagnóstico | **Auditoria de views** | `/admin/debug/views` | Auditoria de views SQL e RLS |
-| Plataforma | **Branding** | `/admin/branding` | Nome, cores e identidade visual |
-| Ajuda | **Tutorial** | `/admin/tutorial` | Este guia passo a passo |
-| Ajuda | **Knowledge Center** | `/admin/knowledge` | Documentação técnica interna (engenharia) |
-| Ajuda | **AI Workspace** | `/admin/ai-workspace` | Context Pack para IAs — **somente Platform Owner** |
+| Grupo       | Aba                    | Rota                       | O que faz                                                           |
+| ----------- | ---------------------- | -------------------------- | ------------------------------------------------------------------- |
+| Operações   | **Central**            | `/admin/central`           | Cockpit operacional Agency OS: briefing, feed, prioridades, kanbans |
+| Operações   | **Visão geral**        | `/admin`                   | Dashboard executivo — KPIs do portfólio inteiro                     |
+| Operações   | **Relatórios**         | `/admin/relatorios`        | Hub para relatório executivo e relatórios por cliente               |
+| Operações   | **Aprovações**         | `/admin/aprovacoes`        | Content Workflow — produção e aprovação de conteúdo                 |
+| Operações   | **Plano Estratégico**  | `/admin/plano-estrategico` | Centro de inteligência estratégica por cliente                      |
+| Operações   | **Clientes**           | `/admin/clientes`          | Cadastro, integrações e workspace do cliente                        |
+| Operações   | **Usuários**           | `/admin/usuarios`          | Contas, papéis e acessos vinculados                                 |
+| Operações   | **Serviços**           | `/admin/servicos`          | Catálogo de serviços contratados                                    |
+| Diagnóstico | **Painel operacional** | `/admin/debug`             | Amostra de ingestão e saúde técnica                                 |
+| Diagnóstico | **Auditoria de views** | `/admin/debug/views`       | Auditoria de views SQL e RLS                                        |
+| Plataforma  | **Branding**           | `/admin/branding`          | Nome, cores e identidade visual                                     |
+| Ajuda       | **Tutorial**           | `/admin/tutorial`          | Este guia passo a passo                                             |
+| Ajuda       | **Knowledge Center**   | `/admin/knowledge`         | Documentação técnica interna (engenharia)                           |
+| Ajuda       | **AI Workspace**       | `/admin/ai-workspace`      | Context Pack para IAs — **somente Platform Owner**                  |
 
 ## Elementos comuns em todas as telas
 

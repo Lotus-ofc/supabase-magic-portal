@@ -48,20 +48,20 @@ flowchart TB
 
 ## ClientScope
 
-| Campo | Descrição |
-| ----- | --------- |
-| `mode` | `client_access` ou `slug_context` |
-| `cadastroClienteId` | ID canônico do cliente |
-| `clienteSlug` | Slug da rota (modo slug) |
-| `scopeInput` | Payload para server functions de adaptação |
+| Campo               | Descrição                                  |
+| ------------------- | ------------------------------------------ |
+| `mode`              | `client_access` ou `slug_context`          |
+| `cadastroClienteId` | ID canônico do cliente                     |
+| `clienteSlug`       | Slug da rota (modo slug)                   |
+| `scopeInput`        | Payload para server functions de adaptação |
 
 ## Rotas
 
-| URL | Modo | Comportamento |
-| --- | ---- | ------------- |
-| `/aprovacoes` | `client_access` | Inalterado — escopo via `client_access(auth.uid())` |
-| `/cliente/:slug/aprovacoes` | `slug_context` | Staff visualiza cards do cliente do slug |
-| `/admin/aprovacoes` | — | Inalterado — workspace admin |
+| URL                         | Modo            | Comportamento                                       |
+| --------------------------- | --------------- | --------------------------------------------------- |
+| `/aprovacoes`               | `client_access` | Inalterado — escopo via `client_access(auth.uid())` |
+| `/cliente/:slug/aprovacoes` | `slug_context`  | Staff visualiza cards do cliente do slug            |
+| `/admin/aprovacoes`         | —               | Inalterado — workspace admin                        |
 
 ## O que **não** mudou
 
@@ -71,9 +71,9 @@ flowchart TB
 
 ## Arquivos novos
 
-| Caminho | Papel |
-| ------- | ----- |
-| `src/modules/client/context/` | `ClientScopeProvider`, tipos |
-| `src/modules/client/scoped-portal.functions.ts` | Adaptação → Approval |
-| `src/modules/client/components/ClientApprovalWorkspace.tsx` | UI compartilhada |
-| `src/routes/.../cliente.$cliente.aprovacoes.tsx` | Rota contextual |
+| Caminho                                                     | Papel                        |
+| ----------------------------------------------------------- | ---------------------------- |
+| `src/modules/client/context/`                               | `ClientScopeProvider`, tipos |
+| `src/modules/client/scoped-portal.functions.ts`             | Adaptação → Approval         |
+| `src/modules/client/components/ClientApprovalWorkspace.tsx` | UI compartilhada             |
+| `src/routes/.../cliente.$cliente.aprovacoes.tsx`            | Rota contextual              |

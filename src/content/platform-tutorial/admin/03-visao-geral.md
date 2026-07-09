@@ -17,13 +17,13 @@ O **Centro executivo** consolida a performance de **todos os clientes** em um ú
 
 ### Hero KPIs (primeira fileira)
 
-| KPI | Significado | Fonte |
-| --- | ----------- | ----- |
-| Investimento total | Soma Meta Ads + Google Ads no período | `vw_overview_cliente` |
-| Clientes ativos | Quantos clientes têm dados recentes | `vw_clientes_ativos` |
-| Alcance Instagram | Alcance agregado (MAX por cliente/dia) | overview |
-| Sessões GA4 | Tráfego do site | overview |
-| Conversões | Total com CPA derivado | overview |
+| KPI                | Significado                            | Fonte                 |
+| ------------------ | -------------------------------------- | --------------------- |
+| Investimento total | Soma Meta Ads + Google Ads no período  | `vw_overview_cliente` |
+| Clientes ativos    | Quantos clientes têm dados recentes    | `vw_clientes_ativos`  |
+| Alcance Instagram  | Alcance agregado (MAX por cliente/dia) | overview              |
+| Sessões GA4        | Tráfego do site                        | overview              |
+| Conversões         | Total com CPA derivado                 | overview              |
 
 Cada card mostra **delta** vs período anterior (pill verde/vermelha).
 
