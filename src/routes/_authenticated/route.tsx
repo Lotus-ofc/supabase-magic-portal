@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { bootstrapSupabase, supabase } from "@/integrations/supabase/client";
-import { resolveBlockedRedirect } from "@/modules/access";
+import { resolveBlockedRedirect } from "@/modules/access/services/resolve-blocked-redirect";
 import { useSignOut } from "@/modules/auth";
 import { assertAccessActive } from "@/lib/access.functions.server";
 import { checkIsAdmin } from "@/lib/admin.functions";

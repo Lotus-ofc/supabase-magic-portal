@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveBlockedRedirect, resolvePostAuthDestination } from "@/modules/access";
+import { resolveBlockedRedirect } from "@/modules/access/services/resolve-blocked-redirect";
+import { resolvePostAuthDestination } from "@/modules/access/services/resolve-post-auth-destination";
 
 describe("access redirect services", () => {
   it("envia admin para /admin e cliente para /dashboard", () => {
