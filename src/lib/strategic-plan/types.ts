@@ -299,3 +299,55 @@ export interface StrategicDashboardPayload {
   needsPrimeiroObjetivo: boolean;
   suggestProximoObjetivo: boolean;
 }
+
+// ---------- Alinhamento estratégico (funil quiz → plano) ----------
+
+export const QUIZ_OBJETIVO_PRINCIPAL = ["vendas", "branding", "leads"] as const;
+export type QuizObjetivoPrincipal = (typeof QUIZ_OBJETIVO_PRINCIPAL)[number];
+
+export interface QuizData {
+  momentoNegocio: string;
+  objetivoPrincipal: QuizObjetivoPrincipal;
+  temSite: boolean;
+  temDominio: boolean;
+  investeTrafego: boolean;
+  posicionamentoRedes: string;
+  verbaAdsMensal: string;
+  cienteCustosInfra: boolean;
+}
+
+export interface PlanData {
+  resumoEstrategia: string;
+  feeAgencia: number;
+  verbaTrafego: number;
+  custosInfra: number;
+  itensEntrega?: string[];
+}
+
+export interface PlanoAlinhamento {
+  id: string;
+  cadastro_cliente_id: number;
+  cliente_nome: string;
+  quiz_completed_at: string | null;
+  quiz_data: QuizData | null;
+  has_active_plan: boolean;
+  plan_data: PlanData | null;
+  plan_approved_at: string | null;
+  plano_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AlinhamentoUiState = "quiz" | "pending" | "active";
+
+export interface AlinhamentoJourney {
+  hasCompletedQuiz: boolean;
+  quizData: QuizData | null;
+  hasActivePlan: boolean;
+  planData: PlanData | null;
+  planApprovedAt: string | null;
+  alinhamento: PlanoAlinhamento | null;
+  uiState: AlinhamentoUiState;
+  /** Plano operacional legado/paralelo (Centro Estratégico), se existir. */
+  legadoPlanoId: string | null;
+}

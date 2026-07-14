@@ -51,8 +51,16 @@ import {
   PLANO_OBJETIVO_SELECT,
   PLANO_OPORTUNIDADE_SELECT,
   PLANO_ROADMAP_MARCO_SELECT,
+  PLANO_ALINHAMENTO_SELECT,
 } from "@/lib/strategic-plan/selects";
 import { ESTRATEGIA_EDITORIAL_STATS_SELECT } from "@/lib/db-selects";
+import type {
+  AlinhamentoJourney,
+  PlanoAlinhamento,
+  QuizData,
+  PlanData,
+} from "@/lib/strategic-plan/types";
+import { QUIZ_OBJETIVO_PRINCIPAL } from "@/lib/strategic-plan/types";
 
 async function isAdmin(ctx: {
   supabase: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown }> };
@@ -1251,4 +1259,272 @@ export const listEstrategiasForCliente = createServerFn({ method: "GET" })
       .order("ordem");
     if (error) throw new Error(error.message);
     return rows ?? [];
+  });
+
+// ---------- ALINHAMENTO ESTRATÉGICO (quiz → pending → active) ----------
+
+const quizDataSchema = z.object({
+  momentoNegocio: z.string().trim().min(20).max(2000),
+  objetivoPrincipal: z.enum(QUIZ_OBJETIVO_PRINCIPAL),
+  temSite: z.boolean(),
+  temDominio: z.boolean(),
+  investeTrafego: z.boolean(),
+  posicionamentoRedes: z.string().trim().min(10).max(2000),
+  verbaAdsMensal: z.string().trim().min(1).max(120),
+  cienteCustosInfra: z.literal(true),
+});
+
+const planDataSchema = z.object({
+  resumoEstrategia: z.string().trim().min(20).max(5000),
+  feeAgencia: z.number().nonnegative(),
+  verbaTrafego: z.number().nonnegative(),
+  custosInfra: z.number().nonnegative(),
+  itensEntrega: z.array(z.string().trim().min(1).max(200)).max(20).optional(),
+});
+
+function toAlinhamentoJourney(
+  row: PlanoAlinhamento | null,
+  legadoPlanoId: string | null,
+): AlinhamentoJourney {
+  const hasCompletedQuiz = !!row?.quiz_completed_at;
+  const hasActivePlan = !!row?.has_active_plan && !!row?.plan_data;
+  let uiState: AlinhamentoJourney["uiState"] = "quiz";
+  if (hasActivePlan) uiState = "active";
+  else if (hasCompletedQuiz) uiState = "pending";
+
+  return {
+    hasCompletedQuiz,
+    quizData: (row?.quiz_data as QuizData | null) ?? null,
+    hasActivePlan,
+    planData: (row?.plan_data as PlanData | null) ?? null,
+    planApprovedAt: row?.plan_approved_at ?? null,
+    alinhamento: row,
+    uiState,
+    legadoPlanoId,
+  };
+}
+
+export const getAlinhamentoJourney = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        cadastro_cliente_id: z.number().int(),
+        cliente_nome: z.string().trim().min(1).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const [{ data: row, error }, { data: legado }] = await Promise.all([
+      context.supabase
+        .from("plano_alinhamentos")
+        .select(PLANO_ALINHAMENTO_SELECT)
+        .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+        .maybeSingle(),
+      context.supabase
+        .from("planos_estrategicos")
+        .select("id")
+        .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+        .eq("status", "ativo")
+        .maybeSingle(),
+    ]);
+    if (error) throw new Error(error.message);
+
+    const journey = toAlinhamentoJourney(
+      (row as PlanoAlinhamento | null) ?? null,
+      legado?.id ?? null,
+    );
+
+    // Clientes legados: já têm Centro ativo, sem quiz — preserva acesso ao operacional.
+    if (!journey.hasCompletedQuiz && journey.legadoPlanoId) {
+      return { ...journey, uiState: "active" as const, hasActivePlan: true };
+    }
+
+    return journey;
+  });
+
+export const submitAlinhamentoQuiz = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        cadastro_cliente_id: z.number().int(),
+        quiz_data: quizDataSchema,
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: cli, error: e0 } = await context.supabase
+      .from("cadastro_clientes")
+      .select("nome_cliente")
+      .eq("id", data.cadastro_cliente_id)
+      .maybeSingle();
+    if (e0) throw new Error(e0.message);
+    if (!cli) throw new Error("Cliente não encontrado");
+
+    const { data: existing, error: e1 } = await context.supabase
+      .from("plano_alinhamentos")
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+      .maybeSingle();
+    if (e1) throw new Error(e1.message);
+
+    if (existing?.has_active_plan) {
+      throw new Error("Este cliente já possui um plano estratégico ativo.");
+    }
+    if (existing?.quiz_completed_at) {
+      throw new Error("O alinhamento já foi enviado. Aguarde a proposta da equipe.");
+    }
+
+    const now = new Date().toISOString();
+    const payload = {
+      cadastro_cliente_id: data.cadastro_cliente_id,
+      cliente_nome: cli.nome_cliente as string,
+      quiz_completed_at: now,
+      quiz_data: data.quiz_data,
+      has_active_plan: false,
+      plan_data: null,
+      updated_at: now,
+    };
+
+    if (existing) {
+      const { data: row, error } = await context.supabase
+        .from("plano_alinhamentos")
+        .update(payload)
+        .eq("id", existing.id)
+        .select(PLANO_ALINHAMENTO_SELECT)
+        .single();
+      if (error) throw new Error(error.message);
+      return toAlinhamentoJourney(row as PlanoAlinhamento, null);
+    }
+
+    const { data: row, error } = await context.supabase
+      .from("plano_alinhamentos")
+      .insert(payload)
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    return toAlinhamentoJourney(row as PlanoAlinhamento, null);
+  });
+
+export const publishAlinhamentoPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        cadastro_cliente_id: z.number().int(),
+        plan_data: planDataSchema,
+        link_plano_operacional: z.boolean().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+
+    const { data: existing, error: e0 } = await context.supabase
+      .from("plano_alinhamentos")
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+      .maybeSingle();
+    if (e0) throw new Error(e0.message);
+    if (!existing?.quiz_completed_at) {
+      throw new Error("O cliente ainda não enviou o alinhamento.");
+    }
+
+    let planoId = existing.plano_id as string | null;
+    if (data.link_plano_operacional !== false && !planoId) {
+      const { data: existingPlano } = await context.supabase
+        .from("planos_estrategicos")
+        .select(PLANO_ESTRATEGICO_SELECT)
+        .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+        .eq("status", "ativo")
+        .maybeSingle();
+      if (existingPlano?.id) {
+        planoId = existingPlano.id;
+      } else {
+        const { data: cli } = await context.supabase
+          .from("cadastro_clientes")
+          .select("nome_cliente")
+          .eq("id", data.cadastro_cliente_id)
+          .maybeSingle();
+        const today = brtToday();
+        const periodo = planoPeriodoLongo(today);
+        const { data: created, error: createErr } = await context.supabase
+          .from("planos_estrategicos")
+          .insert({
+            cadastro_cliente_id: data.cadastro_cliente_id,
+            cliente_nome: cli?.nome_cliente ?? existing.cliente_nome,
+            titulo: defaultPlanoTitulo(cli?.nome_cliente ?? existing.cliente_nome),
+            periodo_inicio: periodo.inicio,
+            periodo_fim: periodo.fim,
+            status: "ativo",
+            objetivo_principal: data.plan_data.resumoEstrategia.slice(0, 500),
+            created_by: context.userId,
+          })
+          .select("id")
+          .single();
+        if (createErr) throw new Error(createErr.message);
+        planoId = created.id;
+        await recordEvent(context, {
+          plano_id: created.id,
+          tipo: "criacao",
+          mensagem: "Plano estratégico criado a partir do alinhamento",
+        });
+      }
+    }
+
+    const now = new Date().toISOString();
+    const { data: row, error } = await context.supabase
+      .from("plano_alinhamentos")
+      .update({
+        has_active_plan: true,
+        plan_data: data.plan_data,
+        plano_id: planoId,
+        plan_approved_at: null,
+        updated_at: now,
+      })
+      .eq("id", existing.id)
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+    return toAlinhamentoJourney(row as PlanoAlinhamento, planoId);
+  });
+
+export const approveAlinhamentoPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ cadastro_cliente_id: z.number().int() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: existing, error: e0 } = await context.supabase
+      .from("plano_alinhamentos")
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .eq("cadastro_cliente_id", data.cadastro_cliente_id)
+      .maybeSingle();
+    if (e0) throw new Error(e0.message);
+    if (!existing?.has_active_plan || !existing.plan_data) {
+      throw new Error("Não há plano ativo para aprovar.");
+    }
+    if (existing.plan_approved_at) {
+      return toAlinhamentoJourney(existing as PlanoAlinhamento, existing.plano_id);
+    }
+
+    const now = new Date().toISOString();
+    const { data: row, error } = await context.supabase
+      .from("plano_alinhamentos")
+      .update({ plan_approved_at: now, updated_at: now })
+      .eq("id", existing.id)
+      .select(PLANO_ALINHAMENTO_SELECT)
+      .single();
+    if (error) throw new Error(error.message);
+
+    if (existing.plano_id) {
+      await recordEvent(context, {
+        plano_id: existing.plano_id,
+        tipo: "decisao",
+        mensagem: "Cliente aprovou o Plano Estratégico / escopo comercial",
+      });
+    }
+
+    return toAlinhamentoJourney(row as PlanoAlinhamento, existing.plano_id);
   });

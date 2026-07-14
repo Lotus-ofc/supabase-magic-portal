@@ -10,6 +10,7 @@ import { SectionCard } from "@/components/lotus/SectionCard";
 import { Button } from "@/components/ui/button";
 import { Field, TextInput, Select } from "@/components/lotus/FormField";
 import { ConfirmDialog } from "@/components/lotus/ConfirmDialog";
+import { PublishAlinhamentoPanel } from "@/components/lotus/strategic-plan/PublishAlinhamentoPanel";
 import { adminTitle } from "@/lib/brand";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ function AdminPlanoPage() {
   const [editingPlano, setEditingPlano] = useState<PlanoRow | null>(null);
   const [editTitulo, setEditTitulo] = useState("");
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [publishClienteId, setPublishClienteId] = useState("");
 
   const clientesSemPlano = (clientes ?? []).filter(
     (c: { id: number; nome_cliente: string }) =>
@@ -157,6 +159,34 @@ function AdminPlanoPage() {
           </div>
         </SectionCard>
       )}
+
+      <SectionCard title="Publicar proposta comercial (aba inteligente)">
+        <div className="mb-4 max-w-md space-y-3">
+          <Field
+            label="Cliente com alinhamento enviado"
+            hint="Após o quiz, publique a proposta para liberar o Estado 3 no portal do cliente."
+          >
+            <Select value={publishClienteId} onChange={(e) => setPublishClienteId(e.target.value)}>
+              <option value="">Selecione o cliente</option>
+              {(clientes ?? []).map((c: { id: number; nome_cliente: string }) => (
+                <option key={c.id} value={c.id}>
+                  {c.nome_cliente}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+        {publishClienteId && (
+          <PublishAlinhamentoPanel
+            cadastroClienteId={Number(publishClienteId)}
+            clienteNome={
+              (clientes ?? []).find(
+                (c: { id: number; nome_cliente: string }) => c.id === Number(publishClienteId),
+              )?.nome_cliente ?? "Cliente"
+            }
+          />
+        )}
+      </SectionCard>
 
       <SectionCard title="Clientes com plano ativo">
         <div className="space-y-2">

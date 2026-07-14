@@ -32,3 +32,6 @@ export const PLANO_ACAO_SELECT =
 
 export const PLANO_EVENTO_SELECT =
   "id,plano_id,entity_type,entity_id,tipo,autor_id,autor_email,mensagem,payload,created_at";
+
+export const PLANO_ALINHAMENTO_SELECT =
+  "id,cadastro_cliente_id,cliente_nome,quiz_completed_at,quiz_data,has_active_plan,plan_data,plan_approved_at,plano_id,created_at,updated_at";

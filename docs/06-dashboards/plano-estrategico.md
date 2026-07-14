@@ -11,6 +11,21 @@ last_review: 2026-06-29
 O **Plano Estratégico** é o centro operacional entre agência e cliente. Não é CRM nem gerenciador
 de tarefas — é o planejamento estratégico vivo, conectado às métricas da plataforma.
 
+## Funil da aba inteligente (1:1)
+
+Rota de entrada: `/cliente/$cliente/plano-estrategico`
+
+| Estado | Condição | UI |
+| ------ | -------- | --- |
+| 1 · Quiz | `quiz_completed_at` nulo | `QuizForm` |
+| 2 · Transição | quiz ok, `has_active_plan` falso | `PendingPlan` |
+| 3 · Plano ativo | `has_active_plan` + `plan_data` | `ActivePlanDashboard` |
+
+Tabela: `plano_alinhamentos` (`31_plano_alinhamento.sql`) — um registro por `cadastro_cliente_id`.
+
+Admin publica a proposta em `/admin/plano-estrategico` (`publishAlinhamentoPlan`).
+Clientes que já tinham Centro operacional sem quiz continuam sendo redirecionados ao `$planoId`.
+
 ## Rotas
 
 | Rota                                           | Público         | Função                                              |
