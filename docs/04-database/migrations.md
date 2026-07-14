@@ -40,6 +40,7 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 | `28_platform_hub.sql`                     | Platform Hub RC1 — `ph_connections`, `ph_credentials`, `ph_identities`, `ph_sync_runs`, `ph_timeline_events`, `ph_oauth_states`. Ver [Platform Hub](../13-platform-hub/README.md).                            |
 | `29_platform_hub_homologation.sql`        | Homologação — `ph_homologation_reports`, `ph_debug_traces`, `ph_comparison_reports`.                                                                                                                          |
 | `30_parallel_metricas_homologation.sql`   | Paralelismo métricas — `base_metricas_hub`, `ph_metricas_source`, `vw_metricas` com fonte configurável (`make` default).                                                                                      |
+| `31_plano_alinhamento.sql`                | Funil inteligente 1:1 — `plano_alinhamentos` (quiz → proposta → aprovação), RLS por `current_user_clientes`, trigger de guarda de colunas comerciais.                                                      |
 
 > **Não existe `04`.** A tentativa `04_integracoes_make.sql` foi **deprecada e substituída**
 > pela `05` (que usa nomes de coluna diferentes); a 04 nunca foi aplicada ao banco.
@@ -73,7 +74,7 @@ As migrations vivem em `supabase/migrations-official/` e seguem três princípio
 Projeto Supabase: `ywvhoctcmibjitvwkkhb`.
 
 1. Acesse o [Supabase Dashboard](https://supabase.com/dashboard) → SQL Editor.
-2. Execute cada arquivo em **ordem numérica** (`01` → `30`).
+2. Execute cada arquivo em **ordem numérica** (`01` → `31`).
 3. Cada migration é idempotente — re-executar é seguro (exceto editar arquivo já aplicado).
 4. Ao final de cada arquivo, rode o bloco de **validação** comentado (quando existir).
 5. Atualize este doc se criar migration `13+`.
